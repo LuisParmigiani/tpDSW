@@ -2,7 +2,7 @@ import { MikroORM } from '@mikro-orm/core';
 import { MySqlDriver } from '@mikro-orm/mysql';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 
-export const orm = await MikroORM.init({
+const orm = await MikroORM.init({
   driver: MySqlDriver, // <--- AGREGA ESTA LÍNEA
   entities: ['dist/**/*.entity.js'],
   entitiesTs: ['src/**/*.entity.ts'],
@@ -28,4 +28,4 @@ export const syncSchema = async () => {
   await generator.updateSchema();
 };
 
-export {};
+export { orm };

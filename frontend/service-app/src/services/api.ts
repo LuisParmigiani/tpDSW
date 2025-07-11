@@ -1,19 +1,33 @@
+//axios es una librería que permite hacer peticiones HTTP
 import axios from 'axios';
 
-// Configuración base de Axios
+// El puerto del backend donde quiere hacer las peticiones
 const API_BASE_URL = 'http://localhost:3000/api';
 
-// Tipos básicos para las entidades
+// ====== INTERFACES Y TIPOS ======
+
+/**
+ * Interfaz genérica para estandarizar las respuestas del API
+ * @template T - Tipo de datos que contiene la respuesta
+ * @property data - Los datos principales de la respuesta
+ * @property status - Código de estado HTTP (200, 404, 500, etc.)
+ * @property message - Mensaje opcional descriptivo (para errores o información adicional)
+ */
 export interface ApiResponse<T> {
   data: T;
   status: number;
   message?: string;
 }
 
+/**
+ * Interfaz flexible para representar cualquier entidad con propiedades dinámicas
+ * Permite que un objeto tenga cualquier cantidad de propiedades con cualquier tipo de valor
+ */
 export interface EntityData {
   [key: string]: unknown;
 }
 
+// ====== CONFIGURACIÓN DE AXIOS ======
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -22,7 +36,13 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// Interceptor para manejar errores globalmente
+// ====== INTERCEPTORES ======
+
+/**
+ * Interceptor de respuestas: Maneja automáticamente todas las respuestas del servidor
+ * - Si la respuesta es exitosa: la retorna sin modificaciones
+ * - Si hay un error: lo registra en consola y rechaza la promesa para manejo posterior
+ */
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -83,7 +103,8 @@ export const apiServices = {
     getAll: () => api.get('/serviceTypes'),
     getById: (id: string) => api.get(`/serviceTypes/${id}`),
     create: (data: EntityData) => api.post('/serviceTypes', data),
-    update: (id: string, data: EntityData) => api.put(`/serviceTypes/${id}`, data),
+    update: (id: string, data: EntityData) =>
+      api.put(`/serviceTypes/${id}`, data),
     delete: (id: string) => api.delete(`/serviceTypes/${id}`),
   },
 

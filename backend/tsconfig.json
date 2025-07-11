@@ -13,6 +13,7 @@
     "alwaysStrict": true,
     "skipLibCheck": true,
     "emitDecoratorMetadata": true,
+
     "experimentalDecorators": true
   },
   "include": ["src/**/*", "**/*.ts"],

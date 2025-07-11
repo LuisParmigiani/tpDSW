@@ -13,10 +13,10 @@ import { horarioRouter } from './horario/horario.routes.js';
 
 const app = express();
 
-// Configurar CORS para permitir peticiones desde el frontend
+// cors lo que hace es dar el permiso al un puerto para hacer las peticiones al back
 app.use(
   cors({
-    origin: 'http://localhost:5173', // Puerto por defecto de Vite
+    origin: 'http://localhost:5173', // El puerto de tu frontend al que le deja hacer peticiones
     credentials: true,
   })
 );
