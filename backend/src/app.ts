@@ -1,4 +1,5 @@
 import express, { Request, Response, NextFunction } from 'express';
+import cors from 'cors';
 import { usuarioRouter } from './usuario/usuario.route.js';
 import { tareaRouter } from './tarea/tarea.route.js';
 import { servicioRouter } from './servicio/servicio.route.js';
@@ -11,6 +12,14 @@ import { serviceTypeRouter } from './tipoServicio/tipoServ.route.js';
 import { horarioRouter } from './horario/horario.routes.js';
 
 const app = express();
+
+// Configurar CORS para permitir peticiones desde el frontend
+app.use(
+  cors({
+    origin: 'http://localhost:5173', // Puerto por defecto de Vite
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 
