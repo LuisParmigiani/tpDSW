@@ -1,0 +1,18 @@
+.phrase {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+}
+.highlight {
+  color: #f66731;
+}
+.arrow {
+  margin-top: 10px;
+  max-width: 5%;
+  max-height: 5%;
+}
