@@ -1,4 +1,13 @@
-import { Entity, Property, OneToOne , Cascade,Rel, ManyToMany, OneToMany, Collection } from '@mikro-orm/core';
+import {
+  Entity,
+  Property,
+  OneToOne,
+  Cascade,
+  Rel,
+  ManyToMany,
+  OneToMany,
+  Collection,
+} from '@mikro-orm/core';
 import { BaseEntity } from '../shared/db/baseEntity.entity.js';
 import { Servicio } from '../servicio/servicio.entity.js';
 import { Turno } from '../turno/turno.entity.js';
@@ -14,10 +23,10 @@ export class Usuario extends BaseEntity {
   contrasena!: string;
   @Property({ nullable: false })
   tipoDoc!: string;
-  @Property({ nullable: false,unique: true })
+  @Property({ nullable: false, unique: true })
   numeroDoc!: string;
   // Este es un campo opcional de cliente
-  @Property({ nullable: true,unique: true })
+  @Property({ nullable: true, unique: true })
   telefono?: string;
   @Property({ nullable: true })
   nombre?: string;
