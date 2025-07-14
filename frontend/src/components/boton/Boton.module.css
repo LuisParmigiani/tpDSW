@@ -1,0 +1,19 @@
+.Boton {
+  width: 250px;
+  height: 64px;
+  border-radius: 48px;
+  background: #f66731;
+  color: #ffffff;
+  text-align: center;
+  font-family: Inter;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+}
+
+.Boton:hover {
+  border: #f66731 2px solid;
+  color: #f66731;
+  background: #ffffff;
+  transition: all 0.3s ease-in-out;
+}
