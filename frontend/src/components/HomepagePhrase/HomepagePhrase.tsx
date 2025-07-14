@@ -1,4 +1,4 @@
-import style from './homepage.phrase.module.css';
+import style from './HomepagePhrase.module.css';
 
 function HomepagePhrase() {
   return (

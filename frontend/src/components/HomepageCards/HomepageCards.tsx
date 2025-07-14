@@ -1,4 +1,4 @@
-import style from './homepage.card.module.css';
+import style from './HomepageCard.module.css';
 
 function HomepageCards() {
   return (
@@ -34,9 +34,7 @@ function HomepageCards() {
               </clipPath>
             </defs>
           </svg>
-
           <h3 className={style.title}>Plomero</h3>
-
           <p className={style.description}>
             Contratá servicios de plomeros matriculados cerca de tu zona.
           </p>
@@ -71,7 +69,6 @@ function HomepageCards() {
               </clipPath>
             </defs>
           </svg>
-
           <h3 className={style.title}>Electricista</h3>
           <p className={style.description}>
             Arreglá tus problemas relacionados a la electricidad con nuestra
