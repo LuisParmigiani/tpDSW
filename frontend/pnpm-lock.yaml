@@ -87,9 +87,6 @@ importers:
       vite:
         specifier: ^7.0.0
         version: 7.0.2
-      vitest:
-        specifier: ^3.2.4
-        version: 3.2.4(@vitest/browser@3.2.4)
 
 packages:
 
