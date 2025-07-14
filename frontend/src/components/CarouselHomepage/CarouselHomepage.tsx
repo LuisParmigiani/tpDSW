@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import styles from './carousel.homepage.module.css';
+import styles from './CarouselHomepage.module.css';
 
 function CarouselHomepage() {
   const fotos = [

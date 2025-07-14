@@ -1,6 +1,6 @@
-import styles from './navBar.module.css';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import styles from './Navbar.module.css';
 
 type Props = {
   id?: number;
@@ -11,7 +11,7 @@ type Usuario = {
   foto: string;
 };
 
-function NavBar({ id }: Props) {
+function Navbar({ id }: Props) {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
 
   useEffect(() => {
@@ -77,4 +77,4 @@ function NavBar({ id }: Props) {
   );
 }
 
-export default NavBar;
+export default Navbar;
