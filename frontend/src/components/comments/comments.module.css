@@ -1,0 +1,68 @@
+.comments {
+  margin: auto;
+  margin-top: 10px;
+  background-color: rgb(224, 230, 230);
+  width: 80%;
+  border-radius: 16px;
+  padding-left: 2%;
+}
+
+.userName {
+  color: black;
+  font-size: 100%;
+}
+
+.userImage {
+  width: 15%;
+  height: 15%;
+  border-radius: 50%;
+  margin-right: 3%;
+}
+
+.firstLine {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  width: 80%;
+}
+
+.star {
+  width: 2%;
+  height: 2%;
+}
+.firstLine {
+  display: flex;
+  align-items: center;
+  width: 80%;
+}
+.userGroup {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 10px;
+  max-width: 100%;
+  max-height: 13%;
+}
+
+.lineStars {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  margin-left: 10px;
+}
+
+.commentText {
+  color: black;
+}
+
+.footer {
+  width: 100%;
+  margin: 2%;
+  display: flex;
+  flex-direction: row;
+}
+
+.footerText {
+  color: rgb(173, 172, 172);
+  font-size: 80%;
+}
