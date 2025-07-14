@@ -1,14 +1,3 @@
-<<<<<<< HEAD
-import NavBarCarouselHomepage from './components/navBar-carousel.homepage';
-import './App.css';
-
-function App() {
-  const id_user = 6; //no se si anda
-
-  return (
-    <>
-      <NavBarCarouselHomepage id={id_user} />
-=======
 import NavbarCarouselHomepage from './components/Navbar-CarouselHomepage/Navbar-CarouselHomepage.js';
 import './App.css';
 import HomepagePhrase from './components/HomepagePhrase/HomepagePhrase.js';
@@ -23,7 +12,6 @@ function App() {
       <HomepagePhrase />
       <HomepageCards />
       <Comments />
->>>>>>> luis
     </>
   );
 }
