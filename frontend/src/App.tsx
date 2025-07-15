@@ -2,7 +2,7 @@ import NavbarCarouselHomepage from './components/Navbar-CarouselHomepage/Navbar-
 import './App.css';
 import HomepagePhrase from './components/HomepagePhrase/HomepagePhrase.js';
 import HomepageCards from './components/HomepageCards/HomepageCards.js';
-import Comments from './components/Comments/Comments.js';
+import CommentsHomepage from './components/CommentsHomepage/CommentsHomepage.js';
 function App() {
   const id_user = undefined; //no se si anda
 
@@ -11,7 +11,7 @@ function App() {
       <NavbarCarouselHomepage id={id_user} />
       <HomepagePhrase />
       <HomepageCards />
-      <Comments />
+      <CommentsHomepage />
     </>
   );
 }

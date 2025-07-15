@@ -1,4 +1,4 @@
-import Navbar from '../Navbar/Navbar.js';
+import Navbar from '../navBar/Navbar.js';
 import CarouselHomepage from '../CarouselHomepage/CarouselHomepage.js';
 import styles from './NavbarHomepage.module.css';
 

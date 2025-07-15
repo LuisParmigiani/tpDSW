@@ -1,10 +1,10 @@
 .phrase {
   text-align: center;
-  margin: 2rem 0;
+  margin: 7vh;
 }
 
 .title {
-  font-size: 2rem;
+  font-size: 300%;
   font-weight: bold;
   color: #333;
 }
@@ -12,7 +12,7 @@
   color: #f66731;
 }
 .arrow {
-  margin-top: 10px;
   max-width: 5%;
   max-height: 5%;
+  margin-top: 10vh;
 }
