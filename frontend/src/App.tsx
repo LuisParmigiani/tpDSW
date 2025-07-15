@@ -5,6 +5,7 @@ import HomepageCards from './components/HomepageCards/HomepageCards.js';
 import Comments from './components/Comments/Comments.js';
 import About from './pages/about/about.js'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import CommentsFooterHomepage from './components/Comments-FooterHomepage/Comments-FooterHomepage.js';
 function App() {
   const id_user = undefined; //no se si anda
 
@@ -29,6 +30,11 @@ function App() {
       </Routes>
     </Router>
       
+    <>
+      <NavbarCarouselHomepage id={id_user} />
+      <HomepagePhrase />
+      <HomepageCards />
+      <CommentsFooterHomepage />
     </>
   );
 }
