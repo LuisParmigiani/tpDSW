@@ -3,6 +3,7 @@ import './App.css';
 import HomepagePhrase from './components/HomepagePhrase/HomepagePhrase.js';
 import HomepageCards from './components/HomepageCards/HomepageCards.js';
 import Comments from './components/Comments/Comments.js';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 function App() {
   const id_user = undefined; //no se si anda
 
