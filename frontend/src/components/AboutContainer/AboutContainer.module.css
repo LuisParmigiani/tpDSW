@@ -7,14 +7,19 @@ body{
 }
 
 
+
 .aboutContainer{
     padding: 10em 20em;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    
     color: #000;
+    background-color: hsl(20, 100%, 97%);
+}
+
+.aboutContainer:first-of-type{
+    background: linear-gradient(0deg,hsl(20, 100%, 97%), hsla(216, 33%, 97%, 1));
 }
 .aboutContent{
     display: flex;

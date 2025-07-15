@@ -11,9 +11,6 @@
   
 }
 
-.container:first-child{
-  background: linear-gradient(0deg,hsl(20, 100%, 97%), hsla(216, 33%, 97%, 1));
-}
 .navBarContainer {
   position: absolute;
   z-index: 10;
