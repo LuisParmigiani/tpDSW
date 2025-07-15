@@ -1,28 +1,54 @@
 import style from './comments.module.css';
 import Stars from '../stars/Stars.js';
-function Comments() {
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+type Props = {
+  id?: number;
+};
+
+type Turno = {
+  usuario?: {
+    nombre: string;
+    fotoPerfil: string;
+  };
+  comentario?: string;
+  calificacion?: number;
+};
+function Comments({ id }: Props) {
+  const [turno, setTurno] = useState<Turno | null>(null);
+
+  useEffect(() => {
+    if (id) {
+      axios
+        .get<{ data: Turno }>(`/api/Turno/${id}`)
+        .then((res) => setTurno(res.data.data))
+        .catch((err) => console.error('Error al cargar Turno:', err));
+    }
+  }, [id]);
+  const fotoUser = turno?.usuario?.fotoPerfil || './images/fotoUserId.png';
+  const nombreUser = turno?.usuario?.nombre || 'Nombre Usuario';
+  const comentarioText = turno?.comentario || 'Comentario no disponible';
+  const prestatario =
+    'no se como se hace para que se vea el nombre del prestatario';
+  const calificacion = turno?.calificacion || 3;
   return (
     <div className={style.comments}>
       <div className={style.firstLine}>
         <div className={style.userGroup}>
           <img
             className={style.userImage}
-            src={'./images/fotoUserId.png'}
+            src={fotoUser}
             alt="foto de perfil de usuario"
           />
-          <h2 className={style.userName}>juan perez</h2>
+          <h2 className={style.userName}>{nombreUser}</h2>
         </div>
         <div className={style.lineStars}>
-          <Stars cant={3} />
+          <Stars cant={calificacion} />
         </div>
       </div>
-      <p className={style.commentText}>
-        La verdad el servicio me encanto, pedí un plomero para mi casa urgente y
-        no solo vino rápido si no que de que me resolvió el tema rapido y
-        sencillo. Lo volvería a contratar
-      </p>
+      <p className={style.commentText}>{comentarioText}</p>
       <div className={style.footer}>
-        <p className={style.footerText}>Reseña al plomero agustin dana </p>
+        <p className={style.footerText}>Reseña al plomero {prestatario}</p>
       </div>
     </div>
   );
