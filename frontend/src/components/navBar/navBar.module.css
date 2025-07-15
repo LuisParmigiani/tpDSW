@@ -41,7 +41,8 @@
   z-index: 10;
   position: relative;
   box-sizing: border-box;
-  background: linear-gradient(to left, #ffffffbe 0%, #ffffff50 35%);
+  background: #737373;
+  background: linear-gradient(90deg,rgba(115, 115, 115, 0.45) 0%, rgba(217, 217, 217, 0.85) 100%);
   opacity: 1;
 }
 

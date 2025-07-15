@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import styles from './Navbar.module.css';
+import { Link }  from 'react-router-dom';
 
 type Props = {
   id?: number;
@@ -27,13 +28,13 @@ function Navbar({ id }: Props) {
       <div className={styles.firstContainerNavBar}>
         <ul className={styles.firstListNavBar}>
           <li className={[styles.liNavBar, styles.logoNavBar].join(' ')}>
-            <a href="#">
+              <Link to='/'>
               <img
                 className={styles.logoImageNavBar}
                 src="/images/logo.png"
                 alt="Logo"
               />
-            </a>
+              </Link>
           </li>
           <div className={styles.menuItems}>
             <li className={styles.liNavBar}>
@@ -47,9 +48,9 @@ function Navbar({ id }: Props) {
               </a>
             </li>
             <li className={styles.liNavBar}>
-              <a className={styles.linkNavBar} href="#">
-                Sobre nosotros
-              </a>
+              <Link className={styles.linkNavBar} to='/about'>
+              Sobre nosotros
+              </Link>
             </li>
           </div>
         </ul>
