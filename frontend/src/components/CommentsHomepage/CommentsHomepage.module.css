@@ -1,0 +1,27 @@
+.phrase {
+  color: black;
+  margin-bottom: 5%;
+}
+
+.word {
+  color: #f66731;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.commentOne {
+  align-self: flex-end;
+  max-width: 40%;
+  max-height: 40%;
+  margin-bottom: 5%;
+}
+
+.commentTwo {
+  align-self: flex-start;
+  max-width: 40%;
+  max-height: 40%;
+}
