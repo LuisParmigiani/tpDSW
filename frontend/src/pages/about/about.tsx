@@ -2,8 +2,8 @@ import React from 'react'
 import styles from './about.module.css'
 import Navbar from '../../components/navBar/Navbar.js'
 import AboutContainer from '../../components/AboutContainer/index.js'
-
-
+const text1 = "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Maiores quisquam dolorum blanditiis excepturi architecto eligendi a assumenda, repellat, ad dolorem omnis quasi sunt impedit ipsum adipisci! Nostrum id alias excepturi."
+const text2 = "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Cupiditate ipsam possimus at aliquid doloremque, quod quas reiciendis consequatur nihil temporibus ipsa iste, ut, qui quaerat. Possimus, odio ea soluta quibusdam harum voluptate inventore debitis commodi aliquid?"
 function About () {
     return(
     <>
@@ -11,7 +11,10 @@ function About () {
             <div  className={styles.navBarContainer}>
                 <Navbar/>
             </div>
-            <AboutContainer/>
+            <div className={styles.aboutCollections}>
+                <AboutContainer isAlignedRight imageUrl="images/nosotros-about.jpg" title="Sobre nosotros" text={text1}></AboutContainer>
+                <AboutContainer isAlignedRight={false} imageUrl="images/SantiagoMalet.png" title="Por que elegimos este camino?" text={text2}></AboutContainer>
+            </div>
         </div>
     </>
     )
