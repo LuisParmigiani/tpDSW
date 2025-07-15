@@ -1,0 +1,131 @@
+.containerNavbar {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+
+.navbarContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+}
+
+.carouselContainer {
+  width: 100%;
+  flex-shrink: 0;
+}
+
+/* Phrase styles */
+.phrase {
+  text-align: center;
+  padding: 7vh;
+  background-color: #f5f7fa;
+}
+
+.phraseTitle {
+  font-size: 300%;
+  font-weight: bold;
+  color: #333;
+}
+.highlight {
+  color: #f66731;
+}
+.phraseArrow {
+  max-width: 5%;
+  max-height: 5%;
+  margin-top: 10vh;
+}
+
+/* Card styles */
+.cardContainer {
+  background-color: #4d4d4d;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 5%;
+}
+.cardLine {
+  margin-top: 3vh;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  width: 100%;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 25%;
+  min-height: 350px;
+  height: 350px;
+  border-radius: 25px;
+  background: #fff5f2;
+  box-shadow: 0px 0px 40px 0px rgba(0, 0, 0, 0.58);
+  padding: 20px;
+  box-sizing: border-box;
+  justify-content: space-between;
+}
+.cardIcon {
+  fill: #fff;
+  margin-top: 0;
+  flex-shrink: 0;
+}
+
+.cardTitle {
+  width: 100%;
+  font-size: 150%;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  margin: 15px 0 10px 0;
+  flex-shrink: 0;
+}
+.cardDescription {
+  width: 90%;
+  font-size: 100%;
+  color: #666;
+  text-align: center;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+/* Comments styles */
+.commentsPhrase {
+  margin-top: 0;
+  padding-top: 5%;
+  color: black;
+  margin-bottom: 5%;
+}
+
+.commentsContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.commentOne {
+  align-self: flex-end;
+  max-width: 40%;
+  max-height: 40%;
+  margin-bottom: 5%;
+}
+
+.commentTwo {
+  align-self: flex-start;
+  max-width: 40%;
+  max-height: 40%;
+}
+
+/*Footer + comments styles*/
+.footerCommentsContainer {
+  background: linear-gradient(to bottom, #f5f7fa 60%, rgb(20, 62, 62) 100%);
+}

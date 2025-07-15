@@ -1,31 +1,6 @@
 import style from './comments.module.css';
-
+import Stars from '../stars/Stars.js';
 function Comments() {
-  const stars = [];
-  const comments = {
-    calificacion: 3,
-  };
-  for (let i = 0; i < 5; i++) {
-    if (i < (comments?.calificacion ?? 0)) {
-      stars.push(
-        <img
-          key={`full-${i}`}
-          className={style.star}
-          src="./images/full-star.png"
-          alt="estrella llena"
-        />
-      );
-    } else {
-      stars.push(
-        <img
-          key={`empty-${i}`}
-          className={style.star}
-          src="./images/empty-star.png"
-          alt="estrella vacía"
-        />
-      );
-    }
-  }
   return (
     <div className={style.comments}>
       <div className={style.firstLine}>
@@ -37,7 +12,9 @@ function Comments() {
           />
           <h2 className={style.userName}>juan perez</h2>
         </div>
-        <div className={style.lineStars}>{stars}</div>
+        <div className={style.lineStars}>
+          <Stars cant={3} />
+        </div>
       </div>
       <p className={style.commentText}>
         La verdad el servicio me encanto, pedí un plomero para mi casa urgente y
