@@ -59,6 +59,7 @@ body{
     align-items: flex-end;
     justify-content: center;
     gap: 2em;
+    text-align: end;
 }
 
 .aboutTextLeft{
@@ -67,6 +68,7 @@ body{
     align-items: flex-start;
     justify-content: center;
     gap: 2em;
+    text-align: start;
 }
 
 

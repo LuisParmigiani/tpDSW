@@ -40,4 +40,4 @@ function AboutContainer({isAlignedRight,imageUrl,title,text}: Props) {
     )
 }
 
-export default AboutContainer;
+export default AboutContainer;  
