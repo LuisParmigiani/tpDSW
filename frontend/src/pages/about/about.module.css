@@ -7,11 +7,13 @@
   height: 100vh;
   margin: 0;
   padding: 0;
-  position: relative;
-  background: #F5F7FA;
-  background: linear-gradient(180deg,rgba(245, 247, 250, 1) 0%, rgba(255, 245, 242, 1) 100%);
+  position: relative; 
+  
 }
 
+.container:first-child{
+  background: linear-gradient(0deg,hsl(20, 100%, 97%), hsla(216, 33%, 97%, 1));
+}
 .navBarContainer {
   position: absolute;
   z-index: 10;
@@ -28,4 +30,7 @@
   padding: 0;
   position: relative;
 }
-
+.aboutCollections{
+  display: flex;
+  flex-direction: column;
+}
