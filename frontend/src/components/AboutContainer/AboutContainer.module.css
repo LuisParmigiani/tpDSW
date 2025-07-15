@@ -1,0 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+body{
+    font-family: 'Inter';
+    margin:0;
+    padding:0;
+}
+.aboutContainer{
+    padding: 10em 20em;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    background-color: #FFF5F2;
+    color: #000;
+    
+}
+.aboutContent{
+    display: flex;
+    flex-direction:row ;
+}
+.aboutImage{
+    height: 522px;
+    width: 300px;
+      overflow: hidden;
+     border: 1px solid red;
+
+}
+
+.aboutImageContent{
+  width: 100%;
+  max-width: 600px;
+  max-height: 600px;
+  border: 1px solid red; /* solo para ver el contenedor */
+}
+.aboutText{
+    display: flex;
+    flex-direction: column;
+    align-content: flex-end;
+}
+
