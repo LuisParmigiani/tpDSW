@@ -1,0 +1,56 @@
+.footer {
+  display: flex;
+  flex-direction: row;
+
+  justify-content: space-between;
+  padding: 5vh;
+}
+
+.companyColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.textCompany {
+  margin: 0;
+}
+.firstLineCompany {
+  margin-left: 2vh;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+.companyName {
+  font-size: 3vh;
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.Title {
+  font-size: 2.5vh;
+  font-weight: bold;
+  margin-bottom: 1vh;
+  text-decoration: underline;
+}
+.List {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+}
+.ListItem {
+  font-size: 1.5vh;
+  margin: 0.5vh 0;
+  align-self: flex-start;
+}
+
+.ListItem a {
+  text-decoration: none;
+  color: #fff;
+}
+.ListItem a:hover {
+  color: #f66731;
+}

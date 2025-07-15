@@ -1,6 +1,7 @@
 .phrase {
   text-align: center;
-  margin: 7vh;
+  padding: 7vh;
+  background-color: #f5f7fa;
 }
 
 .title {

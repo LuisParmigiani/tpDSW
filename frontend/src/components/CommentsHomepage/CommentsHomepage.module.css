@@ -1,4 +1,6 @@
 .phrase {
+  margin-top: 0;
+  padding-top: 5%;
   color: black;
   margin-bottom: 5%;
 }
@@ -6,7 +8,6 @@
 .word {
   color: #f66731;
 }
-
 .container {
   display: flex;
   flex-direction: column;

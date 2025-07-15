@@ -1,4 +1,4 @@
-import Comments from '../Comments/Comments.js';
+import Comments from '../comments/Comments.js';
 import style from './CommentsHomepage.module.css';
 function CommentsHomepage() {
   return (
