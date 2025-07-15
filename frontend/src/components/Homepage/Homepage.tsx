@@ -1,10 +1,12 @@
 import Navbar from '../navBar/Navbar';
-import CarouselHomepage from '../CarouselHomepage/CarouselHomepage';
+import Carousel from '../Carousel/Carousel.js';
 import styles from './Homepage.module.css';
 import Comments from '../comments/Comments';
 import Footer from '../Footer/Footer';
 function Homepage() {
-  const id = undefined; // Aca tine q ir el id del usuario logueado, por ahora lo dejamos undefined
+  const id = 10; // Aca tine q ir el id del usuario logueado, por ahora lo dejamos undefined
+  const CommentOne = 10;
+  const CommentTwo = 11;
   return (
     <>
       <div className={styles.containerNavbar}>
@@ -12,7 +14,14 @@ function Homepage() {
           <Navbar id={id} />
         </div>
         <div className={styles.carouselContainer}>
-          <CarouselHomepage />
+          <Carousel
+            fotos={[
+              '/images/carousel1.jpg',
+              '/images/carousel2.jpg',
+              '/images/carousel.jpg',
+            ]}
+            titulo="Nombre de la empresa"
+          />
         </div>
       </div>
 
@@ -198,10 +207,10 @@ function Homepage() {
         </h1>
         <div className={styles.commentsContainer}>
           <div className={styles.commentOne}>
-            <Comments />
+            <Comments id={CommentOne} />
           </div>
           <div className={styles.commentTwo}>
-            <Comments />
+            <Comments id={CommentTwo} />
           </div>
         </div>
         <div className={styles.footerContainer}>

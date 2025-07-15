@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import styles from './CarouselHomepage.module.css';
+import styles from './Carousel.module.css';
 
-function CarouselHomepage() {
-  const fotos = [
-    '/images/carousel1.jpg',
-    '/images/carousel2.jpg',
-    '/images/carousel.jpg',
-  ];
+type Props = {
+  fotos: string[];
+  titulo: string | undefined;
+};
+
+function Carousel({ fotos, titulo }: Props) {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -25,9 +25,9 @@ function CarouselHomepage() {
         src={fotos[index]}
         alt="Foto Trabajador"
       />
-      <h1 className={styles.carouselh1}>Nombre de la empresa</h1>
+      <h1 className={styles.carouselh1}>{titulo}</h1>
     </div>
   );
 }
 
-export default CarouselHomepage;
+export default Carousel;

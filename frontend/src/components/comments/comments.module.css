@@ -28,11 +28,6 @@
   width: 90%;
 }
 
-.star {
-  width: 6%;
-  height: 6%;
-}
-
 .userGroup {
   display: flex;
   flex-direction: row;
