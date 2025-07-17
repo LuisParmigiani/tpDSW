@@ -1,6 +1,6 @@
 ### Obtener todos los usuarios
 
-GET http://localhost:3000/api/usuario
+GET http://localhost:3000/api/usuario/
 
 
 GET http://localhost:3000/api/usuario/1
@@ -11,14 +11,15 @@ POST http://localhost:3000/api/usuario
 Content-Type: application/json
 
 {
-  "mail": "4luisParmigia@gmail.com",
-  "contrasena": "123489sdfafgdfjasdhjahsd",
+  "mail": "4luisPrmigia@gmail.com",
+  "contrasena": "12429sdfafgdfjasdhjahsd",
   "tipoDoc": "DNI",
-  "numeroDoc": "1234567",
-  "direccion": "Tenis 7884",
+  "numeroDoc": "1234267",
+  "direccion": "Tenis 78824",
   "telefono": "12345689",
   "nombre": "4Luis",
   "apellido":"4Parmigiani"
+  
 }
 
 
@@ -28,7 +29,7 @@ PUT http://localhost:3000/api/usuario/1
 Content-Type: application/json
 
 {
-  "tiposDeServicio": [
+  "servicios": [
     1
   ]
 }
@@ -46,3 +47,5 @@ Content-Type: application/json
 ### Hacemos un delete
 DELETE http://localhost:3000/api/usuario/2
 
+
+GET http://localhost:3000/api/usuario/comments/1

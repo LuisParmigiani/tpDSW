@@ -113,4 +113,25 @@ async function remove(req: Request, res: Response) {
   }
 }
 
-export { sanitizeTurnoInput, findall, findone, add, update, remove };
+async function getTurnosByServicioIdHelper(servicioId: number) {
+  try {
+    const turnos = await em.find(
+      Turno,
+      { servicio: { id: servicioId }, estado: 'completado' },
+      { populate: ['usuario'] }
+    );
+    return turnos;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export {
+  sanitizeTurnoInput,
+  findall,
+  findone,
+  add,
+  update,
+  remove,
+  getTurnosByServicioIdHelper,
+};

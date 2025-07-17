@@ -1,7 +1,7 @@
 .footer {
   display: flex;
   flex-direction: row;
-
+  width: 90%;
   justify-content: space-between;
   padding: 5vh;
 }

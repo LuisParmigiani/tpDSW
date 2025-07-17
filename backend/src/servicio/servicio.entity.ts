@@ -17,6 +17,7 @@ import { Turno } from '../turno/turno.entity.js';
 export class Servicio {
   @PrimaryKey()
   id!: number;
+
   @Property({ nullable: false })
   precio!: number;
 

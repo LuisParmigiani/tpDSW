@@ -16,12 +16,7 @@ Content-Type: application/json
   "descripcionTarea": "Se debe destapar las cañerias de la cocina",
   "duracionTarea": 60,
   "tipoServicio": 
-    {
-      //Podemos crear el tipo de servicio en el momento de crear la tarea
-      "id": 1,
-      "nombreTipo":"Plomeria",
-      "descripcionTipo":"Sevicios de plomeria y fontaneria para toda la casa"
-    }
+    [2]
 }
 
 ###Hacemos un PUT
@@ -33,7 +28,7 @@ Content-Type: application/json
   "nombreTarea": "Tafdpsfposdfopjodsfopdosjfsdjrea 1",
   "descripcionTarea": "Descripcion Cambiada de la tarea 1",
   "duracionTarea": 160,
-  "servicio": 1
+  "servicio": 2
 }
 
 ### Hacemos un patch

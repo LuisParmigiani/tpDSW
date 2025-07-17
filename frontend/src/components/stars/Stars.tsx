@@ -11,7 +11,7 @@ function Stars({ cant }: Props) {
         <img
           key={`full-${i}`}
           className={style.star}
-          src="./images/full-star.png"
+          src="../images/full-star.png"
           alt="estrella llena"
         />
       );
@@ -20,7 +20,7 @@ function Stars({ cant }: Props) {
         <img
           key={`empty-${i}`}
           className={style.star}
-          src="./images/empty-star.png"
+          src="../images/empty-star.png"
           alt="estrella vacía"
         />
       );

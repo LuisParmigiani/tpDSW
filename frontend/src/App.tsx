@@ -1,3 +1,4 @@
+import Borrower from './components/Borrower/Borrower.js';
 import Homepage from './components/Homepage/Homepage.js';
 import './App.css';
 
@@ -8,15 +9,9 @@ function App() {
     <>
       <Router>
         <Routes>
-          <Route
-            path="/"
-            element={
-              <>
-                <Homepage />
-              </>
-            }
-          />
+          <Route path="/" element={<Homepage />} />
           <Route path="/about" element={<About />} />
+          <Route path="/borrower/:id" element={<Borrower id={11} />} />
         </Routes>
       </Router>
     </>

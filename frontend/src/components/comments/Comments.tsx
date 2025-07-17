@@ -1,7 +1,8 @@
 import style from './comments.module.css';
-import Stars from '../stars/Stars.js';
+import Stars from '../stars/Stars';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+
 type Props = {
   id?: number;
 };
@@ -25,7 +26,7 @@ function Comments({ id }: Props) {
         .catch((err) => console.error('Error al cargar Turno:', err));
     }
   }, [id]);
-  const fotoUser = turno?.usuario?.fotoPerfil || './images/fotoUserId.png';
+  const fotoUser = turno?.usuario?.fotoPerfil || '../images/fotoUserId.png';
   const nombreUser = turno?.usuario?.nombre || 'Nombre Usuario';
   const comentarioText = turno?.comentario || 'Comentario no disponible';
   const prestatario =
@@ -46,6 +47,7 @@ function Comments({ id }: Props) {
           <Stars cant={calificacion} />
         </div>
       </div>
+
       <p className={style.commentText}>{comentarioText}</p>
       <div className={style.footer}>
         <p className={style.footerText}>Reseña al plomero {prestatario}</p>
