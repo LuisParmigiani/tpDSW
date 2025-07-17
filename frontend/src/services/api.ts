@@ -57,6 +57,7 @@ export const apiServices = {
   usuarios: {
     getAll: () => api.get('/usuario'),
     getById: (id: string) => api.get(`/usuario/${id}`),
+    getCommentsByUserId: (id: string) => api.get(`/usuario/comments/${id}`),
     create: (data: EntityData) => api.post('/usuario', data),
     update: (id: string, data: EntityData) => api.put(`/usuario/${id}`, data),
     delete: (id: string) => api.delete(`/usuario/${id}`),

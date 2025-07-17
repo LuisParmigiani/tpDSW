@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Usuario } from './usuario.entity.js';
+import { getTurnosByServicioIdHelper } from '../turno/turno.controler.js';
 import { request } from 'http';
 import { orm } from '../shared/db/orm.js';
 const em = orm.em;
@@ -90,4 +91,30 @@ async function remove(req: Request, res: Response) {
   }
 }
 
-export { sanitizeUsuarioInput, findAll, findOne, add, update, remove };
+async function getCommentsByUserId(req: Request, res: Response) {
+  try {
+    const id = Number.parseInt(req.params.id);
+    const user = await em.findOne(Usuario, { id }, { populate: ['servicios'] });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    const allTurnos = [];
+    for (const servicio of user.servicios) {
+      const turnos = await getTurnosByServicioIdHelper(servicio.id);
+      allTurnos.push(...turnos);
+    }
+    res.status(200).json({ message: 'Comments found', data: allTurnos });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
+export {
+  sanitizeUsuarioInput,
+  findAll,
+  findOne,
+  add,
+  update,
+  remove,
+  getCommentsByUserId,
+};

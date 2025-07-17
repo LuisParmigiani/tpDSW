@@ -4,7 +4,7 @@ GET http://localhost:3000/api/turno
 
 ###Obtener turno por id
 
-GET http://localhost:3000/api/turno/1
+GET http://localhost:3000/api/turno/10
 
 ### Cargamos un turno
 
@@ -13,9 +13,11 @@ Content-Type: application/json
 
 {
   "fechaHora": "2023-11-01T10:00:00.000Z",
-  "estado": "pendiente",
-  "servicio": 1,
-  "usuario": 1
+  "estado": "confirmado",
+  "servicio": 3,
+  "usuario": 2,
+  "comentario": "Primer turno de prueba",
+  "calificacion": 4
 }
 
 ###Hacemos un PUT
