@@ -4,7 +4,7 @@ import styles from './Homepage.module.css';
 import Comments from '../comments/Comments';
 import Footer from '../Footer/Footer';
 function Homepage() {
-  const id = 10; // Aca tine q ir el id del usuario logueado, por ahora lo dejamos undefined
+  const id = undefined; // Aca tine q ir el id del usuario logueado, por ahora lo dejamos undefined
   const CommentOne = 10;
   const CommentTwo = 11;
   return (
