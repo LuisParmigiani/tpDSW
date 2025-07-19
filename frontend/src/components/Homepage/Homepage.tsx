@@ -4,14 +4,13 @@ import styles from './Homepage.module.css';
 import Comments from '../comments/Comments';
 import Footer from '../Footer/Footer';
 function Homepage() {
-  const id = undefined; // Aca tine q ir el id del usuario logueado, por ahora lo dejamos undefined
-  const CommentOne = 10;
-  const CommentTwo = 11;
+  const CommentOne = 1;
+  const CommentTwo = 2;
   return (
     <>
       <div className={styles.containerNavbar}>
         <div className={styles.navbarContainer}>
-          <Navbar id={id} />
+          <Navbar />
         </div>
         <div className={styles.carouselContainer}>
           <Carousel

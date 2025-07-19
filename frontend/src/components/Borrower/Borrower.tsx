@@ -5,6 +5,7 @@ import styles from './Borrower.module.css';
 import Navbar from '../navBar/Navbar';
 import Stars from '../stars/Stars';
 import Footer from '../Footer/Footer';
+import Pagination from '../Pagination/Pagination';
 
 type Props = {
   id: number;
@@ -55,18 +56,9 @@ function Borrower(props: Props) {
     for (const comment of borrower) {
       // Se calcula el total de estrellas
       totalStars += comment?.calificacion;
+
       commentToShow.push(<Comments key={comment.id} id={comment.id} />);
     }
-  }
-
-  // Se calcula el promedio de estrellas
-  const starAverage =
-    borrower && borrower.length > 0 ? totalStars / borrower.length : 0;
-  let starAverageShow;
-  if (starAverage === 0) {
-    starAverageShow = <p> aun no hay calificaciones</p>;
-  } else {
-    starAverageShow = <Stars cant={parseFloat(starAverage.toFixed(2))} />;
   }
 
   // Se muestra la cantidad de reseñas
@@ -79,6 +71,16 @@ function Borrower(props: Props) {
     cantComments = (
       <p className={styles.cantComments}>Hay {borrower?.length} reseñas.</p>
     );
+  }
+  // Se calcula el promedio de estrellas
+
+  const starAverage =
+    borrower && borrower.length > 0 ? totalStars / borrower.length : 0;
+  let starAverageShow;
+  if (starAverage === 0) {
+    starAverageShow = <p> aun no hay calificaciones</p>;
+  } else {
+    starAverageShow = <Stars cant={Math.round(starAverage)} />;
   }
 
   return (
@@ -102,7 +104,14 @@ function Borrower(props: Props) {
             <button className={styles.contactButton}>Contactar</button>
           </div>
         </div>
-        <div className={styles.commentsContainer}>{commentToShow}</div>
+        <div className={styles.commentsContainer}>
+          <Pagination
+            elements={commentToShow}
+            maxElementsPerPage={5}
+            showInfo={true}
+            title="Comentarios"
+          />
+        </div>
         <Footer />
       </div>
     </>
