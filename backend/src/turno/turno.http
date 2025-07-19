@@ -13,12 +13,16 @@ Content-Type: application/json
 
 {
   "fechaHora": "2023-11-01T10:00:00.000Z",
-  "estado": "confirmado",
-  "servicio": 3,
-  "usuario": 2,
-  "comentario": "Primer turno de prueba",
+  "estado": "completado",
+  "servicio": 9,
+  "usuario": 1,
+  "comentario": "no me gusto el servicio",
   "calificacion": 4
 }
+
+
+
+
 
 ###Hacemos un PUT
 
@@ -31,7 +35,7 @@ Content-Type: application/json
 }
 
 ### Hacemos un patch
-PATCH http://localhost:3000/api/turno/1
+PATCH http://localhost:3000/api/turno/18
 Content-Type: application/json
 
 {

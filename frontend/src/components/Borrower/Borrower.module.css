@@ -62,28 +62,11 @@
   margin-left: 5%;
 }
 .commentsContainer {
-  width: 80%;
+  width: 70%;
   height: 30%;
 }
 
 /* Responsive Styles */
-/* pantallas mas chicas que 1024px */
-@media (max-width: 1024px) {
-  .containerUser {
-    width: 90%;
-    height: auto;
-    min-height: 50vh;
-    padding: 2vh;
-  }
-  .userInformation {
-    margin-left: 5%;
-  }
-  .contactButton {
-    width: 70%;
-    font-size: 14px;
-  }
-}
-
 /* pantallas mas chicas que 768px */
 @media (max-width: 768px) {
   .containerUser {
@@ -111,6 +94,11 @@
   .starsContainer {
     justify-content: center;
     margin-top: 1vh;
+  }
+  .commentsContainer {
+    width: 90%;
+    height: auto;
+    margin-top: 2vh;
   }
 }
 

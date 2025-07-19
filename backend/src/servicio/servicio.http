@@ -2,7 +2,7 @@
 GET http://localhost:3000/api/servicio
 
 ### Obtener servicio por id
-GET http://localhost:3000/api/servicio/3
+GET http://localhost:3000/api/servicio/9
 
 ### Crear un servicio
 POST http://localhost:3000/api/servicio

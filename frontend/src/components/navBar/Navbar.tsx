@@ -3,10 +3,6 @@ import { useEffect, useState, useRef } from 'react';
 import styles from './Navbar.module.css';
 import { Link } from 'react-router-dom';
 
-type Props = {
-  id?: number;
-};
-
 type Usuario = {
   nombre: string;
   foto: string;
@@ -17,7 +13,8 @@ type Option = {
   url: string;
 };
 
-function Navbar({ id }: Props) {
+function Navbar() {
+  const id = undefined; // Aca tine q ir el id del usuario logueado, por ahora lo dejamos undefined
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [showNav, setShowNav] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
@@ -26,20 +23,17 @@ function Navbar({ id }: Props) {
     setShowNav((prev) => !prev);
   };
 
-  // Cerrar menú cuando se hace clic fuera
+  // Controlar el scroll del body cuando el menú está abierto
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (navRef.current && !navRef.current.contains(event.target as Node)) {
-        setShowNav(false);
-      }
-    };
-
     if (showNav) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
     }
 
+    // Cleanup al desmontar el componente
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.body.style.overflow = 'unset';
     };
   }, [showNav]);
   const options: Option[] = [
@@ -146,22 +140,65 @@ function Navbar({ id }: Props) {
                 className={styles.deployNav}
                 onClick={handleToggleNav}
               >
-                <svg
-                  width="32"
-                  height="32"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-label="Abrir menú"
-                  fill="#fff"
-                >
-                  <rect x="4" y="6" width="16" height="2" rx="1" />
-                  <rect x="4" y="11" width="16" height="2" rx="1" />
-                  <rect x="4" y="16" width="16" height="2" rx="1" />
-                </svg>
+                {!showNav ? (
+                  <svg
+                    width="32"
+                    height="32"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-label="Abrir menú"
+                    fill="#fff"
+                  >
+                    <rect x="4" y="6" width="16" height="2" rx="1" />
+                    <rect x="4" y="11" width="16" height="2" rx="1" />
+                    <rect x="4" y="16" width="16" height="2" rx="1" />
+                  </svg>
+                ) : (
+                  <svg
+                    width="32"
+                    height="32"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-label="Cerrar menú"
+                    fill="#fff"
+                  >
+                    <path
+                      d="M18 6L6 18M6 6L18 18"
+                      stroke="#fff"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      fill="none"
+                    />
+                  </svg>
+                )}
               </div>
               {showNav && (
                 <div className={styles.mobileDropdown}>
                   <ul className={styles.navList}>
+                    <li className={styles.closeButtonContainer}>
+                      <button
+                        className={styles.closeButton}
+                        onClick={() => setShowNav(false)}
+                        aria-label="Cerrar menú"
+                      >
+                        <svg
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                        >
+                          <path
+                            d="M18 6L6 18M6 6L18 18"
+                            stroke="#333"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </button>
+                    </li>
                     {showOptions}
                     <li className={styles.liNavBar}>
                       {usuario ? (
