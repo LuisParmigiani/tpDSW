@@ -51,19 +51,6 @@
 
 /* Mobile */
 @media (max-width: 768px) {
-  .paginationControls {
-    flex-direction: column;
-    gap: 0.75rem;
-    padding: 1rem 0.5rem;
-  }
-
-  .button {
-    width: 100%;
-    max-width: 200px;
-    padding: 0.75rem;
-    font-size: 0.9rem;
-  }
-
   .pageInfo {
     font-size: 0.9rem;
     margin: 0.25rem 0;

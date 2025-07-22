@@ -53,12 +53,10 @@ function Borrower(props: Props) {
   if (!borrower) {
     commentToShow.push(<p>Cargando comentarios...</p>);
   } else {
-    for (const comment of borrower) {
-      // Se calcula el total de estrellas
-      totalStars += comment?.calificacion;
-
+    borrower.map((comment) => {
+      totalStars += comment.calificacion;
       commentToShow.push(<Comments key={comment.id} id={comment.id} />);
-    }
+    });
   }
 
   // Se muestra la cantidad de reseñas

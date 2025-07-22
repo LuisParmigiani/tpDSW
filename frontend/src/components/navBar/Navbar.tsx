@@ -69,8 +69,8 @@ function Navbar() {
         .catch((err) => console.error('Error al cargar usuario:', err));
     }
   }, [id]);
-  const [isMobile, setIsMobile] = useState(false);
 
+  const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
     const checkScreenSize = () => {
       setIsMobile(window.innerWidth <= 768);
