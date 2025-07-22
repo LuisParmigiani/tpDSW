@@ -1,16 +1,24 @@
 import styles from './PaginationControler.module.css';
-
+import { useState, useEffect } from 'react';
 type Props = {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
 };
 
-const PaginationControls = ({
-  currentPage,
-  totalPages,
-  onPageChange,
-}: Props) => {
+function PaginationControls({ currentPage, totalPages, onPageChange }: Props) {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
   const goToPrevious = () => {
     if (currentPage > 1) {
       onPageChange(currentPage - 1);
@@ -33,7 +41,7 @@ const PaginationControls = ({
         className={styles.button}
         aria-label="Página anterior"
       >
-        ← Anterior
+        {isMobile ? '← ' : '← Anterior  '}
       </button>
 
       <span className={styles.pageInfo}>
@@ -46,9 +54,9 @@ const PaginationControls = ({
         className={styles.button}
         aria-label="Página siguiente"
       >
-        Siguiente →
+        {isMobile ? ' →' : 'Siguiente →'}
       </button>
     </div>
   );
-};
+}
 export default PaginationControls;
