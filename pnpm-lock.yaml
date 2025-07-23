@@ -11,6 +11,9 @@ importers:
       '@storybook/react':
         specifier: ^9.0.16
         version: 9.0.16(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@9.0.16(@testing-library/dom@10.4.0))
+      tpDSW:
+        specifier: 'link:'
+        version: 'link:'
 
 packages:
 

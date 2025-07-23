@@ -1,5 +1,6 @@
 {
 	"dependencies": {
-		"@storybook/react": "^9.0.16"
+		"@storybook/react": "^9.0.16",
+		"tpDSW": "link:"
 	}
 }

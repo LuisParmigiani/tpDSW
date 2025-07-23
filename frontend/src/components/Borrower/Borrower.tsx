@@ -50,10 +50,10 @@ function Borrower(props: Props) {
   // Se muestran los comentarios del prestatario
   const commentToShow = [];
   let totalStars = 0;
-  if (!borrower) {
-    commentToShow.push(<p>Cargando comentarios...</p>);
+  if (borrower?.length === 0) {
+    commentToShow.push(<p>No hay comentarios.</p>);
   } else {
-    borrower.map((comment) => {
+    borrower?.map((comment) => {
       totalStars += comment.calificacion;
       commentToShow.push(<Comments key={comment.id} id={comment.id} />);
     });
@@ -76,7 +76,7 @@ function Borrower(props: Props) {
     borrower && borrower.length > 0 ? totalStars / borrower.length : 0;
   let starAverageShow;
   if (starAverage === 0) {
-    starAverageShow = <p> aun no hay calificaciones</p>;
+    starAverageShow = <p> Aun no hay calificaciones</p>;
   } else {
     starAverageShow = <Stars cant={Math.round(starAverage)} />;
   }
