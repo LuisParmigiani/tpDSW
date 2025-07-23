@@ -56,6 +56,8 @@ export const apiServices = {
   // Usuarios
   usuarios: {
     getAll: () => api.get('/usuario'),
+    getPrestatarios: (tipoServicio: string, zona: string) =>
+      api.get(`/usuario/prestatarios/${tipoServicio}/${zona}`),
     getById: (id: string) => api.get(`/usuario/${id}`),
     create: (data: EntityData) => api.post('/usuario', data),
     update: (id: string, data: EntityData) => api.put(`/usuario/${id}`, data),
