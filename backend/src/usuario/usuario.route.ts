@@ -3,6 +3,7 @@ import {
   sanitizeUsuarioInput,
   findAll,
   findOne,
+  findPrestatarios,
   add,
   update,
   remove,
@@ -11,6 +12,7 @@ import {
 export const usuarioRouter = Router();
 
 usuarioRouter.get('/', findAll);
+usuarioRouter.get('/prestatarios/:tipoServicio/:zona', findPrestatarios);
 usuarioRouter.get('/:id', findOne);
 usuarioRouter.post('/', sanitizeUsuarioInput, add);
 usuarioRouter.put('/:id', sanitizeUsuarioInput, update);

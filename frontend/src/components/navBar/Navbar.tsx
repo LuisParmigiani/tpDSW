@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import styles from './Navbar.module.css';
-import { Link }  from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 type Props = {
   id?: number;
@@ -14,7 +14,7 @@ type Usuario = {
 
 function Navbar({ id }: Props) {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
-
+  id = 14; // For testing purposes, you can remove this line in production
   useEffect(() => {
     if (id) {
       axios
@@ -28,19 +28,19 @@ function Navbar({ id }: Props) {
       <div className={styles.firstContainerNavBar}>
         <ul className={styles.firstListNavBar}>
           <li className={[styles.liNavBar, styles.logoNavBar].join(' ')}>
-              <Link to='/'>
+            <Link to="/">
               <img
                 className={styles.logoImageNavBar}
                 src="/images/logo.png"
                 alt="Logo"
               />
-              </Link>
+            </Link>
           </li>
           <div className={styles.menuItems}>
             <li className={styles.liNavBar}>
-              <a className={styles.linkNavBar} href="#">
+              <Link className={styles.linkNavBar} to="/Servicios">
                 Servicios
-              </a>
+              </Link>
             </li>
             <li className={styles.liNavBar}>
               <a className={styles.linkNavBar} href="#">
@@ -48,8 +48,8 @@ function Navbar({ id }: Props) {
               </a>
             </li>
             <li className={styles.liNavBar}>
-              <Link className={styles.linkNavBar} to='/about'>
-              Sobre nosotros
+              <Link className={styles.linkNavBar} to="/about">
+                Sobre nosotros
               </Link>
             </li>
           </div>

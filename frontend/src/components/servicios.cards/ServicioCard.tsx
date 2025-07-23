@@ -1,9 +1,9 @@
 import styles from './ServicioCard.module.css';
-import Boton from '../boton/boton.tsx';
+import Boton from '../Botones/BotonServicios.tsx';
 type Props = {
   id: number;
   nombre: string;
-  rubros: string[];
+  rubros: string;
   puntuacion: number;
 };
 export default function ServicioCard({
@@ -15,7 +15,7 @@ export default function ServicioCard({
   const contactar = () => {
     alert(`Contactando a ${nombre}`);
   };
-  const rubrosPersona = rubros.join(', '); // Convert array to string
+  //const rubrosPersona = rubros.join(', '); // Convert array to string
   return (
     <div className={styles.ServicioCard} key={id}>
       <img
@@ -25,7 +25,7 @@ export default function ServicioCard({
       />
       <span className={styles.Info}>
         <p className={styles.Nombre}>{nombre}</p>
-        <p className={styles.Rubros}>{rubrosPersona}</p>
+        <p className={styles.Rubros}>{rubros}</p>
       </span>
       <div className={styles.puntuacion}>{puntuacion}</div>
       <Boton texto="CONTACTAR" contactar={contactar}></Boton>

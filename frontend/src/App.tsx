@@ -5,6 +5,7 @@ import HomepageCards from './components/HomepageCards/HomepageCards.js';
 import CommentsFooterHomepage from './components/Comments-FooterHomepage/Comments-FooterHomepage.js';
 import About from './pages/about/about.js';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Servicios from './pages/about/Servicios.js';
 function App() {
   const id_user = undefined; //no se si anda
 
@@ -24,6 +25,7 @@ function App() {
             }
           />
           <Route path="/about" element={<About />} />
+          <Route path="/Servicios" element={<Servicios />} />
         </Routes>
       </Router>
     </>
