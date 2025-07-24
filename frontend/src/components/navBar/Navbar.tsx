@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { apiServices } from '../../services/api';
 import { useEffect, useState, useRef } from 'react';
 import styles from './Navbar.module.css';
 import { Link } from 'react-router-dom';
@@ -62,11 +62,16 @@ function Navbar() {
     </li>
   ));
   useEffect(() => {
+    const getUsuario = async (id: number) => {
+      try {
+        const res = await apiServices.usuarios.getById(id);
+        setUsuario(res.data.data);
+      } catch (err) {
+        console.error('Error al cargar usuario:', err);
+      }
+    };
     if (id) {
-      axios
-        .get<{ data: Usuario }>(`/api/usuario/${id}`)
-        .then((res) => setUsuario(res.data.data))
-        .catch((err) => console.error('Error al cargar usuario:', err));
+      getUsuario(id);
     }
   }, [id]);
 
