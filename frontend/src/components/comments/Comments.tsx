@@ -1,10 +1,10 @@
 import style from './comments.module.css';
 import Stars from '../stars/Stars';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { apiServices } from '../../services/api';
 
 type Props = {
-  id?: number;
+  id: number;
 };
 
 type Turno = {
@@ -12,26 +12,62 @@ type Turno = {
     nombre: string;
     fotoPerfil: string;
   };
+  servicio?: {
+    id: number;
+  };
   comentario?: string;
   calificacion?: number;
 };
+type Servicio = {
+  id: number;
+  precio: number;
+  usuarios: {
+    id: number;
+    nombre: string;
+  };
+};
+
 function Comments({ id }: Props) {
   const [turno, setTurno] = useState<Turno | null>(null);
+  const [servicio, setServicio] = useState<Servicio | null>(null);
 
   useEffect(() => {
-    if (id) {
-      axios
-        .get<{ data: Turno }>(`/api/Turno/${id}`)
-        .then((res) => setTurno(res.data.data))
-        .catch((err) => console.error('Error al cargar Turno:', err));
-    }
+    const getTurno = async (id: number) => {
+      try {
+        const res = await apiServices.turnos.getById(String(id));
+        setTurno(res.data.data);
+      } catch (error) {
+        console.error('Error al cargar turno:', error);
+      }
+    };
+    getTurno(id);
   }, [id]);
+
+  const idService = turno?.servicio?.id;
+
+  useEffect(() => {
+    const getServicio = async (id: number) => {
+      try {
+        const res = await apiServices.servicios.getById(id.toString());
+        setServicio(res.data.data);
+      } catch (error) {
+        console.error('Error al cargar servicio:', error);
+      }
+    };
+    if (idService !== undefined) {
+      getServicio(idService);
+    }
+  }, [idService]);
+
   const fotoUser = turno?.usuario?.fotoPerfil || '../images/fotoUserId.png';
   const nombreUser = turno?.usuario?.nombre || 'Nombre Usuario';
   const comentarioText = turno?.comentario || 'Comentario no disponible';
-  const prestatario =
-    'no se como se hace para que se vea el nombre del prestatario';
   const calificacion = turno?.calificacion || 3;
+
+  const nombrePrestatario =
+    Array.isArray(servicio?.usuarios) && servicio.usuarios.length > 0
+      ? servicio.usuarios[0].nombre
+      : 'Nombre Prestatario'; // despues hay que cambiarlo porq ahora es una array de usuarios porq esta mal la base de datos
   return (
     <div className={style.comments}>
       <div className={style.firstLine}>
@@ -50,7 +86,10 @@ function Comments({ id }: Props) {
 
       <p className={style.commentText}>{comentarioText}</p>
       <div className={style.footer}>
-        <p className={style.footerText}>Reseña al plomero {prestatario}</p>
+        <p className={style.footerText}>
+          {' '}
+          Reseña al prestatario: {nombrePrestatario}
+        </p>
       </div>
     </div>
   );

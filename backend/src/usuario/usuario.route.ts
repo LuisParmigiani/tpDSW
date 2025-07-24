@@ -16,7 +16,7 @@ usuarioRouter.get('/', findAll);
 usuarioRouter.get('/prestatarios/:tipoServicio/:zona', findPrestatarios);
 usuarioRouter.get('/:id', findOne);
 usuarioRouter.get('/comments/:id', getCommentsByUserId);
-
+usuarioRouter.get('/:id', findOne);
 usuarioRouter.post('/', sanitizeUsuarioInput, add);
 usuarioRouter.put('/:id', sanitizeUsuarioInput, update);
 usuarioRouter.patch('/:id', sanitizeUsuarioInput, update);

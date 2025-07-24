@@ -1,8 +1,7 @@
-### Obtener todos los usuarios
+### Obtener comentarios de usuario por ID
+GET http://localhost:3000/api/usuario/comments/13
 
-GET http://localhost:3000/api/usuario/13
-
-
+### Obtener un usuario específico
 GET http://localhost:3000/api/usuario/1
 
 ### Obtengo los prestatarios por tipo de servicio y zona
@@ -37,13 +36,14 @@ Content-Type: application/json
 }
 
 ### Hacemos un patch
-PATCH http://localhost:3000/api/usuario/1
+PATCH http://localhost:3000/api/usuario/13
 Content-Type: application/json
 
 {
-  "nombre":"Agustin Ivan",
-  "telefono":"5493496",
-  "mail":"agutindana@hotmail.com"
+  "tiposDeServicio": [
+    1,
+    2
+  ]
 }
 
 ### Hacemos un delete

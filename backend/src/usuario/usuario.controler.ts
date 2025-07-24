@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Usuario } from './usuario.entity.js';
 import { getTurnosByServicioIdHelper } from '../turno/turno.controler.js';
-import { request } from 'http';
+import { get, request } from 'http';
 import { orm } from '../shared/db/orm.js';
 const em = orm.em;
 
@@ -70,7 +70,7 @@ async function findOne(req: Request, res: Response) {
     const user = await em.findOneOrFail(
       Usuario,
       { id },
-      { populate: ['turnos', 'servicios'] }
+      { populate: ['turnos', 'servicios', 'tiposDeServicio', 'horarios'] }
     );
     res.status(200).json({ message: 'found one usuario', data: user });
   } catch (error: any) {
@@ -112,17 +112,53 @@ async function remove(req: Request, res: Response) {
 
 async function getCommentsByUserId(req: Request, res: Response) {
   try {
-    const id = Number.parseInt(req.params.id);
-    const user = await em.findOne(Usuario, { id }, { populate: ['servicios'] });
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+    const { id } = req.params;
+    const maxItems = Number(req.query.maxItems) || 5;
+    const page = Number(req.query.page) || 1;
+    const orderBy = req.query.orderBy || '';
+    const userId = Number.parseInt(id);
+
+    // Encontrar el usuario con sus servicios
+    const userWithServices = await em.findOne(
+      Usuario,
+      { id: userId },
+      { populate: ['servicios'] }
+    );
+
+    if (
+      !userWithServices ||
+      !userWithServices.servicios ||
+      userWithServices.servicios.length === 0
+    ) {
+      return res
+        .status(404)
+        .json({ message: 'Usuario no encontrado o sin servicios' });
     }
-    const allTurnos = [];
-    for (const servicio of user.servicios) {
-      const turnos = await getTurnosByServicioIdHelper(servicio.id);
-      allTurnos.push(...turnos);
-    }
-    res.status(200).json({ message: 'Comments found', data: allTurnos });
+
+    // Obtener los IDs de cada servicio del usuario
+    const idServices = userWithServices.servicios.map(
+      (servicio: any) => servicio.id
+    );
+
+    // conseguir todos los comentarios de todos los servicios del usuario
+    const commentsData = await getTurnosByServicioIdHelper({
+      idServices,
+      maxItems,
+      page,
+      orderBy,
+    });
+
+    res.status(200).json({
+      message: 'Comentarios encontrados',
+      data: commentsData.comments,
+      pagination: {
+        page,
+        maxItems,
+        totalComments: commentsData.totalComments,
+        totalPages: commentsData.totalPages,
+      },
+      average: commentsData.average,
+    });
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
