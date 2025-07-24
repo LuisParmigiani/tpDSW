@@ -5,8 +5,10 @@ GET http://localhost:3000/api/usuario/13
 
 GET http://localhost:3000/api/usuario/1
 
-### Cargamos un usuario
+### Obtengo los prestatarios por tipo de servicio y zona
+GET http://localhost:3000/api/usuario/prestatarios/Plomeria/Norte
 
+### Cargamos un usuario
 POST http://localhost:3000/api/usuario
 Content-Type: application/json
 
