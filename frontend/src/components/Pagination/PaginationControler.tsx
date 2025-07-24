@@ -7,6 +7,13 @@ type Props = {
 };
 
 function PaginationControls({ currentPage, totalPages, onPageChange }: Props) {
+  console.log(
+    'PaginationControls - currentPage:',
+    currentPage,
+    'totalPages:',
+    totalPages
+  ); // Debug VER BIEN
+
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
     const checkScreenSize = () => {
