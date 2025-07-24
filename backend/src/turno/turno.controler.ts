@@ -111,14 +111,63 @@ async function remove(req: Request, res: Response) {
   }
 }
 
-async function getTurnosByServicioIdHelper(servicioId: number) {
+async function getTurnosByServicioIdHelper(params: {
+  idServices: number[];
+  maxItems: number;
+  page: number;
+  orderBy?: any;
+}) {
   try {
-    const turnos = await em.find(
+    const { idServices, maxItems, page, orderBy } = params;
+    const offset = (page - 1) * maxItems;
+
+    // Configurar el orden basado en el parámetro orderBy
+    let orderByClause;
+    switch (orderBy) {
+      case 'new':
+        orderByClause = { fechaHora: -1 };
+        break;
+      case 'old':
+        orderByClause = { fechaHora: 1 };
+        break;
+      case 'best':
+        orderByClause = { calificacion: -1 };
+        break;
+      case 'worst':
+        orderByClause = { calificacion: 1 };
+        break;
+      default:
+        orderByClause = { fechaHora: -1 };
+    }
+
+    // Contar el total de comentarios
+    const totalComments = await em.count(Turno, {
+      servicio: { $in: idServices },
+    });
+
+    // Obtener los comentarios paginados
+    const comments = await em.find(
       Turno,
-      { servicio: { id: servicioId }, estado: 'completado' },
-      { populate: ['usuario'] }
+      { servicio: { $in: idServices }, estado: 'completado' },
+      {
+        populate: ['usuario', 'servicio'],
+        limit: maxItems,
+        offset,
+        orderBy: orderByClause,
+      }
     );
-    return turnos;
+    let totalStars = 0;
+    comments.forEach((comment) => {
+      totalStars += comment.calificacion || 0;
+    });
+    const average = totalStars / comments.length || 0;
+    return {
+      comments,
+      totalComments,
+      totalPages: Math.ceil(totalComments / maxItems),
+      currentPage: page,
+      average: average,
+    };
   } catch (error) {
     throw error;
   }

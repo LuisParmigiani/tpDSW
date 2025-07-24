@@ -3,19 +3,20 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: linear-gradient(to bottom, #ffffff 10%, #fff5f1 50%, #9e9692 90%);
+  background-color: rgba(211, 211, 211, 0.836);
 }
 
 .containerUser {
   display: flex;
   align-items: center;
-  background-color: #fff;
-  box-shadow: 0px 0px 100px 0px rgba(0, 0, 0, 0.25);
-  margin-top: 3vh;
+  background-color: #fff5f2;
+  box-shadow: 10px 10px 45px 0 rgba(0, 0, 0, 0.3);
+  margin-top: 90px;
   margin-bottom: 4vh;
   padding: 10px;
   width: 90%;
   height: 400px;
+  border-radius: 20px;
 }
 
 .userImage {
@@ -65,19 +66,47 @@
 .commentsContainer {
   width: 70%;
   height: 30%;
+  min-height: 70vh;
+}
+.orderBy {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: row;
+  margin-bottom: 60px;
+  color: #fff;
+}
+.commentsContainer h1 {
+  color: #333;
+}
+.orderbybutton {
+  background-color: #f66631c5;
+  color: #fff;
+  border: none;
+  border-radius: 16px;
+  padding: 10px;
+}
+.orderbybutton:focus {
+  border-radius: 16px 16px 0 0;
+  transition: ease-in-out 5ms;
+}
+
+.orderbybutton option {
+  border: 0;
+  background-color: #6a6666;
 }
 
 /* Responsive Styles */
 /* pantallas mas chicas que 768px */
 @media (max-width: 768px) {
   .containerUser {
-    width: 95%;
+    width: 90%;
     flex-direction: column;
-
     margin: 20px;
     padding-top: 50px;
-    padding-bottom: 50px;
+    padding-bottom: 20px;
     text-align: center;
+    height: auto;
   }
   .userImage {
     height: 200px;
