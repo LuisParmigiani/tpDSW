@@ -6,7 +6,7 @@ import ServicioCard from '../../components/servicios.cards/ServicioCard.js';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import axios from 'axios';
-import api, { apiServices } from '../../services/api.js';
+import { apiServices } from '../../services/api.js';
 
 // FIX 1: Complete Usuario type to match ServicioCard props
 type Usuario = {
@@ -153,6 +153,7 @@ function FiltrosDeServicios() {
   }
 
   const tiposOptions = [];
+  tiposOptions.push(<option value={''}> Seleccione un servicio</option>);
   if (tipoServicios && tipoServicios.length > 0) {
     tipoServicios.map((tipo, index) => {
       tiposOptions.push(
@@ -170,6 +171,7 @@ function FiltrosDeServicios() {
   }
 
   const zonasOptions = [];
+  zonasOptions.push(<option value={''}> Seleccione una zona</option>);
   if (zonas && zonas.length > 0) {
     zonas.map((z, index) => {
       zonasOptions.push(

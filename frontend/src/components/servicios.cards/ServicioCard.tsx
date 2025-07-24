@@ -23,7 +23,7 @@ export default function ServicioCard({
         alt="Foto de Perfil"
         className={styles.FotoPerfil}
       />
-      <span className={styles.Info}>
+      <span className={''}>
         <p className={styles.Nombre}>{nombre}</p>
         <p className={styles.Rubros}>{rubros}</p>
       </span>
