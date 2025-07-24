@@ -18,13 +18,6 @@
   border-radius: 100px;
 }
 
-.Info {
-  margin-top: 0px;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
 .Nombre {
   color: #4d4d4d;
   text-align: center;
