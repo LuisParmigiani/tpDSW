@@ -5,7 +5,6 @@ import BotonForm from '../../components/Botones/BotonForm.js';
 import ServicioCard from '../../components/servicios.cards/ServicioCard.js';
 import { useState } from 'react';
 import { useEffect } from 'react';
-import axios from 'axios';
 import { apiServices } from '../../services/api.js';
 
 // FIX 1: Complete Usuario type to match ServicioCard props
@@ -194,40 +193,46 @@ function FiltrosDeServicios() {
         id="formServicios"
         onSubmit={handleSubmit}
       >
-        <label aria-label="Servicio" className={styles.label}>
+        <label
+          aria-label="Servicio"
+          className={'text-base text-secondary mr-1'}
+        >
           Servicio:
-          <select
-            name="servicio"
-            value={filtrosForm.servicio}
-            onChange={handleChange}
-            required
-          >
-            {tiposOptions}
-          </select>
         </label>
-        <label aria-label="Zona" className={styles.label}>
+        <select
+          name="servicio"
+          value={filtrosForm.servicio}
+          onChange={handleChange}
+          required
+        >
+          {tiposOptions}
+        </select>
+        <label aria-label="Zona" className={'text-base text-secondary mr-1'}>
           Zona:
-          <select
-            name="zona"
-            value={filtrosForm.zona}
-            onChange={handleChange}
-            required
-          >
-            {zonasOptions}
-          </select>
         </label>
-        <label aria-label="Ordenar Por" className={styles.label}>
+        <select
+          name="zona"
+          value={filtrosForm.zona}
+          onChange={handleChange}
+          required
+        >
+          {zonasOptions}
+        </select>
+        <label
+          aria-label="Ordenar Por"
+          className={'text-base text-secondary mr-1'}
+        >
           Ordenar por:
-          <select
-            name="ordenarPor"
-            value={filtrosForm.ordenarPor}
-            onChange={handleChange}
-          >
-            <option value="">Seleccionar orden</option>
-            <option value="Precio">Precio</option>
-            <option value="Valoracion">Valoración</option>
-          </select>
         </label>
+        <select
+          name="ordenarPor"
+          value={filtrosForm.ordenarPor}
+          onChange={handleChange}
+        >
+          <option value="">Seleccionar orden</option>
+          <option value="Precio">Precio</option>
+          <option value="Valoracion">Valoración</option>
+        </select>
         <BotonForm texto="Buscar" tipo="submit" />
       </form>
 
