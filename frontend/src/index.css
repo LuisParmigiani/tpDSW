@@ -5,6 +5,13 @@
   --color-naranja-3: #cd4813;
   --color-naranja-4: #bb4111;
   --color-naranja-5: #95340e;
+  --color-secondary: #263238;
+  --color-info: #403d39;
+  --color-tinte-1: #e66c3d;
+  --color-tinte-2: #fb936a;
+  --color-tinte-3: #ffb89c;
+  --color-tinte-4: ;
+  --color-tinte-5: #fff5f2;
 }
 
 :root {
