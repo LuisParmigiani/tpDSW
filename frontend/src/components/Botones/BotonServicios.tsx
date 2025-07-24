@@ -1,9 +1,9 @@
-import styles from './Boton.module.css';
+import styles from './Botones.module.css';
 type Props = {
   texto: string;
   contactar?: () => void;
 };
-export default function Boton({ texto, contactar }: Props) {
+export default function BotonServicios({ texto, contactar }: Props) {
   const handeClick = () => {
     if (contactar) contactar();
     else alert('Botón presionado');

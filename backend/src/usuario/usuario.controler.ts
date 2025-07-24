@@ -23,6 +23,7 @@ function sanitizeUsuarioInput(req: Request, res: Response, next: NextFunction) {
     servicios: req.body.servicios,
     tiposDeServicio: req.body.tiposDeServicio,
     horarios: req.body.horarios,
+    zonas: req.body.zonas,
   };
   Object.keys(req.body.sanitizeUsuarioInput).forEach((key) => {
     if (req.body.sanitizeUsuarioInput[key] === undefined) {
@@ -40,6 +41,24 @@ async function findAll(req: Request, res: Response) {
       { populate: ['turnos', 'servicios', 'tiposDeServicio', 'horarios'] }
     );
     res.status(200).json({ message: 'found all Usuarios', data: users });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
+async function findPrestatarios(req: Request, res: Response) {
+  try {
+    const nombreTipoServicio = req.params.tipoServicio;
+    const nombreZona = req.params.zona;
+    const prestatarios = await em.find(
+      Usuario,
+      {
+        zonas: { descripcionZona: nombreZona },
+        tiposDeServicio: { nombreTipo: nombreTipoServicio },
+      },
+      { populate: ['tiposDeServicio', 'zonas'] }
+    );
+    res.status(200).json({ message: 'found prestatarios', data: prestatarios });
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
@@ -112,6 +131,7 @@ async function getCommentsByUserId(req: Request, res: Response) {
 export {
   sanitizeUsuarioInput,
   findAll,
+  findPrestatarios,
   findOne,
   add,
   update,
