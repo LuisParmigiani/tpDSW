@@ -1,6 +1,5 @@
 import React from "react";
 import styles from "./AboutContainer.module.css";
-import index from "../../index.css"
 type Props = {
   isAlignedRight: boolean;
   imageUrl: string;

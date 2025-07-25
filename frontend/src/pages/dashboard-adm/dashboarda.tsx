@@ -1,10 +1,12 @@
 import React from 'react';
-function dashboard () {
+import '../../index.css'
+//import DashNav from '../../components/DashNav/index.tsx'
+
+function dashboard() {
     return(
-        <>
-        
-        
-        </>
+       <h1>
+            asjdlksajdlkjasdlk
+       </h1>
     )
 
 
