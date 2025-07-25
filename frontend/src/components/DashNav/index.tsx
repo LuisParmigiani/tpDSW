@@ -1,7 +1,17 @@
 import React from 'react';
+import "../../index.css";
+import LogoName from '../../components/LogoName/LogoName.tsx'
+
 function DashNav(){
     return(
-        <h1>asdsaddsadsa </h1>
+        <>
+            <div className="w-1/5 flex justify-center">
+                <div className="w-1/2">
+                    <LogoName/>
+                </div>
+            </div>
+            
+        </>
     )
 
 }
