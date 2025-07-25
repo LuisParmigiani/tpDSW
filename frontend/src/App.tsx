@@ -6,6 +6,7 @@ import About from './pages/about/about.js';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Servicios from './pages/about/Servicios.js';
 import { Helmet } from 'react-helmet';
+import Dashboarda from './pages/dashboard-adm/dashboarda.js'
 function App() {
   return (
     <>
@@ -22,6 +23,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Homepage />} />
           <Route path="/about" element={<About />} />
+          <Route path="/dashboarda" element={<Dashboarda />}/>
           <Route path="/borrower/:id" element={<Borrower id={13} />} />
           <Route path="/Servicios" element={<Servicios />} />
         </Routes>

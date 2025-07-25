@@ -46,8 +46,8 @@ function Navbar() {
       url: '/experiencias',
     },
     {
-      nombre: 'Sobre nosotros',
-      url: '/about',
+      nombre: 'dashboard',
+      url: '/dashboarda',
     },
   ];
   const showOptions = options.map((option) => (

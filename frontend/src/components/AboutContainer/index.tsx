@@ -1,5 +1,6 @@
 import React from "react";
 import styles from "./AboutContainer.module.css";
+import index from "../../index.css"
 type Props = {
   isAlignedRight: boolean;
   imageUrl: string;
@@ -28,7 +29,7 @@ function AboutContainer({isAlignedRight,imageUrl,title,text}: Props) {
         <div className={styles.aboutContainer}>
             <div className={styles.aboutContent}>
                 <div className={aboutText}>
-                    <h1 className  ={aboutTextTitle} >{title}</h1>
+                    <h1 className={aboutTextTitle}  >{title}</h1>
                     <p className={aboutTextDescription}>{text}</p>
                     
                 </div>
