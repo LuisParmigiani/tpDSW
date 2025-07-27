@@ -5,8 +5,8 @@ import LogoName from '../../components/LogoName/LogoName.tsx'
 function DashNav(){
     return(
         <>
-            <div className="w-1/5 flex justify-center">
-                <div className="w-1/2">
+            <div className="w-1/5 flex justify-center ">
+                <div className="">
                     <LogoName/>
                 </div>
             </div>

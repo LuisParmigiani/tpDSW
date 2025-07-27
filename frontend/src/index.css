@@ -1,6 +1,10 @@
 @import 'tailwindcss';
 
-@theme {
+/* cambie el @theme por el :root porque no me reconocia esa palabra. chat gpt dice de que no es una regla valida ni en css ni en tailwind asi qn o se q me falta o si esta bien,
+el root me funciona */
+
+
+:root {
   --color-naranja-1: #eb5e28;
   --color-naranja-2: #e04e15;
   --color-naranja-3: #cd4813;
@@ -13,10 +17,7 @@
   --color-tinte-3: #ffb89c;
   --color-tinte-4: ;
   --color-tinte-5: #fff5f2;
-}
 
-
-:root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
