@@ -1,4 +1,3 @@
-import style from './comments.module.css';
 import Stars from '../stars/Stars';
 import { useState, useEffect } from 'react';
 import { apiServices } from '../../services/api';
@@ -69,24 +68,24 @@ function Comments({ id }: Props) {
       ? servicio.usuarios[0].nombre
       : 'Nombre Prestatario'; // despues hay que cambiarlo porq ahora es una array de usuarios porq esta mal la base de datos
   return (
-    <div className={style.comments}>
-      <div className={style.firstLine}>
-        <div className={style.userGroup}>
+    <div className="mx-auto mt-6 rounded-xl bg-white shadow-[0_0_30px_0_rgba(0,0,0,0.1)] p-3 h-auto pb-0 w-full">
+      <div className="flex items-center flex-row w-11/12 justify-between mb-2.5 ">
+        <div className="flex flex-row items-center max-w-[90%] max-h-[13%]">
           <img
-            className={style.userImage}
+            className="w-12 h-12 rounded-full mr-3 "
             src={fotoUser}
             alt="foto de perfil de usuario"
           />
-          <h2 className={style.userName}>{nombreUser}</h2>
+          <h2 className="text-black">{nombreUser}</h2>
         </div>
-        <div className={style.lineStars}>
+        <div className="flex flex-row-reverse items-center max-w-24 max-h-16">
           <Stars cant={calificacion} />
         </div>
       </div>
 
-      <p className={style.commentText}>{comentarioText}</p>
-      <div className={style.footer}>
-        <p className={style.footerText}>
+      <p className="text-black">{comentarioText}</p>
+      <div className="w-full flex flex-row m-2/100">
+        <p className="mt-3 pb-2 text-gray-500 text-xs">
           {' '}
           Reseña al prestatario: {nombrePrestatario}
         </p>
