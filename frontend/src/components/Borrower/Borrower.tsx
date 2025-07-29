@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import Comments from '../comments/Comments';
 import { apiServices } from '../../services/api.js';
-import styles from './Borrower.module.css';
 import Navbar from '../navBar/Navbar';
 import Stars from '../stars/Stars';
 import Footer from '../Footer/Footer';
@@ -101,11 +100,9 @@ function Borrower(props: Props) {
   if (totalComments === 0) {
     cantComments = <p></p>;
   } else if (totalComments === 1) {
-    cantComments = <p className={styles.cantComments}> 1 reseña</p>;
+    cantComments = <p className="ml-6"> 1 reseña</p>;
   } else {
-    cantComments = (
-      <p className={styles.cantComments}>Hay {totalComments} reseñas.</p>
-    );
+    cantComments = <p className="ml-6"> {totalComments} reseñas.</p>;
   }
 
   // se pone la cantidad de estrellas promedio en la card
@@ -119,51 +116,54 @@ function Borrower(props: Props) {
   return (
     <>
       <Navbar />
-      <div className={styles.container}>
-        <div className={styles.containerUser}>
+      <div className="flex flex-col items-center    ">
+        <div className="lg:flex items-center h-11/12  px-8 py-10 bg-tinte-5 shadow-2xl mt-20 mb-30  lg:w-9/12 lg:h-100 rounded-2xl ">
           <img
-            className={styles.userImage}
+            className="shadow-2xl rounded-xl object-cover  h-52 w-52 lg:h-auto lg:w-85 lg:mx-5"
             src={'../images/fotoUserId.png'}
             alt="foto de perfil del prestatario"
           />
-          <div className={styles.userInformation}>
-            <h2>{prestatario?.nombre}</h2>
-            <p>
-              Servicios:{' '}
+          <div className="flex flex-col items-start justify-between pt-5  text-black h-full lg:ml-17 lg:w-3/5 lg:h-3/4 text-md">
+            <h2 className="text-3xl font-bold lg:pt-0 pt-2">
+              {prestatario?.nombre} {` `} {prestatario?.apellido}
+            </h2>
+            <p className="lg:p-0 pt-2">
               {prestatario?.tiposDeServicio
                 .map((tipoServicio) => tipoServicio?.nombreTipo)
                 .join(', ')}
             </p>
-            <p>Email: {prestatario?.mail}</p>
-            <p>Teléfono: {prestatario?.telefono}</p>
-            <div className={styles.starsContainer}>
-              <div className={styles.starsFoto}>{starAverageShow}</div>
+            <p className="lg:p-0 pt-2"> {prestatario?.mail}</p>
+            <p className="lg:p-0 pt-2"> {prestatario?.telefono}</p>
+            <div className="flex items-center max-h-3 lg:p-0 pt-4 w-full text-sm text-gray-500">
+              <div className="flex items-start mr-4 ">{starAverageShow}</div>
               {cantComments}
             </div>
-            <button className={styles.contactButton}>Contactar</button>
+            <button className="bg-naranja-1  mt-7 border-none rounded-4xl text-white px-17 py-2 hover:bg-neutral-200 hover:border border-naranja-1 hover:text-naranja-1 transition-colors duration-300">
+              Contactar
+            </button>
           </div>
         </div>
-        <div className={styles.commentsContainer}>
-          <h1>Comentarios</h1>
-          <div className={styles.orderBy}>
+        <div className="w-9/12 justify-between">
+          <h1 className="text-4xl font-bold mb-7 text-black">Comentarios</h1>
+          <div className="flex justify-start mb-6 min-h-4/5 ">
             <select
-              className={styles.orderbybutton}
+              className="bg-naranja-2 py-2 px-5 rounded-3xl "
               value={selectedValue}
               onChange={orderBy}
             >
-              <option className={styles.orderBYOption} value="">
+              <option className="bg-gray-400 border-0" value="">
                 Ordenar por
               </option>
-              <option className={styles.orderBYOption} value="new">
+              <option className="bg-gray-400 border-0" value="new">
                 Mas nuevo
               </option>
-              <option className={styles.orderBYOption} value="old">
+              <option className="bg-gray-400  border-0" value="old">
                 Mas viejo
               </option>
-              <option className={styles.orderBYOption} value="best">
+              <option className="bg-gray-400 border-0" value="best">
                 Mejor calificacion
               </option>
-              <option className={styles.orderBYOption} value="worst">
+              <option className="bg-gray-400 border-0" value="worst">
                 Peor calificacion
               </option>
             </select>

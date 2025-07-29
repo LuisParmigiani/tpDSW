@@ -1,8 +1,7 @@
-import style from './Stars.module.css';
-
 type Props = {
   cant: number;
 };
+
 function Stars({ cant }: Props) {
   const stars = [];
   for (let i = 0; i < 5; i++) {
@@ -10,7 +9,7 @@ function Stars({ cant }: Props) {
       stars.push(
         <img
           key={`full-${i}`}
-          className={style.star}
+          className="max-h-4 w-auto"
           src="../images/full-star.png"
           alt="estrella llena"
         />
@@ -19,14 +18,14 @@ function Stars({ cant }: Props) {
       stars.push(
         <img
           key={`empty-${i}`}
-          className={style.star}
+          className="max-h-4 w-auto"
           src="../images/empty-star.png"
           alt="estrella vacía"
         />
       );
     }
   }
-  return <div className={style.starsContainer}>{stars}</div>;
+  return <div className="flex flex-row items-center max-h-10">{stars}</div>;
 }
 
 export default Stars;
