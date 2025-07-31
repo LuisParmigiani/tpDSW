@@ -5,7 +5,12 @@ import DashNav from '../../components/DashNav/index.tsx';
 
 function dashboard() {
     return(
-       <DashNav></DashNav>
+        <>
+            <DashNav></DashNav>
+            <div className="h-">
+
+            </div>
+        </>
     )
 
 
