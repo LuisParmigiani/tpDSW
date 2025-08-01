@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import Comments from '../comments/Comments';
+import Comments from '../Comments/Comments';
 import { apiServices } from '../../services/api.js';
 import styles from './Borrower.module.css';
-import Navbar from '../navBar/Navbar';
+import Navbar from '../Navbar/Navbar';
 import Stars from '../stars/Stars';
 import Footer from '../Footer/Footer';
 import PaginationControls from '../Pagination/PaginationControler.js';

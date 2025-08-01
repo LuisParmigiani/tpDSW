@@ -1,6 +1,5 @@
-import Navbar from '../../components/navBar/Navbar.js';
+import Navbar from '../../components/Navbar/Navbar.js';
 import styles from './Servicios.module.css';
-import React from 'react';
 import BotonForm from '../../components/Botones/BotonForm.js';
 import ServicioCard from '../../components/servicios.cards/ServicioCard.js';
 import { useState } from 'react';
@@ -13,11 +12,11 @@ type Usuario = {
   nombre: string;
   apellido: string;
   nombreFantasia: string;
-  tiposDeServicio: {
+  tiposDeServicio: Array<{
     id: number;
     nombreTipo: string;
     descripcionTipo: string;
-  };
+  }>;
   zonas: Array<{ id: number; descripcionZona: string }>;
   // Add other properties your backend returns
 };
@@ -132,11 +131,15 @@ function FiltrosDeServicios() {
   const cards = [];
   if (usuarios && usuarios.length > 0) {
     usuarios.map((user, index) => {
+      //Uno todos los nombres de los tipos de servicio
+      const nombresRubros = user.tiposDeServicio
+        .map((tipo) => tipo.nombreTipo)
+        .join(', ');
       cards.push(
         <ServicioCard
           id={user.id}
           nombre={user.nombreFantasia}
-          rubros={user.tiposDeServicio.nombreTipo}
+          rubros={nombresRubros}
           puntuacion={4}
           key={index}
         />
@@ -189,65 +192,95 @@ function FiltrosDeServicios() {
   return (
     <>
       <form
-        className={styles.filtros}
+        className={
+          //animaciones
+          'hover:scale-105 transition ease-in-out duration-75 ' +
+          //primero Los mobiles
+          'bg-tinte-5 mx-auto my-2 flex gap-2 py-1 shadow-2xl flex-col max-w-4/5 justify-center items-center rounded-md ' +
+          //después lo desktop
+          'lg:rounded-full lg:flex-row lg:align-middle'
+        }
         id="formServicios"
         onSubmit={handleSubmit}
       >
-        <label
-          aria-label="Servicio"
-          className={'text-base text-secondary mr-1'}
-        >
-          Servicio:
-        </label>
-        <select
-          name="servicio"
-          value={filtrosForm.servicio}
-          onChange={handleChange}
-          required
-        >
-          {tiposOptions}
-        </select>
-        <label aria-label="Zona" className={'text-base text-secondary mr-1'}>
-          Zona:
-        </label>
-        <select
-          name="zona"
-          value={filtrosForm.zona}
-          onChange={handleChange}
-          required
-        >
-          {zonasOptions}
-        </select>
-        <label
-          aria-label="Ordenar Por"
-          className={'text-base text-secondary mr-1'}
-        >
-          Ordenar por:
-        </label>
-        <select
-          name="ordenarPor"
-          value={filtrosForm.ordenarPor}
-          onChange={handleChange}
-        >
-          <option value="">Seleccionar orden</option>
-          <option value="Precio">Precio</option>
-          <option value="Valoracion">Valoración</option>
-        </select>
-        <BotonForm texto="Buscar" tipo="submit" />
+        <div className="mb-4  m ">
+          <label
+            aria-label="Servicio"
+            className={'font-medium text-base text-secondary text-center mr-2'}
+            htmlFor="servicio"
+          >
+            Servicio:
+          </label>
+          <select
+            name="servicio"
+            value={filtrosForm.servicio}
+            onChange={handleChange}
+            required
+            className={'text-secondary text-base font-medium bg-white'}
+          >
+            {tiposOptions}
+          </select>
+        </div>
+        <div className="mb-4   ">
+          <label
+            aria-label="Zona"
+            className={'font-medium text-base text-secondary text-center mr-2'}
+            htmlFor="zona"
+          >
+            Zona:
+          </label>
+          <select
+            name="zona"
+            value={filtrosForm.zona}
+            onChange={handleChange}
+            required
+            className={'text-secondary text-base font-medium bg-white'}
+          >
+            {zonasOptions}
+          </select>
+        </div>
+        <div className="mb-4">
+          <label
+            aria-label="OrdenarPor"
+            className={'font-medium text-base text-secondary text-center mr-2'}
+            htmlFor="ordenarPor"
+          >
+            Ordenar por:
+          </label>
+          <select
+            name="ordenarPor"
+            value={filtrosForm.ordenarPor}
+            onChange={handleChange}
+            className={'text-secondary text-base font-medium bg-white'}
+          >
+            <option value="">Seleccionar orden</option>
+            <option value="Precio">Precio</option>
+            <option value="Valoracion">Valoración</option>
+          </select>
+        </div>
+        <div>
+          <BotonForm texto="Buscar" tipo="submit" />
+        </div>
       </form>
 
+      {/* Display loading state */}
+      {isLoading && <p>Cargando...</p>}
+
+      {/* Display error state */}
+      {error && <p className={styles.error}>{error}</p>}
+
       {/* FIX 7: Proper rendering of results */}
-      <div className={styles.resultados}>{cards}</div>
+      <div className={'flex flex-wrap flex-col xl:flex-row gap-5 mx-8'}>
+        {cards}
+      </div>
     </>
   );
 }
 
 export default function Servicios() {
-  const id_user = 4;
-
   return (
     <>
-      <Navbar id={id_user} />
+      <Navbar />
       <FiltrosDeServicios />
     </>
   );

@@ -15,7 +15,7 @@ export const Default: Story = {
   args: {
     id: 1,
     nombre: 'Juan Perez',
-    rubros: ['Electricidad', 'Plomería'],
+    rubros: 'Electricidad',
     puntuacion: 4,
   },
 };
