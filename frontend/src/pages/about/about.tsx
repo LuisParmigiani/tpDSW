@@ -1,6 +1,5 @@
-import React from 'react';
 import styles from './about.module.css';
-import Navbar from '../../components/navBar/Navbar.js';
+import Navbar from '../../components/Navbar/Navbar.js';
 import AboutContainer from '../../components/AboutContainer/index.js';
 const text1 =
   'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Maiores quisquam dolorum blanditiis excepturi architecto eligendi a assumenda, repellat, ad dolorem omnis quasi sunt impedit ipsum adipisci! Nostrum id alias excepturi.';
@@ -9,12 +8,11 @@ const text2 =
 const text3 =
   'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde, vero enim? Ut unde ab consequuntur, est sequi, quidem voluptatibus voluptas magnam iste delectus, assumenda debitis.';
 function About() {
-  const id_user = undefined;
   return (
     <>
       <div className={styles.container}>
         <div className={styles.navBarContainer}>
-          <Navbar id={id_user} />
+          <Navbar />
         </div>
         <div className={styles.aboutCollections}>
           <AboutContainer

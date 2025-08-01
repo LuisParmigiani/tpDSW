@@ -62,7 +62,7 @@ function Navbar() {
     </li>
   ));
   useEffect(() => {
-    const getUsuario = async (id: number) => {
+    const getUsuario = async (id: string) => {
       try {
         const res = await apiServices.usuarios.getById(id);
         setUsuario(res.data.data);

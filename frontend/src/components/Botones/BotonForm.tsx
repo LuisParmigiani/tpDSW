@@ -1,15 +1,23 @@
-import styles from './Botones.module.css';
+import './../../index.css';
 type Props = {
   texto: string;
-  accion?: (event: React.FormEvent<HTMLFormElement>) => void;
+  accion?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   tipo: 'submit' | 'reset' | 'button';
 };
 export default function BotonForm({ texto, accion, tipo }: Props) {
-  const handleClick = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (accion) accion(event);
   };
   return (
-    <button onClick={handleClick} className={styles.BotonForm} type={tipo}>
+    <button
+      onClick={handleClick}
+      className={
+        'bg-naranja-1 text-white text-center py-2 px-4 rounded-md hover:bg-white ' +
+        'hover:border-naranja-1 hover:border-2 hover:text-naranja-1 hover:text-primary transition-duration-300 ' +
+        'box-border'
+      }
+      type={tipo}
+    >
       {texto}
     </button>
   );
