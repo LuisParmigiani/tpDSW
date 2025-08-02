@@ -1,7 +1,7 @@
-import Navbar from '../navBar/Navbar';
+import Navbar from '../Navbar/Navbar';
 import Carousel from '../Carousel/Carousel.js';
 import styles from './Homepage.module.css';
-import Comments from '../comments/Comments';
+import Comments from '../Comments/Comments';
 import Footer from '../Footer/Footer';
 function Homepage() {
   const CommentOne = 1;
