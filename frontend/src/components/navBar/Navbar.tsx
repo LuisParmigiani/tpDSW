@@ -118,9 +118,11 @@ function Navbar() {
               />
             </a>
           ) : (
-            <a className={styles.buttonNavBar} href="#">
-              Iniciar sesión
-            </a>
+            <Link to="/login">
+              <a className={styles.buttonNavBar} href="#">
+                Iniciar sesión
+              </a>
+            </Link>
           )}
         </div>
       </div>
