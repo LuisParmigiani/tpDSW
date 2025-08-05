@@ -12,9 +12,7 @@ export default function ServicioCard({
   rubros,
   puntuacion,
 }: Props) {
-  const contactar = () => {
-    alert(`Contactando a ${nombre}`);
-  };
+  const contactar = () => {};
   //const rubrosPersona = rubros.join(', '); // Convert array to string
   console.log(rubros);
   return (
