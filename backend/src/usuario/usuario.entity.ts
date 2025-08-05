@@ -43,9 +43,8 @@ export class Usuario extends BaseEntity {
   foto?: string; // aca se pone la ruta de la foto
 
   // Relación con Servicio
-  @ManyToMany(() => Servicio, (servicio) => servicio.usuarios, {
+  @OneToMany(() => Servicio, (servicio) => servicio.usuario, {
     cascade: [Cascade.ALL],
-    owner: true,
     nullable: true,
   })
   servicios = new Collection<Servicio>(this);

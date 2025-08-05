@@ -24,14 +24,13 @@ function sanitizeServicioInput(
   next();
 }
 
-
 // Find all services
 async function findall(req: Request, res: Response) {
   try {
     const services = await em.find(
       Servicio,
       {},
-      { populate: ['usuarios', 'tarea', 'turnos'] }
+      { populate: ['usuario', 'tarea', 'turnos'] }
     );
     res.status(200).json({ message: 'found all services', data: services });
   } catch (error: any) {
@@ -46,7 +45,7 @@ async function findone(req: Request, res: Response) {
     const service = await em.findOneOrFail(
       Servicio,
       { id },
-      { populate: ['usuarios', 'tarea', 'turnos'] }
+      { populate: ['usuario', 'tarea', 'turnos'] }
     );
     res.status(200).json({ message: 'found one service', data: service });
   } catch (error: any) {
@@ -89,4 +88,50 @@ async function remove(req: Request, res: Response) {
     res.status(500).json({ message: error.message });
   }
 }
-export { sanitizeServicioInput, findall, findone, add, update, remove };
+
+async function getServicebyids(req: Request) {
+  try {
+    const ids = req.body.ids;
+    return getServiceByServiceIds(ids);
+  } catch (error: any) {
+    throw error;
+  }
+}
+
+async function getServiceByServiceIds(ids: number[]) {
+  try {
+    const services = await em.find(
+      Servicio,
+      { id: ids },
+      { populate: ['tarea', 'usuario'] }
+    );
+    return services;
+  } catch (error: any) {
+    throw error;
+  }
+}
+
+async function getById(id: number) {
+  try {
+    const service = await em.findOneOrFail(
+      Servicio,
+      { id },
+      { populate: ['tarea', 'usuario'] }
+    );
+    return service;
+  } catch (error: any) {
+    throw error;
+  }
+}
+
+export {
+  sanitizeServicioInput,
+  findall,
+  findone,
+  getById,
+  add,
+  update,
+  remove,
+  getServicebyids,
+  getServiceByServiceIds,
+};

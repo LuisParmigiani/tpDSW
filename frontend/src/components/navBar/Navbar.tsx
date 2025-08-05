@@ -25,7 +25,7 @@ function Navbar() {
   // Controlar el scroll del body cuando el menú está abierto
   useEffect(() => {
     if (showNav) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden ';
     } else {
       document.body.style.overflow = 'unset';
     }
