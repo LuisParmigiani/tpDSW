@@ -7,6 +7,7 @@ import {
   Collection,
   ManyToMany,
   ManyToOne,
+  OneToMany,
 } from '@mikro-orm/core';
 import { BaseEntity } from '../shared/db/baseEntity.entity.js';
 import { Servicio } from '../servicio/servicio.entity.js';
@@ -20,11 +21,11 @@ export class Tarea extends BaseEntity {
   descripcionTarea!: string;
   @Property({ nullable: false })
   duracionTarea!: number; // en minutos
-  @OneToOne(() => Servicio, (servicio) => servicio.tarea, {
+  @OneToMany(() => Servicio, (servicio) => servicio.tarea, {
     nullable: true,
     cascade: [Cascade.ALL],
   })
-  servicio?: Rel<Servicio>;
+  servicios = new Collection<Servicio>(this);
   @ManyToOne(() => TipoServicio, {
     nullable: false,
     //cascade: [Cascade.PERSIST], //Esto nos va a permitir que al crear una tarea, se cree el tipo de servicio si no existeHHHH

@@ -91,6 +91,7 @@ export const apiServices = {
   turnos: {
     getAll: () => api.get('/turno'),
     getById: (id: string) => api.get(`/turno/${id}`),
+    getByUserId: (id: string) => api.get(`/turno/byUser/${id}`),
     create: (data: EntityData) => api.post('/turno', data),
     update: (id: string, data: EntityData) => api.put(`/turno/${id}`, data),
     delete: (id: string) => api.delete(`/turno/${id}`),

@@ -4,7 +4,7 @@ import Login from './pages/about/App_login.js';
 import Recovery from './pages/about/recovery.js';
 import Registration from './pages/about/registration.js';
 import './App.css';
-
+import TurnHistory from './components/TurnHistory/TurnHistory.js';
 import About from './pages/about/about.js';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Servicios from './pages/about/Servicios.js';
@@ -20,6 +20,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/recovery" element={<Recovery />} />
           <Route path="/registration" element={<Registration />} />
+          <Route path="/TurnHistory" element={<TurnHistory />} />
         </Routes>
       </Router>
     </>

@@ -8,6 +8,7 @@ import {
   OneToOne,
   PrimaryKey,
   Rel,
+  ManyToOne,
 } from '@mikro-orm/core';
 import { Tarea } from '../tarea/tarea.entity.js';
 import { Usuario } from '../usuario/usuario.entity.js';
@@ -21,14 +22,13 @@ export class Servicio {
   @Property({ nullable: false })
   precio!: number;
 
-  @OneToOne(() => Tarea)
+  @ManyToOne(() => Tarea, { nullable: false })
   tarea!: Rel<Tarea>;
 
-  @ManyToMany(() => Usuario, (usuario) => usuario.servicios, {
+  @ManyToOne(() => Usuario, {
     nullable: true,
-    //cascade: [Cascade.ALL], Creo que no conviene que se borren los usuarios al borrar un servicio
   })
-  usuarios = new Collection<Usuario>(this);
+  usuario!: Rel<Usuario>;
 
   @OneToMany(() => Turno, (turno) => turno.servicio, {
     cascade: [Cascade.ALL],

@@ -7,6 +7,7 @@
   background: #fff;
   box-shadow: 0px 0px 30px 0px rgba(0, 0, 0, 0.1);
   padding: 3%;
+  height: auto;
   padding-bottom: 0%;
 }
 
@@ -28,6 +29,7 @@
   flex-direction: row;
   width: 90%;
   justify-content: space-between;
+  margin-bottom: 10px;
 }
 
 .userGroup {
@@ -42,7 +44,8 @@
   display: flex;
   flex-direction: row-reverse;
   align-items: center;
-  max-width: 60%;
+  max-width: 100px;
+  max-height: 70px;
 }
 
 .commentText {
@@ -57,6 +60,7 @@
 }
 
 .footerText {
+  margin-top: 15px;
   color: rgb(173, 172, 172);
   font-size: 80%;
 }
