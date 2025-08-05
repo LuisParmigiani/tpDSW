@@ -10,7 +10,7 @@ import {
   type FieldPath,
   type FieldValues,
 } from 'react-hook-form';
-
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import {
   cn,
   useFormField,
@@ -44,7 +44,7 @@ function FormItem({ className, ...props }: React.ComponentProps<'div'>) {
     <FormItemContext.Provider value={{ id }}>
       <div
         data-slot="form-item"
-        className={cn('grid gap-2', className)}
+        className={cn('gap-2 flex', className)}
         {...props}
       />
     </FormItemContext.Provider>
@@ -109,29 +109,36 @@ function FormMessage({ className, ...props }: React.ComponentProps<'p'>) {
   }
 
   return (
-    <p
+    <div
       data-slot="form-message"
       id={formMessageId}
-      className={cn(
-        'text-red-600 text-sm font-medium mt-1 bg-red-50 border border-red-200 rounded-md px-2 py-1 shadow-sm animate-in slide-in-from-top-1 duration-200 flex items-center gap-1',
-        className
-      )}
+      className={cn('flex items-center justify-end mt-1', className)}
       {...props}
     >
-      {/* Add error icon */}
-      <svg
-        className="h-4 w-4 text-red-500 flex-shrink-0"
-        fill="currentColor"
-        viewBox="0 0 20 20"
-      >
-        <path
-          fillRule="evenodd"
-          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-          clipRule="evenodd"
-        />
-      </svg>
-      {body}
-    </p>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div className="flex items-center justify-center w-5 h-5 cursor-help">
+            <svg
+              className="h-4 w-4 text-red-500 hover:text-red-600 transition-colors duration-200"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent
+          side="top"
+          className="bg-red-600 text-white border-red-600 text-sm"
+        >
+          {body}
+        </TooltipContent>
+      </Tooltip>
+    </div>
   );
 }
 
