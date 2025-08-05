@@ -1,10 +1,16 @@
-import Navbar from '../../components/Navbar/Navbar.js';
-import styles from './Servicios.module.css';
+import { useEffect, useState } from 'react';
 import BotonForm from '../../components/Botones/BotonForm.js';
+import Navbar from '../../components/Navbar/Navbar.js';
 import ServicioCard from '../../components/servicios.cards/ServicioCard.js';
-import { useState } from 'react';
-import { useEffect } from 'react';
 import { apiServices } from '../../services/api.js';
+import styles from './Servicios.module.css';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from './../../components/Select/Select.js';
 
 // FIX 1: Complete Usuario type to match ServicioCard props
 type Usuario = {
@@ -18,6 +24,7 @@ type Usuario = {
     descripcionTipo: string;
   }>;
   zonas: Array<{ id: number; descripcionZona: string }>;
+
   // Add other properties your backend returns
 };
 
@@ -155,38 +162,44 @@ function FiltrosDeServicios() {
   }
 
   const tiposOptions = [];
-  tiposOptions.push(<option value={''}> Seleccione un servicio</option>);
   if (tipoServicios && tipoServicios.length > 0) {
     tipoServicios.map((tipo, index) => {
       tiposOptions.push(
-        <option key={index} value={tipo.nombreTipo}>
+        <SelectItem
+          value={tipo.nombreTipo}
+          className="text-secondary text-base font-medium bg-white hover:bg-gray-200"
+          key={index}
+        >
           {tipo.nombreTipo}
-        </option>
+        </SelectItem>
       );
     });
   } else {
     tiposOptions.push(
-      <option key={0} value="">
+      <SelectItem key={0} value="vacio">
         No hay servicios disponibles
-      </option>
+      </SelectItem>
     );
   }
 
   const zonasOptions = [];
-  zonasOptions.push(<option value={''}> Seleccione una zona</option>);
   if (zonas && zonas.length > 0) {
     zonas.map((z, index) => {
       zonasOptions.push(
-        <option key={index} value={z.descripcionZona}>
+        <SelectItem
+          key={index}
+          value={z.descripcionZona}
+          className="text-secondary text-base font-medium bg-white hover:bg-gray-200"
+        >
           {z.descripcionZona}
-        </option>
+        </SelectItem>
       );
     });
   } else {
     zonasOptions.push(
-      <option key={0} value="">
+      <SelectItem key={0} value="vacio">
         No hay zonas disponibles
-      </option>
+      </SelectItem>
     );
   }
   return (
@@ -204,61 +217,43 @@ function FiltrosDeServicios() {
         onSubmit={handleSubmit}
       >
         <div className="mb-4  m ">
-          <label
-            aria-label="Servicio"
-            className={'font-medium text-base text-secondary text-center mr-2'}
-            htmlFor="servicio"
-          >
-            Servicio:
-          </label>
-          <select
-            name="servicio"
-            value={filtrosForm.servicio}
-            onChange={handleChange}
-            required
-            className={'text-secondary text-base font-medium bg-white'}
-          >
-            {tiposOptions}
-          </select>
+          <Select>
+            <SelectTrigger className="w-[180px] text-secondary text-base font-medium bg-white">
+              <SelectValue placeholder="Servicio" />
+            </SelectTrigger>
+            <SelectContent>{tiposOptions}</SelectContent>
+          </Select>
         </div>
         <div className="mb-4   ">
-          <label
-            aria-label="Zona"
-            className={'font-medium text-base text-secondary text-center mr-2'}
-            htmlFor="zona"
-          >
-            Zona:
-          </label>
-          <select
-            name="zona"
-            value={filtrosForm.zona}
-            onChange={handleChange}
-            required
-            className={'text-secondary text-base font-medium bg-white'}
-          >
-            {zonasOptions}
-          </select>
+          <Select>
+            <SelectTrigger className="w-[180px] text-secondary text-base font-medium bg-white">
+              <SelectValue placeholder="Zona" />
+            </SelectTrigger>
+            <SelectContent>{zonasOptions}</SelectContent>
+          </Select>
         </div>
         <div className="mb-4">
-          <label
-            aria-label="OrdenarPor"
-            className={'font-medium text-base text-secondary text-center mr-2'}
-            htmlFor="ordenarPor"
-          >
-            Ordenar por:
-          </label>
-          <select
-            name="ordenarPor"
-            value={filtrosForm.ordenarPor}
-            onChange={handleChange}
-            className={'text-secondary text-base font-medium bg-white'}
-          >
-            <option value="">Seleccionar orden</option>
-            <option value="Precio">Precio</option>
-            <option value="Valoracion">Valoración</option>
-          </select>
+          <Select>
+            <SelectTrigger className="w-[180px] text-secondary text-base font-medium bg-white">
+              <SelectValue placeholder="Ordenar por" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem
+                value="calificacion"
+                className="text-secondary text-base font-medium bg-white hover:bg-gray-200"
+              >
+                Calificación
+              </SelectItem>
+              <SelectItem
+                value="nombre"
+                className="text-secondary text-base font-medium bg-white hover:bg-gray-200"
+              >
+                Nombre
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-        <div>
+        <div className="mb-4">
           <BotonForm texto="Buscar" tipo="submit" />
         </div>
       </form>
