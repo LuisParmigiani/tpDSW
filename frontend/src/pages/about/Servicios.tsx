@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from './../../components/Select/Select.js';
+import { ServiciosForm } from '../../components/Forms/FormServicios.js';
 
 // FIX 1: Complete Usuario type to match ServicioCard props
 type Usuario = {
@@ -126,7 +127,11 @@ function FiltrosDeServicios() {
     setFiltrosForm(newFiltros);
     setSubmit(true);
   };
-
+  const handleFormSubmit = (values: FormValues) => {
+    console.log('handling form submit with values:', values);
+    setFiltrosForm(values);
+    setSubmit(true);
+  };
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSubmit(false);
     setFiltrosForm((prev) => ({
@@ -268,6 +273,11 @@ function FiltrosDeServicios() {
       <div className={'flex flex-wrap flex-col xl:flex-row gap-5 mx-8'}>
         {cards}
       </div>
+      <ServiciosForm
+        tipoServicios={tipoServicios}
+        zonas={zonas}
+        onSubmit={handleFormSubmit}
+      />
     </>
   );
 }
