@@ -12,7 +12,7 @@ export default function BotonForm({ texto, accion, tipo }: Props) {
     <button
       onClick={handleClick}
       className={
-        'bg-naranja-1 text-white text-center py-2 px-4 rounded-md hover:bg-white ' +
+        'bg-naranja-1 border-2 border-naranja-1 text-white text-center py-1 px-4 rounded-md hover:bg-white ' +
         'hover:border-naranja-1 hover:border-2 hover:text-naranja-1 hover:text-primary transition-duration-300 ' +
         'box-border'
       }
