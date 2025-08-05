@@ -1,16 +1,7 @@
 import { useEffect, useState } from 'react';
-import BotonForm from '../../components/Botones/BotonForm.js';
 import Navbar from '../../components/Navbar/Navbar.js';
 import ServicioCard from '../../components/servicios.cards/ServicioCard.js';
 import { apiServices } from '../../services/api.js';
-import styles from './Servicios.module.css';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from './../../components/Select/Select.js';
 import { ServiciosForm } from '../../components/Forms/FormServicios.js';
 
 // FIX 1: Complete Usuario type to match ServicioCard props
@@ -42,6 +33,12 @@ type TipoServicio = {
 type Zona = {
   id: number;
   descripcionZona: string;
+};
+
+type FormValues = {
+  servicio: string;
+  zona: string;
+  ordenarPor: string;
 };
 function FiltrosDeServicios() {
   const [filtrosForm, setFiltrosForm] = useState<Filtros>({
@@ -101,7 +98,7 @@ function FiltrosDeServicios() {
         );
         setUsuarios(response.data.data);
         console.log('Usuarios fetched:', response.data.data);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Error: ', err);
         setError('Error al cargar los prestadores de servicios');
         setUsuarios([]);
@@ -114,170 +111,155 @@ function FiltrosDeServicios() {
   }, [submit, filtrosForm.servicio, filtrosForm.zona]);
 
   // FIX 6: Fixed form submission logic
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    console.log('handling submit');
-    event.preventDefault(); // Prevent page reload
-
-    const formData = new FormData(event.currentTarget);
-    const newFiltros = {
-      servicio: formData.get('servicio') as string,
-      zona: formData.get('zona') as string,
-      ordenarPor: formData.get('ordenarPor') as string,
-    };
-    setFiltrosForm(newFiltros);
-    setSubmit(true);
-  };
   const handleFormSubmit = (values: FormValues) => {
     console.log('handling form submit with values:', values);
     setFiltrosForm(values);
     setSubmit(true);
-  };
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSubmit(false);
-    setFiltrosForm((prev) => ({
-      ...prev,
-      [event.target.name]: event.target.value,
-    }));
+    setError(null); // Clear previous errors when submitting
   };
 
-  const cards = [];
-  if (usuarios && usuarios.length > 0) {
-    usuarios.map((user, index) => {
-      //Uno todos los nombres de los tipos de servicio
-      const nombresRubros = user.tiposDeServicio
-        .map((tipo) => tipo.nombreTipo)
-        .join(', ');
-      cards.push(
-        <ServicioCard
-          id={user.id}
-          nombre={user.nombreFantasia}
-          rubros={nombresRubros}
-          puntuacion={4}
-          key={index}
-        />
-      );
-    });
-  } else {
-    const index = 0;
-    cards.push(
-      <p key={index} className={styles.noResults}>
-        No se encontraron prestatarios
+  // Loading component
+  const LoadingSpinner = () => (
+    <div className="flex justify-center items-center py-12">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-secondary"></div>
+      <p className="ml-4 text-secondary text-lg font-medium">
+        Cargando prestadores de servicios...
       </p>
-    );
-  }
+    </div>
+  );
 
-  const tiposOptions = [];
-  if (tipoServicios && tipoServicios.length > 0) {
-    tipoServicios.map((tipo, index) => {
-      tiposOptions.push(
-        <SelectItem
-          value={tipo.nombreTipo}
-          className="text-secondary text-base font-medium bg-white hover:bg-gray-200"
-          key={index}
-        >
-          {tipo.nombreTipo}
-        </SelectItem>
-      );
-    });
-  } else {
-    tiposOptions.push(
-      <SelectItem key={0} value="vacio">
-        No hay servicios disponibles
-      </SelectItem>
-    );
-  }
+  // Error component
+  const ErrorMessage = ({ message }: { message: string }) => (
+    <div className="mx-auto my-8 max-w-md">
+      <div className="bg-red-50 border border-red-200 rounded-lg p-6 shadow-lg">
+        <div className="flex items-center">
+          <div className="flex-shrink-0">
+            <svg
+              className="h-5 w-5 text-red-400"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </div>
+          <div className="ml-3">
+            <h3 className="text-sm font-medium text-red-800">
+              Error al cargar los datos
+            </h3>
+            <p className="mt-1 text-sm text-red-700">{message}</p>
+          </div>
+        </div>
+        <div className="mt-4">
+          <button
+            onClick={() => {
+              setError(null);
+              setSubmit(true); // Retry the request
+            }}
+            className="bg-red-100 hover:bg-red-200 text-red-800 px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+          >
+            Intentar nuevamente
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 
-  const zonasOptions = [];
-  if (zonas && zonas.length > 0) {
-    zonas.map((z, index) => {
-      zonasOptions.push(
-        <SelectItem
-          key={index}
-          value={z.descripcionZona}
-          className="text-secondary text-base font-medium bg-white hover:bg-gray-200"
-        >
-          {z.descripcionZona}
-        </SelectItem>
+  // Empty state component
+  const EmptyState = () => (
+    <div className="mx-auto my-12 max-w-md text-center">
+      <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 shadow-lg">
+        <div className="flex justify-center mb-4">
+          <svg
+            className="h-12 w-12 text-gray-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+        </div>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">
+          No se encontraron prestadores
+        </h3>
+        <p className="text-gray-600 mb-4">
+          No hay prestadores disponibles para los filtros seleccionados.
+        </p>
+        <p className="text-sm text-gray-500">
+          Intenta modificar tus criterios de búsqueda.
+        </p>
+      </div>
+    </div>
+  );
+
+  // Render cards or states
+  const renderContent = () => {
+    // Show error if there's an error
+    if (error) {
+      return <ErrorMessage message={error} />;
+    }
+
+    // Show loading if loading
+    if (isLoading) {
+      return <LoadingSpinner />;
+    }
+
+    // Show results or empty state
+    if (usuarios && usuarios.length > 0) {
+      const cards = usuarios.map((user) => {
+        const nombresRubros = user.tiposDeServicio
+          .map((tipo) => tipo.nombreTipo)
+          .join(', ');
+
+        return (
+          <ServicioCard
+            id={user.id}
+            nombre={user.nombreFantasia}
+            rubros={nombresRubros}
+            puntuacion={4}
+            key={user.id} // Better to use user.id instead of index
+          />
+        );
+      });
+
+      return (
+        <div className="flex flex-wrap flex-col xl:flex-row gap-5 mx-8">
+          {cards}
+        </div>
       );
-    });
-  } else {
-    zonasOptions.push(
-      <SelectItem key={0} value="vacio">
-        No hay zonas disponibles
-      </SelectItem>
+    }
+
+    // Show empty state only if we've submitted the form (to avoid showing it initially)
+    if (submit) {
+      return <EmptyState />;
+    }
+
+    // Initial state - show nothing or a welcome message
+    return (
+      <div className="text-center py-12">
+        <p className="text-gray-600 text-lg">
+          Selecciona un servicio y zona para ver los prestadores disponibles
+        </p>
+      </div>
     );
-  }
+  };
+
   return (
     <>
-      <form
-        className={
-          //animaciones
-          'hover:scale-105 transition ease-in-out duration-75 ' +
-          //primero Los mobiles
-          'bg-tinte-5 mx-auto my-2 flex gap-2 py-1 shadow-2xl flex-col max-w-4/5 justify-center items-center rounded-md ' +
-          //después lo desktop
-          'lg:rounded-full lg:flex-row lg:align-middle'
-        }
-        id="formServicios"
-        onSubmit={handleSubmit}
-      >
-        <div className="mb-4  m ">
-          <Select>
-            <SelectTrigger className="w-[180px] text-secondary text-base font-medium bg-white">
-              <SelectValue placeholder="Servicio" />
-            </SelectTrigger>
-            <SelectContent>{tiposOptions}</SelectContent>
-          </Select>
-        </div>
-        <div className="mb-4   ">
-          <Select>
-            <SelectTrigger className="w-[180px] text-secondary text-base font-medium bg-white">
-              <SelectValue placeholder="Zona" />
-            </SelectTrigger>
-            <SelectContent>{zonasOptions}</SelectContent>
-          </Select>
-        </div>
-        <div className="mb-4">
-          <Select>
-            <SelectTrigger className="w-[180px] text-secondary text-base font-medium bg-white">
-              <SelectValue placeholder="Ordenar por" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem
-                value="calificacion"
-                className="text-secondary text-base font-medium bg-white hover:bg-gray-200"
-              >
-                Calificación
-              </SelectItem>
-              <SelectItem
-                value="nombre"
-                className="text-secondary text-base font-medium bg-white hover:bg-gray-200"
-              >
-                Nombre
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="mb-4">
-          <BotonForm texto="Buscar" tipo="submit" />
-        </div>
-      </form>
-
-      {/* Display loading state */}
-      {isLoading && <p>Cargando...</p>}
-
-      {/* Display error state */}
-      {error && <p className={styles.error}>{error}</p>}
-
-      {/* FIX 7: Proper rendering of results */}
-      <div className={'flex flex-wrap flex-col xl:flex-row gap-5 mx-8'}>
-        {cards}
-      </div>
       <ServiciosForm
         tipoServicios={tipoServicios}
         zonas={zonas}
         onSubmit={handleFormSubmit}
       />
+      {renderContent()}
     </>
   );
 }
