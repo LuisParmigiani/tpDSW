@@ -1,4 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
+import {
+  getServiceByServiceIds,
+  getById,
+} from '../servicio/servicio.controler.js';
 import { Turno } from './turno.entity.js';
 import { orm } from '../shared/db/orm.js';
 
@@ -111,6 +115,41 @@ async function remove(req: Request, res: Response) {
   }
 }
 
+// Get turns by user ID
+async function getTurnosByUserId(req: Request, res: Response) {
+  const userId = Number.parseInt(req.params.id);
+  try {
+    // Buscar los turnos del usuario, populando servicio y usuario
+    const turnos = await em.find(
+      Turno,
+      { usuario: { id: userId } },
+      { populate: ['servicio', 'usuario'] }
+    );
+
+    // Para cada turno, reemplazar el servicio por el servicio completo (con tarea y usuarios)
+    const turnosConServicioCompleto = await Promise.all(
+      turnos.map(async (turno) => {
+        if (turno.servicio && typeof turno.servicio.id === 'number') {
+          // getById retorna el servicio con tarea y usuarios populados
+          const servicioCompleto = await getById(turno.servicio.id);
+          return {
+            ...turno,
+            servicio: servicioCompleto,
+          };
+        }
+        return turno;
+      })
+    );
+
+    res.status(200).json({
+      message: 'found turns by user id',
+      data: turnosConServicioCompleto,
+    });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
 async function getTurnosByServicioIdHelper(params: {
   idServices: number[];
   maxItems: number;
@@ -181,4 +220,5 @@ export {
   update,
   remove,
   getTurnosByServicioIdHelper,
+  getTurnosByUserId,
 };

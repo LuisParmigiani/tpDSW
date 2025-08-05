@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import styles from './Carousel.module.css';
 
 type Props = {
   fotos: string[];
@@ -19,13 +18,15 @@ function Carousel({ fotos, titulo }: Props) {
   }, [fotos.length]);
 
   return (
-    <div className={styles.carousel}>
+    <div className="relative flex items-center justify-center w-full h-[80vh] m-0">
       <img
-        className={styles.carouselImg}
+        className="w-full h-full object-cover z-0 brightness-50"
         src={fotos[index]}
         alt="Foto Trabajador"
       />
-      <h1 className={styles.carouselh1}>{titulo}</h1>
+      <h1 className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-2xl text-center z-10">
+        {titulo}
+      </h1>
     </div>
   );
 }

@@ -1,18 +1,18 @@
 import Navbar from '../Navbar/Navbar';
 import Carousel from '../Carousel/Carousel.js';
-import styles from './Homepage.module.css';
-import Comments from '../Comments/Comments';
+import Comments from './../Comments/Comments.js';
 import Footer from '../Footer/Footer';
 function Homepage() {
   const CommentOne = 1;
   const CommentTwo = 2;
+
   return (
     <>
-      <div className={styles.containerNavbar}>
-        <div className={styles.navbarContainer}>
+      <div className="flex flex-col w-full">
+        <div className="absolute inset-0 w-full z-20">
           <Navbar />
         </div>
-        <div className={styles.carouselContainer}>
+        <div className="w-full">
           <Carousel
             fotos={[
               '/images/carousel1.jpg',
@@ -24,27 +24,27 @@ function Homepage() {
         </div>
       </div>
 
-      <div className={styles.phrase}>
-        <h2 className={styles.phraseTitle}>
-          La solucion de tus <span className={styles.highlight}>problemas</span>
+      <div className="flex flex-col items-center content-center align-center p-11 bg-white w-full m-0 h-96">
+        <h2 className="text-5xl  font-bold text-[#333] m-0 mt-3">
+          La solucion de tus <span className="text-naranja-1">problemas</span>
           , <br /> al alcance de un
-          <span className={styles.highlight}> click</span>.
+          <span className="text-naranja-1"> click</span>.
         </h2>
         <img
-          className={styles.phraseArrow}
+          className="max-w-2/12 max-h-2/12 mt-auto"
           src="/images/down-arrow.png"
           alt="Flecha para abajo"
         />
       </div>
 
-      <div className={styles.cardContainer}>
-        <div className={styles.cardLine}>
-          <div className={styles.card}>
+      <div className="bg-[#4d4d4d] flex flex-col pb-5">
+        <div className="mt-9 flex flex-row justify-around w-full gap-5 flex-wrap ">
+          <div className="flex flex-col items-center flex-1 max-w-80 min-w-72 min-h-80 h-auto rounded-3xl bg-[#fff5f2] shadow-[0_0_40px_0_rgba(0,0,0,0.58)] p-5 box-border justify-between">
             <svg
               width="105"
               height="104"
               viewBox="0 0 105 104"
-              className={styles.cardIcon}
+              className="fill-white mt-0 shrink-0"
               xmlns="http://www.w3.org/2000/svg"
             >
               <circle cx="52.5" cy="52" r="52" fill="white" />
@@ -69,17 +69,19 @@ function Homepage() {
                 </clipPath>
               </defs>
             </svg>
-            <h3 className={styles.cardTitle}>Plomero</h3>
-            <p className={styles.cardDescription}>
+            <h3 className="w-full text-2xl font-bold text-gray-800 text-center my-4 shrink-0">
+              Plomero
+            </h3>
+            <p className="w-9/10 text-base text-gray-600 text-center grow flex items-center justify-center mb-2 leading-relaxed">
               Contratá servicios de plomeros matriculados cerca de tu zona.
             </p>
           </div>
-          <div className={styles.card}>
+          <div className="flex flex-col items-center flex-1 max-w-80 min-w-72 min-h-80 h-auto rounded-3xl bg-[#fff5f2] shadow-[0_0_40px_0_rgba(0,0,0,0.58)] p-5 box-border justify-between">
             <svg
               width="105"
               height="104"
               viewBox="0 0 105 104"
-              className={styles.cardIcon}
+              className="fill-white mt-0 shrink-0"
               xmlns="http://www.w3.org/2000/svg"
             >
               <circle cx="52.5" cy="52" r="52" fill="white" />
@@ -104,18 +106,20 @@ function Homepage() {
                 </clipPath>
               </defs>
             </svg>
-            <h3 className={styles.cardTitle}>Electricista</h3>
-            <p className={styles.cardDescription}>
+            <h3 className="w-full text-2xl font-bold text-gray-800 text-center my-4 shrink-0">
+              Electricista
+            </h3>
+            <p className="w-9/10 text-base text-gray-600 text-center grow flex items-center justify-center mb-2 leading-relaxed">
               Arreglá tus problemas relacionados a la electricidad con nuestra
               gran selección de calificados electricistas.
             </p>
           </div>
-          <div className={styles.card}>
+          <div className="flex flex-col items-center flex-1 max-w-80 min-w-72 min-h-80 h-auto rounded-3xl bg-[#fff5f2] shadow-[0_0_40px_0_rgba(0,0,0,0.58)] p-5 box-border justify-between">
             <svg
               width="105"
               height="104"
               viewBox="0 0 105 104"
-              className={styles.cardIcon}
+              className="fill-white mt-0 shrink-0"
               xmlns="http://www.w3.org/2000/svg"
             >
               <circle cx="52.5" cy="52" r="52" fill="white" />
@@ -125,20 +129,22 @@ function Homepage() {
               />
             </svg>
 
-            <h3 className={styles.cardTitle}>Carpintero.</h3>
-            <p className={styles.cardDescription}>
+            <h3 className="w-full text-2xl font-bold text-gray-800 text-center my-4 shrink-0">
+              Carpintero.
+            </h3>
+            <p className="w-9/10 text-base text-gray-600 text-center grow flex items-center justify-center mb-2 leading-relaxed">
               Todos los arreglos que tengan que ver con la madera estarán en
               buenas manos con nuestros carpinteros.
             </p>
           </div>
         </div>
-        <div className={styles.cardLine}>
-          <div className={styles.card}>
+        <div className="mt-9 flex flex-row justify-around w-full gap-5 flex-wrap">
+          <div className="flex flex-col items-center flex-1 max-w-80 min-w-72 min-h-80 h-auto rounded-3xl bg-[#fff5f2] shadow-[0_0_40px_0_rgba(0,0,0,0.58)] p-5 box-border justify-between">
             <svg
               width="105"
               height="104"
               viewBox="0 0 105 104"
-              className={styles.cardIcon}
+              className="fill-white mt-0 shrink-0"
               xmlns="http://www.w3.org/2000/svg"
             >
               <circle cx="52.5" cy="52" r="52" fill="white" />
@@ -148,17 +154,19 @@ function Homepage() {
               />
             </svg>
 
-            <h3 className={styles.cardTitle}>Pintor.</h3>
-            <p className={styles.cardDescription}>
+            <h3 className="w-full text-2xl font-bold text-gray-800 text-center my-4 shrink-0">
+              Pintor.
+            </h3>
+            <p className="w-9/10 text-base text-gray-600 text-center grow flex items-center justify-center mb-2 leading-relaxed">
               Dale vida a tu hogar con nuestros pintores profesionales.
             </p>
           </div>
-          <div className={styles.card}>
+          <div className="flex flex-col items-center flex-1 max-w-80 min-w-72 min-h-80 h-auto rounded-3xl bg-[#fff5f2] shadow-[0_0_40px_0_rgba(0,0,0,0.58)] p-5 box-border justify-between">
             <svg
               width="105"
               height="104"
               viewBox="0 0 105 104"
-              className={styles.cardIcon}
+              className="fill-white mt-0 shrink-0"
               xmlns="http://www.w3.org/2000/svg"
             >
               <circle cx="52.5" cy="52" r="52" fill="white" />
@@ -167,18 +175,20 @@ function Homepage() {
                 fill="#F66731"
               />
             </svg>
-            <h3 className={styles.cardTitle}>Constructor.</h3>
-            <p className={styles.cardDescription}>
+            <h3 className="w-full text-2xl font-bold text-gray-800 text-center my-4 shrink-0">
+              Constructor.
+            </h3>
+            <p className="w-9/10 text-base text-gray-600 text-center grow flex items-center justify-center mb-2 leading-relaxed">
               Los problemas de construcción no serán una inconveniencia para
               nuestros albañiles.
             </p>
           </div>
-          <div className={styles.card}>
+          <div className="flex flex-col items-center flex-1 max-w-80 min-w-72 min-h-80 h-auto rounded-3xl bg-[#fff5f2] shadow-[0_0_40px_0_rgba(0,0,0,0.58)] p-5 box-border justify-between">
             <svg
               width="105"
               height="104"
               viewBox="0 0 105 104"
-              className={styles.cardIcon}
+              className="fill-white mt-0 shrink-0"
               xmlns="http://www.w3.org/2000/svg"
             >
               <circle cx="52.5" cy="52" r="52" fill="white" />
@@ -191,28 +201,30 @@ function Homepage() {
               />
             </svg>
 
-            <h3 className={styles.cardTitle}>Cerrajero.</h3>
-            <p className={styles.cardDescription}>
+            <h3 className="w-full text-2xl font-bold text-gray-800 text-center my-4 shrink-0">
+              Cerrajero.
+            </h3>
+            <p className="w-9/10 text-base text-gray-600 text-center grow flex items-center justify-center mb-2 leading-relaxed">
               En cuanto la necesidad de trabajar algo con tus cerraduras, no
               dudes en contactar a nuestros cerrajeros.
             </p>
           </div>
         </div>
       </div>
-      <div className={styles.footerCommentsContainer}>
-        <h1 className={styles.commentsPhrase}>
+      <div className="bg-gradient-to-b from-gray-100 to-teal-900">
+        <h1 className="mt-0 pt-12 text-black mb-20 text-4xl lg:text-6xl m-17">
           No nos escuches a nosotros, escucha a nuestros{' '}
-          <span className={styles.highlight}>clientes.</span>
+          <span className="text-naranja-1">clientes.</span>
         </h1>
-        <div className={styles.commentsContainer}>
-          <div className={styles.commentOne}>
+        <div className="flex flex-col w-full ">
+          <div className="self-end  lg:w-5/12 w-10/12 max-h-40 mb-9 mr-7">
             <Comments id={CommentOne} />
           </div>
-          <div className={styles.commentTwo}>
+          <div className="self-start lg:w-5/12 w-10/12 ml-9 max-h-40 mb-5">
             <Comments id={CommentTwo} />
           </div>
         </div>
-        <div className={styles.footerContainer}>
+        <div>
           <Footer />
         </div>
       </div>

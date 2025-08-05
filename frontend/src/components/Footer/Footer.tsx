@@ -1,5 +1,4 @@
-import styles from './Footer.module.css';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 interface Item {
@@ -46,19 +45,6 @@ function Footer() {
   const [showNavigation, setShowNavigation] = useState(false);
   const [showSocial, setShowSocial] = useState(false);
 
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkScreenSize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-
-    checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
-
-    return () => window.removeEventListener('resize', checkScreenSize);
-  }, []);
-
   // Funciones para manejar el toggle de las secciones
   const handleToggleServices = () => {
     setShowServices((prev) => !prev);
@@ -79,8 +65,13 @@ function Footer() {
   // Función para renderizar listas
   const renderList = (list: Item[]) => {
     return list.map((listItem) => (
-      <li className={styles.ListItem} key={listItem.id}>
-        <Link to={listItem.link}>{listItem.name}</Link>
+      <li className="text-2sm my-1.5 " key={listItem.id}>
+        <Link
+          className="no-underline text-black transition-colors duration-200 ease-in-out hover:text-naranja-1"
+          to={listItem.link}
+        >
+          {listItem.name}
+        </Link>
       </li>
     ));
   };
@@ -115,11 +106,13 @@ function Footer() {
   );
 
   return (
-    <footer className={styles.footer}>
+    <footer className="lg:flex lg:flex-row  w-full m-auto pb-7 pt-7 mt-10 justify-between pl-10 pr-10 text-black box-border">
       {/* Sección de la empresa */}
-      <div className={styles.companyColumn}>
-        <div className={styles.firstLineCompany}>
-          <h4 className={styles.companyName}>Nombre de la Empresa</h4>
+      <div className="flex flex-col items-center flex-1 lg:m-0 mb-10">
+        <div className="flex flex-row items-center justify-center gap-10 mb-4 mr-6">
+          <h4 className="text-2xl font-bold m-0 text-center ">
+            Nombre de la Empresa
+          </h4>
           <svg
             width="24"
             height="24"
@@ -134,98 +127,122 @@ function Footer() {
             />
           </svg>
         </div>
-        <p className={styles.textCompany}>© 2025 Nombre de la Empresa</p>
-        <p className={styles.textCompany}>Todos los derechos reservados</p>
+        <p className="m-1 text-1xl align-center text-black">
+          © 2025 Nombre de la Empresa
+        </p>
+        <p className="text-base text-gray text-center">
+          Todos los derechos reservados
+        </p>
       </div>
 
       {/* Versión móvil con acordeones */}
-      {isMobile && (
-        <>
-          <div className={styles.serviceContainer}>
-            <div className={styles.toggleButton} onClick={handleToggleServices}>
-              <h4>
-                Servicios
-                <ArrowIcon isOpen={showServices} />
-              </h4>
-            </div>
-            {showServices && (
-              <div className={styles.servicesList}>
-                <ul className={styles.List}>{renderList(services)}</ul>
-              </div>
-            )}
+      <div className="lg:hidden w-full">
+        <div className="mb-4">
+          <div
+            className="cursor-pointer pl-3 pr-3 border-b-1 border-gray select-none"
+            onClick={handleToggleServices}
+          >
+            <h4 className="m-0 text-1xl flex items-center justify-between font-bold">
+              Servicios
+              <ArrowIcon isOpen={showServices} />
+            </h4>
           </div>
+          {showServices && (
+            <div className="py-3 animate-slideDown ">
+              <ul className="list-none p-0 m-0 flex flex-col">
+                {renderList(services)}
+              </ul>
+            </div>
+          )}
+        </div>
 
-          <div className={styles.usContainer}>
-            <div className={styles.toggleButton} onClick={handleToggleUs}>
-              <h4>
-                Sobre Nosotros
-                <ArrowIcon isOpen={showUs} />
-              </h4>
-            </div>
-            {showUs && (
-              <div className={styles.usList}>
-                <ul className={styles.List}>{renderList(us)}</ul>
-              </div>
-            )}
+        <div className="mb-4">
+          <div
+            className="cursor-pointer pl-3 pr-3 border-b-1 border-gray select-none"
+            onClick={handleToggleUs}
+          >
+            <h4 className="m-0 text-1xl flex items-center justify-between font-bold">
+              Sobre Nosotros
+              <ArrowIcon isOpen={showUs} />
+            </h4>
           </div>
+          {showUs && (
+            <div className="py-3 animate-slideDown ">
+              <ul className="list-none p-0 m-0 flex flex-col">
+                {renderList(us)}
+              </ul>
+            </div>
+          )}
+        </div>
 
-          <div className={styles.navigationContainer}>
-            <div
-              className={styles.toggleButton}
-              onClick={handleToggleNavigation}
-            >
-              <h4>
-                Navegación
-                <ArrowIcon isOpen={showNavigation} />
-              </h4>
-            </div>
-            {showNavigation && (
-              <div className={styles.navigationList}>
-                <ul className={styles.List}>{renderList(navegacion)}</ul>
-              </div>
-            )}
+        <div className="mb-4">
+          <div
+            className="cursor-pointer pl-3 pr-3 border-b-1 border-gray select-none"
+            onClick={handleToggleNavigation}
+          >
+            <h4 className="m-0 text-1xl flex items-center justify-between font-bold">
+              Navegación
+              <ArrowIcon isOpen={showNavigation} />
+            </h4>
           </div>
+          {showNavigation && (
+            <div className="py-3 animate-slideDown ">
+              <ul className="list-none p-0 m-0 flex flex-col">
+                {renderList(navegacion)}
+              </ul>
+            </div>
+          )}
+        </div>
 
-          <div className={styles.socialContainer}>
-            <div className={styles.toggleButton} onClick={handleToggleSocial}>
-              <h4>
-                Redes Sociales
-                <ArrowIcon isOpen={showSocial} />
-              </h4>
-            </div>
-            {showSocial && (
-              <div className={styles.socialList}>
-                <ul className={styles.List}>{renderList(social)}</ul>
-              </div>
-            )}
+        <div className="mb-4">
+          <div
+            className="cursor-pointer pl-3 pr-3 border-b-1 border-gray select-none"
+            onClick={handleToggleSocial}
+          >
+            <h4 className="m-0 text-1xl flex items-center justify-between font-bold">
+              Redes Sociales
+              <ArrowIcon isOpen={showSocial} />
+            </h4>
           </div>
-        </>
-      )}
+          {showSocial && (
+            <div className="py-3 animate-slideDown ">
+              <ul className="list-none p-0 m-0 flex flex-col">
+                {renderList(social)}
+              </ul>
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Versión desktop con columnas */}
-      {!isMobile && (
-        <>
-          <div className={styles.olumn}>
-            <h4 className={styles.Title}>Servicios</h4>
-            <ul className={styles.List}>{renderList(services)}</ul>
-          </div>
 
-          <div className={styles.column}>
-            <h4 className={styles.Title}>Sobre Nosotros</h4>
-            <ul className={styles.List}>{renderList(us)}</ul>
-          </div>
+      <div className="lg:flex hidden w-10/12">
+        <div className="flex flex-col flex-1 min-w-0 mx-1">
+          <h4 className=" font-bold mb-4 underline text-2xl">Servicios</h4>
+          <ul className="list-none p-0 m-0 flex flex-col">
+            {renderList(services)}
+          </ul>
+        </div>
 
-          <div className={styles.column}>
-            <h4 className={styles.Title}>Navegación</h4>
-            <ul className={styles.List}>{renderList(navegacion)}</ul>
-          </div>
+        <div className="flex flex-col flex-1 min-w-0 mx-1">
+          <h4 className=" font-bold mb-4 underline text-2xl">Sobre Nosotros</h4>
+          <ul className="list-none p-0 m-0 flex flex-col">{renderList(us)}</ul>
+        </div>
 
-          <div className={styles.column}>
-            <h4 className={styles.Title}>Redes Sociales</h4>
-            <ul className={styles.List}>{renderList(social)}</ul>
-          </div>
-        </>
-      )}
+        <div className="flex flex-col flex-1 min-w-0 mx-1">
+          <h4 className=" font-bold mb-4 underline text-2xl">Navegación</h4>
+          <ul className="list-none p-0 m-0 flex flex-col">
+            {renderList(navegacion)}
+          </ul>
+        </div>
+
+        <div className="flex flex-col flex-1 min-w-0 mx-1">
+          <h4 className=" font-bold mb-4 underline text-2xl">Redes Sociales</h4>
+          <ul className="list-none p-0 m-0 flex flex-col">
+            {renderList(social)}
+          </ul>
+        </div>
+      </div>
     </footer>
   );
 }

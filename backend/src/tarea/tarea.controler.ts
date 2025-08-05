@@ -22,7 +22,7 @@ function sanitizeTareaInput(req: Request, res: Response, next: NextFunction) {
 }
 async function findall(req: Request, res: Response) {
   try {
-    const tasks = await em.find(Tarea, {}, { populate: ['servicio'] });
+    const tasks = await em.find(Tarea, {}, { populate: ['servicios'] });
     res.status(200).json({ message: 'found all tasks', data: tasks });
   } catch (error: any) {
     res.status(500).json({ message: error.message });
@@ -35,7 +35,7 @@ async function findone(req: Request, res: Response) {
     const task = await em.findOneOrFail(
       Tarea,
       { id },
-      { populate: ['servicio'] }
+      { populate: ['servicios'] }
     );
     res.status(200).json({ message: 'found one task', data: task });
   } catch (error: any) {

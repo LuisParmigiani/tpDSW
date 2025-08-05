@@ -1,5 +1,3 @@
-import styles from './PaginationControler.module.css';
-import { useState, useEffect } from 'react';
 type Props = {
   currentPage: number;
   totalPages: number;
@@ -7,25 +5,6 @@ type Props = {
 };
 
 function PaginationControls({ currentPage, totalPages, onPageChange }: Props) {
-  console.log(
-    'PaginationControls - currentPage:',
-    currentPage,
-    'totalPages:',
-    totalPages
-  ); // Debug VER BIEN
-
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const checkScreenSize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-
-    checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
-
-    return () => window.removeEventListener('resize', checkScreenSize);
-  }, []);
-
   const goToPrevious = () => {
     if (currentPage > 1) {
       onPageChange(currentPage - 1);
@@ -41,27 +20,43 @@ function PaginationControls({ currentPage, totalPages, onPageChange }: Props) {
   if (totalPages <= 1) return null;
 
   return (
-    <div className={styles.paginationControls}>
+    <div className="flex flex-row content-center items-center gap-4 flex-wrap p-4 pt-7">
       <button
         onClick={goToPrevious}
         disabled={currentPage === 1}
-        className={styles.button}
+        className=" lg:hidden bg-naranja-1  rounded-2xl py-2 px-4 hover:bg-orange-100 transition-colors duration-300 hover:text-naranja-1 hover:border border-naranja-1 text-white  disabled:opacity-50 disabled:bg-gray-700 disabled:hover:border-0 disabled:hover:text-white"
         aria-label="Página anterior"
       >
-        {isMobile ? '← ' : '← Anterior  '}
+        {'← '}
+      </button>
+      <button
+        onClick={goToPrevious}
+        disabled={currentPage === 1}
+        className=" hidden lg:block bg-naranja-1  rounded-2xl py-2 px-4 hover:bg-orange-100 transition-colors duration-300 hover:text-naranja-1 hover:border border-naranja-1 text-white disabled:opacity-50 disabled:bg-gray-700 disabled:hover:border-0 disabled:hover:text-white"
+        aria-label="Página anterior"
+      >
+        {'← Anterior  '}
       </button>
 
-      <span className={styles.pageInfo}>
+      <span className="text-black text-md">
         Página {currentPage} de {totalPages}
       </span>
 
       <button
         onClick={goToNext}
         disabled={currentPage === totalPages}
-        className={styles.button}
+        className="lg:hidden bg-naranja-1  rounded-2xl py-2 px-4 hover:bg-orange-100 transition-colors duration-300 hover:text-naranja-1 hover:border border-naranja-1 text-white  disabled:opacity-50 disabled:bg-gray-700 disabled:hover:border-0 disabled:hover:text-white"
         aria-label="Página siguiente"
       >
-        {isMobile ? ' →' : 'Siguiente →'}
+        {' →'}
+      </button>
+      <button
+        onClick={goToNext}
+        disabled={currentPage === totalPages}
+        className="hidden lg:block bg-naranja-1  rounded-2xl py-2 px-4 hover:bg-orange-100 transition-colors duration-300 hover:text-naranja-1 hover:border border-naranja-1 text-white  disabled:opacity-50 disabled:bg-gray-700 disabled:hover:border-0 disabled:hover:text-white"
+        aria-label="Página siguiente"
+      >
+        {' Siguiente →'}
       </button>
     </div>
   );
