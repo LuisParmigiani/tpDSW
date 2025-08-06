@@ -24,6 +24,7 @@ function sanitizeUsuarioInput(req: Request, res: Response, next: NextFunction) {
     tiposDeServicio: req.body.tiposDeServicio,
     horarios: req.body.horarios,
     zonas: req.body.zonas,
+    orderBy: req.body.orderBy,
   };
   Object.keys(req.body.sanitizeUsuarioInput).forEach((key) => {
     if (req.body.sanitizeUsuarioInput[key] === undefined) {
@@ -32,6 +33,19 @@ function sanitizeUsuarioInput(req: Request, res: Response, next: NextFunction) {
   });
   next();
 }
+type PrestatarioWithRating = {
+  id: number;
+  nombre: string;
+  apellido: string;
+  nombreFantasia: string;
+  tiposDeServicio: Array<{
+    id: number;
+    nombreTipo: string;
+    descripcionTipo: string;
+  }>;
+  zonas: Array<{ id: number; descripcionZona: string }>;
+  calificacion: number;
+};
 
 async function findAll(req: Request, res: Response) {
   try {
@@ -46,19 +60,88 @@ async function findAll(req: Request, res: Response) {
   }
 }
 
-async function findPrestatarios(req: Request, res: Response) {
+async function findPrestatariosByTipoServicioAndZona(
+  req: Request,
+  res: Response
+) {
   try {
     const nombreTipoServicio = req.params.tipoServicio;
     const nombreZona = req.params.zona;
+    const orderBy = req.params.orderBy as string;
+
     const prestatarios = await em.find(
       Usuario,
       {
         zonas: { descripcionZona: nombreZona },
         tiposDeServicio: { nombreTipo: nombreTipoServicio },
       },
-      { populate: ['tiposDeServicio', 'zonas'] }
+      {
+        populate: ['tiposDeServicio', 'zonas', 'servicios', 'servicios.turnos'],
+      }
     );
-    res.status(200).json({ message: 'found prestatarios', data: prestatarios });
+
+    if (prestatarios.length === 0) {
+      return res.status(404).json({
+        message: 'No prestatarios found for the given tipoServicio and zona',
+      });
+    }
+
+    // Transform Usuario entities to PrestatarioWithRating
+    const prestatariosWithRating = prestatarios.map((prest) => {
+      let totalCalificaciones = 0;
+      let countCalificaciones = 0;
+
+      const servicios = prest.servicios.getItems();
+      for (const servicio of servicios) {
+        if (servicio.turnos !== null && servicio.turnos !== undefined) {
+          const turnos = servicio.turnos;
+          for (const turno of turnos) {
+            if (
+              turno.calificacion !== null &&
+              turno.calificacion !== undefined
+            ) {
+              totalCalificaciones += turno.calificacion;
+              countCalificaciones++;
+            }
+          }
+        }
+      }
+      // Build a plain object with all needed properties
+      return {
+        id: prest.id,
+        nombre: prest.nombre,
+        apellido: prest.apellido,
+        nombreFantasia: prest.nombreFantasia,
+        descripcion: prest.descripcion,
+        foto: prest.foto,
+        tiposDeServicio: prest.tiposDeServicio.getItems(),
+        calificacion:
+          countCalificaciones > 0
+            ? totalCalificaciones / countCalificaciones
+            : 0,
+      };
+    });
+
+    // Apply ordering if specified
+    //Se que es una mala práctica utilizar un any type pero sino era batante dificil hacer que typescript no se queje
+    if (orderBy) {
+      prestatariosWithRating.sort((a, b) => {
+        switch (orderBy) {
+          case 'Nombre':
+            return (a as any).nombreFantasia.localeCompare(b.nombreFantasia);
+          case 'Calificacion':
+            return (b.calificacion || 0) - (a.calificacion || 0); // Descending
+          default:
+            return (a as any).nombreFantasia.localeCompare(b.nombreFantasia);
+        }
+      });
+    }
+
+    // Return the processed data with ratings
+    res.status(200).json({
+      message: 'found prestatarios',
+      data: prestatariosWithRating,
+    });
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
@@ -167,7 +250,7 @@ async function getCommentsByUserId(req: Request, res: Response) {
 export {
   sanitizeUsuarioInput,
   findAll,
-  findPrestatarios,
+  findPrestatariosByTipoServicioAndZona,
   findOne,
   add,
   update,

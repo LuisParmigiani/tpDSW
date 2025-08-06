@@ -35,7 +35,7 @@ export default function ServicioCard({
           {rubros}
         </p>
       </span>
-      <div className={''}>{puntuacion}</div>
+      <div className={'text-blue-950'}>{puntuacion}</div>
       <Boton texto="HORARIOS" contactar={contactar}></Boton>
     </div>
   );

@@ -16,6 +16,7 @@ type Usuario = {
     descripcionTipo: string;
   }>;
   zonas: Array<{ id: number; descripcionZona: string }>;
+  calificacion: number;
 
   // Add other properties your backend returns
 };
@@ -80,9 +81,12 @@ function FiltrosDeServicios() {
   useEffect(() => {
     if (!submit) return;
 
-    const fetchUsuarios = async (servicio: string, zona: string) => {
-      console.log(servicio);
-      if (servicio === '' || zona === '') {
+    const fetchUsuarios = async (
+      servicio: string,
+      zona: string,
+      ordenarPor: string
+    ) => {
+      if (servicio === '' || zona === '' || ordenarPor === '') {
         console.log('Missing servicio or zona');
         return;
       }
@@ -90,12 +94,14 @@ function FiltrosDeServicios() {
       try {
         setIsLoading(true);
         console.log(
-          `Fetching usuarios for servicio: ${servicio}, zona: ${zona}`
+          `Fetching usuarios for servicio: ${servicio}, zona: ${zona} and ordered by: ${ordenarPor}`
         );
-        const response = await apiServices.usuarios.getPrestatarios(
-          servicio,
-          zona
-        );
+        const response =
+          await apiServices.usuarios.getPrestatariosByTipoServicioAndZona(
+            servicio,
+            zona,
+            ordenarPor
+          );
         setUsuarios(response.data.data);
         console.log('Usuarios fetched:', response.data.data);
       } catch (err: unknown) {
@@ -107,8 +113,12 @@ function FiltrosDeServicios() {
       }
     };
 
-    fetchUsuarios(filtrosForm.servicio, filtrosForm.zona);
-  }, [submit, filtrosForm.servicio, filtrosForm.zona]);
+    fetchUsuarios(
+      filtrosForm.servicio,
+      filtrosForm.zona,
+      filtrosForm.ordenarPor
+    );
+  }, [submit, filtrosForm.servicio, filtrosForm.zona, filtrosForm.ordenarPor]);
 
   // FIX 6: Fixed form submission logic
   const handleFormSubmit = (values: FormValues) => {
@@ -224,7 +234,7 @@ function FiltrosDeServicios() {
             id={user.id}
             nombre={user.nombreFantasia}
             rubros={nombresRubros}
-            puntuacion={4}
+            puntuacion={user.calificacion}
             key={user.id} // Better to use user.id instead of index
           />
         );

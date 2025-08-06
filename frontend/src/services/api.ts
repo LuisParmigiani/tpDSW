@@ -56,8 +56,11 @@ export const apiServices = {
   // Usuarios
   usuarios: {
     getAll: () => api.get('/usuario'),
-    getPrestatarios: (tipoServicio: string, zona: string) =>
-      api.get(`/usuario/prestatarios/${tipoServicio}/${zona}`),
+    getPrestatariosByTipoServicioAndZona: (
+      tipoServicio: string,
+      zona: string,
+      orderBy: string
+    ) => api.get(`/usuario/prestatarios/${tipoServicio}/${zona}/${orderBy}`),
     getById: (id: string) => api.get(`/usuario/${id}`),
     getCommentsByUserId: (
       userId: string,
