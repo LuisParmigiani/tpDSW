@@ -3,6 +3,7 @@ import Navbar from '../../components/Navbar/Navbar.js';
 import ServicioCard from '../../components/servicios.cards/ServicioCard.js';
 import { apiServices } from '../../services/api.js';
 import { ServiciosForm } from '../../components/Forms/FormServicios.js';
+import PaginationControls from '../../components/Pagination/PaginationControler.js';
 
 // FIX 1: Complete Usuario type to match ServicioCard props
 type Usuario = {
@@ -20,7 +21,6 @@ type Usuario = {
 
   // Add other properties your backend returns
 };
-
 type Filtros = {
   servicio: string;
   zona: string;
@@ -54,6 +54,9 @@ function FiltrosDeServicios() {
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [tipoServicios, setTipoServicios] = useState<TipoServicio[]>([]);
   const [zonas, setZonas] = useState<Zona[]>([]);
+  const [currentPage, setCurrentPage] = useState(1); // Página actual
+  const [totalPages, setTotalPages] = useState(1); // Total de páginas
+  const cantPrestPorPagina = '6';
   // FIX 3: Separate function for fetching data
   useEffect(() => {
     const fetchServicios = async () => {
@@ -84,7 +87,9 @@ function FiltrosDeServicios() {
     const fetchUsuarios = async (
       servicio: string,
       zona: string,
-      ordenarPor: string
+      ordenarPor: string,
+      cantPrestPorPagina: string,
+      currentPage: number
     ) => {
       if (servicio === '' || zona === '' || ordenarPor === '') {
         console.log('Missing servicio or zona');
@@ -96,14 +101,20 @@ function FiltrosDeServicios() {
         console.log(
           `Fetching usuarios for servicio: ${servicio}, zona: ${zona} and ordered by: ${ordenarPor}`
         );
+        console.log(cantPrestPorPagina, currentPage);
         const response =
           await apiServices.usuarios.getPrestatariosByTipoServicioAndZona(
             servicio,
             zona,
-            ordenarPor
+            ordenarPor,
+            cantPrestPorPagina,
+            currentPage.toString()
           );
         setUsuarios(response.data.data);
+        setTotalPages(response.data.pagination.totalPages);
+
         console.log('Usuarios fetched:', response.data.data);
+        console.log(response.data.pagination);
       } catch (err: unknown) {
         console.error('Error: ', err);
         setError('Error al cargar los prestadores de servicios');
@@ -116,9 +127,17 @@ function FiltrosDeServicios() {
     fetchUsuarios(
       filtrosForm.servicio,
       filtrosForm.zona,
-      filtrosForm.ordenarPor
+      filtrosForm.ordenarPor,
+      cantPrestPorPagina,
+      currentPage
     );
-  }, [submit, filtrosForm.servicio, filtrosForm.zona, filtrosForm.ordenarPor]);
+  }, [
+    submit,
+    filtrosForm.servicio,
+    filtrosForm.zona,
+    filtrosForm.ordenarPor,
+    currentPage,
+  ]);
 
   // FIX 6: Fixed form submission logic
   const handleFormSubmit = (values: FormValues) => {
@@ -241,9 +260,18 @@ function FiltrosDeServicios() {
       });
 
       return (
-        <div className="flex flex-wrap flex-col xl:flex-row gap-5 mx-8">
-          {cards}
-        </div>
+        <>
+          <div className="flex flex-wrap flex-col xl:flex-row gap-5 mx-8  align-middle justify-items-center">
+            {cards}
+          </div>
+          <div className="flex justify-center mt-8">
+            <PaginationControls
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          </div>
+        </>
       );
     }
 

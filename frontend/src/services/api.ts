@@ -59,8 +59,18 @@ export const apiServices = {
     getPrestatariosByTipoServicioAndZona: (
       tipoServicio: string,
       zona: string,
-      orderBy: string
-    ) => api.get(`/usuario/prestatarios/${tipoServicio}/${zona}/${orderBy}`),
+      orderBy: string,
+      maxItems?: string,
+      page?: string
+    ) => {
+      const params = new URLSearchParams(); // crea los parámetros para pasarlos en la consulta
+      if (maxItems !== undefined) params.append('maxItems=', maxItems);
+      if (page !== undefined) params.append('page=', page);
+      const url = `/usuario/prestatarios/${tipoServicio}/${zona}/${orderBy}${
+        params ? `?${params}` : ''
+      }`;
+      return api.get(url);
+    },
     getById: (id: string) => api.get(`/usuario/${id}`),
     getCommentsByUserId: (
       userId: string,

@@ -25,6 +25,8 @@ function sanitizeUsuarioInput(req: Request, res: Response, next: NextFunction) {
     horarios: req.body.horarios,
     zonas: req.body.zonas,
     orderBy: req.body.orderBy,
+    maxItems: req.body.maxItems,
+    page: req.body.page,
   };
   Object.keys(req.body.sanitizeUsuarioInput).forEach((key) => {
     if (req.body.sanitizeUsuarioInput[key] === undefined) {
@@ -68,8 +70,10 @@ async function findPrestatariosByTipoServicioAndZona(
     const nombreTipoServicio = req.params.tipoServicio;
     const nombreZona = req.params.zona;
     const orderBy = req.params.orderBy as string;
-
-    const prestatarios = await em.find(
+    const maxItems = Number(req.query.maxItems) || 6;
+    const page = Number(req.query.page) || 1;
+    const offset = (page - 1) * maxItems;
+    const [prestatarios, total] = await em.findAndCount(
       Usuario,
       {
         zonas: { descripcionZona: nombreZona },
@@ -77,6 +81,9 @@ async function findPrestatariosByTipoServicioAndZona(
       },
       {
         populate: ['tiposDeServicio', 'zonas', 'servicios', 'servicios.turnos'],
+        limit: maxItems,
+        offset: offset,
+        //Pasar order by después.
       }
     );
 
@@ -136,11 +143,14 @@ async function findPrestatariosByTipoServicioAndZona(
         }
       });
     }
-
-    // Return the processed data with ratings
     res.status(200).json({
       message: 'found prestatarios',
       data: prestatariosWithRating,
+      pagination: {
+        page,
+        maxItems,
+        totalPages: Math.ceil(total / maxItems),
+      },
     });
   } catch (error: any) {
     res.status(500).json({ message: error.message });

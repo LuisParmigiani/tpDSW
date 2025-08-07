@@ -9,22 +9,7 @@ INSERT INTO `zona` (`descripcion_zona`) VALUES
 ('Norte'),
 ('Sur'),
 ('Este'),
-('Oeste'),
-('Microcentro'),
-('Barrio Pichincha'),
-('Barrio Fisherton'),
-('Barrio Echesortu'),
-('Barrio Alberdi'),
-('Barrio República'),
-('Barrio Celedonio'),
-('Barrio Belgrano'),
-('Barrio Saladillo'),
-('Barrio La Florida'),
-('Barrio Parque Casas'),
-('Barrio Refinería'),
-('Barrio Villa Manuelita'),
-('Barrio Tablada'),
-('Barrio Lisandro de la Torre');
+('Oeste');
 
 -- 2. Insertar TIPOS DE SERVICIO
 INSERT INTO `tipo_servicio` (`nombre_tipo`, `descripcion_tipo`) VALUES
@@ -139,29 +124,44 @@ INSERT INTO `usuario` (`mail`, `contrasena`, `tipo_doc`, `numero_doc`, `telefono
 ('martin.silva@hotmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '22334455', '341-5552233', 'Martín', 'Silva', 'Junín 980', NULL, NULL, 'perfil12.jpg'),
 ('carolina.lopez@yahoo.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '33445566', '341-5553344', 'Carolina', 'López', 'Italia 1650', NULL, NULL, 'perfil13.jpg'),
 ('pablo.martinez@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '44556677', '341-5554455', 'Pablo', 'Martínez', 'Francia 890', NULL, NULL, 'perfil14.jpg'),
-('natalia.rodriguez@outlook.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '55667788', '341-5555566', 'Natalia', 'Rodríguez', 'Paraguay 1230', NULL, NULL, 'perfil15.jpg'),
+('natalia.rodriguez@outlook.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '55667788', '341-5555566', 'Natalia', 'Rodríguez', 'Paraguay 1230', NULL, NULL, 'perfil15.jpg');
 
 -- PRESTADORES (IDs 16-35: tienen nombre_fantasia y descripcion - también tienen telefono, nombre, apellido, direccion)
-('limpieza.rosario@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '11111111', '341-6661111', 'Marta', 'Jiménez', 'Tucumán 1400', 'Limpieza Total', 'Servicios de limpieza profesional con 15 años de experiencia', 'empresa1.jpg'),
-('plomero.raul@hotmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '22222222', '341-6662222', 'Raúl', 'Herrera', 'Santa Fe 2200', 'Plomería Herrera', 'Plomero matriculado con atención las 24 horas', 'empresa2.jpg'),
-('electricista.jose@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '33333333', '341-6663333', 'José', 'Ramírez', 'Belgrano 1800', 'Electricidad Ramírez', 'Electricista matriculado, instalaciones y reparaciones', 'empresa3.jpg'),
-('jardinero.miguel@yahoo.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '44444444', '341-6664444', 'Miguel', 'Vega', 'Zeballos 950', 'Jardines Vega', 'Diseño y mantenimiento de jardines y parques', 'empresa4.jpg'),
-('pintor.antonio@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '55555555', '341-6665555', 'Antonio', 'Moreno', 'Pueyrredón 1600', 'Pintura Moreno', 'Pintor profesional, trabajos en altura y fachadas', 'empresa5.jpg'),
-('carpintero.pablo@hotmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '66666666', '341-6666666', 'Pablo', 'Ruiz', 'Urquiza 1300', 'Carpintería Ruiz', 'Muebles a medida y restauración', 'empresa6.jpg'),
-('albanil.ricardo@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '77777777', '341-6667777', 'Ricardo', 'Díaz', 'Alvear 1100', 'Construcciones Díaz', 'Albañilería y construcción en general', 'empresa7.jpg'),
-('cerrajero.omar@yahoo.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '88888888', '341-6668888', 'Omar', 'Flores', 'Cochabamba 800', 'Cerrajería Flores', 'Cerrajería y seguridad, servicio de emergencia', 'empresa8.jpg'),
-('clima.tecnico@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '99999999', '341-6669999', 'Técnico', 'Gómez', 'Mitre 1900', 'Clima Service', 'Instalación y mantenimiento de equipos de climatización', 'empresa9.jpg'),
-('mudanzas.pedro@hotmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '10101010', '341-6661010', 'Pedro', 'Ortega', 'Jujuy 1700', 'Mudanzas Ortega', 'Mudanzas locales y a larga distancia', 'empresa10.jpg'),
-('mecanico.hugo@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '12121212', '341-6661212', 'Hugo', 'Vargas', 'San Luis 1500', 'Reparaciones Vargas', 'Reparación de electrodomésticos a domicilio', 'empresa11.jpg'),
-('tapicero.manuel@yahoo.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '13131313', '341-6661313', 'Manuel', 'Aguirre', 'Catamarca 1200', 'Tapicería Aguirre', 'Tapicería y restauración de muebles', 'empresa12.jpg'),
-('herrero.daniel@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '14141414', '341-6661414', 'Daniel', 'Medina', 'Salta 1600', 'Herrería Medina', 'Trabajos en hierro y soldadura', 'empresa13.jpg'),
-('vidriero.carlos@hotmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '15151515', '341-6661515', 'Carlos', 'Navarro', 'Entre Ríos 1400', 'Vidriería Navarro', 'Instalación y reparación de vidrios', 'empresa14.jpg'),
-('chef.patricia@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '16161616', '341-6661616', 'Patricia', 'Delgado', 'Corrientes 1800', 'Cocina Delgado', 'Servicios de catering y cocina doméstica', 'empresa15.jpg'),
-('limpieza.ana@yahoo.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '17171717', '341-6661717', 'Ana', 'Sosa', 'Callao 1000', 'Clean House', 'Limpieza residencial y comercial', 'empresa16.jpg'),
-('plomero.sergio@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '18181818', '341-6661818', 'Sergio', 'Peña', 'Dorrego 1300', 'Plomería Express', 'Servicios de plomería rápida', 'empresa17.jpg'),
-('electricista.mario@hotmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '19191919', '341-6661919', 'Mario', 'Ibáñez', 'Balcarce 1500', 'Electricidad 24hs', 'Electricista con servicio de emergencia', 'empresa18.jpg'),
-('jardinero.fernando@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '20202020', '341-6662020', 'Fernando', 'Ramos', 'Moreno 1700', 'Verde Total', 'Paisajismo y mantenimiento de jardines', 'empresa19.jpg'),
-('pintor.gabriel@yahoo.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '21212121', '341-6662121', 'Gabriel', 'Torres', 'Wheelwright 1200', 'Pintura Profesional', 'Pintura interior y exterior de calidad', 'empresa20.jpg');
+INSERT INTO `usuario` (`mail`, `contrasena`, `tipo_doc`, `numero_doc`, `telefono`, `nombre`, `apellido`, `direccion`, `nombre_fantasia`, `descripcion`, `foto`) VALUES
+('limpieza.rosario@gmail.com', '$2y$10$92ixunpkjo0roq5bymi.ye4okoea3ro9llc/.og/at2.uhewg/igi', 'dni', '11111111', '341-6661111', 'marta', 'jiménez', 'tucumán 1400', 'limpieza total', 'servicios de limpieza profesional con 15 años de experiencia', 'empresa1.jpg'),
+('plomero.raul@hotmail.com', '$2y$10$92ixunpkjo0roq5bymi.ye4okoea3ro9llc/.og/at2.uhewg/igi', 'dni', '22222222', '341-6662222', 'raúl', 'herrera', 'santa fe 2200', 'plomería herrera', 'plomero matriculado con atención las 24 horas', 'empresa2.jpg'),
+('electricista.jose@gmail.com', '$2y$10$92ixunpkjo0roq5bymi.ye4okoea3ro9llc/.og/at2.uhewg/igi', 'dni', '33333333', '341-6663333', 'josé', 'ramírez', 'belgrano 1800', 'electricidad ramírez', 'electricista matriculado, instalaciones y reparaciones', 'empresa3.jpg'),
+('jardinero.miguel@yahoo.com', '$2y$10$92ixunpkjo0roq5bymi.ye4okoea3ro9llc/.og/at2.uhewg/igi', 'dni', '44444444', '341-6664444', 'miguel', 'vega', 'zeballos 950', 'jardines vega', 'diseño y mantenimiento de jardines y parques', 'empresa4.jpg'),
+('pintor.antonio@gmail.com', '$2y$10$92ixunpkjo0roq5bymi.ye4okoea3ro9llc/.og/at2.uhewg/igi', 'dni', '55555555', '341-6665555', 'antonio', 'moreno', 'pueyrredón 1600', 'pintura moreno', 'pintor profesional, trabajos en altura y fachadas', 'empresa5.jpg'),
+('carpintero.pablo@hotmail.com', '$2y$10$92ixunpkjo0roq5bymi.ye4okoea3ro9llc/.og/at2.uhewg/igi', 'dni', '66666666', '341-6666666', 'pablo', 'ruiz', 'urquiza 1300', 'carpintería ruiz', 'muebles a medida y restauración', 'empresa6.jpg'),
+('albanil.ricardo@gmail.com', '$2y$10$92ixunpkjo0roq5bymi.ye4okoea3ro9llc/.og/at2.uhewg/igi', 'dni', '77777777', '341-6667777', 'ricardo', 'díaz', 'alvear 1100', 'construcciones díaz', 'albañilería y construcción en general', 'empresa7.jpg'),
+('cerrajero.omar@yahoo.com', '$2y$10$92ixunpkjo0roq5bymi.ye4okoea3ro9llc/.og/at2.uhewg/igi', 'dni', '88888888', '341-6668888', 'omar', 'flores', 'cochabamba 800', 'cerrajería flores', 'cerrajería y seguridad, servicio de emergencia', 'empresa8.jpg'),
+('clima.tecnico@gmail.com', '$2y$10$92ixunpkjo0roq5bymi.ye4okoea3ro9llc/.og/at2.uhewg/igi', 'dni', '99999999', '341-6669999', 'técnico', 'gómez', 'mitre 1900', 'clima service', 'instalación y mantenimiento de equipos de climatización', 'empresa9.jpg'),
+('mudanzas.pedro@hotmail.com', '$2y$10$92ixunpkjo0roq5bymi.ye4okoea3ro9llc/.og/at2.uhewg/igi', 'dni', '10101010', '341-6661010', 'pedro', 'ortega', 'jujuy 1700', 'mudanzas ortega', 'mudanzas locales y a larga distancia', 'empresa10.jpg'),
+('mecanico.hugo@gmail.com', '$2y$10$92ixunpkjo0roq5bymi.ye4okoea3ro9llc/.og/at2.uhewg/igi', 'dni', '12121212', '341-6661212', 'hugo', 'vargas', 'san luis 1500', 'reparaciones vargas', 'reparación de electrodomésticos a domicilio', 'empresa11.jpg'),
+('tapicero.manuel@yahoo.com', '$2y$10$92ixunpkjo0roq5bymi.ye4okoea3ro9llc/.og/at2.uhewg/igi', 'dni', '13131313', '341-6661313', 'manuel', 'aguirre', 'catamarca 1200', 'tapicería aguirre', 'tapicería y restauración de muebles', 'empresa12.jpg'),
+('herrero.daniel@gmail.com', '$2y$10$92ixunpkjo0roq5bymi.ye4okoea3ro9llc/.og/at2.uhewg/igi', 'dni', '14141414', '341-6661414', 'daniel', 'medina', 'salta 1600', 'herrería medina', 'trabajos en hierro y soldadura', 'empresa13.jpg'),
+('vidriero.carlos@hotmail.com', '$2y$10$92ixunpkjo0roq5bymi.ye4okoea3ro9llc/.og/at2.uhewg/igi', 'dni', '15151515', '341-6661515', 'carlos', 'navarro', 'entre ríos 1400', 'vidriería navarro', 'instalación y reparación de vidrios', 'empresa14.jpg'),
+('chef.patricia@gmail.com', '$2y$10$92ixunpkjo0roq5bymi.ye4okoea3ro9llc/.og/at2.uhewg/igi', 'dni', '16161616', '341-6661616', 'patricia', 'delgado', 'corrientes 1800', 'cocina delgado', 'servicios de catering y cocina doméstica', 'empresa15.jpg'),
+('limpieza.ana@yahoo.com', '$2y$10$92ixunpkjo0roq5bymi.ye4okoea3ro9llc/.og/at2.uhewg/igi', 'dni', '17171717', '341-6661717', 'ana', 'sosa', 'callao 1000', 'clean house', 'limpieza residencial y comercial', 'empresa16.jpg'),
+('plomero.sergio@gmail.com', '$2y$10$92ixunpkjo0roq5bymi.ye4okoea3ro9llc/.og/at2.uhewg/igi', 'dni', '18181818', '341-6661818', 'sergio', 'peña', 'dorrego 1300', 'plomería express', 'servicios de plomería rápida', 'empresa17.jpg'),
+('electricista.mario@hotmail.com', '$2y$10$92ixunpkjo0roq5bymi.ye4okoea3ro9llc/.og/at2.uhewg/igi', 'dni', '19191919', '341-6661919', 'mario', 'ibáñez', 'balcarce 1500', 'electricidad 24hs', 'electricista con servicio de emergencia', 'empresa18.jpg'),
+('jardinero.fernando@gmail.com', '$2y$10$92ixunpkjo0roq5bymi.ye4okoea3ro9llc/.og/at2.uhewg/igi', 'dni', '20202020', '341-6662020', 'fernando', 'ramos', 'moreno 1700', 'verde total', 'paisajismo y mantenimiento de jardines', 'empresa19.jpg'),
+('pintor.gabriel@yahoo.com', '$2y$10$92ixunpkjo0roq5bymi.ye4okoea3ro9llc/.og/at2.uhewg/igi', 'dni', '21212121', '341-6662121', 'gabriel', 'torres', 'wheelwright 1200', 'pintura profesional', 'pintura interior y exterior de calidad', 'empresa20.jpg'),
+('plomeria.rosario1@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '22230001', '341-7771001', 'Juan', 'Pérez', 'San Juan 1001', 'Plomería Rápida', 'Soluciones urgentes en plomería', 'plomeria1.jpg'),
+('plomeria.rosario2@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '22230002', '341-7771002', 'Luis', 'Gómez', 'San Luis 1002', 'Plomería Central', 'Plomería profesional en el centro', 'plomeria2.jpg'),
+('plomeria.rosario3@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '22230003', '341-7771003', 'Carlos', 'Fernández', 'San Martín 1003', 'Plomería Express 24hs', 'Atención inmediata las 24 horas', 'plomeria3.jpg'),
+('plomeria.rosario4@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '22230004', '341-7771004', 'Miguel', 'López', 'Córdoba 1004', 'Plomería del Norte', 'Especialistas en zona norte', 'plomeria4.jpg'),
+('plomeria.rosario5@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '22230005', '341-7771005', 'Sergio', 'Ramírez', 'Oroño 1005', 'Plomería Sur', 'Servicios de plomería en zona sur', 'plomeria5.jpg'),
+('plomeria.rosario6@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '22230006', '341-7771006', 'Roberto', 'Sosa', 'Italia 1006', 'Plomería Total', 'Plomería integral para el hogar', 'plomeria6.jpg'),
+('plomeria.rosario7@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '22230007', '341-7771007', 'Martín', 'Morales', 'Paraguay 1007', 'Plomería y Gas', 'Instalaciones y reparaciones de gas y agua', 'plomeria7.jpg'),
+('plomeria.rosario8@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '22230008', '341-7771008', 'Javier', 'Navarro', 'Maipú 1008', 'Plomería Económica', 'Precios accesibles y calidad', 'plomeria8.jpg'),
+('plomeria.rosario9@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '22230009', '341-7771009', 'Pablo', 'Castro', 'Montevideo 1009', 'Plomería Profesional', 'Plomeros matriculados', 'plomeria9.jpg'),
+('plomeria.rosario10@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '22230010', '341-7771010', 'Diego', 'Martínez', 'Laprida 1010', 'Plomería Rosario', 'Servicio en toda la ciudad', 'plomeria10.jpg'),
+('plomeria.rosario11@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '22230011', '341-7771011', 'Andrés', 'Silva', 'Santa Fe 1011', 'Plomería Familiar', 'Atención personalizada y familiar', 'plomeria11.jpg'),
+('plomeria.rosario12@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '22230012', '341-7771012', 'Esteban', 'García', 'Junín 1012', 'Plomería Urbana', 'Soluciones urbanas de plomería', 'plomeria12.jpg'),
+('plomeria.rosario13@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '22230013', '341-7771013', 'Ramiro', 'Vega', 'Francia 1013', 'Plomería del Oeste', 'Especialistas en zona oeste', 'plomeria13.jpg'),
+('plomeria.rosario14@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DNI', '22230014', '341-7771014', 'Matías', 'Díaz', 'Wheelwright 1014', 'Plomería Premium', 'Servicios premium de plomería', 'plomeria14.jpg');
 
 -- 5. Insertar SERVICIOS (cada servicio pertenece a UN único prestador con su tarifa base)
 INSERT INTO `servicio` (`precio`, `tarea_id`, `usuario_id`) VALUES
@@ -251,46 +251,74 @@ INSERT INTO `horario` (`dia_semana`, `hora_desde`, `hora_hasta`, `usuario_id`) V
 
 -- 7. Insertar relaciones USUARIO_ZONAS (prestadores con zonas donde trabajan)
 INSERT INTO `usuario_zonas` (`usuario_id`, `zona_id`) VALUES
--- Limpieza Total (usuario 16) - Centro, Norte, Microcentro
-(16, 1), (16, 2), (16, 6),
+-- Limpieza Total (usuario 16) - Centro, Norte
+(16, 1), (16, 2),
 -- Plomería Herrera (usuario 17) - Todas las zonas (servicio 24hs)
-(17, 1), (17, 2), (17, 3), (17, 4), (17, 5), (17, 6), (17, 7), (17, 8), (17, 9), (17, 10),
+(17, 1), (17, 2), (17, 3), (17, 4), (17, 5),
 -- Electricidad Ramírez (usuario 18) - Centro, Norte, Sur
 (18, 1), (18, 2), (18, 3),
--- Jardines Vega (usuario 19) - Norte, Sur, Barrio Fisherton, Barrio Echesortu
-(19, 2), (19, 3), (19, 8), (19, 9),
--- Pintura Moreno (usuario 20) - Centro, Oeste, Microcentro
-(20, 1), (20, 5), (20, 6),
+-- Jardines Vega (usuario 19) - Norte, Sur
+(19, 2), (19, 3),
+-- Pintura Moreno (usuario 20) - Centro, Oeste
+(20, 1), (20, 5),
 -- Carpintería Ruiz (usuario 21) - Centro, Norte, Este
 (21, 1), (21, 2), (21, 4),
 -- Construcciones Díaz (usuario 22) - Norte, Sur, Este, Oeste
 (22, 2), (22, 3), (22, 4), (22, 5),
 -- Cerrajería Flores (usuario 23) - Todas las zonas (servicio de emergencia)
-(23, 1), (23, 2), (23, 3), (23, 4), (23, 5), (23, 6), (23, 7), (23, 8), (23, 9), (23, 10), (23, 11), (23, 12), (23, 13), (23, 14), (23, 15), (23, 16), (23, 17), (23, 18), (23, 19), (23, 20),
--- Clima Service (usuario 24) - Centro, Norte, Sur, Microcentro
-(24, 1), (24, 2), (24, 3), (24, 6),
+(23, 1), (23, 2), (23, 3), (23, 4), (23, 5),
+-- Clima Service (usuario 24) - Centro, Norte, Sur
+(24, 1), (24, 2), (24, 3),
 -- Mudanzas Ortega (usuario 25) - Todas las zonas principales
-(25, 1), (25, 2), (25, 3), (25, 4), (25, 5), (25, 6), (25, 7), (25, 8), (25, 9), (25, 10),
--- Reparaciones Vargas (usuario 26) - Centro, Norte, Microcentro
-(26, 1), (26, 2), (26, 6),
+(25, 1), (25, 2), (25, 3), (25, 4), (25, 5),
+-- Reparaciones Vargas (usuario 26) - Centro, Norte
+(26, 1), (26, 2),
 -- Tapicería Aguirre (usuario 27) - Centro, Sur, Oeste
 (27, 1), (27, 3), (27, 5),
 -- Herrería Medina (usuario 28) - Norte, Este, Oeste
 (28, 2), (28, 4), (28, 5),
 -- Vidriería Navarro (usuario 29) - Centro, Sur, Este
 (29, 1), (29, 3), (29, 4),
--- Cocina Delgado (usuario 30) - Centro, Norte, Microcentro, Barrio Pichincha
-(30, 1), (30, 2), (30, 6), (30, 7),
+-- Cocina Delgado (usuario 30) - Centro, Norte
+(30, 1), (30, 2),
 -- Clean House (usuario 31) - Centro, Sur, Oeste
 (31, 1), (31, 3), (31, 5),
 -- Plomería Express (usuario 32) - Centro, Norte, Sur, Este
 (32, 1), (32, 2), (32, 3), (32, 4),
 -- Electricidad 24hs (usuario 33) - Todas las zonas (servicio 24hs)
-(33, 1), (33, 2), (33, 3), (33, 4), (33, 5), (33, 6), (33, 7), (33, 8), (33, 9), (33, 10), (33, 11), (33, 12), (33, 13), (33, 14), (33, 15), (33, 16), (33, 17), (33, 18), (33, 19), (33, 20),
--- Verde Total (usuario 34) - Norte, Sur, Barrio Fisherton, Barrio Parque Casas
-(34, 2), (34, 3), (34, 8), (34, 16),
--- Pintura Profesional (usuario 35) - Centro, Norte, Este, Microcentro
-(35, 1), (35, 2), (35, 4), (35, 6);
+(33, 1), (33, 2), (33, 3), (33, 4), (33, 5),
+-- Verde Total (usuario 34) - Norte, Sur
+(34, 2), (34, 3),
+-- Pintura Profesional (usuario 35) - Centro, Norte, Este
+(35, 1), (35, 2), (35, 4),
+-- Plomería Rápida (usuario 36) - Norte
+(36, 2),
+-- Plomería Central (usuario 37 - Norte)
+(37, 2),
+-- Plomería Express 24hs (usuario 38 - Norte)
+(38, 2),
+-- Plomería del Norte (usuario 39 - Norte)
+(39, 2),
+-- Plomería Sur (usuario 40 - Norte)
+(40, 2),
+-- Plomería Total (usuario 41 - Norte)
+(41, 2),
+-- Plomería y Gas (usuario 42 - Norte)
+(42, 2),
+-- Plomería Económica (usuario 43 - Norte)
+(43, 2),
+-- Plomería Profesional (usuario 44 - Norte)
+(44, 2),
+-- Plomería Rosario (usuario 45 - Norte)
+(45, 2),
+-- Plomería Familiar (usuario 46 - Norte)
+(46, 2),
+-- Plomería Urbana (usuario 47 - Norte)
+(47, 2),
+-- Plomería del Oeste (usuario 48 - Norte)
+(48, 2),
+-- Plomería Premium (usuario 49 - Norte)
+(49, 2);
 
 -- 8. Insertar relaciones USUARIO_TIPOS_DE_SERVICIO (prestadores con sus tipos de servicio)
 INSERT INTO `usuario_tipos_de_servicio` (`usuario_id`, `tipo_servicio_id`) VALUES
@@ -333,7 +361,36 @@ INSERT INTO `usuario_tipos_de_servicio` (`usuario_id`, `tipo_servicio_id`) VALUE
 -- Verde Total (usuario 34) - Jardinería
 (34, 4),
 -- Pintura Profesional (usuario 35) - Pintura
-(35, 5);
+(35, 5),
+-- Plomería Rápida (usuario 36) - Plomeria
+(36, 2),
+-- Plomería Central (usuario 37- Plomeria)
+(37, 2),
+-- Plomería Express 24hs (usuario 38- Plomeria)
+(38, 2),
+-- Plomería del Norte (usuario 39- Plomeria)
+(39, 2),
+-- Plomería Sur (usuario 40- Plomeria)
+(40, 2),
+-- Plomería Total (usuario 41- Plomeria)
+(41, 2),
+-- Plomería y Gas (usuario 42- Plomeria)
+(42, 2),
+-- Plomería Económica (usuario 43- Plomeria)
+(43, 2),
+-- Plomería Profesional (usuario 44- Plomeria)
+(44, 2),
+-- Plomería Rosario (usuario 45- Plomeria)
+(45, 2),
+-- Plomería Familiar (usuario 46- Plomeria)
+(46, 2),
+-- Plomería Urbana (usuario 47- Plomeria)
+(47, 2),
+-- Plomería del Oeste (usuario 48- Plomeria)
+(48, 2),
+-- Plomería Premium (usuario 49- Plomeria)
+(49, 2);
+
 
 -- 9. Insertar TURNOS
 INSERT INTO `turno` (`fecha_hora`, `estado`, `calificacion`, `comentario`, `monto_final`, `fecha_pago`, `servicio_id`, `usuario_id`) VALUES
