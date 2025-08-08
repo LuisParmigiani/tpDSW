@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import Navbar from '../../components/Navbar/Navbar.js';
 import ServicioCard from '../../components/servicios.cards/ServicioCard.js';
-import { apiServices } from '../../services/api.js';
+import { tiposServicioApi } from '../../services/tipoSericiosApi.js';
+import { zonasApi } from '../../services/zonasApi.js';
+import { usuariosApi } from '../../services/usuariosApi.js';
 import { ServiciosForm } from '../../components/Forms/FormServicios.js';
 
 // FIX 1: Complete Usuario type to match ServicioCard props
@@ -58,7 +60,7 @@ function FiltrosDeServicios() {
   useEffect(() => {
     const fetchServicios = async () => {
       try {
-        const response = await apiServices.tiposServicio.getAll();
+        const response = await tiposServicioApi.getAll();
         setTipoServicios(response.data.data);
       } catch (error) {
         console.error('Error fetching servicios:', error);
@@ -67,7 +69,7 @@ function FiltrosDeServicios() {
     };
     const fetchZonas = async () => {
       try {
-        const response = await apiServices.zonas.getAll();
+        const response = await zonasApi.getAll();
         setZonas(response.data.data);
       } catch (error) {
         console.error('Error fetching zonas:', error);
@@ -96,12 +98,11 @@ function FiltrosDeServicios() {
         console.log(
           `Fetching usuarios for servicio: ${servicio}, zona: ${zona} and ordered by: ${ordenarPor}`
         );
-        const response =
-          await apiServices.usuarios.getPrestatariosByTipoServicioAndZona(
-            servicio,
-            zona,
-            ordenarPor
-          );
+        const response = await usuariosApi.getPrestatariosByTipoServicioAndZona(
+          servicio,
+          zona,
+          ordenarPor
+        );
         setUsuarios(response.data.data);
         console.log('Usuarios fetched:', response.data.data);
       } catch (err: unknown) {

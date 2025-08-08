@@ -11,8 +11,11 @@ import {
 export const turnoRouter = Router();
 
 turnoRouter.get('/', findall);
+turnoRouter.get(
+  '/byUser/:id/:cantItemsPerPage?/:currentPage?/:selectedValueShow?/:selectedValueOrder?',
+  getTurnosByUserId
+);
 turnoRouter.get('/:id', findone);
-turnoRouter.get('/byUser/:id', getTurnosByUserId);
 turnoRouter.post('/', sanitizeTurnoInput, add);
 turnoRouter.put('/:id', sanitizeTurnoInput, update);
 turnoRouter.patch('/:id', sanitizeTurnoInput, update);

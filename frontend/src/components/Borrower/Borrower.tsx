@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Comments from '../Comments/Comments';
-import { apiServices } from '../../services/api.js';
-import Navbar from './../Navbar/Navbar.js';
+import { usuariosApi } from '../../services/usuariosApi.js';
+import Navbar from '../Navbar/Navbar.js';
 import Stars from '../stars/Stars';
 import Footer from '../Footer/Footer';
 import PaginationControls from '../Pagination/PaginationControler.js';
@@ -50,7 +50,7 @@ function Borrower(props: Props) {
   useEffect(() => {
     const pres = async (id: number) => {
       try {
-        const res = await apiServices.usuarios.getById(id.toString());
+        const res = await usuariosApi.getById(id.toString());
         setPrestatario(res.data.data);
       } catch (err) {
         console.error('Error al cargar usuario:', err);
@@ -64,7 +64,7 @@ function Borrower(props: Props) {
     const getComments = async (id: number) => {
       try {
         setLoading(true);
-        const res = await apiServices.usuarios.getCommentsByUserId(
+        const res = await usuariosApi.getCommentsByUserId(
           String(id), // ID del usuario
           cantItemsPerPage, // Cantidad de comentarios por página
           currentPage.toString(), // Página actual
