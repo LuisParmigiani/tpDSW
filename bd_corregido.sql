@@ -397,13 +397,143 @@ INSERT INTO `turno` (`fecha_hora`, `estado`, `calificacion`, `comentario`, `mont
 ('2024-08-18 09:00:00', 'pendiente', NULL, NULL, 30000, NULL, 16, 7),
 ('2024-08-25 13:00:00', 'confirmado', NULL, NULL, 3000, NULL, 32, 7),
 
--- Turnos para Roberto Pérez (usuario 8) - 6 turnos
+-- Turnos para Roberto Pérez (usuario 8) - 6 turnos iniciales + 10 adicionales = 16 turnos
 ('2024-07-23 11:00:00', 'confirmado', NULL, NULL, 35000, NULL, 20, 8),
 ('2024-07-30 16:00:00', 'pendiente', NULL, NULL, 6000, NULL, 36, 8),
 ('2024-08-06 13:30:00', 'confirmado', NULL, NULL, 30000, NULL, 52, 8),
 ('2024-08-13 10:30:00', 'pendiente', NULL, NULL, 43000, NULL, 68, 8),
 ('2024-08-20 15:00:00', 'confirmado', NULL, NULL, 50000, NULL, 24, 8),
-('2024-08-27 12:00:00', 'pendiente', NULL, NULL, 12000, NULL, 4, 8);
+('2024-08-27 12:00:00', 'pendiente', NULL, NULL, 12000, NULL, 4, 8),
+-- Turnos adicionales para Roberto Pérez
+('2025-08-07 09:00:00', 'confirmado', NULL, NULL, 15000, NULL, 1, 8),
+('2025-08-10 11:30:00', 'confirmado', NULL, NULL, 8000, NULL, 5, 8),
+('2025-08-14 14:00:00', 'confirmado', NULL, NULL, 12000, NULL, 9, 8),
+('2025-08-18 16:30:00', 'confirmado', NULL, NULL, 20000, NULL, 13, 8),
+('2025-08-22 10:00:00', 'confirmado', NULL, NULL, 45000, NULL, 17, 8),
+('2025-08-26 13:00:00', 'pendiente', NULL, NULL, 80000, NULL, 21, 8),
+('2025-08-30 15:30:00', 'cancelado', NULL, NULL, 55000, NULL, 25, 8),
+('2025-09-03 12:00:00', 'pendiente', NULL, NULL, 12000, NULL, 29, 8),
+('2025-09-06 14:30:00', 'cancelado', NULL, NULL, 45000, NULL, 33, 8),
+('2025-09-07 11:00:00', 'pendiente', NULL, NULL, 25000, NULL, 37, 8),
+
+-- Turnos adicionales para María González (usuario 1) - 10 turnos iniciales + 30 adicionales = 40 turnos
+('2025-08-08 08:30:00', 'confirmado', NULL, NULL, 25000, NULL, 2, 1),
+('2025-08-11 10:00:00', 'confirmado', NULL, NULL, 5000, NULL, 6, 1),
+('2025-08-15 12:30:00', 'confirmado', NULL, NULL, 18000, NULL, 7, 1),
+('2025-08-19 15:00:00', 'confirmado', NULL, NULL, 8000, NULL, 14, 1),
+('2025-08-23 09:30:00', 'confirmado', NULL, NULL, 30000, NULL, 16, 1),
+('2025-08-27 11:30:00', 'pendiente', NULL, NULL, 60000, NULL, 18, 1),
+('2025-08-31 14:00:00', 'cancelado', NULL, NULL, 15000, NULL, 22, 1),
+('2025-09-04 16:30:00', 'pendiente', NULL, NULL, 40000, NULL, 27, 1),
+('2025-09-05 13:00:00', 'cancelado', NULL, NULL, 8000, NULL, 30, 1),
+('2025-09-07 15:30:00', 'pendiente', NULL, NULL, 25000, NULL, 35, 1),
+
+-- 30 turnos adicionales para María González (usuario 1)
+-- 15 turnos completados sin calificación ni comentario
+('2025-08-07 09:00:00', 'completado', NULL, NULL, 15000, '2025-08-07', 1, 1),
+('2025-08-08 11:00:00', 'completado', NULL, NULL, 25000, '2025-08-08', 2, 1),
+('2025-08-09 13:30:00', 'completado', NULL, NULL, 35000, '2025-08-09', 3, 1),
+('2025-08-10 15:00:00', 'completado', NULL, NULL, 12000, '2025-08-10', 4, 1),
+('2025-08-12 08:30:00', 'completado', NULL, NULL, 8000, '2025-08-12', 5, 1),
+('2025-08-13 10:30:00', 'completado', NULL, NULL, 5000, '2025-08-13', 6, 1),
+('2025-08-14 14:00:00', 'completado', NULL, NULL, 18000, '2025-08-14', 7, 1),
+('2025-08-16 16:30:00', 'completado', NULL, NULL, 7000, '2025-08-16', 8, 1),
+('2025-08-17 09:30:00', 'completado', NULL, NULL, 12000, '2025-08-17', 9, 1),
+('2025-08-18 12:00:00', 'completado', NULL, NULL, 6000, '2025-08-18', 10, 1),
+('2025-08-20 14:30:00', 'completado', NULL, NULL, 15000, '2025-08-20', 11, 1),
+('2025-08-21 11:00:00', 'completado', NULL, NULL, 10000, '2025-08-21', 12, 1),
+('2025-08-22 13:00:00', 'completado', NULL, NULL, 20000, '2025-08-22', 13, 1),
+('2025-08-24 15:30:00', 'completado', NULL, NULL, 8000, '2025-08-24', 14, 1),
+('2025-08-25 10:00:00', 'completado', NULL, NULL, 12000, '2025-08-25', 15, 1),
+
+-- 15 turnos adicionales con estados mixtos
+('2025-08-26 09:00:00', 'confirmado', NULL, NULL, 30000, NULL, 16, 1),
+('2025-08-28 11:30:00', 'pendiente', NULL, NULL, 45000, NULL, 17, 1),
+('2025-08-29 14:00:00', 'confirmado', NULL, NULL, 60000, NULL, 18, 1),
+('2025-08-30 16:00:00', 'cancelado', NULL, NULL, 25000, NULL, 19, 1),
+('2025-09-01 08:30:00', 'confirmado', NULL, NULL, 35000, NULL, 20, 1),
+('2025-09-02 10:30:00', 'pendiente', NULL, NULL, 80000, NULL, 21, 1),
+('2025-09-03 13:00:00', 'confirmado', NULL, NULL, 15000, NULL, 22, 1),
+('2025-09-04 15:30:00', 'cancelado', NULL, NULL, 10000, NULL, 23, 1),
+('2025-09-05 09:00:00', 'pendiente', NULL, NULL, 55000, NULL, 25, 1),
+('2025-09-06 11:30:00', 'confirmado', NULL, NULL, 20000, NULL, 26, 1),
+('2025-09-06 14:30:00', 'pendiente', NULL, NULL, 40000, NULL, 27, 1),
+('2025-09-07 08:00:00', 'cancelado', NULL, NULL, 30000, NULL, 28, 1),
+('2025-09-07 10:30:00', 'confirmado', NULL, NULL, 12000, NULL, 29, 1),
+('2025-09-07 13:30:00', 'pendiente', NULL, NULL, 35000, NULL, 31, 1),
+('2025-09-07 16:00:00', 'cancelado', NULL, NULL, 3000, NULL, 32, 1),
+
+-- Turnos adicionales para Carlos Rodríguez (usuario 2) - 10 turnos adicionales 
+('2025-08-09 10:00:00', 'confirmado', NULL, NULL, 35000, NULL, 3, 2),
+('2025-08-12 12:00:00', 'confirmado', NULL, NULL, 7000, NULL, 8, 2),
+('2025-08-16 15:30:00', 'confirmado', NULL, NULL, 6000, NULL, 10, 2),
+('2025-08-20 08:30:00', 'confirmado', NULL, NULL, 12000, NULL, 15, 2),
+('2025-08-24 11:00:00', 'confirmado', NULL, NULL, 25000, NULL, 19, 2),
+('2025-08-28 14:30:00', 'pendiente', NULL, NULL, 10000, NULL, 23, 2),
+('2025-09-01 16:00:00', 'cancelado', NULL, NULL, 20000, NULL, 26, 2),
+('2025-09-02 09:00:00', 'pendiente', NULL, NULL, 35000, NULL, 31, 2),
+('2025-09-06 13:30:00', 'cancelado', NULL, NULL, 15000, NULL, 45, 2),
+('2025-09-07 16:30:00', 'pendiente', NULL, NULL, 18000, NULL, 47, 2),
+
+-- Turnos adicionales para Ana Martínez (usuario 3) - 10 turnos adicionales
+('2025-08-07 09:00:00', 'confirmado', NULL, NULL, 12000, NULL, 4, 3),
+('2025-08-13 11:30:00', 'confirmado', NULL, NULL, 15000, NULL, 11, 3),
+('2025-08-17 14:00:00', 'confirmado', NULL, NULL, 20000, NULL, 13, 3),
+('2025-08-21 16:30:00', 'confirmado', NULL, NULL, 45000, NULL, 17, 3),
+('2025-08-25 10:30:00', 'confirmado', NULL, NULL, 50000, NULL, 24, 3),
+('2025-08-29 13:00:00', 'pendiente', NULL, NULL, 15000, NULL, 29, 3),
+('2025-09-02 15:30:00', 'cancelado', NULL, NULL, 25000, NULL, 46, 3),
+('2025-09-03 12:00:00', 'pendiente', NULL, NULL, 60000, NULL, 50, 3),
+('2025-09-05 14:30:00', 'cancelado', NULL, NULL, 8000, NULL, 53, 3),
+('2025-09-07 11:00:00', 'pendiente', NULL, NULL, 12000, NULL, 55, 3),
+
+-- Turnos adicionales para Luis Fernández (usuario 4) - 10 turnos adicionales
+('2025-08-08 08:00:00', 'confirmado', NULL, NULL, 14000, NULL, 65, 4),
+('2025-08-14 10:30:00', 'confirmado', NULL, NULL, 7000, NULL, 70, 4),
+('2025-08-18 13:00:00', 'confirmado', NULL, NULL, 6000, NULL, 72, 4),
+('2025-08-22 15:30:00', 'confirmado', NULL, NULL, 25000, NULL, 2, 4),
+('2025-08-26 09:00:00', 'confirmado', NULL, NULL, 18000, NULL, 7, 4),
+('2025-08-30 12:00:00', 'pendiente', NULL, NULL, 12000, NULL, 12, 4),
+('2025-09-01 14:30:00', 'cancelado', NULL, NULL, 30000, NULL, 16, 4),
+('2025-09-04 16:00:00', 'pendiente', NULL, NULL, 35000, NULL, 20, 4),
+('2025-09-06 11:30:00', 'cancelado', NULL, NULL, 55000, NULL, 25, 4),
+('2025-09-07 13:30:00', 'pendiente', NULL, NULL, 12000, NULL, 32, 4),
+
+-- Turnos adicionales para Sofía López (usuario 5) - 10 turnos adicionales
+('2025-08-09 09:30:00', 'confirmado', NULL, NULL, 8000, NULL, 5, 5),
+('2025-08-15 12:00:00', 'confirmado', NULL, NULL, 10000, NULL, 12, 5),
+('2025-08-19 14:30:00', 'confirmado', NULL, NULL, 8000, NULL, 14, 5),
+('2025-08-23 16:00:00', 'confirmado', NULL, NULL, 60000, NULL, 18, 5),
+('2025-08-27 10:00:00', 'confirmado', NULL, NULL, 15000, NULL, 22, 5),
+('2025-08-31 13:30:00', 'pendiente', NULL, NULL, 30000, NULL, 28, 5),
+('2025-09-02 15:00:00', 'cancelado', NULL, NULL, 3000, NULL, 32, 5),
+('2025-09-05 11:30:00', 'pendiente', NULL, NULL, 6000, NULL, 36, 5),
+('2025-09-06 14:00:00', 'cancelado', NULL, NULL, 12000, NULL, 40, 5),
+('2025-09-07 16:30:00', 'pendiente', NULL, NULL, 15000, NULL, 49, 5),
+
+-- Turnos adicionales para Diego Santos (usuario 6) - 10 turnos adicionales
+('2025-08-10 08:30:00', 'confirmado', NULL, NULL, 35000, NULL, 3, 6),
+('2025-08-16 11:00:00', 'confirmado', NULL, NULL, 5000, NULL, 6, 6),
+('2025-08-20 13:30:00', 'confirmado', NULL, NULL, 12000, NULL, 9, 6),
+('2025-08-24 15:00:00', 'confirmado', NULL, NULL, 20000, NULL, 13, 6),
+('2025-08-28 09:30:00', 'confirmado', NULL, NULL, 25000, NULL, 19, 6),
+('2025-09-01 12:30:00', 'pendiente', NULL, NULL, 80000, NULL, 21, 6),
+('2025-09-03 14:00:00', 'cancelado', NULL, NULL, 40000, NULL, 27, 6),
+('2025-09-05 16:30:00', 'pendiente', NULL, NULL, 35000, NULL, 31, 6),
+('2025-09-06 11:00:00', 'cancelado', NULL, NULL, 18000, NULL, 41, 6),
+('2025-09-07 13:00:00', 'pendiente', NULL, NULL, 25000, NULL, 46, 6),
+
+-- Turnos adicionales para Patricia Silva (usuario 7) - 10 turnos adicionales
+('2025-08-11 10:00:00', 'confirmado', NULL, NULL, 15000, NULL, 1, 7),
+('2025-08-17 12:30:00', 'confirmado', NULL, NULL, 18000, NULL, 7, 7),
+('2025-08-21 15:00:00', 'confirmado', NULL, NULL, 15000, NULL, 11, 7),
+('2025-08-25 08:00:00', 'confirmado', NULL, NULL, 30000, NULL, 16, 7),
+('2025-08-29 11:30:00', 'confirmado', NULL, NULL, 45000, NULL, 17, 7),
+('2025-09-02 14:00:00', 'pendiente', NULL, NULL, 10000, NULL, 23, 7),
+('2025-09-04 16:00:00', 'cancelado', NULL, NULL, 25000, NULL, 35, 7),
+('2025-09-06 12:30:00', 'pendiente', NULL, NULL, 20000, NULL, 44, 7),
+('2025-09-07 15:30:00', 'cancelado', NULL, NULL, 15000, NULL, 49, 7),
+('2025-09-07 10:30:00', 'pendiente', NULL, NULL, 8000, NULL, 54, 7);
 
 -- Script completado exitosamente
 SELECT 'Base de datos HomeService poblada exitosamente con estructura corregida' AS mensaje;

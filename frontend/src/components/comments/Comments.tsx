@@ -1,7 +1,7 @@
 import Stars from '../stars/Stars';
 import { useState, useEffect } from 'react';
-import { apiServices } from '../../services/api';
-
+import { turnosApi } from '../../services/turnosApi';
+import { serviciosApi } from '../../services/serviciosApi';
 type Props = {
   id: number;
 };
@@ -33,7 +33,7 @@ function Comments({ id }: Props) {
   useEffect(() => {
     const getTurno = async (id: number) => {
       try {
-        const res = await apiServices.turnos.getById(String(id));
+        const res = await turnosApi.getById(String(id));
         setTurno(res.data.data);
       } catch (error) {
         console.error('Error al cargar turno:', error);
@@ -47,7 +47,7 @@ function Comments({ id }: Props) {
   useEffect(() => {
     const getServicio = async (id: number) => {
       try {
-        const res = await apiServices.servicios.getById(id.toString());
+        const res = await serviciosApi.getById(id.toString());
         setServicio(res.data.data);
       } catch (error) {
         console.error('Error al cargar servicio:', error);

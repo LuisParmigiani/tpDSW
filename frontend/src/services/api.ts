@@ -7,19 +7,6 @@ const API_BASE_URL = 'http://localhost:3000/api';
 // ====== INTERFACES Y TIPOS ======
 
 /**
- * Interfaz genérica para estandarizar las respuestas del API
- * @template T - Tipo de datos que contiene la respuesta
- * @property data - Los datos principales de la respuesta
- * @property status - Código de estado HTTP (200, 404, 500, etc.)
- * @property message - Mensaje opcional descriptivo (para errores o información adicional)
- */
-export interface ApiResponse<T> {
-  data: T;
-  status: number;
-  message?: string;
-}
-
-/**
  * Interfaz flexible para representar cualquier entidad con propiedades dinámicas
  * Permite que un objeto tenga cualquier cantidad de propiedades con cualquier tipo de valor
  */
@@ -28,7 +15,7 @@ export interface EntityData {
 }
 
 // ====== CONFIGURACIÓN DE AXIOS ======
-const api = axios.create({
+export const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
@@ -50,92 +37,3 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-// Servicios para cada entidad
-export const apiServices = {
-  // Usuarios
-  usuarios: {
-    getAll: () => api.get('/usuario'),
-    getPrestatariosByTipoServicioAndZona: (
-      tipoServicio: string,
-      zona: string,
-      orderBy: string
-    ) => api.get(`/usuario/prestatarios/${tipoServicio}/${zona}/${orderBy}`),
-    getById: (id: string) => api.get(`/usuario/${id}`),
-    getCommentsByUserId: (
-      userId: string,
-      maxItems?: string,
-      page?: string,
-      orderBy?: string
-    ) => {
-      const params = new URLSearchParams(); // crea los parámetros para pasarlos en la consulta
-      if (maxItems !== undefined) params.append('maxItems', maxItems);
-      if (page !== undefined) params.append('page', page);
-      if (orderBy !== undefined) params.append('orderBy', orderBy);
-
-      const url = `/usuario/comments/${userId}${params ? `?${params}` : ''}`;
-      return api.get(url);
-    },
-    create: (data: EntityData) => api.post('/usuario', data),
-    update: (id: string, data: EntityData) => api.put(`/usuario/${id}`, data),
-    delete: (id: string) => api.delete(`/usuario/${id}`),
-  },
-
-  // Servicios
-  servicios: {
-    getAll: () => api.get('/servicio'),
-    getById: (id: string) => api.get(`/servicio/${id}`),
-    create: (data: EntityData) => api.post('/servicio', data),
-    update: (id: string, data: EntityData) => api.put(`/servicio/${id}`, data),
-    delete: (id: string) => api.delete(`/servicio/${id}`),
-  },
-
-  // Turnos
-  turnos: {
-    getAll: () => api.get('/turno'),
-    getById: (id: string) => api.get(`/turno/${id}`),
-    getByUserId: (id: string) => api.get(`/turno/byUser/${id}`),
-    create: (data: EntityData) => api.post('/turno', data),
-    update: (id: string, data: EntityData) => api.put(`/turno/${id}`, data),
-    delete: (id: string) => api.delete(`/turno/${id}`),
-  },
-
-  // Tareas
-  tareas: {
-    getAll: () => api.get('/tarea'),
-    getById: (id: string) => api.get(`/tarea/${id}`),
-    create: (data: EntityData) => api.post('/tarea', data),
-    update: (id: string, data: EntityData) => api.put(`/tarea/${id}`, data),
-    delete: (id: string) => api.delete(`/tarea/${id}`),
-  },
-
-  // Zonas
-  zonas: {
-    getAll: () => api.get('/zona'),
-    getById: (id: string) => api.get(`/zona/${id}`),
-    create: (data: EntityData) => api.post('/zona', data),
-    update: (id: string, data: EntityData) => api.put(`/zona/${id}`, data),
-    delete: (id: string) => api.delete(`/zona/${id}`),
-  },
-
-  // Tipos de servicio
-  tiposServicio: {
-    getAll: () => api.get('/serviceTypes'),
-    getById: (id: string) => api.get(`/serviceTypes/${id}`),
-    create: (data: EntityData) => api.post('/serviceTypes', data),
-    update: (id: string, data: EntityData) =>
-      api.put(`/serviceTypes/${id}`, data),
-    delete: (id: string) => api.delete(`/serviceTypes/${id}`),
-  },
-
-  // Horarios
-  horarios: {
-    getAll: () => api.get('/horario'),
-    getById: (id: string) => api.get(`/horario/${id}`),
-    create: (data: EntityData) => api.post('/horario', data),
-    update: (id: string, data: EntityData) => api.put(`/horario/${id}`, data),
-    delete: (id: string) => api.delete(`/horario/${id}`),
-  },
-};
-
-export default api;

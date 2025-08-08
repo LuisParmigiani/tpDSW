@@ -1,10 +1,10 @@
 ### Obtener todos los turnos
 
-GET http://localhost:3000/api/turno/byUser/1
+GET http://localhost:3000/api/turno/byUser/1/
 
 ###Obtener turno por id
 
-GET http://localhost:3000/api/turno/10
+GET http://localhost:3000/api/turno/
 
 ### Cargamos un turno
 
@@ -26,20 +26,21 @@ Content-Type: application/json
 
 ###Hacemos un PUT
 
-PUT http://localhost:3000/api/turno/3
+PUT http://localhost:3000/api/turno/1
 Content-Type: application/json
 
 {
-  "calificacion": 5,
+  "calificacion": 4,
   "comentario": "Excelente servicio"
 }
 
 ### Hacemos un patch
-PATCH http://localhost:3000/api/turno/18
+PATCH http://localhost:3000/api/turno/1
 Content-Type: application/json
 
 {
-  "estado": "completado"
+  "estado": "completado",
+  "fechaHora": "2025-08-01T16:45:00.000Z"
 }
 
 

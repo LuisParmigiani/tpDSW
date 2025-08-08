@@ -118,32 +118,70 @@ async function remove(req: Request, res: Response) {
 // Get turns by user ID
 async function getTurnosByUserId(req: Request, res: Response) {
   const userId = Number.parseInt(req.params.id);
-  try {
-    // Buscar los turnos del usuario, populando servicio y usuario
-    const turnos = await em.find(
-      Turno,
-      { usuario: { id: userId } },
-      { populate: ['servicio', 'usuario'] }
-    );
+  const cantItemsPerPage = Number(req.params.cantItemsPerPage) || 10;
+  const currentPage = Number(req.params.currentPage) || 1;
+  const selectedValueShow = req.params.selectedValueShow || '';
+  const selectedValueOrder = req.params.selectedValueOrder || '';
 
-    // Para cada turno, reemplazar el servicio por el servicio completo (con tarea y usuarios)
-    const turnosConServicioCompleto = await Promise.all(
-      turnos.map(async (turno) => {
-        if (turno.servicio && typeof turno.servicio.id === 'number') {
-          // getById retorna el servicio con tarea y usuarios populados
-          const servicioCompleto = await getById(turno.servicio.id);
-          return {
-            ...turno,
-            servicio: servicioCompleto,
-          };
-        }
-        return turno;
-      })
-    );
+  // Determinar el filtro de calificación según selectedValueShow
+  let calificacionFilter: any = {};
+  switch (selectedValueShow) {
+    case 'faltanCalificar':
+      calificacionFilter = { calificacion: null, estado: 'completado' };
+      break;
+    case 'calificados':
+      calificacionFilter = { calificacion: { $ne: null } };
+      break;
+    case 'cancelados':
+      calificacionFilter = { estado: 'cancelado' };
+      break;
+    case 'pendientes':
+      calificacionFilter = { estado: 'pendiente' };
+  }
+  let selectedValueOrderShow;
+  switch (selectedValueOrder) {
+    case 'fechaA':
+      selectedValueOrderShow = { fechaHora: 1 };
+      break;
+    case 'calificacionM':
+      selectedValueOrderShow = { fechaHora: -1 };
+      break;
+    case 'calificacionB':
+      selectedValueOrderShow = { calificacion: -1 };
+      break;
+    case 'calificacionP':
+      selectedValueOrderShow = { calificacion: 1 };
+      break;
+    default:
+      selectedValueOrderShow = { fechaHora: -1 };
+  }
+
+  // estructura para poder filtrar
+  const where = {
+    usuario: { id: userId },
+    ...calificacionFilter,
+  };
+  try {
+    // Total de turnos para ver el paginado
+    const totalCount = await em.count(Turno, where);
+
+    // Buscar los turnos del usuario, populando toda la información necesaria en una sola consulta
+    const turnos = await em.find(Turno, where, {
+      populate: ['servicio.tarea', 'servicio.usuario', 'usuario'],
+      limit: cantItemsPerPage,
+      offset: (currentPage - 1) * cantItemsPerPage,
+      orderBy: selectedValueOrderShow,
+    });
 
     res.status(200).json({
       message: 'found turns by user id',
-      data: turnosConServicioCompleto,
+      data: turnos,
+      pagination: {
+        totalPages: Math.ceil(totalCount / cantItemsPerPage),
+        currentPage: currentPage,
+        totalItems: totalCount,
+        itemsPerPage: cantItemsPerPage,
+      },
     });
   } catch (error: any) {
     res.status(500).json({ message: error.message });

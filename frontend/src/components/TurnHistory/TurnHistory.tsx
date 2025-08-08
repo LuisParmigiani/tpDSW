@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
-import { apiServices } from '../../services/api';
-import NatBar from '../navBar/Navbar.js';
+import { turnosApi } from '../../services/turnosApi.js';
+import Natbar from '../Navbar/Navbar.js';
 import Footer from '../Footer/Footer';
+import PaginationControls from '../Pagination/PaginationControler';
+import CustomSelect from '../Select/CustomSelect';
+import CalificationModal from '../Modal/CalificationModal';
+import Stars from '../stars/Stars.js';
 
 type Turno = {
   id: number;
@@ -10,6 +14,8 @@ type Turno = {
   servicio: servicio;
   calificacion: number | null;
   comentario: string | null;
+  estado: string;
+  usuario: Usuario;
 };
 
 type servicio = {
@@ -24,41 +30,119 @@ type Tarea = {
   duracionTarea: number;
 };
 type Usuario = {
+  id: number;
+  mail: string;
   nombreFantasia: string;
 };
 
 function TurnHistory() {
   const id = 1; // aca el id del usuario
-  const [turns, setTurns] = useState<Turno[] | null>(null);
+  const [turns, setTurns] = useState<Turno[] | null>(null); // Se guardan todos los turnos del usuario
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   // Modal para calificar
   const [isOpen, setIsOpen] = useState(false);
   const [data, setData] = useState<Turno | null>(null);
+  // Variables para la calificacion
+  const [startRating, setStartRating] = useState<number>(5);
+  const [comentario, setComentario] = useState<string>('');
+
+  // orden de los turnos
+  const [selectedValueOrder, setSelectedValueOrder] = useState('');
+  // Filtros de los turnos
+  const [selectedValueShow, setSelectedValueShow] = useState('');
+
+  // Variables de paginacion:
+  const cantItemsPerPage = '9'; // Cantidad de turnos por pagina
+  const [currentPage, setCurrentPage] = useState(1); // Página actual
+  const [totalPages, setTotalPages] = useState(1); // Total de páginas
 
   // buscar todos los turnos del usuario con la informcaion del mismo.
   useEffect(() => {
     const turn = async (id: number) => {
+      setLoading(true);
+      setError(null);
       try {
-        const res = await apiServices.turnos.getByUserId(id.toString());
+        const res = await turnosApi.getByUserId(
+          id.toString(),
+          cantItemsPerPage,
+          currentPage.toString(),
+          selectedValueShow,
+          selectedValueOrder
+        );
         setTurns(res.data.data);
+        if (res.data.pagination) {
+          setTotalPages(res.data.pagination.totalPages); // Total de páginas
+        }
       } catch (err) {
         console.error('Error al cargar turnos:', err);
+        setError('Error al cargar los turnos. Por favor, intenta de nuevo.');
+        // Resetear el estado en caso de error
+        setTurns([]);
+      } finally {
+        setLoading(false);
       }
     };
     if (id) {
       turn(id);
     }
-  }, [id]);
+  }, [id, currentPage, selectedValueShow, selectedValueOrder]);
 
   //modal para calificar
   const openModal = (modalData: Turno) => {
-    setData(modalData);
+    setData(modalData); // Guardar los datos del turno seleccionado
+    // Inicializar el formulario con valores por defecto
+    setComentario(modalData.comentario || '');
     setIsOpen(true);
   };
   const closeModal = () => {
     setIsOpen(false);
     setData(null);
+    // Resetear el formulario
+    setStartRating(5);
+    setComentario('');
+  };
+  const SaveRating = async () => {
+    if (data) {
+      // Mostrar la información capturada
+      console.log('Datos del turno:', data);
+      console.log('Calificación seleccionada:', startRating);
+      console.log('Comentario ingresado:', comentario);
+      // aca va la api
+      const dataForUpdate = {
+        calificacion: startRating,
+        comentario: comentario,
+      };
+      try {
+        const res = await turnosApi.update(data.id.toString(), dataForUpdate);
+        console.log('Respuesta de la API:', res);
+
+        // Actualizar el turno en la lista local en lugar de recargar toda la página
+        if (turns) {
+          const updatedTurns = turns.map((turn) =>
+            turn.id === data.id
+              ? { ...turn, calificacion: startRating, comentario: comentario }
+              : turn
+          );
+          setTurns(updatedTurns);
+        }
+
+        // Resetear el formulario y cerrar modal
+        setStartRating(5);
+        setComentario('');
+        closeModal();
+      } catch (error) {
+        console.error('Error al guardar la calificación:', error);
+      }
+    }
   };
 
+  // Función para manejar el cambio de página
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  // Efecto para manejar el cierre del modal y el scroll del body
   useEffect(() => {
     if (isOpen && data) {
       console.log('Modal abierto con datos:', data);
@@ -81,78 +165,65 @@ function TurnHistory() {
 
   return (
     <>
-      <NatBar />
-      {isOpen && data && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-5 backdrop-blur-xs  bg-opacity-40">
-          <div className="bg-white rounded-lg shadow-2xl p-10 text-black w-6/12  h-6/12">
-            <h1 className="text-2xl font-bold mb-4">Detalles del Turno</h1>
-            <div className="flex flex-col gap-2 pb-3 items-start text-left pl-25">
-              <p>
-                Turno ID: <strong>{data.id}</strong>
-              </p>
-              <p>
-                Prestatario:{' '}
-                <strong>
-                  {data.servicio.usuario.nombreFantasia || 'Sin nombre'}
-                </strong>
-              </p>
-              <p>
-                Fecha y Hora:{' '}
-                {new Date(data.fechaHora).toLocaleDateString('es-AR', {
-                  year: 'numeric',
-                  month: '2-digit',
-                  day: '2-digit',
-                })}{' '}
-                a las{' '}
-                {new Date(data.fechaHora).toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}{' '}
-              </p>
-            </div>
-            <form action="" className="flex flex-col items-center gap-4">
-              <div className="flex w-full items-center justify-between">
-                <label htmlFor="calificacion" className="whitespace-nowrap">
-                  Calificación:
-                </label>
-                <input
-                  className="border border-naranja-1 rounded-md mx-2 p-2 w-full"
-                  type="number"
-                  min="1"
-                  max="5"
-                  id="calificacion"
-                />
-              </div>
-              <div className="flex w-full items-center justify-between">
-                <label htmlFor="comentario" className="whitespace-nowrap">
-                  Comentario:
-                </label>
-                <textarea
-                  className="border border-naranja-1 rounded-md mx-2 p-2 w-full"
-                  id="comentario"
-                  rows={4}
-                />
-              </div>
-            </form>
-            <button
-              className="mt-4 px-4 py-2 bg-white text-amber-700 rounded hover:bg-amber-600 hover:text-white"
-              onClick={closeModal}
-            >
-              Cerrar
-            </button>
-          </div>
-        </div>
-      )}
-      <div className="text-black">
-        <h1 className="text-4xl font-bold my-4">Historial de Turnos</h1>
+      <Natbar />
 
-        {turns ? (
+      {isOpen && data && (
+        <CalificationModal
+          data={data}
+          closeModal={closeModal}
+          startRating={startRating}
+          setStartRating={setStartRating}
+          comentario={comentario}
+          setComentario={setComentario}
+          SaveRating={SaveRating}
+        />
+      )}
+
+      <div className="text-black">
+        <h1 className="text-4xl font-bold mt-6">Historial de Turnos</h1>
+
+        <div className="flex flex-row gap-4 lg:-mt-11  mt-3 pl-3 mb-8 ">
+          <CustomSelect
+            Name="Ordenar por"
+            options={[
+              { value: 'todos', label: 'Mostrar Todos' },
+              { value: 'fechaA', label: 'Fecha ascendente' },
+              { value: 'fechaD', label: 'Fecha descendente' },
+              { value: 'calificacionM', label: 'Mejor calificación' },
+              { value: 'calificacionP', label: 'Peor calificación' },
+            ]}
+            setOptions={setSelectedValueOrder}
+            setPage={setCurrentPage}
+          />
+          <CustomSelect
+            Name="Mostrar"
+            options={[
+              { value: 'todos', label: 'Mostrar Todos' },
+              { value: 'faltanCalificar', label: 'Faltan Calificar' },
+              { value: 'calificados', label: 'Calificados' },
+              { value: 'cancelados', label: 'Cancelados' },
+              { value: 'pendientes', label: 'Pendientes' },
+            ]}
+            setOptions={setSelectedValueShow}
+            setPage={setCurrentPage}
+          />
+        </div>
+
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            {error}
+          </div>
+        )}
+
+        {loading ? (
+          <p>Cargando turnos...</p>
+        ) : turns ? (
           turns.length > 0 ? (
-            <ul className="flex flex-row flex-wrap items-center justify-center w-4/5 m-auto ">
+            <ul className="flex flex-row flex-wrap items-center justify-center w-full m-auto ">
               {turns.map((turn) => (
                 <li
                   key={turn.id}
-                  className="flex flex-row items-center w-98  m-6 rounded-xl shadow-md p-6 bg-white hover:shadow-xl transition-shadow"
+                  className="flex flex-row items-center w-98  m-6 rounded-xl shadow-md p-6 h-45  hover:shadow-xl transition-shadow"
                 >
                   <div className="mr-6 flex-shrink-0">
                     <img
@@ -180,15 +251,20 @@ function TurnHistory() {
                       Monto: ${turn.montoFinal}
                     </p>
                     {(() => {
-                      // Mostrar botón "Calificar" si el turno es mayor a 1 mes y no fue calificado
+                      // Mostrar botón "Calificar" si el turno es menor a 1 mes y no fue calificado
                       const unMesPasado =
-                        Date.now() - new Date(turn.fechaHora).getTime() >
+                        Date.now() - new Date(turn.fechaHora).getTime() <
                         30 * 24 * 60 * 60 * 1000; // dias, horas, minutos, segundos, milisegundos
-                      if (unMesPasado && turn.calificacion === null) {
+                      console.log(unMesPasado);
+                      if (
+                        unMesPasado &&
+                        turn.calificacion === null &&
+                        turn.estado === 'completado'
+                      ) {
                         return (
                           <button
                             onClick={() => openModal(turn)}
-                            className="bg-naranja-1 w-4/5 text-white px-4 py-2 rounded-md  m-auto mt-2 hover:bg-white hover:text-naranja-1 hover:border border-naranja-1 transition-colors duration-300"
+                            className="bg-naranja-1 w-4/5 text-white px-4 py-2 rounded-md  m-auto mt-2 hover:bg-white hover:text-naranja-1 border border-naranja-1 transition-colors duration-300"
                           >
                             Calificar
                           </button>
@@ -196,10 +272,20 @@ function TurnHistory() {
                       } else {
                         if (turn.calificacion !== null) {
                           return (
-                            <button className="bg-naranja-1 w-4/5 text-green-600 px-4 py-2 rounded-md  m-auto mt-2">
-                              Ver Calificación
-                            </button>
+                            <div className="justify-center flex mt-3">
+                              <Stars cant={turn.calificacion} />
+                            </div>
                           );
+                        } else {
+                          if (turn.estado === 'completado') {
+                            return (
+                              <p className="mt-2">
+                                Expiró el tiempo de calificación
+                              </p>
+                            );
+                          } else {
+                            return <p> Estado: {turn.estado}</p>;
+                          }
                         }
                       }
                       return null;
@@ -211,9 +297,16 @@ function TurnHistory() {
           ) : (
             <p>No hay turnos.</p>
           )
-        ) : (
-          <p>Cargando turnos...</p>
-        )}
+        ) : null}
+
+        {/* Controles de paginación */}
+        <div className="flex justify-center">
+          <PaginationControls
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </div>
       </div>
 
       <Footer />

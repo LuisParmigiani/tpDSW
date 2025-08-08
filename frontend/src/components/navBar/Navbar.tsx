@@ -1,4 +1,4 @@
-import { apiServices } from '../../services/api';
+import { usuariosApi } from '../../services/usuariosApi';
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -66,7 +66,7 @@ function Navbar() {
   useEffect(() => {
     const getUsuario = async (id: string) => {
       try {
-        const res = await apiServices.usuarios.getById(id.toString());
+        const res = await usuariosApi.getById(id.toString());
         setUsuario(res.data.data);
       } catch (err) {
         console.error('Error al cargar usuario:', err);
