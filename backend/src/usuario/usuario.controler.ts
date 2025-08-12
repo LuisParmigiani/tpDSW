@@ -73,19 +73,30 @@ async function findPrestatariosByTipoServicioAndZona(
     const maxItems = Number(req.query.maxItems) || 6;
     const page = Number(req.query.page) || 1;
     const offset = (page - 1) * maxItems;
-    const [prestatarios, total] = await em.findAndCount(
-      Usuario,
-      {
-        zonas: { descripcionZona: nombreZona },
-        tiposDeServicio: { nombreTipo: nombreTipoServicio },
-      },
-      {
-        populate: ['tiposDeServicio', 'zonas', 'servicios', 'servicios.turnos'],
-        limit: maxItems,
-        offset: offset,
-        //Pasar order by después.
-      }
-    );
+    let filtroTipoServicio = '';
+    if (nombreTipoServicio !== 'Todos') {
+      filtroTipoServicio = nombreTipoServicio;
+    }
+    let filtroZona = '';
+    if (nombreZona !== 'Todas') {
+      filtroZona = nombreZona;
+    }
+
+    // Build the where clause conditionally
+    const whereClause: any = {};
+    if (filtroTipoServicio) {
+      whereClause.tiposDeServicio = { nombreTipo: filtroTipoServicio };
+    }
+    if (filtroZona) {
+      whereClause.zonas = { descripcion_zona: filtroZona };
+    }
+
+    const [prestatarios, total] = await em.findAndCount(Usuario, whereClause, {
+      populate: ['tiposDeServicio', 'zonas', 'servicios', 'servicios.turnos'],
+      limit: maxItems,
+      offset: offset,
+      //Pasar order by después.
+    });
 
     if (prestatarios.length === 0) {
       return res.status(404).json({
