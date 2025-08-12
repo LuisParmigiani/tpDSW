@@ -104,10 +104,6 @@ function TurnHistory() {
   };
   const SaveRating = async () => {
     if (data) {
-      // Mostrar la información capturada
-      console.log('Datos del turno:', data);
-      console.log('Calificación seleccionada:', startRating);
-      console.log('Comentario ingresado:', comentario);
       // aca va la api
       const dataForUpdate = {
         calificacion: startRating,
@@ -182,31 +178,37 @@ function TurnHistory() {
       <div className="text-black">
         <h1 className="text-4xl font-bold mt-6">Historial de Turnos</h1>
 
-        <div className="flex flex-row gap-4 lg:-mt-11  mt-3 pl-3 mb-8 ">
-          <CustomSelect
-            Name="Ordenar por"
-            options={[
-              { value: 'todos', label: 'Mostrar Todos' },
-              { value: 'fechaA', label: 'Fecha ascendente' },
-              { value: 'fechaD', label: 'Fecha descendente' },
-              { value: 'calificacionM', label: 'Mejor calificación' },
-              { value: 'calificacionP', label: 'Peor calificación' },
-            ]}
-            setOptions={setSelectedValueOrder}
-            setPage={setCurrentPage}
-          />
-          <CustomSelect
-            Name="Mostrar"
-            options={[
-              { value: 'todos', label: 'Mostrar Todos' },
-              { value: 'faltanCalificar', label: 'Faltan Calificar' },
-              { value: 'calificados', label: 'Calificados' },
-              { value: 'cancelados', label: 'Cancelados' },
-              { value: 'pendientes', label: 'Pendientes' },
-            ]}
-            setOptions={setSelectedValueShow}
-            setPage={setCurrentPage}
-          />
+        <div className="flex flex-row gap-4 lg:-mt-11  mt-3 pl-3 mb-8  ">
+          <div>
+            <CustomSelect
+              Name="Ordenar por"
+              options={[
+                { value: 'todos', label: 'Mostrar Todos' },
+                { value: 'fechaA', label: 'Fecha ascendente' },
+                { value: 'fechaD', label: 'Fecha descendente' },
+                { value: 'calificacionM', label: 'Mejor calificación' },
+                { value: 'calificacionP', label: 'Peor calificación' },
+              ]}
+              setOptions={setSelectedValueOrder}
+              setPage={setCurrentPage}
+            />
+          </div>
+          <div>
+            {' '}
+            <CustomSelect
+              Name="Mostrar"
+              options={[
+                { value: 'todos', label: 'Mostrar Todos' },
+                { value: 'faltanCalificar', label: 'Faltan Calificar' },
+                { value: 'calificados', label: 'Calificados' },
+                { value: 'cancelados', label: 'Cancelados' },
+                { value: 'pendientes', label: 'Pendientes' },
+                { value: 'completado', label: 'Completado' },
+              ]}
+              setOptions={setSelectedValueShow}
+              setPage={setCurrentPage}
+            />
+          </div>
         </div>
 
         {error && (
@@ -223,7 +225,7 @@ function TurnHistory() {
               {turns.map((turn) => (
                 <li
                   key={turn.id}
-                  className="flex flex-row items-center w-98  m-6 rounded-xl shadow-md p-6 h-45  hover:shadow-xl transition-shadow"
+                  className="flex flex-row items-center w-98  m-6 rounded-xl shadow-md p-6 h-55  hover:shadow-xl transition-shadow"
                 >
                   <div className="mr-6 flex-shrink-0">
                     <img
@@ -232,9 +234,9 @@ function TurnHistory() {
                       alt="Foto de perfil de usuario"
                     />
                   </div>
-                  <div className="flex flex-col justify-center w-full">
+                  <div className="flex flex-col mx-auto gap-1  ml-3 items-start w-full">
                     <h2 className="text-lg font-bold text-gray-800 mb-1">
-                      {turn.servicio.usuario?.nombreFantasia || 'Sin nombre'}
+                      {turn.servicio.usuario?.nombreFantasia}
                     </h2>
                     <p className="text-sm text-gray-600 mb-1">
                       Fecha:{' '}
@@ -255,7 +257,6 @@ function TurnHistory() {
                       const unMesPasado =
                         Date.now() - new Date(turn.fechaHora).getTime() <
                         30 * 24 * 60 * 60 * 1000; // dias, horas, minutos, segundos, milisegundos
-                      console.log(unMesPasado);
                       if (
                         unMesPasado &&
                         turn.calificacion === null &&
@@ -284,6 +285,16 @@ function TurnHistory() {
                               </p>
                             );
                           } else {
+                            if (turn.estado !== 'cancelado') {
+                              return (
+                                <>
+                                  <p> Estado: {turn.estado}</p>
+                                  <button className="bg-naranja-1  text-white hover:text-naranja-1 hover:bg-white w-full rounded-2xl border-2 border-naranja-1">
+                                    Cancelar
+                                  </button>
+                                </>
+                              );
+                            }
                             return <p> Estado: {turn.estado}</p>;
                           }
                         }

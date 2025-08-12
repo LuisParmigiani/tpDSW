@@ -24,4 +24,6 @@ export const turnosApi = {
   create: (data: EntityData) => api.post('/turno', data),
   update: (id: string, data: EntityData) => api.put(`/turno/${id}`, data),
   delete: (id: string) => api.delete(`/turno/${id}`),
+  getTurnsPerDay: (id: string, date: string) =>
+    api.get(`turno/turnosPorDia/${id}/${date}`),
 };

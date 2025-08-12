@@ -1,8 +1,8 @@
-### Obtener comentarios de usuario por ID
-GET http://localhost:3000/api/usuario/comments/13
+### Obtener turnos de usuario por ID y fecha
+GET http://localhost:3000/api/usuario/17
 
 ### Obtener un usuario específico
-GET http://localhost:3000/api/usuario/1
+GET http://localhost:3000/api/usuario/comments/:id
 
 ### Obtengo los prestatarios por tipo de servicio y zona
 GET http://localhost:3000/api/usuario/prestatarios/Plomeria/Norte/Calificacion

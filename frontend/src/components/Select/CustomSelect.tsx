@@ -36,11 +36,11 @@ function CustomSelect({ Name, options, setOptions, setPage }: Props) {
   };
 
   return (
-    <div className="relative inline-block">
+    <div className="relative inline-block w-full">
       {/* Select personalizado que simula el original */}
       <button
         type="button"
-        className="border border-orange-500 bg-white text-orange-500 hover:shadow-2xl rounded-3xl px-4 py-2 text-left min-w-40 flex justify-between items-center"
+        className="border border-orange-500 bg-white text-orange-500 hover:shadow-2xl rounded-3xl px-4 py-2 text-left min-w-40 flex justify-between items-center w-full"
         onClick={() => setIsOpen(!isOpen)}
       >
         <span>{getDisplayText()}</span>

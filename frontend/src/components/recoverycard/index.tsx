@@ -41,7 +41,7 @@ function Recovery() {
             >
               Ingresar código
             </button>
-            <p className="text-black font-inter mb-0 mb-7">
+            <p className="text-black font-inter  mb-7">
               ¿No tienes cuenta?{' '}
               <Link
                 to="/registration"
