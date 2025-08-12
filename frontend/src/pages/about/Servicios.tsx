@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 import Navbar from '../../components/Navbar/Navbar.js';
 import ServicioCard from '../../components/servicios.cards/ServicioCard.js';
 import { tiposServicioApi } from '../../services/tipoSericiosApi.js';
@@ -44,6 +45,12 @@ type FormValues = {
   ordenarPor: string;
 };
 function FiltrosDeServicios() {
+  // Get URL parameters
+  const { servicio: servicioParam } = useParams<{ servicio: string }>();
+  const [searchParams] = useSearchParams();
+  const zonaParam = searchParams.get('zona') || '';
+  const orderByParam = searchParams.get('orderBy') || '';
+
   const [filtrosForm, setFiltrosForm] = useState<Filtros>({
     servicio: '',
     zona: '',
@@ -59,11 +66,30 @@ function FiltrosDeServicios() {
   const [currentPage, setCurrentPage] = useState(1); // Página actual
   const [totalPages, setTotalPages] = useState(1); // Total de páginas
   const cantPrestPorPagina = '6';
+
+  // Initialize form with URL parameters when component mounts
+  useEffect(() => {
+    if (servicioParam && zonaParam && orderByParam) {
+      const decodedServicio = decodeURIComponent(servicioParam);
+      setFiltrosForm({
+        servicio: decodedServicio,
+        zona: zonaParam,
+        ordenarPor: orderByParam,
+      });
+      setSubmit(true); // Automatically trigger the search
+    }
+  }, [servicioParam, zonaParam, orderByParam]);
+
   // FIX 3: Separate function for fetching data
   useEffect(() => {
     const fetchServicios = async () => {
       try {
         const response = await tiposServicioApi.getAll();
+        const servs = response.data.data;
+        servs.push({
+          nombreTipo: 'Todos',
+          descripcionTipo: 'Todos los servicios',
+        });
         setTipoServicios(response.data.data);
       } catch (error) {
         console.error('Error fetching servicios:', error);
@@ -73,7 +99,11 @@ function FiltrosDeServicios() {
     const fetchZonas = async () => {
       try {
         const response = await zonasApi.getAll();
-        setZonas(response.data.data);
+        const zons = response.data.data;
+        zons.push({
+          descripcionZona: 'Todas',
+        });
+        setZonas(zons);
       } catch (error) {
         console.error('Error fetching zonas:', error);
         return [];
