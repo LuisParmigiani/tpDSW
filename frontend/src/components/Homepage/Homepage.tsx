@@ -2,13 +2,19 @@ import Navbar from '../Navbar/Navbar.js';
 import Carousel from '../Carousel/Carousel.js';
 import Comments from './../Comments/Comments.js';
 import Footer from '../Footer/Footer';
+import { useNavigate } from 'react-router-dom';
 function Homepage() {
   const CommentOne = 1;
   const CommentTwo = 2;
-
+  const navigate = useNavigate();
+  const handleClick = (servicio: string) => {
+    navigate(
+      `/servicios?tipoServicio=${servicio}&zona=Todas&orderBy=calificacion`
+    );
+  };
   return (
     <>
-      <div className="flex flex-col w-full">
+      <div onClick={() => handleClick} className="flex flex-col w-full">
         <div className="absolute inset-0 w-full z-20">
           <Navbar />
         </div>
@@ -39,7 +45,13 @@ function Homepage() {
 
       <div className="bg-[#4d4d4d] flex flex-col pb-5">
         <div className="mt-9 flex flex-row justify-around w-full gap-5 flex-wrap ">
-          <div className="flex flex-col items-center flex-1 max-w-80 min-w-72 min-h-80 h-auto rounded-3xl bg-[#fff5f2] shadow-[0_0_40px_0_rgba(0,0,0,0.58)] p-5 box-border justify-between">
+          <div
+            className={
+              'flex flex-col cursor-pointer items-center flex-1 max-w-80 min-w-72 min-h-80 h-auto rounded-3xl bg-[#fff5f2] shadow-[0_0_40px_0_rgba(0,0,0,0.58)] p-5 box-border justify-between ' +
+              'hover:scale-102 transition duration-300 ease-in-out hover:bg-orange-200'
+            }
+            onClick={() => handleClick('Plomería')}
+          >
             <svg
               width="105"
               height="104"
@@ -76,7 +88,13 @@ function Homepage() {
               Contratá servicios de plomeros matriculados cerca de tu zona.
             </p>
           </div>
-          <div className="flex flex-col items-center flex-1 max-w-80 min-w-72 min-h-80 h-auto rounded-3xl bg-[#fff5f2] shadow-[0_0_40px_0_rgba(0,0,0,0.58)] p-5 box-border justify-between">
+          <div
+            className={
+              'flex flex-col cursor-pointer items-center flex-1 max-w-80 min-w-72 min-h-80 h-auto rounded-3xl bg-[#fff5f2] shadow-[0_0_40px_0_rgba(0,0,0,0.58)] p-5 box-border justify-between ' +
+              'hover:scale-102 transition duration-300 ease-in-out hover:bg-orange-200'
+            }
+            onClick={() => handleClick('Electricidad')}
+          >
             <svg
               width="105"
               height="104"
@@ -114,7 +132,13 @@ function Homepage() {
               gran selección de calificados electricistas.
             </p>
           </div>
-          <div className="flex flex-col items-center flex-1 max-w-80 min-w-72 min-h-80 h-auto rounded-3xl bg-[#fff5f2] shadow-[0_0_40px_0_rgba(0,0,0,0.58)] p-5 box-border justify-between">
+          <div
+            className={
+              'flex flex-col cursor-pointer items-center flex-1 max-w-80 min-w-72 min-h-80 h-auto rounded-3xl bg-[#fff5f2] shadow-[0_0_40px_0_rgba(0,0,0,0.58)] p-5 box-border justify-between ' +
+              'hover:scale-102 transition duration-300 ease-in-out hover:bg-orange-200'
+            }
+            onClick={() => handleClick('Carpintería')}
+          >
             <svg
               width="105"
               height="104"
@@ -139,7 +163,13 @@ function Homepage() {
           </div>
         </div>
         <div className="mt-9 flex flex-row justify-around w-full gap-5 flex-wrap">
-          <div className="flex flex-col items-center flex-1 max-w-80 min-w-72 min-h-80 h-auto rounded-3xl bg-[#fff5f2] shadow-[0_0_40px_0_rgba(0,0,0,0.58)] p-5 box-border justify-between">
+          <div
+            className={
+              'flex flex-col cursor-pointer items-center flex-1 max-w-80 min-w-72 min-h-80 h-auto rounded-3xl bg-[#fff5f2] shadow-[0_0_40px_0_rgba(0,0,0,0.58)] p-5 box-border justify-between ' +
+              'hover:scale-102 transition duration-300 ease-in-out hover:bg-orange-200'
+            }
+            onClick={() => handleClick('Pintura')}
+          >
             <svg
               width="105"
               height="104"
@@ -161,7 +191,13 @@ function Homepage() {
               Dale vida a tu hogar con nuestros pintores profesionales.
             </p>
           </div>
-          <div className="flex flex-col items-center flex-1 max-w-80 min-w-72 min-h-80 h-auto rounded-3xl bg-[#fff5f2] shadow-[0_0_40px_0_rgba(0,0,0,0.58)] p-5 box-border justify-between">
+          <div
+            className={
+              'flex flex-col cursor-pointer items-center flex-1 max-w-80 min-w-72 min-h-80 h-auto rounded-3xl bg-[#fff5f2] shadow-[0_0_40px_0_rgba(0,0,0,0.58)] p-5 box-border justify-between ' +
+              'hover:scale-102 transition duration-300 ease-in-out hover:bg-orange-200'
+            }
+            onClick={() => handleClick('Albañilería')}
+          >
             <svg
               width="105"
               height="104"
@@ -183,7 +219,13 @@ function Homepage() {
               nuestros albañiles.
             </p>
           </div>
-          <div className="flex flex-col items-center flex-1 max-w-80 min-w-72 min-h-80 h-auto rounded-3xl bg-[#fff5f2] shadow-[0_0_40px_0_rgba(0,0,0,0.58)] p-5 box-border justify-between">
+          <div
+            className={
+              'flex flex-col cursor-pointer items-center flex-1 max-w-80 min-w-72 min-h-80 h-auto rounded-3xl bg-[#fff5f2] shadow-[0_0_40px_0_rgba(0,0,0,0.58)] p-5 box-border justify-between ' +
+              'hover:scale-102 transition duration-300 ease-in-out hover:bg-orange-200'
+            }
+            onClick={() => handleClick('Cerrajería')}
+          >
             <svg
               width="105"
               height="104"

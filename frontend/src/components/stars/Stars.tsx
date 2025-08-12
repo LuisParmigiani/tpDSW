@@ -3,7 +3,6 @@ type Props = {
 };
 
 function Stars({ cant }: Props) {
-  cant = 3.5;
   const stars = [];
   for (let i = 0; i < 5; i++) {
     if (i < cant) {
@@ -69,7 +68,9 @@ function Stars({ cant }: Props) {
       );
     }
   }
-  return <div className="flex flex-row items-center max-h-auto">{stars}</div>;
+  return (
+    <div className="flex flex-row items-center max-h-auto mx-14">{stars}</div>
+  );
 }
 
 export default Stars;

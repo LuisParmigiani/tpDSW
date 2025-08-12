@@ -5,7 +5,7 @@ GET http://localhost:3000/api/usuario/17
 GET http://localhost:3000/api/usuario/comments/:id
 
 ### Obtengo los prestatarios por tipo de servicio y zona
-GET http://localhost:3000/api/usuario/prestatarios/Plomeria/Norte/Calificacion
+GET http://localhost:3000/api/usuario/prestatarios/Plomeria/Norte/Calificacion?maxItems=6&page=2
 
 ### Cargamos un usuario
 POST http://localhost:3000/api/usuario
