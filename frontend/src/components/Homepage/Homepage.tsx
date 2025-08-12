@@ -9,7 +9,7 @@ function Homepage() {
   const navigate = useNavigate();
   const handleClick = (servicio: string) => {
     navigate(
-      `/servicios?tipoServicio=${servicio}&zona=todas&orderBy=calificacion`
+      `/servicios?tipoServicio=${servicio}&zona=Todas&orderBy=calificacion`
     );
   };
   return (

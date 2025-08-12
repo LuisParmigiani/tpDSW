@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { useEffect } from 'react';
 import { z } from 'zod';
 import { Button } from './../Botones/FormButton.js';
 import { Form, FormControl, FormField, FormItem, FormMessage } from './Form.js';
@@ -13,6 +14,11 @@ import {
   SelectContent,
 } from './../Select/Select.js';
 
+type Filtros = {
+  servicio: string;
+  zona: string;
+  ordenarPor: string;
+};
 // Define the form schema
 const formSchema = z.object({
   servicio: z.string().min(1, {
@@ -34,21 +40,47 @@ type ServiciosFormProps = {
   tipoServicios: Array<{ nombreTipo: string; descripcionTipo: string }>;
   zonas: Array<{ id: number; descripcionZona: string }>;
   onSubmit: (values: FormValues) => void;
+  filtrosForm?: Filtros;
 };
 
 export function ServiciosForm({
   tipoServicios,
   zonas,
   onSubmit,
+  filtrosForm, // Added to accept initial filter values
 }: ServiciosFormProps) {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      servicio: '',
-      zona: '',
-      ordenarPor: '',
+      servicio: filtrosForm?.servicio || '',
+      zona: filtrosForm?.zona || '',
+      ordenarPor: filtrosForm?.ordenarPor || '',
     },
   });
+
+  // Reset form values when filtrosForm prop changes
+  useEffect(() => {
+    console.log('FormServicios: filtrosForm changed:', filtrosForm);
+    console.log(
+      'FormServicios: tipoServicios available:',
+      tipoServicios.length
+    );
+    console.log('FormServicios: zonas available:', zonas.length);
+
+    if (filtrosForm && tipoServicios.length > 0 && zonas.length > 0) {
+      console.log('FormServicios: Resetting form with values:', {
+        servicio: filtrosForm.servicio,
+        zona: filtrosForm.zona,
+        ordenarPor: filtrosForm.ordenarPor,
+      });
+
+      form.reset({
+        servicio: filtrosForm.servicio || '',
+        zona: filtrosForm.zona || '',
+        ordenarPor: filtrosForm.ordenarPor || '',
+      });
+    }
+  }, [filtrosForm, form, tipoServicios, zonas]);
 
   const handleSubmit = (values: FormValues) => {
     console.log('Form values:', values);
@@ -59,7 +91,7 @@ export function ServiciosForm({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(handleSubmit)}
-        className="hover:scale-105 transition mt-4 ease-in-out duration-75 bg-tinte-5 mx-auto my-2 flex gap-2 py-1 shadow-2xl flex-col max-w-4/5 justify-items-center justify-center items-center rounded-md lg:rounded-full lg:flex-row lg:align-middle"
+        className="hover:scale-105 transition mt-4 ease-in-out duration-400 bg-tinte-5 mx-auto my-2 flex gap-2 py-1 shadow-2xl flex-col max-w-4/5 justify-items-center justify-center items-center rounded-md lg:rounded-full lg:flex-row lg:align-middle"
       >
         <div className="mb-4">
           <Button

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import Navbar from '../../components/Navbar/Navbar.js';
 import ServicioCard from '../../components/servicios.cards/ServicioCard.js';
 import { tiposServicioApi } from '../../services/tipoSericiosApi.js';
@@ -46,8 +46,8 @@ type FormValues = {
 };
 function FiltrosDeServicios() {
   // Get URL parameters
-  const { servicio: servicioParam } = useParams<{ servicio: string }>();
   const [searchParams] = useSearchParams();
+  const servicioParam = searchParams.get('tipoServicio') || '';
   const zonaParam = searchParams.get('zona') || '';
   const orderByParam = searchParams.get('orderBy') || '';
 
@@ -69,13 +69,14 @@ function FiltrosDeServicios() {
 
   // Initialize form with URL parameters when component mounts
   useEffect(() => {
+    console.log('URL Parameters:', { servicioParam, zonaParam, orderByParam });
     if (servicioParam && zonaParam && orderByParam) {
-      const decodedServicio = decodeURIComponent(servicioParam);
       setFiltrosForm({
-        servicio: decodedServicio,
+        servicio: servicioParam,
         zona: zonaParam,
         ordenarPor: orderByParam,
       });
+
       setSubmit(true); // Automatically trigger the search
     }
   }, [servicioParam, zonaParam, orderByParam]);
@@ -90,7 +91,7 @@ function FiltrosDeServicios() {
           nombreTipo: 'Todos',
           descripcionTipo: 'Todos los servicios',
         });
-        setTipoServicios(response.data.data);
+        setTipoServicios(servs); // Use the modified array
       } catch (error) {
         console.error('Error fetching servicios:', error);
         return [];
@@ -101,9 +102,10 @@ function FiltrosDeServicios() {
         const response = await zonasApi.getAll();
         const zons = response.data.data;
         zons.push({
+          id: 999, // Add an ID for the "Todas" option
           descripcionZona: 'Todas',
         });
-        setZonas(zons);
+        setZonas(zons); // Use the modified array
       } catch (error) {
         console.error('Error fetching zonas:', error);
         return [];
@@ -292,7 +294,7 @@ function FiltrosDeServicios() {
 
       return (
         <>
-          <div className="flex flex-wrap flex-col xl:flex-row gap-5 mx-8  align-middle justify-items-center">
+          <div className="flex flex-wrap flex-col xl:flex-row gap-5 mx-8 mt-8 align-middle justify-items-center">
             {cards}
           </div>
           <div className="flex justify-center mt-8">
@@ -327,6 +329,7 @@ function FiltrosDeServicios() {
         tipoServicios={tipoServicios}
         zonas={zonas}
         onSubmit={handleFormSubmit}
+        filtrosForm={filtrosForm}
       />
       {renderContent()}
     </>
