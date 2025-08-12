@@ -28,6 +28,8 @@ function sanitizeUsuarioInput(req: Request, res: Response, next: NextFunction) {
     horarios: req.body.horarios,
     zonas: req.body.zonas,
     orderBy: req.body.orderBy,
+    maxItems: req.body.maxItems,
+    page: req.body.page,
   };
   Object.keys(req.body.sanitizeUsuarioInput).forEach((key) => {
     if (req.body.sanitizeUsuarioInput[key] === undefined) {
@@ -71,17 +73,33 @@ async function findPrestatariosByTipoServicioAndZona(
     const nombreTipoServicio = req.params.tipoServicio;
     const nombreZona = req.params.zona;
     const orderBy = req.params.orderBy as string;
+    const maxItems = Number(req.query.maxItems) || 6;
+    const page = Number(req.query.page) || 1;
+    const offset = (page - 1) * maxItems;
+    let filtroTipoServicio = '';
+    if (nombreTipoServicio !== 'Todos') {
+      filtroTipoServicio = nombreTipoServicio;
+    }
+    let filtroZona = '';
+    if (nombreZona !== 'Todas') {
+      filtroZona = nombreZona;
+    }
 
-    const prestatarios = await em.find(
-      Usuario,
-      {
-        zonas: { descripcionZona: nombreZona },
-        tiposDeServicio: { nombreTipo: nombreTipoServicio },
-      },
-      {
-        populate: ['tiposDeServicio', 'zonas', 'servicios', 'servicios.turnos'],
-      }
-    );
+    // Build the where clause conditionally
+    const whereClause: any = {};
+    if (filtroTipoServicio) {
+      whereClause.tiposDeServicio = { nombreTipo: filtroTipoServicio };
+    }
+    if (filtroZona) {
+      whereClause.zonas = { descripcion_zona: filtroZona };
+    }
+
+    const [prestatarios, total] = await em.findAndCount(Usuario, whereClause, {
+      populate: ['tiposDeServicio', 'zonas', 'servicios', 'servicios.turnos'],
+      limit: maxItems,
+      offset: offset,
+      //Pasar order by después.
+    });
 
     if (prestatarios.length === 0) {
       return res.status(404).json({
@@ -130,20 +148,23 @@ async function findPrestatariosByTipoServicioAndZona(
     if (orderBy) {
       prestatariosWithRating.sort((a, b) => {
         switch (orderBy) {
-          case 'Nombre':
+          case 'nombre':
             return (a as any).nombreFantasia.localeCompare(b.nombreFantasia);
-          case 'Calificacion':
+          case 'calificacion':
             return (b.calificacion || 0) - (a.calificacion || 0); // Descending
           default:
             return (a as any).nombreFantasia.localeCompare(b.nombreFantasia);
         }
       });
     }
-
-    // Return the processed data with ratings
     res.status(200).json({
       message: 'found prestatarios',
       data: prestatariosWithRating,
+      pagination: {
+        page,
+        maxItems,
+        totalPages: Math.ceil(total / maxItems),
+      },
     });
   } catch (error: any) {
     res.status(500).json({ message: error.message });
