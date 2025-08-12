@@ -134,9 +134,9 @@ async function findPrestatariosByTipoServicioAndZona(
     if (orderBy) {
       prestatariosWithRating.sort((a, b) => {
         switch (orderBy) {
-          case 'Nombre':
+          case 'nombre':
             return (a as any).nombreFantasia.localeCompare(b.nombreFantasia);
-          case 'Calificacion':
+          case 'calificacion':
             return (b.calificacion || 0) - (a.calificacion || 0); // Descending
           default:
             return (a as any).nombreFantasia.localeCompare(b.nombreFantasia);

@@ -262,7 +262,7 @@ function FiltrosDeServicios() {
 
       return (
         <>
-          <div className="flex flex-wrap flex-row gap-3  flex-grow-0 flex-shrink-0 mx-8 justify-start">
+          <div className="flex flex-wrap flex-col xl:flex-row gap-5 mx-8  align-middle justify-items-center">
             {cards}
           </div>
           <div className="flex justify-center mt-8">

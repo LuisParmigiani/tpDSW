@@ -59,9 +59,20 @@ export function ServiciosForm({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(handleSubmit)}
-        className="hover:scale-105 transition ease-in-out duration-75 bg-tinte-5 mx-auto my-2 flex gap-2 py-1 shadow-2xl flex-col max-w-4/5 justify-center items-center rounded-md lg:rounded-full lg:flex-row lg:align-middle"
+        className="hover:scale-105 transition mt-4 ease-in-out duration-75 bg-tinte-5 mx-auto my-2 flex gap-2 py-1 shadow-2xl flex-col max-w-4/5 justify-items-center justify-center items-center rounded-md lg:rounded-full lg:flex-row lg:align-middle"
       >
-        {/* Servicio Field */}
+        <div className="mb-4">
+          <Button
+            type="reset"
+            className={
+              'border-1 border-gray-800 bg-gray-500 text-white text-center py-1 px-4 rounder-md  ' +
+              'hover:bg-gray-300 hover:text-gray-800 transition duration-300 cursor-pointer'
+            }
+            onClick={() => form.reset()}
+          >
+            Reestablecer
+          </Button>
+        </div>
         <FormField
           control={form.control}
           name="servicio"
@@ -157,7 +168,7 @@ export function ServiciosForm({
             className={
               'bg-naranja-1 border-2 border-naranja-1 text-white text-center py-1 px-4 rounded-md hover:bg-white ' +
               'hover:border-naranja-1 hover:border-2 hover:text-naranja-1 hover:text-primary transition-duration-300 ' +
-              'box-border'
+              'box-border cursor-pointer'
             }
           >
             Buscar
