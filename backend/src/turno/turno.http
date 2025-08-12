@@ -1,6 +1,7 @@
 ### Obtener todos los turnos
 
-GET http://localhost:3000/api/turno/byUser/1/
+GET http://localhost:3000/api/turno/turnosPorDia/16/2025-08-12
+
 
 ###Obtener turno por id
 
@@ -8,16 +9,15 @@ GET http://localhost:3000/api/turno/
 
 ### Cargamos un turno
 
+
 POST http://localhost:3000/api/turno
 Content-Type: application/json
 
 {
-  "fechaHora": "2023-11-01T10:00:00.000Z",
-  "estado": "completado",
-  "servicio": 9,
-  "usuario": 1,
-  "comentario": "no me gusto el servicio",
-  "calificacion": 4
+  "fechaHora": "2025-08-01T15:30:00.000Z",
+  "estado": "pendiente",
+  "servicio": 1,
+  "usuario": 2
 }
 
 

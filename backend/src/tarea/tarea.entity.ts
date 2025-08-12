@@ -28,7 +28,6 @@ export class Tarea extends BaseEntity {
   servicios = new Collection<Servicio>(this);
   @ManyToOne(() => TipoServicio, {
     nullable: false,
-    //cascade: [Cascade.PERSIST], //Esto nos va a permitir que al crear una tarea, se cree el tipo de servicio si no existeHHHH
   })
   tipoServicio!: Rel<TipoServicio>;
 }

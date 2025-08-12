@@ -5,6 +5,7 @@ import Navbar from '../Navbar/Navbar.js';
 import Stars from '../stars/Stars';
 import Footer from '../Footer/Footer';
 import PaginationControls from '../Pagination/PaginationControler.js';
+import NewTurnModal from '../Modal/NewTurnModal.js';
 
 type Props = {
   id: number;
@@ -18,20 +19,44 @@ type Turno = {
 };
 
 type Usuario = {
+  id: number;
   nombre: string;
   apellido: string;
   foto: string;
   mail: string;
   telefono: string;
-  tiposDeServicio: {
-    nombreTipo: string;
+  tiposDeServicio: TipoDeServicio[];
+  horarios: {
+    dia: string;
+    horaDesde: string;
+    horaHasta: string;
   }[];
+  servicios: Servicio[];
+};
+type TipoDeServicio = {
+  id: number;
+  nombreTipo: string;
+};
+
+type Servicio = {
+  id: number;
+  precio: number;
+  tarea: Tarea;
+};
+
+type Tarea = {
+  id: number;
+  nombreTarea: string;
+  descripcionTarea: string;
+  duracion: number;
+  tipoServicio: TipoDeServicio;
 };
 
 function Borrower(props: Props) {
-  const { id } = props;
+  const id = props.id;
+
   // variable de prestatario para mostrar en la card de usuario y Buscar sus comentarios de cada servicio
-  const [prestatario, setPrestatario] = useState<Usuario | null>(null);
+  const [prestatario, setPrestatario] = useState<Usuario>();
   // Se guarda la informacion de los comentarios del prestatario, incluyendo el promedio de estrellas y la cantidad de comentarios
   const [borrower, setBorrower] = useState<Turno[] | null>(null); // Comentarios del prestatario
   const [average, setAverage] = useState(0); // Variable de promedio de estrellas
@@ -45,6 +70,8 @@ function Borrower(props: Props) {
   const [currentPage, setCurrentPage] = useState(1); // Página actual
   const [totalPages, setTotalPages] = useState(1); // Total de páginas
   const [totalComments, setTotalComments] = useState(0); // Total de comentarios
+  // variables del modal
+  const [isOpen, setIsOpen] = useState(false);
 
   // Se carga la informacion del prestatario
   useEffect(() => {
@@ -116,6 +143,9 @@ function Borrower(props: Props) {
   return (
     <>
       <Navbar />
+      {isOpen && prestatario && (
+        <NewTurnModal prestatario={prestatario} setopen={setIsOpen} />
+      )}
       <div className="flex flex-col items-center    ">
         <div className="lg:flex items-center h-11/12  px-8 py-10 bg-tinte-5 shadow-2xl mt-20 mb-30  lg:w-9/12 lg:h-100 rounded-2xl ">
           <img
@@ -138,8 +168,13 @@ function Borrower(props: Props) {
               <div className="flex items-start mr-4 ">{starAverageShow}</div>
               {cantComments}
             </div>
-            <button className="bg-naranja-1  mt-7 border-none rounded-4xl text-white px-17 py-2 hover:bg-neutral-200 hover:border border-naranja-1 hover:text-naranja-1 transition-colors duration-300">
-              Contactar
+            <button
+              onClick={() => {
+                setIsOpen(true);
+              }}
+              className="bg-naranja-1  mt-7 border-none rounded-4xl text-white px-17 py-2 hover:bg-neutral-200 border-2 border-naranja-1  hover:text-naranja-1 transition-colors duration-300"
+            >
+              Contratar
             </button>
           </div>
         </div>

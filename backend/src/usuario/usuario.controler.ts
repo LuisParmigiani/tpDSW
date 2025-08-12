@@ -1,7 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { Usuario } from './usuario.entity.js';
-import { getTurnosByServicioIdHelper } from '../turno/turno.controler.js';
-import { get, request } from 'http';
+import {
+  getTurnosByServicioIdHelper,
+  getTurnsPerDay,
+} from '../turno/turno.controler.js';
+
 import { orm } from '../shared/db/orm.js';
 const em = orm.em;
 
@@ -153,7 +156,16 @@ async function findOne(req: Request, res: Response) {
     const user = await em.findOneOrFail(
       Usuario,
       { id },
-      { populate: ['turnos', 'servicios', 'tiposDeServicio', 'horarios'] }
+      {
+        populate: [
+          'turnos',
+          'servicios',
+          'servicios.tarea',
+          'servicios.tarea.tipoServicio',
+          'tiposDeServicio',
+          'horarios',
+        ],
+      }
     );
     res.status(200).json({ message: 'found one usuario', data: user });
   } catch (error: any) {
@@ -195,24 +207,19 @@ async function remove(req: Request, res: Response) {
 
 async function getCommentsByUserId(req: Request, res: Response) {
   try {
-    const { id } = req.params;
     const maxItems = Number(req.query.maxItems) || 5;
     const page = Number(req.query.page) || 1;
     const orderBy = req.query.orderBy || '';
-    const userId = Number.parseInt(id);
+    const userId = Number.parseInt(req.params.id);
 
-    // Encontrar el usuario con sus servicios
+    // conseguir todos los servicios del usuario para ver los turnos
     const userWithServices = await em.findOne(
       Usuario,
       { id: userId },
       { populate: ['servicios'] }
     );
 
-    if (
-      !userWithServices ||
-      !userWithServices.servicios ||
-      userWithServices.servicios.length === 0
-    ) {
+    if (!userWithServices?.servicios?.length) {
       return res
         .status(404)
         .json({ message: 'Usuario no encontrado o sin servicios' });
