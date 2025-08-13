@@ -237,7 +237,7 @@ async function getTurnosByServicioIdHelper(params: {
     comments.forEach((comment) => {
       totalStars += comment.calificacion || 0;
     });
-    const average = totalStars / total || 0;
+    const average = comments.length > 0 ? totalStars / comments.length : 0;
     return {
       comments,
       totalComments: total,

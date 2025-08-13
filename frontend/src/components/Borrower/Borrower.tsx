@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import Comments from '../Comments/Comments';
 import { usuariosApi } from '../../services/usuariosApi.js';
 import Navbar from '../Navbar/Navbar.js';
@@ -6,10 +7,6 @@ import Stars from '../stars/Stars';
 import Footer from '../Footer/Footer';
 import PaginationControls from '../Pagination/PaginationControler.js';
 import NewTurnModal from '../Modal/NewTurnModal.js';
-
-type Props = {
-  id: number;
-};
 
 type Turno = {
   id: number;
@@ -52,9 +49,9 @@ type Tarea = {
   tipoServicio: TipoDeServicio;
 };
 
-function Borrower(props: Props) {
-  const id = props.id;
-
+function Borrower() {
+  const { id } = useParams<{ id: string }>();
+  const numericId = Number(id);
   // variable de prestatario para mostrar en la card de usuario y Buscar sus comentarios de cada servicio
   const [prestatario, setPrestatario] = useState<Usuario>();
   // Se guarda la informacion de los comentarios del prestatario, incluyendo el promedio de estrellas y la cantidad de comentarios
@@ -83,8 +80,8 @@ function Borrower(props: Props) {
         console.error('Error al cargar usuario:', err);
       }
     };
-    pres(id);
-  }, [id]);
+    pres(numericId);
+  }, [numericId]);
 
   // Se cargan los comentarios del prestatario, promedio de estrellas y cantidad de comentarios
   useEffect(() => {
@@ -112,8 +109,8 @@ function Borrower(props: Props) {
         setLoading(false);
       }
     };
-    getComments(id);
-  }, [id, currentPage, selectedValue]); // Cada que cambia el id de usuario, la página actual o el filtro de orden se vuelve a hacer la petición
+    getComments(numericId);
+  }, [numericId, currentPage, selectedValue]); // Cada que cambia el id de usuario, la página actual o el filtro de orden se vuelve a hacer la petición
 
   // Cambia el orden de los comentarios segun el filtro seleccionado
   const orderBy = (e: React.ChangeEvent<HTMLSelectElement>) => {

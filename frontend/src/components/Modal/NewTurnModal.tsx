@@ -105,6 +105,49 @@ function NewTurnModal({ prestatario, setopen }: Props) {
 
   // Efecto para obtener los horarios no disponibles (Los turnos que estan ese dia) según el día seleccionado
   useEffect(() => {
+    // Función para generar los horarios disponibles
+    const generateHorarios = (
+      horaDesde: string,
+      horaHasta: string,
+      turnosOcupados: number[][] = []
+    ) => {
+      // Convierte "08:00:00" a minutos totales
+      const [hDesde, mDesde] = horaDesde.split(':').map(Number);
+      const [hHasta, mHasta] = horaHasta.split(':').map(Number);
+      let horaAct = hDesde * 60 + mDesde;
+      const horaHastaMin = hHasta * 60 + mHasta;
+      const taskDuration =
+        prestatario.servicios.find(
+          (servicio) => servicio.tarea.nombreTarea === selectedTask
+        )?.tarea.duracion || 30;
+
+      const nuevosHorariosManana: number[] = [];
+      const nuevosHorariosTarde: number[] = [];
+      while (horaAct + taskDuration <= horaHastaMin) {
+        // Es la suma de arranque mas la duracion para ver que entre la tarea completa y no se solapen
+        const finNuevoTurno = horaAct + taskDuration;
+
+        // Verificar si el turno con la duracion entra o se solapa
+        const haySolapamiento = turnosOcupados.some(
+          ([inicioOcupado, finOcupado]) => {
+            // No entra si arranca antes de que termine el turno o termina despues de que arranca un turno
+            return horaAct < finOcupado && finNuevoTurno > inicioOcupado;
+          }
+        );
+
+        if (!haySolapamiento) {
+          if (horaAct < 13 * 60) {
+            nuevosHorariosManana.push(horaAct);
+          } else {
+            nuevosHorariosTarde.push(horaAct);
+          }
+        }
+
+        horaAct += 30; // Incrementar en 30 minutos
+      }
+      setHorariosManana(nuevosHorariosManana);
+      setHorariosTarde(nuevosHorariosTarde);
+    };
     const fetchHorarios = async () => {
       if (dayForTurn) {
         const response = await turnosApi.getTurnsPerDay(
@@ -139,7 +182,13 @@ function NewTurnModal({ prestatario, setopen }: Props) {
       }
     };
     fetchHorarios();
-  }, [dayForTurn, prestatario.id, prestatario.horarios]);
+  }, [
+    dayForTurn,
+    prestatario.id,
+    prestatario.horarios,
+    prestatario.servicios,
+    selectedTask,
+  ]);
 
   // Función para convertir minutos a formato Horas hh:mm
   const minutosAHora = (minutos: number): string => {
@@ -148,50 +197,6 @@ function NewTurnModal({ prestatario, setopen }: Props) {
     return `${horas.toString().padStart(2, '0')}:${mins
       .toString()
       .padStart(2, '0')}`;
-  };
-
-  // Función para generar los horarios disponibles
-  const generateHorarios = (
-    horaDesde: string,
-    horaHasta: string,
-    turnosOcupados: number[][] = []
-  ) => {
-    // Convierte "08:00:00" a minutos totales
-    const [hDesde, mDesde] = horaDesde.split(':').map(Number);
-    const [hHasta, mHasta] = horaHasta.split(':').map(Number);
-    let horaAct = hDesde * 60 + mDesde;
-    const horaHastaMin = hHasta * 60 + mHasta;
-    const taskDuration =
-      prestatario.servicios.find(
-        (servicio) => servicio.tarea.nombreTarea === selectedTask
-      )?.tarea.duracion || 30;
-
-    const nuevosHorariosManana: number[] = [];
-    const nuevosHorariosTarde: number[] = [];
-    while (horaAct + taskDuration <= horaHastaMin) {
-      // Es la suma de arranque mas la duracion para ver que entre la tarea completa y no se solapen
-      const finNuevoTurno = horaAct + taskDuration;
-
-      // Verificar si el turno con la duracion entra o se solapa
-      const haySolapamiento = turnosOcupados.some(
-        ([inicioOcupado, finOcupado]) => {
-          // No entra si arranca antes de que termine el turno o termina despues de que arranca un turno
-          return horaAct < finOcupado && finNuevoTurno > inicioOcupado;
-        }
-      );
-
-      if (!haySolapamiento) {
-        if (horaAct < 13 * 60) {
-          nuevosHorariosManana.push(horaAct);
-        } else {
-          nuevosHorariosTarde.push(horaAct);
-        }
-      }
-
-      horaAct += 30; // Incrementar en 30 minutos
-    }
-    setHorariosManana(nuevosHorariosManana);
-    setHorariosTarde(nuevosHorariosTarde);
   };
 
   // Función para mostrar los días de la semana con las fechas
@@ -220,7 +225,7 @@ function NewTurnModal({ prestatario, setopen }: Props) {
             onClick={() => setDayForTurn(fecha.toISOString().split('T')[0])}
             className={
               dayForTurn === fecha.toISOString().split('T')[0]
-                ? 'sm:block hidden  bg-naranja-1 border-none rounded-md w-25 m-auto text-white px-6 py-2 hover:bg-neutral-200 border-2 border-naranja-1 hover:text-naranja-1 items-center justify-center transition-colors duration-300'
+                ? 'sm:block hidden  bg-naranja-1  rounded-md w-25 m-auto text-white py-2  border-2 border-naranja-1  items-center  text-center  justify-center transition-colors duration-300'
                 : 'sm:flex hidden bg-neutral-200 rounded-md py-2 w-25 m-auto px-4 hover:bg-neutral-400 text-center  flex-col'
             }
           >
@@ -265,10 +270,6 @@ function NewTurnModal({ prestatario, setopen }: Props) {
         (s) => s.tarea.nombreTarea === selectedTask
       );
       const precio = services?.precio || 100;
-      console.log('Task ID:', services?.tarea.id);
-      console.log('Service ID:', services?.id);
-      console.log('Monto:', precio * 0.02 + precio);
-      console.log('fechaHora:', `${dayForTurn}T${horarioSelected}:00`);
       await turnosApi.create({
         Usuario: 2, //aca va el token del usuario regitrado ,
         servicio: services?.id,
@@ -435,6 +436,7 @@ function NewTurnModal({ prestatario, setopen }: Props) {
                 Name="Tipo Servicios"
                 options={serviciosoptions}
                 setOptions={setSelectedService}
+                value={selectedService}
               />
             </div>
             <div className="w-full mt-5 ">
@@ -444,6 +446,7 @@ function NewTurnModal({ prestatario, setopen }: Props) {
                 }
                 options={tareasOptions}
                 setOptions={setSelectedTask}
+                value={selectedTask}
               />
             </div>
           </div>

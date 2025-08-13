@@ -15,7 +15,7 @@ Content-Type: application/json
 
 {
   "fechaHora": "2025-08-01T15:30:00.000Z",
-  "estado": "pendiente",
+  "estado": "completado",
   "servicio": 1,
   "usuario": 2
 }
