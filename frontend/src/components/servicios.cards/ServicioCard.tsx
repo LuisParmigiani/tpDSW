@@ -1,6 +1,7 @@
 import Boton from '../Botones/BotonServicios.tsx';
 import './../../index.css';
 import Stars from '../stars/Stars.js';
+import { useNavigate } from 'react-router-dom';
 
 type Props = {
   id: number;
@@ -14,7 +15,10 @@ export default function ServicioCard({
   rubros,
   puntuacion,
 }: Props) {
-  const contactar = () => {};
+  const handleClick = () => {
+    navigate(`/borrower/${id}`);
+  };
+  const navigate = useNavigate();
   return (
     <div
       className={
@@ -48,7 +52,7 @@ export default function ServicioCard({
       <Boton
         texto="CONTRATAR"
         estilosExtras="mt-4 mb-2"
-        contactar={contactar}
+        contactar={handleClick}
       />
     </div>
   );
