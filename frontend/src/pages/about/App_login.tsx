@@ -1,4 +1,4 @@
-import NavBar from '../../components/navBar/Navbar.js';
+import NavBar from '../../components/Navbar/Navbar.js';
 import Logincard from '../../components/logincard/index.js';
 
 function App_login() {
