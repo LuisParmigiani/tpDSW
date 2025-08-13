@@ -11,12 +11,15 @@ type Props = {
   options: Option[];
   setOptions: (value: string) => void;
   setPage?: (page: number) => void;
+  value?: string;
 };
 
 // haciendo una funcion en la cual le paso la funcion para desp poder saber el valor que eligio en la variable y ademas pasar las opciones.
-function CustomSelect({ Name, options, setOptions, setPage }: Props) {
+function CustomSelect({ Name, options, setOptions, setPage, value }: Props) {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedValueOrder, setSelectedValueOrder] = useState<string>('');
+  const [selectedValueOrder, setSelectedValueOrder] = useState<string>(
+    value || ''
+  );
 
   const handleSelect = (value: string) => {
     if (value !== '') {

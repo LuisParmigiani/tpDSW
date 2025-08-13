@@ -6,6 +6,7 @@ import PaginationControls from '../Pagination/PaginationControler';
 import CustomSelect from '../Select/CustomSelect';
 import CalificationModal from '../Modal/CalificationModal';
 import Stars from '../stars/Stars.js';
+import { useNavigate } from 'react-router-dom';
 
 type Turno = {
   id: number;
@@ -36,7 +37,8 @@ type Usuario = {
 };
 
 function TurnHistory() {
-  const id = 1; // aca el id del usuario
+  const navigate = useNavigate();
+  const id = 2; // aca el id del usuario
   const [turns, setTurns] = useState<Turno[] | null>(null); // Se guardan todos los turnos del usuario
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -159,6 +161,19 @@ function TurnHistory() {
     }
   }, [isOpen, data]);
 
+  // Cancelar turno
+  const cancelarTurno = async (id: number) => {
+    try {
+      await turnosApi.update(id.toString(), {
+        estado: 'cancelado',
+      });
+      // Actualizar el estado local de los turnos
+      setTurns(turns ? turns.filter((turno) => turno.id !== id) : null);
+    } catch (error) {
+      console.error('Error al cancelar el turno:', error);
+    }
+  };
+
   return (
     <>
       <Natbar />
@@ -263,33 +278,76 @@ function TurnHistory() {
                         turn.estado === 'completado'
                       ) {
                         return (
-                          <button
-                            onClick={() => openModal(turn)}
-                            className="bg-naranja-1 w-4/5 text-white px-4 py-2 rounded-md  m-auto mt-2 hover:bg-white hover:text-naranja-1 border border-naranja-1 transition-colors duration-300"
-                          >
-                            Calificar
-                          </button>
+                          <>
+                            <button
+                              onClick={() => openModal(turn)}
+                              className="bg-naranja-1  text-white hover:text-naranja-1 hover:bg-white w-full rounded-2xl border-2 border-naranja-1"
+                            >
+                              Calificar
+                            </button>
+                            <button
+                              className="bg-naranja-1 text-white hover:text-naranja-1 hover:bg-white w-full rounded-2xl border-2 border-naranja-1"
+                              onClick={() => {
+                                // Navegar a la ruta con el ID dinámico
+                                navigate(
+                                  `/borrower/${turn.servicio.usuario.id}`
+                                );
+                              }}
+                            >
+                              Volver a contratar
+                            </button>
+                          </>
                         );
                       } else {
                         if (turn.calificacion !== null) {
                           return (
-                            <div className="justify-center flex mt-3">
-                              <Stars cant={turn.calificacion} />
-                            </div>
+                            <>
+                              <div className="justify-center flex">
+                                <Stars cant={turn.calificacion} />
+                              </div>
+                              <button
+                                className="bg-naranja-1 text-white hover:text-naranja-1 hover:bg-white w-full rounded-2xl border-2 border-naranja-1"
+                                onClick={() => {
+                                  // Navegar a la ruta con el ID dinámico
+                                  navigate(
+                                    `/borrower/${turn.servicio.usuario.id}`
+                                  );
+                                }}
+                              >
+                                Volver a contratar
+                              </button>
+                            </>
                           );
                         } else {
                           if (turn.estado === 'completado') {
                             return (
-                              <p className="mt-2">
-                                Expiró el tiempo de calificación
-                              </p>
+                              <>
+                                {' '}
+                                <p className="mt-2">
+                                  Expiró el tiempo de calificación
+                                </p>
+                                <button
+                                  className="bg-naranja-1 text-white hover:text-naranja-1 hover:bg-white w-full rounded-2xl border-2 border-naranja-1"
+                                  onClick={() => {
+                                    // Navegar a la ruta con el ID dinámico
+                                    navigate(
+                                      `/borrower/${turn.servicio.usuario.id}`
+                                    );
+                                  }}
+                                >
+                                  Volver a contratar
+                                </button>
+                              </>
                             );
                           } else {
                             if (turn.estado !== 'cancelado') {
                               return (
                                 <>
                                   <p> Estado: {turn.estado}</p>
-                                  <button className="bg-naranja-1  text-white hover:text-naranja-1 hover:bg-white w-full rounded-2xl border-2 border-naranja-1">
+                                  <button
+                                    onClick={() => cancelarTurno(turn.id)}
+                                    className="bg-naranja-1  text-white hover:text-naranja-1 hover:bg-white w-full rounded-2xl border-2 border-naranja-1"
+                                  >
                                     Cancelar
                                   </button>
                                 </>

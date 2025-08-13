@@ -2,7 +2,7 @@
 GET http://localhost:3000/api/usuario/17
 
 ### Obtener un usuario específico
-GET http://localhost:3000/api/usuario/comments/:id
+GET http://localhost:3000/api/usuario/comments/47
 
 ### Obtengo los prestatarios por tipo de servicio y zona
 GET http://localhost:3000/api/usuario/prestatarios/Plomeria/Norte/Calificacion?maxItems=6&page=2
