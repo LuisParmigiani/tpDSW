@@ -97,8 +97,8 @@ export function ServiciosForm({
           <Button
             type="reset"
             className={
-              'border-1 border-gray-800 bg-gray-500 text-white text-center py-1 px-4 rounder-md  ' +
-              'hover:bg-gray-300 hover:text-gray-800 transition duration-300 cursor-pointer'
+              'border-1 border-gray-800 min-w-10 bg-gray-500 text-white text-center py-1 px-4 rounder-md  ' +
+              'hover:bg-gray-300 hover:text-gray-800 w-25 transition duration-300 cursor-pointer'
             }
             onClick={() => form.reset()}
           >
@@ -112,7 +112,7 @@ export function ServiciosForm({
             <FormItem className="mb-4">
               <FormControl>
                 <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger className="w-[180px] text-secondary text-base font-medium bg-white">
+                  <SelectTrigger className="!w-36 text-secondary text-base font-medium bg-white">
                     <SelectValue placeholder="Servicio" />
                   </SelectTrigger>
                   <SelectContent>
@@ -141,7 +141,7 @@ export function ServiciosForm({
             <FormItem className="mb-4">
               <FormControl>
                 <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger className="w-[180px] text-secondary text-base font-medium bg-white">
+                  <SelectTrigger className="!w-36 text-secondary text-base font-medium bg-white">
                     <SelectValue placeholder="Zona" />
                   </SelectTrigger>
                   <SelectContent>
@@ -170,7 +170,7 @@ export function ServiciosForm({
             <FormItem className="mb-4">
               <FormControl>
                 <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger className="w-[180px] text-secondary text-base font-medium bg-white">
+                  <SelectTrigger className="!w-36 text-secondary text-base font-medium bg-white">
                     <SelectValue placeholder="Ordenar por" />
                   </SelectTrigger>
                   <SelectContent>
@@ -200,7 +200,7 @@ export function ServiciosForm({
             className={
               'bg-naranja-1 border-2 border-naranja-1 text-white text-center py-1 px-4 rounded-md hover:bg-white ' +
               'hover:border-naranja-1 hover:border-2 hover:text-naranja-1 hover:text-primary transition-duration-300 ' +
-              'box-border cursor-pointer'
+              'box-border cursor-pointer w-25'
             }
           >
             Buscar
