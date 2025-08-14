@@ -88,21 +88,21 @@ async function findPrestatariosByTipoServicioAndZona(
 
     // Build the where clause conditionally
     const whereClause: any = {};
+    whereClause.nombreFantasia = { $ne: null }; // De esta manera no traemos ningún usuario que no
     if (filtroTipoServicio) {
       whereClause.tiposDeServicio = { nombreTipo: filtroTipoServicio };
     }
     if (filtroZona) {
       whereClause.zonas = { descripcion_zona: filtroZona };
     }
-
+    //! Por un tema de performance se tendría que calcular y guardar en algún lado la calificación, apra no tener que calcular todas las calificaciones
+    //! y ordenar 30 objetos cada vez que se llama
     const [prestatarios, total] = await em.findAndCount(Usuario, whereClause, {
       populate: ['tiposDeServicio', 'zonas', 'servicios', 'servicios.turnos'],
-      limit: maxItems,
-      offset: offset,
       //Pasar order by después.
     });
 
-    if (prestatarios.length === 0) {
+    if (total === 0) {
       return res.status(404).json({
         message: 'No prestatarios found for the given tipoServicio and zona',
       });
@@ -158,13 +158,18 @@ async function findPrestatariosByTipoServicioAndZona(
         }
       });
     }
+    // Paginación manual
+    const totalPages = Math.ceil(total / maxItems);
+    const start = (page - 1) * maxItems;
+    const end = start + maxItems;
+    const pageItems = prestatariosWithRating.slice(start, end);
     res.status(200).json({
       message: 'found prestatarios',
-      data: prestatariosWithRating,
+      data: pageItems,
       pagination: {
         page,
         maxItems,
-        totalPages: Math.ceil(total / maxItems),
+        totalPages,
       },
     });
   } catch (error: any) {
