@@ -7,7 +7,6 @@ const orm = await MikroORM.init({
   entities: ['dist/**/*.entity.js'],
   entitiesTs: ['src/**/*.entity.ts'],
   dbName: 'homeService',
-  //clientUrl: 'mysql://dsw:dsw@localhost:3306/homeService',
   clientUrl: 'mysql://root:root@localhost:3306/homeService',
   highlighter: new SqlHighlighter(),
   debug: true,
@@ -22,8 +21,8 @@ export const syncSchema = async () => {
   const generator = orm.getSchemaGenerator();
 
   //Lineas para borrar y crear la base de datos
-  //await generator.dropSchema();
-  //await generator.createSchema();
+  /*   await generator.dropSchema();
+  await generator.createSchema(); */
 
   //await generator.updateSchema();
 };
