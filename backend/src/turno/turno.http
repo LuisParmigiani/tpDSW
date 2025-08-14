@@ -14,8 +14,8 @@ POST http://localhost:3000/api/turno
 Content-Type: application/json
 
 {
-  "fechaHora": "2025-08-01T15:30:00.000Z",
-  "estado": "completado",
+  "fechaHora": "2025-08-14T15:40:00.000Z",
+  "estado": "pendiente",
   "servicio": 1,
   "usuario": 2
 }
@@ -26,7 +26,7 @@ Content-Type: application/json
 
 ###Hacemos un PUT
 
-PUT http://localhost:3000/api/turno/1
+PUT http://localhost:3000/api/turno/902
 Content-Type: application/json
 
 {

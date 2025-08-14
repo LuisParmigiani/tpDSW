@@ -78,41 +78,36 @@ INSERT INTO `usuario` (`mail`, `contrasena`, `tipo_doc`, `numero_doc`, `telefono
 
 -- PRESTADORES (usuarios 46-70)
 ('limpieza.total@email.com', 'prest123', 'CUIT', '20-12345678-9', '341-666-0201', 'Roberto', 'Limpieza', 'Zona Industrial 123', 'Limpieza Total', 'Empresa de limpieza profesional', 'limpieza_total.jpg'),
-('plomeria.herrera@email.com', 'prest123', 'CUIT', '20-23456789-0', '341-666-0202', 'Miguel', 'Herrera', 'Barrio Norte 234', 'Plomería Herrera', 'Servicios de plomería 24hs', 'plomeria_herrera.jpg'),
-('electricidad.ramirez@email.com', 'prest123', 'CUIT', '20-34567890-1', '341-666-0203', 'Eduardo', 'Ramírez', 'Centro 345', 'Electricidad Ramírez', 'Instalaciones eléctricas certificadas', 'electricidad_ramirez.jpg'),
+('plomeria.herrera@email.com', 'prest123', 'CUIT', '20-23456789-0', '341-666-0202', 'Miguel', 'Herrera', 'Barrio Norte 234', 'Plomer Herrera', 'Servicios de plomería 24hs', 'plomeria_herrera.jpg'),
+('electricidad.ramirez@email.com', 'prest123', 'CUIT', '20-34567890-1', '341-666-0203', 'Eduardo', 'Ramírez', 'Centro 345', 'Electri Ramírez', 'Instalaciones eléctricas certificadas', 'electricidad_ramirez.jpg'),
 ('jardines.vega@email.com', 'prest123', 'CUIT', '20-45678901-2', '341-666-0204', 'Francisco', 'Vega', 'Zona Sur 456', 'Jardines Vega', 'Paisajismo y mantenimiento', 'jardines_vega.jpg'),
 ('pintura.moreno@email.com', 'prest123', 'CUIT', '20-56789012-3', '341-666-0205', 'Gustavo', 'Moreno', 'Zona Este 567', 'Pintura Moreno', 'Pintura y decoración', 'pintura_moreno.jpg'),
-('carpinteria.ruiz@email.com', 'prest123', 'CUIT', '20-67890123-4', '341-666-0206', 'Raúl', 'Ruiz', 'Zona Oeste 678', 'Carpintería Ruiz', 'Muebles a medida', 'carpinteria_ruiz.jpg'),
-('construcciones.diaz@email.com', 'prest123', 'CUIT', '20-78901234-5', '341-666-0207', 'Oscar', 'Díaz', 'Periferia 789', 'Construcciones Díaz', 'Obras y reformas', 'construcciones_diaz.jpg'),
-('cerrajeria.flores@email.com', 'prest123', 'CUIT', '20-89012345-6', '341-666-0208', 'Horacio', 'Flores', 'Centro 890', 'Cerrajería Flores', 'Seguridad 24hs', 'cerrajeria_flores.jpg'),
+('carpinteria.ruiz@email.com', 'prest123', 'CUIT', '20-67890123-4', '341-666-0206', 'Raúl', 'Ruiz', 'Zona Oeste 678', 'Carpint Ruiz', 'Muebles a medida', 'carpinteria_ruiz.jpg'),
+('construcciones.diaz@email.com', 'prest123', 'CUIT', '20-78901234-5', '341-666-0207', 'Oscar', 'Díaz', 'Periferia 789', 'Constru Díaz', 'Obras y reformas', 'construcciones_diaz.jpg'),
+('cerrajeria.flores@email.com', 'prest123', 'CUIT', '20-89012345-6', '341-666-0208', 'Horacio', 'Flores', 'Centro 890', 'Cerraj Flores', 'Seguridad 24hs', 'cerrajeria_flores.jpg'),
 ('clima.service@email.com', 'prest123', 'CUIT', '20-90123456-7', '341-666-0209', 'Sergio', 'Clima', 'Zona Norte 123', 'Clima Service', 'Aires acondicionados', 'clima_service.jpg'),
-('reparaciones.express@email.com', 'prest123', 'CUIT', '20-01234567-8', '341-666-0210', 'Daniel', 'Reparaciones', 'Centro 234', 'Reparaciones Express', 'Arreglos rápidos', 'reparaciones_express.jpg'),
+('reparaciones.express@email.com', 'prest123', 'CUIT', '20-01234567-8', '341-666-0210', 'Daniel', 'Reparaciones', 'Centro 234', 'Repara Express', 'Arreglos rápidos', 'reparaciones_express.jpg'),
 ('tecnicos.garcia@email.com', 'prest123', 'CUIT', '20-11234567-9', '341-666-0211', 'Marcelo', 'García', 'Zona Sur 345', 'Técnicos García', 'Servicios especializados', 'tecnicos_garcia.jpg'),
-('mantenimientos.lopez@email.com', 'prest123', 'CUIT', '20-22234567-0', '341-666-0212', 'Alberto', 'López', 'Zona Este 456', 'Mantenimientos López', 'Mantenimiento integral', 'mantenimientos_lopez.jpg'),
-('hogar.martin@email.com', 'prest123', 'CUIT', '20-33234567-1', '341-666-0213', 'Gabriel', 'Martín', 'Zona Oeste 567', 'Servicios del Hogar Martín', 'Todo para su hogar', 'hogar_martin.jpg'),
-('integrales.torres@email.com', 'prest123', 'CUIT', '20-44234567-2', '341-666-0214', 'Fernando', 'Torres', 'Centro 678', 'Servicios Integrales Torres', 'Soluciones completas', 'integrales_torres.jpg'),
-('jardin.vera@email.com', 'prest123', 'CUIT', '20-55234567-3', '341-666-0215', 'Andrés', 'Vera', 'Zona Norte 789', 'Hogar y Jardín Vera', 'Espacios verdes', 'jardin_vera.jpg'),
-('inmobiliarios.castro@email.com', 'prest123', 'CUIT', '20-66234567-4', '341-666-0216', 'Ricardo', 'Castro', 'Centro 890', 'Servicios Inmobiliarios Castro', 'Administración de propiedades', 'inmobiliarios_castro.jpg'),
-('multiservicios.pena@email.com', 'prest123', 'CUIT', '20-77234567-5', '341-666-0217', 'Javier', 'Peña', 'Zona Sur 123', 'Multi-Servicios Peña', 'Todo tipo de servicios', 'multiservicios_pena.jpg'),
-('profesionales.ortega@email.com', 'prest123', 'CUIT', '20-88234567-6', '341-666-0218', 'Leonardo', 'Ortega', 'Zona Este 234', 'Servicios Profesionales Ortega', 'Calidad garantizada', 'profesionales_ortega.jpg'),
-('especializados.silva@email.com', 'prest123', 'CUIT', '20-99234567-7', '341-666-0219', 'Cristian', 'Silva', 'Zona Oeste 345', 'Servicios Especializados Silva', 'Expertos en servicios', 'especializados_silva.jpg'),
-('pintura.profesional@email.com', 'prest123', 'CUIT', '20-10234567-8', '341-666-0220', 'Maximiliano', 'Pintura', 'Centro 456', 'Pintura Profesional', 'Pintura de alta calidad', 'pintura_profesional.jpg'),
-('veterinaria.salud@email.com', 'prest123', 'CUIT', '20-20345678-9', '341-666-0221', 'Patricia', 'Veterinaria', 'Zona Norte 567', 'Veterinaria Salud Animal', 'Atención veterinaria integral', 'veterinaria_salud.jpg'),
+('mantenimientos.lopez@email.com', 'prest123', 'CUIT', '20-22234567-0', '341-666-0212', 'Alberto', 'López', 'Zona Este 456', 'Mantto López', 'Mantenimiento integral', 'mantenimientos_lopez.jpg'),
+('hogar.martin@email.com', 'prest123', 'CUIT', '20-33234567-1', '341-666-0213', 'Gabriel', 'Martín', 'Zona Oeste 567', 'Hogar Martín', 'Todo para su hogar', 'hogar_martin.jpg'),
+('integrales.torres@email.com', 'prest123', 'CUIT', '20-44234567-2', '341-666-0214', 'Fernando', 'Torres', 'Centro 678', 'Integra Torres', 'Soluciones completas', 'integrales_torres.jpg'),
+('jardin.vera@email.com', 'prest123', 'CUIT', '20-55234567-3', '341-666-0215', 'Andrés', 'Vera', 'Zona Norte 789', 'Jardín Vera', 'Espacios verdes', 'jardin_vera.jpg'),
+('inmobiliarios.castro@email.com', 'prest123', 'CUIT', '20-66234567-4', '341-666-0216', 'Ricardo', 'Castro', 'Centro 890', 'Inmob Castro', 'Administración de propiedades', 'inmobiliarios_castro.jpg'),
+('multiservicios.pena@email.com', 'prest123', 'CUIT', '20-77234567-5', '341-666-0217', 'Javier', 'Peña', 'Zona Sur 123', 'Multi Peña', 'Todo tipo de servicios', 'multiservicios_pena.jpg'),
+('profesionales.ortega@email.com', 'prest123', 'CUIT', '20-88234567-6', '341-666-0218', 'Leonardo', 'Ortega', 'Zona Este 234', 'Profes Ortega', 'Calidad garantizada', 'profesionales_ortega.jpg'),
+('especializados.silva@email.com', 'prest123', 'CUIT', '20-99234567-7', '341-666-0219', 'Cristian', 'Silva', 'Zona Oeste 345', 'Especial Silva', 'Expertos en servicios', 'especializados_silva.jpg'),
+('pintura.profesional@email.com', 'prest123', 'CUIT', '20-10234567-8', '341-666-0220', 'Maximiliano', 'Pintura', 'Centro 456', 'Pintu Pro', 'Pintura de alta calidad', 'pintura_profesional.jpg'),
+('veterinaria.salud@email.com', 'prest123', 'CUIT', '20-20345678-9', '341-666-0221', 'Patricia', 'Veterinaria', 'Zona Norte 567', 'Vet Salud', 'Atención veterinaria integral', 'veterinaria_salud.jpg'),
 ('estetica.belleza@email.com', 'prest123', 'CUIT', '20-30345678-0', '341-666-0222', 'Mónica', 'Estética', 'Centro 678', 'Belleza Total', 'Servicios de peluquería y estética', 'estetica_belleza.jpg'),
-('coaching.desarrollo@email.com', 'prest123', 'CUIT', '20-40345678-1', '341-666-0223', 'Roberto', 'Coach', 'Zona Este 789', 'Desarrollo Personal', 'Coach profesional certificado', 'coaching_desarrollo.jpg'),
-('traduccion.idiomas@email.com', 'prest123', 'CUIT', '20-50345678-2', '341-666-0224', 'Laura', 'Traductora', 'Centro 890', 'Idiomas Profesionales', 'Traducción e interpretación', 'traduccion_idiomas.jpg'),
+('coaching.desarrollo@email.com', 'prest123', 'CUIT', '20-40345678-1', '341-666-0223', 'Roberto', 'Coach', 'Zona Este 789', 'Desarr Personal', 'Coach profesional certificado', 'coaching_desarrollo.jpg'),
+('traduccion.idiomas@email.com', 'prest123', 'CUIT', '20-50345678-2', '341-666-0224', 'Laura', 'Traductora', 'Centro 890', 'Idiomas Pro', 'Traducción e interpretación', 'traduccion_idiomas.jpg'),
 ('desarrollo.software@email.com', 'prest123', 'CUIT', '20-60345678-3', '341-666-0225', 'Carlos', 'Developer', 'Zona Sur 123', 'Code Solutions', 'Desarrollo de software a medida', 'desarrollo_software.jpg'),
 ('marketing.digital@email.com', 'prest123', 'CUIT', '20-70345678-4', '341-666-0226', 'Ana', 'Marketing', 'Zona Oeste 234', 'Digital Growth', 'Marketing digital y SEO', 'marketing_digital.jpg'),
-('arquitectura.ingeniera@email.com', 'prest123', 'CUIT', '20-80345678-5', '341-666-0227', 'Miguel', 'Arquitecto', 'Centro 345', 'Diseños Arquitectónicos', 'Proyectos arquitectónicos', 'arquitectura_ingeniera.jpg'),
-('legal.servicios@email.com', 'prest123', 'CUIT', '20-90345678-6', '341-666-0228', 'Sofía', 'Abogada', 'Zona Norte 456', 'Servicios Legales Integrales', 'Asesoramiento jurídico', 'legal_servicios.jpg'),
-('psicologia.terapia@email.com', 'prest123', 'CUIT', '20-11345678-7', '341-666-0229', 'Diego', 'Psicólogo', 'Centro 567', 'Bienestar Mental', 'Terapia psicológica', 'psicologia_terapia.jpg'),
+('arquitectura.ingeniera@email.com', 'prest123', 'CUIT', '20-80345678-5', '341-666-0227', 'Miguel', 'Arquitecto', 'Centro 345', 'Diseños Arqui', 'Proyectos arquitectónicos', 'arquitectura_ingeniera.jpg'),
+('legal.servicios@email.com', 'prest123', 'CUIT', '20-90345678-6', '341-666-0228', 'Sofía', 'Abogada', 'Zona Norte 456', 'Legal Integral', 'Asesoramiento jurídico', 'legal_servicios.jpg'),
+('psicologia.terapia@email.com', 'prest123', 'CUIT', '20-11345678-7', '341-666-0229', 'Diego', 'Psicólogo', 'Centro 567', 'Bienestar', 'Terapia psicológica', 'psicologia_terapia.jpg'),
 ('nutricion.deportiva@email.com', 'prest123', 'CUIT', '20-22345678-8', '341-666-0230', 'Fernanda', 'Nutricionista', 'Zona Este 678', 'Nutrición Pro', 'Nutrición deportiva especializada', 'nutricion_deportiva.jpg'),
 
--- NUEVOS PRESTADORES (usuarios 71-75)
-('cuidado.adultos@email.com', 'prest123', 'CUIT', '20-33445678-9', '341-666-0231', 'Carmen', 'Enfermera', 'Zona Residencial 789', 'Cuidados Especializados', 'Cuidado de adultos mayores', 'cuidado_adultos.jpg'),
-('terapias.alternativas@email.com', 'prest123', 'CUIT', '20-44445678-0', '341-666-0232', 'Roberto', 'Terapeuta', 'Centro Terapéutico 890', 'Terapias Naturales', 'Medicina alternativa y bienestar', 'terapias_alternativas.jpg'),
-('eventos.organizacion@email.com', 'prest123', 'CUIT', '20-55445678-1', '341-666-0233', 'Valeria', 'Organizadora', 'Zona Comercial 901', 'Eventos Premium', 'Organización de eventos sociales', 'eventos_organizacion.jpg'),
-('musica.clases@email.com', 'prest123', 'CUIT', '20-66445678-2', '341-666-0234', 'Martín', 'Profesor', 'Barrio Cultural 012', 'Academia Musical', 'Clases de música y canto', 'musica_clases.jpg'),
 ('deportes.entrenamiento@email.com', 'prest123', 'CUIT', '20-77445678-3', '341-666-0235', 'Lucía', 'Entrenadora', 'Zona Deportiva 123', 'Fitness Total', 'Entrenamiento personalizado', 'deportes_entrenamiento.jpg');
 
 -- 3. INSERTAR HORARIOS (7 horarios por cada prestador = 245 horarios: 210 existentes + 35 nuevos)
@@ -388,50 +383,6 @@ INSERT INTO `horario` (`dia_semana`, `hora_desde`, `hora_hasta`, `usuario_id`) V
 (5, '08:00:00', '20:00:00', 75), -- Viernes
 (6, '08:00:00', '18:00:00', 75), -- Sábado
 
--- NUEVOS PRESTADORES (71-75) - Horarios adicionales
--- Prestador 71 (Cuidados Especializados)
-(0, '00:00:00', '23:59:59', 71), -- Domingo (24hs)
-(1, '00:00:00', '23:59:59', 71), -- Lunes (24hs)
-(2, '00:00:00', '23:59:59', 71), -- Martes (24hs)
-(3, '00:00:00', '23:59:59', 71), -- Miércoles (24hs)
-(4, '00:00:00', '23:59:59', 71), -- Jueves (24hs)
-(5, '00:00:00', '23:59:59', 71), -- Viernes (24hs)
-(6, '00:00:00', '23:59:59', 71), -- Sábado (24hs)
-
--- Prestador 72 (Terapias Naturales)
-(0, '10:00:00', '18:00:00', 72), -- Domingo
-(1, '09:00:00', '19:00:00', 72), -- Lunes
-(2, '09:00:00', '19:00:00', 72), -- Martes
-(3, '09:00:00', '19:00:00', 72), -- Miércoles
-(4, '09:00:00', '19:00:00', 72), -- Jueves
-(5, '09:00:00', '19:00:00', 72), -- Viernes
-(6, '10:00:00', '16:00:00', 72), -- Sábado
-
--- Prestador 73 (Eventos Premium)
-(0, '08:00:00', '22:00:00', 73), -- Domingo
-(1, '08:00:00', '22:00:00', 73), -- Lunes
-(2, '08:00:00', '22:00:00', 73), -- Martes
-(3, '08:00:00', '22:00:00', 73), -- Miércoles
-(4, '08:00:00', '22:00:00', 73), -- Jueves
-(5, '08:00:00', '22:00:00', 73), -- Viernes
-(6, '08:00:00', '22:00:00', 73), -- Sábado
-
--- Prestador 74 (Academia Musical)
-(0, '10:00:00', '18:00:00', 46), -- Domingo
-(1, '15:00:00', '21:00:00', 46), -- Lunes
-(2, '15:00:00', '21:00:00', 46), -- Martes
-(3, '15:00:00', '21:00:00', 46), -- Miércoles
-(4, '15:00:00', '21:00:00', 46), -- Jueves
-(5, '15:00:00', '21:00:00', 46), -- Viernes
-(6, '09:00:00', '17:00:00', 46), -- Sábado
-
--- Prestador 75 (Fitness Total)
-(0, '08:00:00', '20:00:00', 75), -- Domingo
-(1, '06:00:00', '22:00:00', 75), -- Lunes
-(2, '06:00:00', '22:00:00', 75), -- Martes
-(3, '06:00:00', '22:00:00', 75), -- Miércoles
-(4, '06:00:00', '22:00:00', 75), -- Jueves
-(5, '06:00:00', '22:00:00', 75), -- Viernes
 (6, '08:00:00', '18:00:00', 75); -- Sábado
 
 -- 4. INSERTAR TIPOS DE SERVICIO (40 tipos únicos)
@@ -458,26 +409,7 @@ INSERT INTO `tipo_servicio` (`nombre_tipo`, `descripcion_tipo`) VALUES
 ('Decoración Interior', 'Diseño y decoración de interiores'),
 ('Refrigeración', 'Servicios de frío y climatización'),
 ('Tecnología y Automatización', 'Servicios tecnológicos y automatización'),
-('Seguridad del Hogar', 'Sistemas de seguridad residencial'),
-('Servicios Veterinarios', 'Atención médica para mascotas'),
-('Peluquería y Estética', 'Servicios de belleza personal'),
-('Coaching y Mentoring', 'Desarrollo personal y profesional'),
-('Traducción e Interpretación', 'Servicios lingüísticos'),
-('Desarrollo de Software', 'Programación y aplicaciones'),
-('Marketing Digital', 'Publicidad online y redes sociales'),
-('Arquitectura y Diseño', 'Diseño y cálculos estructurales'),
-
--- NUEVOS TIPOS DE SERVICIO (31-40)
-('Cuidado de Adultos Mayores', 'Asistencia y cuidados especializados'),
-('Terapias Alternativas', 'Medicina alternativa y bienestar holístico'),
-('Organización de Eventos', 'Planificación y coordinación de eventos'),
-('Clases de Música', 'Enseñanza musical e instrumental'),
-('Entrenamiento Personal', 'Fitness y acondicionamiento físico'),
-('Diseño Web', 'Creación y desarrollo de sitios web'),
-('Consultoría Empresarial', 'Asesoramiento en gestión de negocios'),
-('Servicios Contables', 'Contabilidad y administración financiera'),
-('Fotografía Profesional', 'Servicios fotográficos especializados'),
-('Reparación de Celulares', 'Servicio técnico de dispositivos móviles');
+('Seguridad del Hogar', 'Sistemas de seguridad residencial');
 
 -- 5. INSERTAR TAREAS (350 tareas total: 300 existentes + 50 nuevas)
 INSERT INTO `tarea` (`nombre_tarea`, `descripcion_tarea`, `duracion_tarea`, `tipo_servicio_id`) VALUES
@@ -755,163 +687,7 @@ INSERT INTO `tarea` (`nombre_tarea`, `descripcion_tarea`, `duracion_tarea`, `tip
 ('Sistemas de iluminación seguridad', 'Iluminación automatizada', 150, 23),
 ('Control remoto seguridad', 'Monitoreo a distancia', 120, 23),
 ('Blindaje ejecutivo vehicular', 'Protección física para vehículos ejecutivos', 300, 23),
-('Mantenimiento de alarmas', 'Servicio de sistemas', 90, 23),
-
--- Tipo 24: Servicios Veterinarios
-('Consulta veterinaria especializada', 'Examen médico para mascotas', 60, 24),
-('Vacunación de mascotas', 'Aplicación de vacunas', 30, 24),
-('Cirugía veterinaria', 'Intervenciones quirúrgicas', 180, 24),
-('Desparasitación especializada', 'Tratamiento antiparasitario', 45, 24),
-('Castración y esterilización', 'Cirugía reproductiva', 120, 24),
-('Consulta domiciliaria', 'Atención en hogar', 90, 24),
-('Análisis clínicos veterinarios', 'Estudios de laboratorio', 120, 24),
-('Odontología veterinaria', 'Cuidado dental mascotas', 90, 24),
-('Peluquería canina veterinaria', 'Estética y salud', 60, 24),
-('Emergencias veterinarias', 'Atención de urgencias', 120, 24),
-
--- Tipo 25: Peluquería y Estética
-('Corte de cabello profesional', 'Corte y peinado profesional', 60, 25),
-('Coloración capilar', 'Tintura y mechas', 120, 25),
-('Tratamientos faciales profesionales', 'Limpieza y cuidado facial', 90, 25),
-('Manicura y pedicura profesional', 'Cuidado de uñas', 75, 25),
-('Depilación profesional', 'Eliminación de vello corporal', 45, 25),
-('Tratamientos capilares', 'Hidratación y nutrición', 90, 25),
-('Maquillaje profesional', 'Maquillaje para eventos', 60, 25),
-('Masajes estéticos', 'Tratamientos corporales', 90, 25),
-('Extensiones de pestañas', 'Aplicación de extensiones', 120, 25),
-('Tratamientos antiedad', 'Cuidado facial especializado', 120, 25),
-
--- Tipo 26: Coaching y Mentoring
-('Sesión de coaching personal', 'Desarrollo personal individual', 90, 26),
-('Coaching empresarial', 'Desarrollo de equipos', 120, 26),
-('Mentoring profesional', 'Guía en carrera profesional', 90, 26),
-('Workshop de liderazgo', 'Talleres de liderazgo', 180, 26),
-('Coaching de vida', 'Orientación en objetivos vitales', 90, 26),
-('Coaching ejecutivo', 'Desarrollo de líderes', 120, 26),
-('Coaching deportivo', 'Entrenamiento mental', 90, 26),
-('Coaching familiar', 'Desarrollo de relaciones', 120, 26),
-('Coaching financiero', 'Educación financiera', 90, 26),
-('Team building', 'Desarrollo de equipos', 240, 26),
-
--- Tipo 27: Traducción e Interpretación
-('Traducción de documentos', 'Traducción escrita profesional', 120, 27),
-('Interpretación simultánea', 'Interpretación en tiempo real', 180, 27),
-('Traducción jurada', 'Traducción oficial certificada', 90, 27),
-('Interpretación consecutiva', 'Interpretación por turnos', 180, 27),
-('Localización de software', 'Adaptación cultural de programas', 360, 27),
-('Traducción médica', 'Traducción especializada médica', 120, 27),
-('Traducción legal', 'Traducción jurídica', 150, 27),
-('Subtitulado', 'Traducción audiovisual', 240, 27),
-('Transcripción', 'Conversión de audio a texto', 180, 27),
-('Corrección de textos', 'Revisión y corrección', 120, 27),
-
--- Tipo 28: Desarrollo de Software
-('Desarrollo web', 'Creación de sitios web', 480, 28),
-('Aplicaciones móviles', 'Desarrollo para smartphones', 720, 28),
-('Sistemas de gestión', 'Software empresarial', 960, 28),
-('Mantenimiento de software', 'Soporte y actualizaciones', 240, 28),
-('Consultoría IT', 'Asesoramiento tecnológico', 120, 28),
-('Bases de datos', 'Diseño y administración', 360, 28),
-('Testing de software', 'Pruebas y calidad', 180, 28),
-('Integración de sistemas', 'Conexión de plataformas', 480, 28),
-('Desarrollo de APIs', 'Interfaces de programación', 360, 28),
-('Seguridad informática', 'Protección de sistemas', 240, 28),
-
--- Tipo 29: Marketing Digital
-('Gestión de redes sociales', 'Community management', 240, 29),
-('Publicidad online', 'Campañas digitales', 180, 29),
-('SEO y posicionamiento', 'Optimización para buscadores', 360, 29),
-('Email marketing', 'Campañas por correo', 120, 29),
-('Análisis de datos', 'Métricas y estadísticas', 180, 29),
-('Diseño gráfico digital', 'Contenido visual', 240, 29),
-('Marketing de contenidos', 'Estrategia de contenido', 300, 29),
-('Influencer marketing', 'Gestión de influencers', 240, 29),
-('E-commerce', 'Tiendas online', 480, 29),
-('Branding digital', 'Identidad de marca online', 360, 29),
-
--- Tipo 30: Arquitectura y Diseño
-('Diseño arquitectónico', 'Proyectos de arquitectura', 720, 30),
-('Planos y cálculos', 'Documentación técnica', 480, 30),
-('Diseño de interiores arquitectura', 'Espacios interiores', 360, 30),
-('Consultoría arquitectónica', 'Asesoramiento técnico', 120, 30),
-('Dirección de obra', 'Supervisión de construcción', 960, 30),
-('Diseño de jardines arquitectura', 'Paisajismo', 240, 30),
-('Restauración arquitectónica', 'Conservación de edificios', 480, 30),
-('Diseño sustentable', 'Arquitectura ecológica', 360, 30),
-('Evaluación estructural', 'Análisis de estructuras', 240, 30),
-('Planificación urbana', 'Desarrollo urbanístico', 720, 30),
-
--- NUEVAS TAREAS PARA TIPOS DE SERVICIO 31-40 (50 tareas adicionales)
-
--- Tipo 31: Cuidado de Adultos Mayores
-('Cuidado domiciliario', 'Asistencia integral en el hogar', 240, 31),
-('Acompañamiento médico', 'Acompañar a consultas médicas', 120, 31),
-('Asistencia personal', 'Ayuda en actividades diarias', 180, 31),
-('Cuidado nocturno', 'Vigilancia y cuidado durante la noche', 480, 31),
-('Fisioterapia domiciliaria', 'Rehabilitación en casa', 90, 31),
-
--- Tipo 32: Terapias Alternativas
-('Acupuntura', 'Tratamiento con agujas', 60, 32),
-('Masoterapia', 'Terapia de masajes relajantes', 90, 32),
-('Aromaterapia', 'Terapia con aceites esenciales', 60, 32),
-('Reiki', 'Sanación energética', 60, 32),
-('Reflexología', 'Terapia de puntos reflejos', 75, 32),
-
--- Tipo 33: Organización de Eventos
-('Bodas', 'Organización completa de bodas', 720, 33),
-('Cumpleaños infantiles', 'Fiestas temáticas para niños', 240, 33),
-('Eventos corporativos', 'Conferencias y reuniones empresariales', 480, 33),
-('Quinceañeras', 'Celebración de 15 años', 360, 33),
-('Baby shower', 'Celebración pre-natal', 180, 33),
-
--- Tipo 34: Clases de Música
-('Clases de piano', 'Enseñanza de piano', 60, 34),
-('Clases de guitarra', 'Enseñanza de guitarra', 60, 34),
-('Clases de canto', 'Técnica vocal', 60, 34),
-('Clases de violín', 'Enseñanza de violín', 60, 34),
-('Teoría musical', 'Fundamentos de música', 90, 34),
-
--- Tipo 35: Entrenamiento Personal
-('Entrenamiento funcional', 'Ejercicios funcionales', 60, 35),
-('Pilates', 'Ejercicios de pilates', 60, 35),
-('Yoga', 'Clases de yoga', 90, 35),
-('Crossfit', 'Entrenamiento de alta intensidad', 60, 35),
-('Nutrición deportiva', 'Asesoramiento nutricional', 60, 35),
-
--- Tipo 36: Diseño Web
-('Diseño de sitios web', 'Creación de páginas web', 240, 36),
-('Desarrollo frontend', 'Programación de interfaces', 300, 36),
-('SEO básico', 'Optimización para buscadores', 120, 36),
-('Mantenimiento web', 'Actualización de sitios', 90, 36),
-('Tienda online personalizada', 'Desarrollo de e-commerce a medida', 360, 36),
-
--- Tipo 37: Consultoría Empresarial
-('Análisis de mercado', 'Estudios de mercado', 240, 37),
-('Plan de negocios', 'Desarrollo de planes empresariales', 480, 37),
-('Consultoría financiera', 'Asesoramiento financiero', 180, 37),
-('Gestión de recursos humanos', 'Manejo de personal', 240, 37),
-('Estrategia empresarial', 'Planificación estratégica', 360, 37),
-
--- Tipo 38: Servicios Contables
-('Liquidación de sueldos', 'Cálculo de salarios', 120, 38),
-('Declaraciones impositivas', 'Presentación de impuestos', 180, 38),
-('Contabilidad general', 'Registración contable', 240, 38),
-('Auditoría interna', 'Revisión de cuentas', 300, 38),
-('Asesoramiento fiscal', 'Consultoría impositiva', 120, 38),
-
--- Tipo 39: Fotografía Profesional
-('Fotografía de eventos', 'Cobertura fotográfica de eventos', 360, 39),
-('Retratos familiares', 'Sesiones fotográficas familiares', 120, 39),
-('Fotografía de productos', 'Fotografía comercial', 180, 39),
-('Fotografía de bodas', 'Cobertura completa de bodas', 480, 39),
-('Edición fotográfica', 'Post-producción de imágenes', 240, 39),
-
--- Tipo 40: Reparación de Celulares
-('Cambio de pantalla', 'Reemplazo de display', 60, 40),
-('Reparación de batería', 'Cambio de batería', 45, 40),
-('Liberación de equipos', 'Desbloqueo de celulares', 30, 40),
-('Recuperación datos móviles', 'Rescate de información de celulares', 120, 40),
-('Reparación de software', 'Instalación y configuración', 90, 40);
+('Mantenimiento de alarmas', 'Servicio de sistemas', 90, 23);
 
 -- 6. INSERTAR RELACIONES USUARIO-TIPOS DE SERVICIO (cada prestador mínimo 3 tipos similares)
 INSERT INTO `usuario_tipos_de_servicio` (`usuario_id`, `tipo_servicio_id`) VALUES
@@ -933,7 +709,6 @@ INSERT INTO `usuario_tipos_de_servicio` (`usuario_id`, `tipo_servicio_id`) VALUE
 -- Prestador 49: Jardines Vega - Servicios de jardinería
 (49, 4),  -- Jardinería
 (49, 14), -- Hogar y Jardín
-(49, 30), -- Arquitectura y Diseño
 
 -- Prestador 50: Pintura Moreno - Servicios de pintura
 (50, 5),  -- Pintura
@@ -943,12 +718,10 @@ INSERT INTO `usuario_tipos_de_servicio` (`usuario_id`, `tipo_servicio_id`) VALUE
 -- Prestador 51: Carpintería Ruiz - Trabajos en madera
 (51, 6),  -- Carpintería
 (51, 7),  -- Construcción
-(51, 30), -- Arquitectura y Diseño
 
 -- Prestador 52: Construcciones Díaz - Construcción y obras
 (52, 7),  -- Construcción
 (52, 18), -- Mantenimiento Integral
-(52, 30), -- Arquitectura y Diseño
 
 -- Prestador 53: Cerrajería Flores - Seguridad
 (53, 8),  -- Cerrajería
@@ -968,7 +741,6 @@ INSERT INTO `usuario_tipos_de_servicio` (`usuario_id`, `tipo_servicio_id`) VALUE
 -- Prestador 56: Técnicos García - Servicios técnicos
 (56, 11), -- Servicios Técnicos
 (56, 22), -- Tecnología y Automatización
-(56, 28), -- Desarrollo de Software
 
 -- Prestador 57: Mantenimientos López - Mantenimiento
 (57, 18), -- Mantenimiento Integral
@@ -1003,7 +775,6 @@ INSERT INTO `usuario_tipos_de_servicio` (`usuario_id`, `tipo_servicio_id`) VALUE
 -- Prestador 63: Servicios Profesionales Ortega - Servicios profesionales
 (63, 11), -- Servicios Técnicos
 (63, 13), -- Servicios Integrales
-(63, 26), -- Coaching y Mentoring
 
 -- Prestador 64: Servicios Especializados Silva - Especializados
 (64, 17), -- Control de Plagas
@@ -1015,55 +786,34 @@ INSERT INTO `usuario_tipos_de_servicio` (`usuario_id`, `tipo_servicio_id`) VALUE
 (65, 20), -- Decoración Interior
 (65, 7),  -- Construcción
 
--- Prestador 66: Veterinaria Salud Animal - Veterinaria
-(66, 24), -- Servicios Veterinarios
-(66, 25), -- Peluquería y Estética (para mascotas)
-(66, 12), -- Servicios del Hogar (cuidado mascotas)
-
 -- Prestador 67: Belleza Total - Estética
-(67, 25), -- Peluquería y Estética
-(67, 26), -- Coaching y Mentoring
 (67, 12), -- Servicios del Hogar
 
--- Prestador 68: Desarrollo Personal - Coaching
-(68, 26), -- Coaching y Mentoring
-(68, 29), -- Marketing Digital
-(68, 28), -- Desarrollo de Software
+-- Prestador 68: Desarrollo Personal - Coaching cambiado a Servicios del Hogar
+(68, 12), -- Servicios del Hogar
 
--- Prestador 69: Idiomas Profesionales - Traducción
-(69, 27), -- Traducción e Interpretación
-(69, 26), -- Coaching y Mentoring
-(69, 29), -- Marketing Digital
+-- Prestador 69: Idiomas Profesionales - cambiado a Servicios del Hogar
+(69, 12), -- Servicios del Hogar
 
--- Prestador 70: Code Solutions - Software
-(70, 28), -- Desarrollo de Software
+-- Prestador 70: Code Solutions - cambiado a Tecnología
 (70, 22), -- Tecnología y Automatización
 (70, 11), -- Servicios Técnicos
 
--- Prestador 71: Digital Growth - Marketing
-(71, 29), -- Marketing Digital
-(71, 28), -- Desarrollo de Software
-(71, 27), -- Traducción e Interpretación
+-- Prestador 71: Digital Growth - cambiado a Servicios del Hogar
+(71, 12), -- Servicios del Hogar
 
--- Prestador 72: Diseños Arquitectónicos - Arquitectura
-(72, 30), -- Arquitectura y Diseño
+-- Prestador 72: Diseños Arquitectónicos - cambiado a Construcción
 (72, 7),  -- Construcción
 (72, 20), -- Decoración Interior
 
 -- Prestador 73: Servicios Legales Integrales - Legal
 (73, 15), -- Servicios Inmobiliarios
-(73, 26), -- Coaching y Mentoring
-(73, 27), -- Traducción e Interpretación
 
--- Prestador 74: Bienestar Mental - Psicología
-(74, 26), -- Coaching y Mentoring
-(74, 25), -- Peluquería y Estética (bienestar)
+-- Prestador 74: Bienestar Mental - cambiado a Estética
 (74, 12), -- Servicios del Hogar
 
--- Prestador 75: Nutrición Pro - Nutrición
-(75, 26), -- Coaching y Mentoring
-(75, 24), -- Servicios Veterinarios (nutrición mascotas)
-(75, 25); -- Peluquería y Estética (bienestar)
+-- Prestador 75: Nutrición Pro - cambiado a Estética
+(75, 12); -- Servicios del Hogar
 
 -- 7. INSERTAR USUARIO-ZONAS (cada prestador en al menos 2 zonas)
 INSERT INTO `usuario_zonas` (`usuario_id`, `zona_id`) VALUES
@@ -1088,7 +838,6 @@ INSERT INTO `usuario_zonas` (`usuario_id`, `zona_id`) VALUES
 (63, 3), (63, 1), -- Servicios Profesionales Ortega: Sur, Centro
 (64, 4), (64, 2), -- Servicios Especializados Silva: Este, Norte
 (65, 5), (65, 3), -- Pintura Profesional: Oeste, Sur
-(66, 1), (66, 2), (66, 3), -- Veterinaria Salud Animal: Centro, Norte, Sur
 (67, 1), (67, 4), -- Belleza Total: Centro, Este
 (68, 2), (68, 5), -- Desarrollo Personal: Norte, Oeste
 (69, 1), (69, 3), -- Idiomas Profesionales: Centro, Sur
@@ -1113,9 +862,7 @@ INSERT INTO `servicio` (`precio`, `tarea_id`, `usuario_id`) VALUES
 -- Tipo 16: Limpieza Industrial
 (12000, 151, 46), -- Limpieza de oficinas industrial
 (18000, 152, 46), -- Limpieza de fábricas
-(10000, 153, 46), -- Desinfección industrial
-
--- Prestador 47 (Plomería Herrera) - Tipos: 2, 10, 9
+(10000, 153, 46), -- Desinfección industrial-- Prestador 47 (Plomería Herrera) - Tipos: 2, 10, 9
 -- Tipo 2: Plomería
 (4000, 11, 47),   -- Reparación de canillas
 (6000, 12, 47),   -- Destapado de cañerías
@@ -1143,19 +890,15 @@ INSERT INTO `servicio` (`precio`, `tarea_id`, `usuario_id`) VALUES
 (30000, 222, 48), -- Monitoreo de seguridad
 (15000, 223, 48), -- Instalación de cámaras IP
 
--- Prestador 49 (Jardines Vega) - Tipos: 4, 14, 30
+-- Prestador 49 (Jardines Vega) - Tipos: 4, 14
 -- Tipo 4: Jardinería
-(3000, 31, 48),   -- Corte de césped
-(8000, 32, 48),   -- Poda de árboles
-(5000, 33, 48),   -- Plantación de flores
+(3000, 31, 49),   -- Corte de césped
+(8000, 32, 49),   -- Poda de árboles
+(5000, 33, 49),   -- Plantación de flores
 -- Tipo 14: Hogar y Jardín
-(8000, 131, 48),  -- Mantenimiento de piscinas básico
-(15000, 132, 48), -- Jardinería y limpieza
-(10000, 133, 48), -- Cuidado de mascotas
--- Tipo 30: Arquitectura y Diseño
-(50000, 291, 48), -- Diseño arquitectónico
-(35000, 292, 48), -- Planos y cálculos
-(25000, 293, 48), -- Diseño de interiores arquitectura
+(8000, 131, 49),  -- Mantenimiento de piscinas básico
+(15000, 132, 49), -- Jardinería y limpieza
+(10000, 133, 49), -- Cuidado de mascotas
 
 -- Prestador 50 (Pintura Moreno) - Tipos: 5, 20, 10
 -- Tipo 5: Pintura
@@ -1185,7 +928,7 @@ INSERT INTO `servicio` (`precio`, `tarea_id`, `usuario_id`) VALUES
 (6000, 195, 51),  -- Asesoramiento en decoración
 (30000, 196, 51), -- Instalación de pisos decorativos
 
--- Prestador 52 (Construcciones Díaz) - Tipos: 7, 18, 30
+-- Prestador 52 (Construcciones Díaz) - Tipos: 7, 18
 -- Tipo 7: Construcción
 (50000, 64, 52),  -- Construcción de baños
 (8000, 65, 52),   -- Refacciones menores
@@ -1194,10 +937,6 @@ INSERT INTO `servicio` (`precio`, `tarea_id`, `usuario_id`) VALUES
 (15000, 171, 52), -- Mantenimiento preventivo integral
 (10000, 172, 52), -- Mantenimiento correctivo
 (20000, 173, 52), -- Mantenimiento de jardines integral
--- Tipo 30: Arquitectura y Diseño
-(60000, 294, 52), -- Consultoría arquitectónica
-(80000, 295, 52), -- Dirección de obra
-(18000, 296, 52), -- Diseño de jardines arquitectura
 
 -- Prestador 53 (Cerrajería Flores) - Tipos: 8, 23, 10
 -- Tipo 8: Cerrajería
@@ -1241,19 +980,15 @@ INSERT INTO `servicio` (`precio`, `tarea_id`, `usuario_id`) VALUES
 (12000, 115, 55), -- Organización del hogar
 (8000, 116, 55),  -- Preparación de comidas
 
--- Prestador 41 (Técnicos García) - Tipos: 11, 22, 28
+-- Prestador 56 (Técnicos García) - Tipos: 11, 22
 -- Tipo 11: Servicios Técnicos
-(6000, 104, 69),  -- Configuración de sistemas
-(4000, 105, 69),  -- Soporte técnico general
-(5000, 106, 69),  -- Instalación de software
+(6000, 104, 56),  -- Configuración de sistemas
+(4000, 105, 56),  -- Soporte técnico general
+(5000, 106, 56),  -- Instalación de software
 -- Tipo 22: Tecnología y Automatización
-(20000, 214, 69), -- Redes informáticas
-(25000, 215, 69), -- Sistemas inteligentes
-(12000, 216, 69), -- Control de accesos
--- Tipo 28: Desarrollo de Software
-(35000, 271, 69), -- Desarrollo web
-(50000, 272, 69), -- Aplicaciones móviles
-(60000, 273, 69), -- Sistemas de gestión
+(20000, 214, 56), -- Redes informáticas
+(25000, 215, 56), -- Sistemas inteligentes
+(12000, 216, 56), -- Control de accesos
 
 -- Prestador 42 (Mantenimientos López) - Tipos: 18, 13, 15
 -- Tipo 18: Mantenimiento Integral
@@ -1339,19 +1074,15 @@ INSERT INTO `servicio` (`precio`, `tarea_id`, `usuario_id`) VALUES
 (15000, 171, 47), -- Mantenimiento preventivo integral
 (10000, 172, 47), -- Mantenimiento correctivo
 
--- Prestador 48 (Servicios Profesionales Ortega) - Tipos: 11, 13, 26
+-- Prestador 63 (Servicios Profesionales Ortega) - Tipos: 11, 13
 -- Tipo 11: Servicios Técnicos
-(8000, 107, 48),  -- Reparación de tablets
-(4000, 108, 48),  -- Configuración de impresoras
-(12000, 109, 48), -- Mantenimiento de servidores
+(8000, 107, 63),  -- Reparación de tablets
+(4000, 108, 63),  -- Configuración de impresoras
+(12000, 109, 63), -- Mantenimiento de servidores
 -- Tipo 13: Servicios Integrales
-(12000, 130, 48), -- Auditoría de servicios
-(25000, 121, 48), -- Mantenimiento integral
-(20000, 122, 48), -- Administración de propiedades
--- Tipo 26: Coaching y Mentoring
-(6000, 251, 48),  -- Sesión de coaching personal
-(8000, 252, 48),  -- Coaching empresarial
-(6000, 253, 48),  -- Mentoring profesional
+(12000, 130, 63), -- Auditoría de servicios
+(25000, 121, 63), -- Mantenimiento integral
+(20000, 122, 63), -- Administración de propiedades
 
 -- Prestador 49 (Servicios Especializados Silva) - Tipos: 17, 16, 18
 -- Tipo 17: Control de Plagas
@@ -1381,145 +1112,75 @@ INSERT INTO `servicio` (`precio`, `tarea_id`, `usuario_id`) VALUES
 (30000, 68, 51),  -- Construcción de quinchos
 (25000, 69, 51),  -- Reparación de cimientos
 
--- Prestador 51 (Veterinaria Salud Animal) - Tipos: 24, 25, 12
--- Tipo 24: Servicios Veterinarios
-(5000, 231, 52),  -- Consulta veterinaria especializada
-(2000, 232, 52),  -- Vacunación de mascotas
-(15000, 233, 52), -- Cirugía veterinaria
--- Tipo 25: Peluquería y Estética (para mascotas)
-(4000, 249, 52),  -- Peluquería canina veterinaria
-(8000, 248, 52),  -- Odontología veterinaria
-(6000, 247, 52),  -- Análisis clínicos veterinarios
+-- Prestador 67 (Belleza Total) - Tipo: 12
 -- Tipo 12: Servicios del Hogar
-(10000, 133, 52), -- Cuidado de mascotas
-(8000, 114, 52),  -- Cuidado de plantas
-(12000, 115, 52), -- Organización del hogar
-
--- Prestador 52 (Belleza Total) - Tipos: 25, 26, 12
--- Tipo 25: Peluquería y Estética
-(4000, 241, 53),  -- Corte de cabello profesional
-(8000, 242, 53),  -- Coloración capilar
-(6000, 243, 53),  -- Tratamientos faciales profesionales
--- Tipo 26: Coaching y Mentoring
-(10000, 254, 53), -- Workshop de liderazgo
-(6000, 255, 53),  -- Coaching de vida
-(8000, 256, 53),  -- Coaching ejecutivo
+(4000, 116, 67),  -- Preparación de comidas
+(8000, 115, 67),  -- Organización del hogar
+(6000, 114, 67),  -- Cuidado de plantas
 -- Tipo 12: Servicios del Hogar
-(10000, 120, 53), -- Mantenimiento de electrodomésticos
-(12000, 115, 53), -- Organización del hogar
-(8000, 116, 53),  -- Preparación de comidas
+(10000, 120, 67), -- Mantenimiento de electrodomésticos
+(12000, 115, 67), -- Organización del hogar
+(8000, 116, 67),  -- Preparación de comidas
 
--- Prestador 53 (Desarrollo Personal) - Tipos: 26, 29, 28
--- Tipo 26: Coaching y Mentoring
-(6000, 257, 54),  -- Coaching deportivo
-(8000, 258, 54),  -- Coaching familiar
-(6000, 259, 54),  -- Coaching financiero
--- Tipo 29: Marketing Digital
-(15000, 281, 54), -- Gestión de redes sociales
-(12000, 282, 54), -- Publicidad online
-(10000, 283, 54), -- SEO y posicionamiento
--- Tipo 28: Desarrollo de Software
-(20000, 274, 54), -- Mantenimiento de software
-(8000, 275, 54),  -- Consultoría IT
-(25000, 276, 54), -- Bases de datos
+-- Prestador 68 (Desarrollo Personal cambiado a Servicios del Hogar) - Tipo: 12
+-- Tipo 12: Servicios del Hogar
+(12000, 115, 68), -- Organización del hogar
+(8000, 116, 68),  -- Preparación de comidas
+(15000, 117, 68), -- Cuidado de niños
 
--- Prestador 54 (Idiomas Profesionales) - Tipos: 27, 26, 29
--- Tipo 27: Traducción e Interpretación
-(8000, 261, 55),  -- Traducción de documentos
-(15000, 262, 55), -- Interpretación simultánea
-(6000, 263, 55),  -- Traducción jurada
--- Tipo 26: Coaching y Mentoring
-(15000, 260, 55), -- Team building
-(6000, 251, 55),  -- Sesión de coaching personal
-(8000, 252, 55),  -- Coaching empresarial
--- Tipo 29: Marketing Digital
-(8000, 284, 55),  -- Email marketing
-(12000, 285, 55), -- Análisis de datos
-(15000, 286, 55), -- Diseño gráfico digital
+-- Prestador 69 (Idiomas Profesionales cambiado a Servicios del Hogar) - Tipo: 12  
+-- Tipo 12: Servicios del Hogar
+(10000, 111, 69), -- Limpieza doméstica
+(6000, 112, 69),  -- Lavado de ropa
+(4000, 113, 69),  -- Planchado
 
--- Prestador 55 (Code Solutions) - Tipos: 28, 22, 11
--- Tipo 28: Desarrollo de Software
-(12000, 277, 69), -- Testing de software
-(30000, 278, 69), -- Integración de sistemas
-(25000, 279, 69), -- Desarrollo de APIs
+-- Prestador 71 (Digital Growth cambiado a Servicios del Hogar) - Tipo: 12
+-- Tipo 12: Servicios del Hogar
+(15000, 114, 71), -- Cuidado de plantas
+(12000, 115, 71), -- Organización del hogar
+(10000, 120, 71), -- Mantenimiento de electrodomésticos
+
+-- Prestador 70 (Code Solutions cambiado a Tecnología) - Tipos: 22, 11
 -- Tipo 22: Tecnología y Automatización
-(35000, 217, 69), -- Automatización industrial
-(8000, 218, 69),  -- Instalación de sensores
-(6000, 219, 69),  -- Configuración de routers
+(35000, 217, 70), -- Automatización industrial
+(8000, 218, 70),  -- Instalación de sensores
+(6000, 219, 70),  -- Configuración de routers
 -- Tipo 11: Servicios Técnicos
-(18000, 110, 69), -- Recuperación de datos
-(12000, 102, 69), -- Instalación de redes
-(10000, 103, 69), -- Mantenimiento de equipos
+(18000, 110, 70), -- Recuperación de datos
+(12000, 102, 70), -- Instalación de redes
+(10000, 103, 70), -- Mantenimiento de equipos
 
--- Prestador 56 (Digital Growth) - Tipos: 29, 28, 27
--- Tipo 29: Marketing Digital
-(20000, 287, 70), -- Marketing de contenidos
-(15000, 288, 70), -- Influencer marketing
-(30000, 289, 70), -- E-commerce
--- Tipo 28: Desarrollo de Software
-(15000, 280, 70), -- Seguridad informática
-(35000, 271, 70), -- Desarrollo web
-(25000, 276, 70), -- Bases de datos
--- Tipo 27: Traducción e Interpretación
-(12000, 264, 70), -- Interpretación consecutiva
-(25000, 265, 70), -- Localización de software
-(8000, 266, 70),  -- Traducción médica
-
--- Prestador 57 (Diseños Arquitectónicos) - Tipos: 30, 7, 20
--- Tipo 30: Arquitectura y Diseño
-(40000, 297, 71), -- Restauración arquitectónica
-(25000, 298, 71), -- Diseño sustentable
-(15000, 299, 71), -- Evaluación estructural
+-- Prestador 72 (Diseños Arquitectónicos cambiado a Construcción) - Tipos: 7, 20
 -- Tipo 7: Construcción
-(50000, 70, 71),  -- Construcción de garages
-(30000, 61, 71),  -- Construcción de paredes
-(25000, 62, 71),  -- Instalación de pisos
+(50000, 70, 72),  -- Construcción de garages
+(30000, 61, 72),  -- Construcción de paredes
+(25000, 62, 72),  -- Instalación de pisos
 -- Tipo 20: Decoración Interior
-(20000, 200, 71), -- Decoración de jardines
-(15000, 191, 71), -- Diseño de interiores
-(12000, 192, 71), -- Decoración de ambientes
+(20000, 200, 72), -- Decoración de jardines
+(15000, 191, 72), -- Diseño de interiores
+(12000, 192, 72), -- Decoración de ambientes
 
--- Prestador 58 (Servicios Legales Integrales) - Tipos: 15, 26, 27
+-- Prestador 73 (Servicios Legales Integrales) - Tipo: 15
 -- Tipo 15: Servicios Inmobiliarios
-(18000, 150, 72), -- Due diligence inmobiliaria
-(8000, 141, 72),  -- Tasaciones
-(6000, 143, 72),  -- Asesoramiento inmobiliario
--- Tipo 26: Coaching y Mentoring
-(8000, 252, 72),  -- Coaching empresarial
-(6000, 253, 72),  -- Mentoring profesional
-(10000, 254, 72), -- Workshop de liderazgo
--- Tipo 27: Traducción e Interpretación
-(10000, 267, 72), -- Traducción legal
-(15000, 268, 72), -- Subtitulado
-(12000, 269, 72), -- Transcripción
+(18000, 150, 73), -- Due diligence inmobiliaria
+(8000, 141, 73),  -- Tasaciones
+(6000, 143, 73),  -- Asesoramiento inmobiliario
 
--- Prestador 59 (Bienestar Mental) - Tipos: 26, 25, 12
--- Tipo 26: Coaching y Mentoring
-(6000, 251, 73),  -- Sesión de coaching personal
-(6000, 255, 73),  -- Coaching de vida
-(8000, 258, 73),  -- Coaching familiar
--- Tipo 25: Peluquería y Estética
-(6000, 248, 73),  -- Masajes estéticos
-(8000, 250, 73),  -- Tratamientos antiedad
-(6000, 243, 73),  -- Tratamientos faciales profesionales
+-- Prestador 74 (Bienestar Mental cambiado a Estética) - Tipo: 12
 -- Tipo 12: Servicios del Hogar
-(12000, 115, 73), -- Organización del hogar
-(8000, 114, 73),  -- Cuidado de plantas
-(15000, 117, 73), -- Cuidado de niños
+(6000, 118, 74),  -- Compras domésticas
+(8000, 117, 74),  -- Cuidado de niños
+(6000, 119, 74),  -- Limpieza de cocina
+-- Tipo 12: Servicios del Hogar
+(12000, 115, 74), -- Organización del hogar
+(8000, 114, 74),  -- Cuidado de plantas
+(15000, 117, 74), -- Cuidado de niños
 
--- Prestador 60 (Nutrición Pro) - Tipos: 26, 24, 25
--- Tipo 26: Coaching y Mentoring
-(6000, 259, 46),  -- Coaching financiero
-(6000, 255, 46),  -- Coaching de vida
-(6000, 251, 46),  -- Sesión de coaching personal
--- Tipo 24: Servicios Veterinarios
-(4000, 234, 46),  -- Desparasitación especializada
-(8000, 236, 46),  -- Consulta domiciliaria
-(10000, 240, 46), -- Emergencias veterinarias
--- Tipo 25: Peluquería y Estética
-(8000, 250, 46),  -- Tratamientos antiedad
-(6000, 243, 46),  -- Tratamientos faciales profesionales
-(6000, 248, 74);  -- Masajes estéticos
+-- Prestador 75 (Nutrición Pro cambiado a Estética) - Tipo: 12
+-- Tipo 12: Servicios del Hogar
+(8000, 111, 75),  -- Limpieza doméstica
+(6000, 112, 75),  -- Lavado de ropa
+(6000, 113, 75);  -- Planchado
 
 -- 9. INSERTAR TURNOS (mínimo 30 turnos por cliente = 900 turnos)
 -- Turnos desde 13/07/2025 en adelante
