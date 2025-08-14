@@ -10,6 +10,7 @@ import { zonaRouter } from './zona/zona.route.js';
 import { RequestContext } from '@mikro-orm/core';
 import { serviceTypeRouter } from './tipoServicio/tipoServ.route.js';
 import { horarioRouter } from './horario/horario.routes.js';
+import { CronManager } from './shared/cron/cronManager.js';
 
 const app = express();
 
@@ -41,6 +42,9 @@ app.use('/api/zona', zonaRouter);
 // }); comente esto pq me tiraba error
 
 await syncSchema(); //nunca en producción
+
+// Inicializar cron jobs para testing
+await CronManager.initializeAll();
 
 app.listen(3000, () => {
   console.log('Server runnning on http://localhost:3000/');

@@ -1,7 +1,7 @@
 {
-	"dependencies": {
-		"@radix-ui/react-tooltip": "^1.2.7",
-		"@storybook/react": "^9.0.16",
-		"tpDSW": "link:"
-	}
+  "dependencies": {
+    "@radix-ui/react-tooltip": "^1.2.7",
+    "@storybook/react": "^9.0.16",
+    "tpDSW": "link:"
+  }
 }
