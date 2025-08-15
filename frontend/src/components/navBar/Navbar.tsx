@@ -45,6 +45,10 @@ function Navbar() {
       url: '/experiencias',
     },
     {
+      nombre: 'Dashboard',
+      url: '/dashboard',
+    },
+    {
       nombre: 'Sobre nosotros',
       url: '/about',
     },
