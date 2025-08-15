@@ -66,7 +66,7 @@ function DashNav({ activeSection, setActiveSection, menuItems: customMenuItems }
           )}
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-1 rounded-md hover:bg-gray-100 transition-colors focus:outline-none focus:ring-0 border-0 outline-none"
+            className="p-1 rounded-md hover:bg-gray-100 transition-colors focus:outline-none focus:ring-0 border-0 outline-none cursor-pointer"
             style={{ outline: 'none', border: 'none' }}
           >
             <svg 
@@ -88,7 +88,15 @@ function DashNav({ activeSection, setActiveSection, menuItems: customMenuItems }
             <li key={item.id}>
               <button
                 onClick={() => setActiveSection(item.id)}
-                className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors focus:outline-none focus:ring-0 border-0 outline-none ${
+                className={`w-full flex items-center transition-colors focus:outline-none focus:ring-0 border-0 outline-none cursor-pointer ${
+                  isCollapsed 
+                    ? 'justify-center p-2' 
+                    : 'space-x-3 px-3 py-2'
+                } ${
+                  isCollapsed 
+                    ? 'rounded-md' 
+                    : 'rounded-lg'
+                } text-left ${
                   activeSection === item.id
                     ? 'bg-orange-500 text-white'
                     : 'text-gray-700 hover:bg-gray-50 hover:text-orange-600'
