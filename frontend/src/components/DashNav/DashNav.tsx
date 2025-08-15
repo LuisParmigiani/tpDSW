@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 export interface MenuItem {
   id: string;
@@ -50,34 +51,54 @@ function DashNav({ activeSection, setActiveSection }: DashNavProps) {
 
   return (
     <div className={`bg-white shadow-lg border-r border-gray-200 transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'} flex flex-col`}>
-      {/* Header with Logo */}
+      
       <div className="p-4 border-b border-gray-200">
-        <div className="flex items-center justify-between">
-          {!isCollapsed && (
-            <div className="flex items-center space-x-2">
+        {!isCollapsed ? (
+          <div className="flex items-center justify-between">
+            <Link 
+              to="/" 
+              className="flex items-center space-x-2 hover:bg-gray-50 hover:scale-105 transition-all duration-200 rounded-lg p-2 cursor-pointer group"
+            >
               <img 
                 src="/images/logo.png" 
                 alt="Logo" 
                 className="w-8 h-8"
               />
-              <h1 className="text-lg font-bold text-orange-500">NombreEmpresa</h1>
-            </div>
-          )}
-          <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-1 rounded-md hover:bg-gray-100 transition-colors focus:outline-none focus:ring-0 border-0 outline-none"
-            style={{ outline: 'none', border: 'none' }}
-          >
-            <svg 
-              className={`w-5 h-5 text-gray-600 transition-transform ${isCollapsed ? 'rotate-180' : ''}`} 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
+              <h1 className="text-lg font-bold text-orange-500 group-hover:text-orange-600 transition-colors">NombreEmpresa</h1>
+            </Link>
+            <button
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="p-1 rounded-md hover:bg-gray-100 transition-colors focus:outline-none focus:ring-0 border-0 outline-none cursor-pointer"
+              style={{ outline: 'none', border: 'none' }}
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-        </div>
+              <svg 
+                className={`w-5 h-5 text-gray-600 transition-transform ${isCollapsed ? 'rotate-180' : ''}`} 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+          </div>
+        ) : (
+          <div className="flex justify-center">
+            <button
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="p-1 rounded-md hover:bg-gray-100 transition-colors focus:outline-none focus:ring-0 border-0 outline-none cursor-pointer"
+              style={{ outline: 'none', border: 'none' }}
+            >
+              <svg 
+                className={`w-4 h-4 text-gray-600 transition-transform ${isCollapsed ? 'rotate-180' : ''}`} 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+          </div>
+        )}
       </div>
 
       
@@ -87,14 +108,14 @@ function DashNav({ activeSection, setActiveSection }: DashNavProps) {
             <li key={item.id}>
               <button
                 onClick={() => setActiveSection(item.id)}
-                className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors focus:outline-none focus:ring-0 border-0 outline-none ${
+                className={`w-full flex items-center ${isCollapsed ? 'justify-center px-2' : 'space-x-3 px-3'} py-2 rounded-lg ${isCollapsed ? 'text-center' : 'text-left'} transition-colors focus:outline-none focus:ring-0 border-0 outline-none cursor-pointer group ${
                   activeSection === item.id
                     ? 'bg-orange-500 text-white'
                     : 'text-gray-700 hover:bg-gray-50 hover:text-orange-600'
                 }`}
                 style={{ outline: 'none', border: 'none' }}
               >
-                <span className={`${activeSection === item.id ? 'text-white' : 'text-gray-500'}`}>
+                <span className={`transition-colors ${activeSection === item.id ? 'text-white' : 'text-gray-500 group-hover:text-orange-600'}`}>
                   {item.icon}
                 </span>
                 {!isCollapsed && (
