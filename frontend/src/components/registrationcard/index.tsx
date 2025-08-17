@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 function RegisCard() {
+  // ojo para ocultar password
+  /*
   const [imag, setimag] = useState(
     'fa-solid fa-eye-slash absolute top-[20%] left-[300px] text-gray-500 text-[16px] cursor-pointer'
   );
   const [type_text, settypetext] = useState('password');
-
+*/
   // Estado para los campos del formulario
   const [form, setForm] = useState({
     nombre: '',
@@ -18,7 +20,7 @@ function RegisCard() {
     apellido: '',
     direccion: '',
     nombreFantasia: '',
-    Descripcion: '',
+    descripcion: '',
   });
 
   const [tipoUsuario, setearTipoUsuario] = useState('aaa');
@@ -70,7 +72,7 @@ function RegisCard() {
         className="w-full pt-[12px] pb-[12px] pr-[20px] pl-[50px] text-base border-none rounded-[30px] bg-[#f5f5f5] shadow-[inset_0_0_3px_rgba(0,0,0,0.1)] outline-none mb-4 text-black font-inter "
       />
       <input
-        type={type_text}
+        type="text"
         name="contrasena"
         value={form.contrasena}
         onChange={handleChange}
@@ -83,6 +85,14 @@ function RegisCard() {
         value={form.telefono}
         onChange={handleChange}
         placeholder="Teléfono"
+        className="w-full pt-[12px] pb-[12px] pr-[20px] pl-[50px] text-base border-none rounded-[30px] bg-[#f5f5f5] shadow-[inset_0_0_3px_rgba(0,0,0,0.1)] outline-none mb-4 text-black font-inter "
+      />
+      <input
+        type="text"
+        name="direccion"
+        value={form.direccion}
+        onChange={handleChange}
+        placeholder="Dirección"
         className="w-full pt-[12px] pb-[12px] pr-[20px] pl-[50px] text-base border-none rounded-[30px] bg-[#f5f5f5] shadow-[inset_0_0_3px_rgba(0,0,0,0.1)] outline-none mb-4 text-black font-inter "
       />
     </>
@@ -100,8 +110,8 @@ function RegisCard() {
       />
       <input
         type="text"
-        name="Descripcion"
-        value={form.Descripcion}
+        name="descripcion"
+        value={form.descripcion}
         onChange={handleChange}
         placeholder="Descripción"
         className="w-full pt-[12px] pb-[12px] pr-[20px] pl-[50px] text-base border-none rounded-[30px] bg-[#f5f5f5] shadow-[inset_0_0_3px_rgba(0,0,0,0.1)] outline-none mb-4 text-black font-inter "
@@ -109,6 +119,8 @@ function RegisCard() {
     </>
   );
 
+  // ojo para ocultar password
+  /*
   const handleClickCrossedEye = () => {
     if (
       imag ==
@@ -125,7 +137,7 @@ function RegisCard() {
       settypetext('password');
     }
   };
-
+  */
   async function envioFormulario(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const res = await fetch('http://localhost:3000/api/usuario', {
@@ -148,7 +160,9 @@ function RegisCard() {
       ) {
         alert('Ya existe un usuario con ese número de documento.');
       } else {
-        alert('Ya existe un usuario con ese mail o número de documento.');
+        alert(
+          'Ya existe un usuario con ese mail, número de documento o telefono.'
+        );
       }
     }
   }
@@ -198,7 +212,6 @@ function RegisCard() {
               </button>
             </form>
           )}
-          // Eliminar todo esto mas tarde
           {/* <form
               onSubmit={envioFormulario}
               className="w-full flex flex-col items-center"
