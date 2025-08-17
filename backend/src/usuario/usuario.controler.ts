@@ -275,6 +275,31 @@ async function getCommentsByUserId(req: Request, res: Response) {
   }
 }
 
+async function loginUsuario(req: Request, res: Response) {
+  const { mail, contrasena } = req.body;
+  if (!mail || !contrasena) {
+    return res
+      .status(400)
+      .json({ message: 'Faltan datos de inicio de sesión' });
+  }
+
+  const usuario = await em.findOne(Usuario, { mail });
+  if (!usuario) {
+    return res.status(401).json({ message: 'Usuario no encontrado' });
+  }
+
+  if (usuario.contrasena !== contrasena) {
+    return res.status(401).json({ message: 'Contraseña incorrecta' });
+  }
+
+  // Opcional: eliminar la contraseña antes de enviar el usuario
+  const { contrasena: _, ...usuarioSinContrasena } = usuario;
+
+  return res
+    .status(200)
+    .json({ message: 'Login exitoso', data: usuarioSinContrasena });
+}
+
 export {
   sanitizeUsuarioInput,
   findAll,
@@ -282,6 +307,7 @@ export {
   findOne,
   add,
   update,
+  loginUsuario,
   remove,
   getCommentsByUserId,
 };

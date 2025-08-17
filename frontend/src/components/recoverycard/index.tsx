@@ -54,7 +54,7 @@ function Recovery() {
           <div className="w-[500px]">
             <img
               className="w-full h-full object-cover rounded-tr-[30px] rounded-br-[30px] shadow-[10px_10px_45px_0_rgba(0,0,0,0.3)]"
-              src="/images/carousel2.jpg"
+              src="/images/imagen-registration.jpg"
             />
           </div>
         </div>
