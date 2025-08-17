@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 function Logincard() {
   const [imag, setimag] = useState(
@@ -26,6 +27,8 @@ function Logincard() {
   };
   const [form, setForm] = useState({ mail: '', contrasena: '' });
 
+  const navegacion = useNavigate();
+
   async function envioFormulario(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const res = await fetch('http://localhost:3000/api/usuario/login', {
@@ -38,6 +41,10 @@ function Logincard() {
 
     if (!res.ok) {
       alert('Credenciales incorrectas');
+    }
+    if (res.ok) {
+      alert('Credenciales correctas');
+      navegacion('/');
     }
   }
 
