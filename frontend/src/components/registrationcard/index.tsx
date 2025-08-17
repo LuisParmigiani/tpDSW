@@ -9,7 +9,8 @@ function RegisCard() {
   );
   const [type_text, settypetext] = useState('password');
 */
-  // Estado para los campos del formulario
+
+  // Estado iniciar para los campos del formulario
   const [form, setForm] = useState({
     nombre: '',
     mail: '',
@@ -25,7 +26,7 @@ function RegisCard() {
 
   const [tipoUsuario, setearTipoUsuario] = useState('aaa');
 
-  // Cambiar esto despues
+  // Actualiza estado del form cuando se escribe un nuevo input
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -164,6 +165,22 @@ function RegisCard() {
           'Ya existe un usuario con ese mail, número de documento o telefono.'
         );
       }
+    }
+    if (res.ok) {
+      alert('Usuario creado exitosamente');
+      setForm({
+        nombre: '',
+        mail: '',
+        contrasena: '',
+        tipoDoc: '',
+        numeroDoc: '',
+        telefono: '',
+        apellido: '',
+        direccion: '',
+        nombreFantasia: '',
+        descripcion: '',
+      });
+      setearTipoUsuario('aaa');
     }
   }
 
