@@ -5,6 +5,7 @@ import {
   getTurnsPerDay,
 } from '../turno/turno.controler.js';
 
+import bcrypt from 'bcrypt';
 import { orm } from '../shared/db/orm.js';
 const em = orm.em;
 
@@ -196,6 +197,14 @@ async function findOne(req: Request, res: Response) {
 
 async function add(req: Request, res: Response) {
   try {
+    // encripta password
+    if (req.body.sanitizeUsuarioInput.contrasena) {
+      const hashedPassword = await bcrypt.hash(
+        req.body.sanitizeUsuarioInput.contrasena,
+        10
+      );
+      req.body.sanitizeUsuarioInput.contrasena = hashedPassword;
+    }
     const newUser = em.create(Usuario, req.body.sanitizeUsuarioInput);
     await em.flush();
     res.status(201).json({ message: 'created new usuario', data: newUser });
@@ -288,11 +297,12 @@ async function loginUsuario(req: Request, res: Response) {
     return res.status(401).json({ message: 'Usuario no encontrado' });
   }
 
-  if (usuario.contrasena !== contrasena) {
+  const passwordMatch = await bcrypt.compare(contrasena, usuario.contrasena);
+  if (!passwordMatch) {
     return res.status(401).json({ message: 'Contraseña incorrecta' });
   }
 
-  // Opcional: eliminar la contraseña antes de enviar el usuario
+  // elimina contraseña antes de enviar el usuario, probarlo
   const { contrasena: _, ...usuarioSinContrasena } = usuario;
 
   return res
