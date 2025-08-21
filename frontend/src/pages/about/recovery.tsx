@@ -1,4 +1,4 @@
-import NavBar from '../../components/Navbar/Navbar.js';
+import NavBar from '../../components/Navbar/Navbar';
 import Recovery from '../../components/recoverycard/index.js';
 
 function App_recovery() {
