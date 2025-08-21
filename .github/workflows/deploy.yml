@@ -3,7 +3,7 @@ name: 🚀 Despliegue automático a Hostinger
 on:
   push:
     branches:
-      - main
+      - main # Cambiá si tu rama principal no es main
 
 jobs:
   build-and-deploy:
@@ -20,9 +20,14 @@ jobs:
 
       - name: 🔧 Instalar dependencias
         run: pnpm install --frozen-lockfile
+        working-directory: frontend
 
       - name: 🏗️ Construir la aplicación
         run: pnpm build
+        working-directory: frontend
+
+      - name: 📂 Verificar build
+        run: ls -la frontend/dist
 
       - name: 🚀 Subir a Hostinger por FTP
         uses: SamKirkland/FTP-Deploy-Action@v4
