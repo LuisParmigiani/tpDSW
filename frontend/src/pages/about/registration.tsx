@@ -1,5 +1,5 @@
 import NavBar from '../../components/Navbar/Navbar';
-import Registrationn from '../../components/registrationcard/registration.js';
+import Registrationn from '../../components/registrationcard/registration';
 
 function Registration() {
   return (

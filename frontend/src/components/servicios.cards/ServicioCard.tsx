@@ -1,6 +1,6 @@
 import Boton from '../Botones/BotonServicios.tsx';
 import './../../index.css';
-import Stars from '../stars/Stars.js';
+import Stars from '../stars/Stars';
 import { useNavigate } from 'react-router-dom';
 
 type Props = {

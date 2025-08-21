@@ -1,5 +1,5 @@
 import NavBar from '../../components/Navbar/Navbar';
-import Logincard from '../../components/logincard/index.js';
+import Logincard from '../../components/logincard/index';
 
 function App_login() {
   return (
