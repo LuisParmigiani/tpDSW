@@ -84,6 +84,8 @@ function ClientesSection() {
 	const [showBar, setShowBar] = useState(false);
 	const [fadeOut, setFadeOut] = useState(false);
 	const [turnos, setTurnos] = useState(mockTurnos);
+	const [pendingAction, setPendingAction] = useState<null | 'Confirmado' | 'Cancelado'>(null);
+	const [modalVisible, setModalVisible] = useState(false);
 
 	useEffect(() => {
 		if (selectedRows.length > 0) {
@@ -94,6 +96,14 @@ function ClientesSection() {
 			setTimeout(() => setShowBar(false), 300);
 		}
 	}, [selectedRows, showBar]);
+
+	useEffect(() => {
+		if (pendingAction) {
+			setModalVisible(true);
+		} else if (modalVisible) {
+			setTimeout(() => setModalVisible(false), 200);
+		}
+	}, [pendingAction, modalVisible]);
 
 	const handleSelectRow = (idx: number) => {
 		setSelectedRows((prev) =>
@@ -111,14 +121,32 @@ function ClientesSection() {
 
 	// Handler para actualizar estado de los seleccionados
 	const handleUpdateEstado = (nuevoEstado: 'Confirmado' | 'Cancelado') => {
-		setTurnos((prev) =>
-			prev.map((t, idx) =>
-				selectedRows.includes(idx) ? { ...t, estado: nuevoEstado } : t
-			)
-		);
-		setShowMenu(false);
-		setSelectedRows([]);
+		setPendingAction(nuevoEstado);
 	};
+
+	const handleConfirmAction = () => {
+		if (pendingAction) {
+			setTurnos((prev) =>
+				prev.map((t, idx) =>
+					selectedRows.includes(idx) && (t.estado === 'Pendiente' || t.estado === 'Confirmado')
+						? { ...t, estado: pendingAction }
+						: t
+				)
+			);
+			setShowMenu(false);
+			setSelectedRows([]);
+			setPendingAction(null);
+		}
+	};
+
+	const handleCancelAction = () => {
+		setPendingAction(null);
+	};
+
+	const getValidSelectedCount = () =>
+		selectedRows.filter(idx => turnos[idx].estado === 'Pendiente' || turnos[idx].estado === 'Confirmado').length;
+	const getInvalidSelectedCount = () =>
+		selectedRows.filter(idx => turnos[idx].estado === 'Cancelado' || turnos[idx].estado === 'Completado').length;
 
 	return (
 		<DashboardSection>
@@ -233,6 +261,38 @@ function ClientesSection() {
 						onConfirm={() => handleUpdateEstado('Confirmado')}
 						onCancel={() => handleUpdateEstado('Cancelado')}
 					/>
+				)}
+				{(pendingAction || modalVisible) && (
+					<div className="fixed inset-0 z-50 flex items-center justify-center">
+						<div className={`absolute inset-0 bg-black opacity-20 transition-opacity duration-200 ${pendingAction ? 'opacity-20' : 'opacity-0'}`}></div>
+						<div className={`relative bg-white border border-gray-300 rounded-lg shadow-lg p-6 min-w-[300px] flex flex-col items-center ${pendingAction ? 'animate-fadeInModal' : 'animate-fadeOutModal'}` }>
+							<span className="text-lg font-semibold mb-4 text-gray-900">¿Seguro que quieres {pendingAction === 'Confirmado' ? 'confirmar' : 'cancelar'} los turnos seleccionados?</span>
+							<span className="text-sm text-gray-700 mb-2">{getValidSelectedCount()} turno(s) se pueden actualizar.</span>
+							{getInvalidSelectedCount() > 0 && (
+								<span className="text-sm text-red-500 mb-2">{getInvalidSelectedCount()} turno(s) no se pueden modificar por estar cancelados o completados.</span>
+							)}
+							<div className="flex gap-4">
+								<button className="bg-orange-500 text-white px-4 py-2 rounded font-medium hover:bg-orange-600 cursor-pointer" onClick={handleConfirmAction}>Sí, {pendingAction === 'Confirmado' ? 'confirmar' : 'cancelar'}</button>
+								<button className="bg-gray-200 text-gray-700 px-4 py-2 rounded font-medium hover:bg-gray-300 cursor-pointer" onClick={handleCancelAction}>Cancelar</button>
+							</div>
+						</div>
+						<style>{`
+      @keyframes fadeInModal {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+      }
+      @keyframes fadeOutModal {
+        from { opacity: 1; transform: scale(1); }
+        to { opacity: 0; transform: scale(0.95); }
+      }
+      .animate-fadeInModal {
+        animation: fadeInModal 0.2s ease;
+      }
+      .animate-fadeOutModal {
+        animation: fadeOutModal 0.2s ease;
+      }
+    `}</style>
+					</div>
 				)}
 			</div>
 		</DashboardSection>
