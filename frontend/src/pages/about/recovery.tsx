@@ -1,5 +1,5 @@
 import NavBar from '../../components/Navbar/Navbar';
-import Recovery from '../../components/recoverycard/index.js';
+import Recovery from '../../components/recoverycard/index';
 
 function App_recovery() {
   return (

@@ -4,8 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useEffect } from 'react';
 import { z } from 'zod';
-import { Button } from './../Botones/FormButton.js';
-import { Form, FormControl, FormField, FormItem, FormMessage } from './Form.js';
+import { Button } from './../Botones/FormButton';
+import { Form, FormControl, FormField, FormItem, FormMessage } from './Form';
 import {
   Select,
   SelectItem,

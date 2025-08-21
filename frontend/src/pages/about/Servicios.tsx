@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Navbar from '../../components/Navbar/Navbar';
-import ServicioCard from '../../components/servicios.cards/ServicioCard.js';
-import { tiposServicioApi } from '../../services/tipoSericiosApi.js';
-import { zonasApi } from '../../services/zonasApi.js';
-import { usuariosApi } from '../../services/usuariosApi.js';
-import { ServiciosForm } from '../../components/Forms/FormServicios.js';
-import PaginationControls from '../../components/Pagination/PaginationControler.js';
+import ServicioCard from '../../components/servicios.cards/ServicioCard';
+import { tiposServicioApi } from '../../services/tipoSericiosApi';
+import { zonasApi } from '../../services/zonasApi';
+import { usuariosApi } from '../../services/usuariosApi';
+import { ServiciosForm } from '../../components/Forms/FormServicios';
+import PaginationControls from '../../components/Pagination/PaginationControler';
 
 // FIX 1: Complete Usuario type to match ServicioCard props
 type Usuario = {
