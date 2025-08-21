@@ -13,6 +13,8 @@
     "moduleDetection": "force",
     "noEmit": true,
 
+    "allowSyntheticDefaultImports": true,
+
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
