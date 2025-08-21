@@ -1,105 +1,45 @@
-name: 🚀 Despliegue automático a Hostinger
+name: Deploy
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
-    concurrency:
-      group: deploy-hostinger
-      cancel-in-progress: true
-
     steps:
-      - name: 📥 Checkout
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: 📦 Instalar pnpm
+      - name: Setup pnpm
         uses: pnpm/action-setup@v3
         with:
           version: 8
 
-      - name: ♻️ Cache pnpm store
-        uses: actions/cache@v4
-        with:
-          path: ~/.pnpm-store
-          key: pnpm-store-${{ hashFiles('frontend/pnpm-lock.yaml') }}
-          restore-keys: |
-            pnpm-store-
-
-      - name: 🧹 Limpiar dist y caché
-        working-directory: frontend
-        run: |
-          rm -rf dist node_modules/.tmp
-
-      - name: 🔧 Instalar dependencias
+      - name: Install deps
         working-directory: frontend
         run: pnpm install --no-frozen-lockfile
 
-      - name: 🏗️ Construir la aplicación
+      - name: Build
         working-directory: frontend
         run: pnpm build
 
-      - name: 📂 Verificar build
-        run: |
-          ls -la frontend/dist | head -50
-          echo "Tamaño total (bytes):" \
-            $(du -sb frontend/dist | cut -f1)
+      - name: List dist
+        run: ls -la frontend/dist
 
-      - name: 🔐 Calcular hash de contenido dist
-        id: hash
-        run: |
-          find frontend/dist -type f -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -d' ' -f1 > dist.hash
-          echo "hash=$(cat dist.hash)" >> $GITHUB_OUTPUT
-          echo "Hash dist: $(cat dist.hash)"
-
-      - name: 🗃️ Cache hash (para saltar despliegues repetidos)
-        id: cache-dist-hash
-        uses: actions/cache@v4
-        with:
-          path: dist.hash
-          key: dist-hash-${{ steps.hash.outputs.hash }}
-          restore-keys: |
-            dist-hash-
-
-      - name: 📦 Subir artifact del build
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-dist
-          path: frontend/dist
-
-      # Paso de despliegue FTP
-      - name: 🚀 Subir a Hostinger por FTP
-        # Despliega sólo si el contenido cambió (o si se fuerza manualmente quitando esta condición)
-        if: steps.cache-dist-hash.outputs.cache-hit != 'true'
+      - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftps # Cambiado a FTPS explícito (TLS). Si falla revertir a ftp.
+          protocol: ftp
           local-dir: frontend/dist/
-          server-dir: ./ # El root del usuario apunta a public_html
+          server-dir: ./
           exclude: |
             **/.git*
             **/node_modules/**
             **/*.map
             **/story*/**
           log-level: verbose
-          dangerous-clean-slate: false # Volvemos a no borrar todo en cada deploy
-
-      - name: ⏭️ Saltado (build sin cambios)
-        if: steps.cache-dist-hash.outputs.cache-hit == 'true'
-        run: echo "Deploy omitido: hash ya desplegado." 
-
-      - name: 🔎 Health check sitio
-        if: always()
-        run: |
-          set -e
-          echo "HEAD https://reformix.site"
-          (curl -I --max-time 15 -s https://reformix.site || curl -I --max-time 15 -s http://reformix.site) | head -15
-          echo "Primeras líneas del index:";
-          (curl -s --max-time 20 https://reformix.site || curl -s --max-time 20 http://reformix.site) | head -20 || true
-          echo "Fin health check"
+          dangerous-clean-slate: false
