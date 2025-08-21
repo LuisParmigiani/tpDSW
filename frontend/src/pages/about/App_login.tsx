@@ -1,4 +1,4 @@
-import NavBar from '../../components/Navbar/Navbar';
+import NavBar from '../../components/Navbar/Navbar.tsx';
 import Logincard from '../../components/logincard/index';
 
 function App_login() {
