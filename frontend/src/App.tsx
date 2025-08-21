@@ -8,6 +8,7 @@ import TurnHistory from './components/TurnHistory/TurnHistory.js';
 import About from './pages/about/about.js';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Servicios from './pages/about/Servicios.js';
+import Dashboard from './pages/dashboard/dashboard-p.js';
 function App() {
   // Creación de la API DSP hay que llevarla a login
 
@@ -23,6 +24,7 @@ function App() {
           <Route path="/recovery" element={<Recovery />} />
           <Route path="/registration" element={<Registration />} />
           <Route path="/TurnHistory" element={<TurnHistory />} />
+          <Route path="/dashboard" element={<Dashboard />} />
         </Routes>
       </Router>
     </>
