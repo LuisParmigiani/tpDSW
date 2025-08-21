@@ -3,7 +3,7 @@ name: 🚀 Despliegue automático a Hostinger
 on:
   push:
     branches:
-      - main # Cambiá si tu rama principal no es main
+      - main
 
 jobs:
   build-and-deploy:
@@ -19,7 +19,7 @@ jobs:
           version: 8
 
       - name: 🔧 Instalar dependencias
-        run: pnpm install --frozen-lockfile
+  run: pnpm install --no-frozen-lockfile
         working-directory: frontend
 
       - name: 🏗️ Construir la aplicación
