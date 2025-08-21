@@ -1,7 +1,7 @@
 // Replace your-framework with the framework you are using, e.g. react-vite, nextjs, nextjs-vite, etc.
 import type { Meta, StoryObj } from '@storybook/react';
 
-import ServicioCard from './ServicioCard.tsx';
+import ServicioCard from './ServicioCard';
 
 const meta = {
   title: 'Components/ServicioCard',
