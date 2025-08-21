@@ -18,6 +18,10 @@ jobs:
         with:
           version: 8
 
+        - name: 🧹 Limpiar dist y caché
+          run: rm -rf dist node_modules/.tmp
+          working-directory: frontend
+
       - name: 🔧 Instalar dependencias
         run: pnpm install --no-frozen-lockfile
         working-directory: frontend
