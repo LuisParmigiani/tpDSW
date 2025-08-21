@@ -25,4 +25,4 @@ usuarioRouter.post('/', sanitizeUsuarioInput, add);
 usuarioRouter.put('/:id', sanitizeUsuarioInput, update);
 usuarioRouter.patch('/:id', sanitizeUsuarioInput, update);
 usuarioRouter.delete('/:id', remove);
-usuarioRouter.post('/login', loginUsuario);
+usuarioRouter.get('/login', loginUsuario);
