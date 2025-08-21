@@ -38,11 +38,11 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftp
           local-dir: frontend/dist/
-          server-dir: public_html/
+          server-dir: ./
           exclude: |
             **/.git*
             **/node_modules/**
             **/*.map
             **/story*/**
           log-level: verbose
-          dangerous-clean-slate: true # SOLO este run para limpiar estructura duplicada y subir assets
+          dangerous-clean-slate: true # Este run limpia raíz (elimina carpeta public_html duplicada). Luego volver a false.
