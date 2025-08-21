@@ -1,7 +1,7 @@
-interface DashboardSectionProps {
+type DashboardSectionProps = {
   children: React.ReactNode;
   className?: string;
-}
+};
 
 function DashboardSection({ children, className = "" }: DashboardSectionProps) {
   return (
