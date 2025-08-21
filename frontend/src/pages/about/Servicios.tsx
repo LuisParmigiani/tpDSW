@@ -68,18 +68,6 @@ function FiltrosDeServicios() {
   const cantPrestPorPagina = '6';
 
   // Initialize form with URL parameters when component mounts
-  useEffect(() => {
-    console.log('URL Parameters:', { servicioParam, zonaParam, orderByParam });
-    if (servicioParam && zonaParam && orderByParam) {
-      setFiltrosForm({
-        servicio: servicioParam,
-        zona: zonaParam,
-        ordenarPor: orderByParam,
-      });
-
-      setSubmit(true); // Automatically trigger the search
-    }
-  }, [servicioParam, zonaParam, orderByParam]);
 
   // FIX 3: Separate function for fetching data
   useEffect(() => {
@@ -111,9 +99,27 @@ function FiltrosDeServicios() {
         return [];
       }
     };
+    //!Todo esto se hace apenas carga la página, ya que el useEffect está vacío
     fetchServicios();
     fetchZonas();
-  }, []);
+    // Hago que es muestren todos de manera default:
+
+    if (servicioParam && zonaParam && orderByParam) {
+      setFiltrosForm({
+        servicio: servicioParam,
+        zona: zonaParam,
+        ordenarPor: orderByParam,
+      });
+    } else {
+      setFiltrosForm((prev) => ({
+        ...prev,
+        servicio: 'Todos',
+        zona: 'Todas',
+        ordenarPor: 'calificacion',
+      }));
+    }
+    setSubmit(true); // Trigger the search after fetching
+  }, [orderByParam, servicioParam, zonaParam]);
 
   useEffect(() => {
     if (!submit) return;

@@ -41,12 +41,12 @@ export default function ServicioCard({
         </p>
         <p
           className={
-            'text-gray-700 text-center break-normal text-lg font-normal mb-8'
+            'text-gray-700 text-center break-normal text-lg font-normal mb-8 h-18'
           }
         >
           {rubros}
         </p>
-        <div className="flex-grow"></div>
+        <div className="flex-grow mt-2"></div>
         <Stars cant={puntuacion} />
       </div>
       <Boton
