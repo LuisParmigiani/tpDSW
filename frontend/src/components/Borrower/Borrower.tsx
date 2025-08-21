@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import Comments from '../Comments/Comments';
+import Comments from '../comments/Comments.js';
 import { usuariosApi } from '../../services/usuariosApi.js';
 import Navbar from '../Navbar/Navbar.js';
 import Stars from '../stars/Stars';

@@ -1,6 +1,6 @@
 import Navbar from '../Navbar/Navbar.js';
 import Carousel from '../Carousel/Carousel.js';
-import Comments from './../Comments/Comments.js';
+import Comments from '../comments/Comments';
 import Footer from '../Footer/Footer';
 import { useNavigate } from 'react-router-dom';
 function Homepage() {

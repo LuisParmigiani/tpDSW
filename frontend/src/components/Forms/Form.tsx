@@ -10,7 +10,6 @@ import {
   type FieldPath,
   type FieldValues,
 } from 'react-hook-form';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import {
   cn,
   useFormField,
@@ -18,6 +17,8 @@ import {
   FormItemContext,
 } from '../../lib/utils.js';
 import { Label } from '../Label/Label.js';
+
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
 const Form = FormProvider;
 
