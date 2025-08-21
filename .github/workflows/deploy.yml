@@ -10,30 +10,45 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📥 Descargar el repositorio
-        uses: actions/checkout@v3
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
 
       - name: 📦 Instalar pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v3
         with:
           version: 8
 
       - name: 🧹 Limpiar dist y caché
-        run: rm -rf dist node_modules/.tmp
         working-directory: frontend
+        run: |
+          rm -rf dist node_modules/.tmp
 
       - name: 🔧 Instalar dependencias
-        run: pnpm install --no-frozen-lockfile
         working-directory: frontend
+        run: pnpm install --no-frozen-lockfile
 
       - name: 🏗️ Construir la aplicación
-        run: pnpm build
         working-directory: frontend
+        run: pnpm build
 
       - name: 📂 Verificar build
         run: ls -la frontend/dist
 
-      # Paso de diagnóstico removido tras estabilizar credenciales
+      - name: 🔍 Diagnóstico credenciales FTP
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          echo "Usuario => $FTP_USERNAME"
+          echo "Longitud password => ${#FTP_PASSWORD}"
+          echo "Intento FTP plano"; set +e
+          curl -s --disable-epsv ftp://$FTP_SERVER -u "$FTP_USERNAME:$FTP_PASSWORD" >/dev/null && echo "LOGIN OK (curl)" || echo "LOGIN FALLÓ (curl)"
+          command -v lftp >/dev/null || sudo apt-get update -y >/dev/null 2>&1 && sudo apt-get install -y lftp >/dev/null 2>&1
+          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" -e "set ftp:ssl-allow no; set net:max-retries 1; pwd; bye" "$FTP_SERVER" && echo "LOGIN OK (lftp)" || echo "LOGIN FALLÓ (lftp)"
+          echo "(Si falla => usuario/contraseña incorrectos o todavía no propagado en servidor)"
+
+      # Paso de despliegue FTP
       - name: 🚀 Subir a Hostinger por FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
