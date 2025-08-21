@@ -1,0 +1,13 @@
+# Rewrite rules para SPA React/Vite
+# Forzar HTTPS (opcional, descomentar si tu hosting soporta SSL configurado con el dominio)
+#RewriteEngine On
+#RewriteCond %{HTTPS} !=on
+#RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+RewriteEngine On
+# Si el archivo o directorio real existe, servirlo normalmente
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+# Cualquier otra ruta entregar index.html para permitir routing del cliente
+RewriteRule ^ index.html [L]
