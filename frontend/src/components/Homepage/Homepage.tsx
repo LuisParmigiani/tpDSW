@@ -1,4 +1,4 @@
-import Navbar from '../Navbar/Navbar.js';
+import Navbar from '../Navbar/Navbar';
 import Carousel from '../Carousel/Carousel.js';
 import Comments from '../comments/Comments';
 import Footer from '../Footer/Footer';

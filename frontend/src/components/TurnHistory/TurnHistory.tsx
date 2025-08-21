@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { turnosApi } from '../../services/turnosApi';
-import Navbar from '../Navbar/Navbar.js';
+import Navbar from '../Navbar/Navbar';
 import Footer from '../Footer/Footer';
 import PaginationControls from '../Pagination/PaginationControler';
 import CustomSelect from '../Select/CustomSelect';

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import Navbar from '../../components/Navbar/Navbar.js';
+import Navbar from '../../components/Navbar/Navbar';
 import ServicioCard from '../../components/servicios.cards/ServicioCard';
 import { tiposServicioApi } from '../../services/tipoSericiosApi';
 import { zonasApi } from '../../services/zonasApi';
