@@ -33,15 +33,31 @@ jobs:
       - name: 📂 Verificar build
         run: ls -la frontend/dist
 
-      - name: 🚀 Subir a Hostinger por FTP
+      - name: 🔐 Probar login FTP (diagnóstico)
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y lftp
+          echo "Probando conexión a $FTP_SERVER como $FTP_USERNAME";
+          set +e
+          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" -e "cls -1; bye" "$FTP_SERVER" || exit 1
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+
+      - name:  Subir a Hostinger por FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }} # Ej: u797556926.reformix (cuenta de dominio) ó u797556926 (cuenta principal)
+          username: ${{ secrets.FTP_USERNAME }}            # Debe coincidir exactamente (ej: reformix)
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: frontend/dist/                 # Debe terminar en /
-          # Si usas la cuenta de dominio (u797556926.reformix) cuya raíz ya es /home/u797556926/domains/reformix.site
-          # entonces basta con 'server-dir: public_html/'. Si usas la cuenta principal (u797556926) necesitas ruta absoluta completa.
-          server-dir: /home/u797556926/domains/reformix.site/public_html/  # Ajustado con 'domains/reformix.site'
-          protocol: ftp
+          protocol: ftp                                    # Sólo cambiar a ftps si activas TLS explícito
+          local-dir: frontend/dist/                        # Contenido compilado
+          server-dir: public_html/                         # Raíz de tu dominio para este usuario
+          exclude: |
+            **/.git*
+            **/node_modules/**
+            **/*.map
+            **/story*/**
           log-level: verbose
+          dangerous-clean-slate: true                      # Borra archivos remotos que no existan local (confirma antes)
