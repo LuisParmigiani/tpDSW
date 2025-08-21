@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   deploy:
@@ -35,11 +35,11 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftp
           local-dir: frontend/dist/
-          server-dir: ./
+          server-dir: public_html/
           exclude: |
             **/.git*
             **/node_modules/**
             **/*.map
             **/story*/**
           log-level: verbose
-          dangerous-clean-slate: false
+          dangerous-clean-slate: true # SOLO este run para limpiar estructura duplicada y subir assets
