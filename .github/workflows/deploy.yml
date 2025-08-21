@@ -25,7 +25,10 @@ jobs:
         run: pnpm build
 
       - name: List dist
-        run: ls -la frontend/dist
+        run: |
+          echo "Contenido dist:";
+          find frontend/dist -maxdepth 3 -type f -print | sed 's/^/ - /'
+          echo "Fin listado"
 
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
