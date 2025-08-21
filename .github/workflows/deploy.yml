@@ -18,7 +18,9 @@ jobs:
         with:
           version: 8
 
-  # (Opcional) Limpieza previa eliminada según nueva versión solicitada
+      - name: 🧹 Limpiar dist y caché
+        run: rm -rf dist node_modules/.tmp
+        working-directory: frontend
 
       - name: 🔧 Instalar dependencias
         run: pnpm install --no-frozen-lockfile
@@ -37,5 +39,5 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: frontend/dist/    # Barra final => sube SOLO el contenido
-          server-dir: public_html/     # Barra final => destino raíz dentro de public_html
+          local-dir: frontend/dist
+          server-dir: public_html
