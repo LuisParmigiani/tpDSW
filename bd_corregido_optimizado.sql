@@ -17,6 +17,7 @@ TRUNCATE TABLE usuario;
 TRUNCATE TABLE zona;
 SET FOREIGN_KEY_CHECKS = 1;
 
+
 -- 1. INSERTAR ZONAS
 INSERT INTO `zona` (`descripcion_zona`) VALUES
 ('Centro'),
@@ -28,7 +29,7 @@ INSERT INTO `zona` (`descripcion_zona`) VALUES
 -- 2. INSERTAR USUARIOS (45 Clientes + 35 Prestadores = 80 total)
 INSERT INTO `usuario` (`mail`, `contrasena`, `tipo_doc`, `numero_doc`, `telefono`, `nombre`, `apellido`, `direccion`, `nombre_fantasia`, `descripcion`, `foto`) VALUES
 -- CLIENTES (usuarios 1-30)
-('maria.gonzalez@email.com', 'pass123', 'DNI', '12345678', '341-555-0101', 'María', 'González', 'Av. Pellegrini 1234', NULL, NULL, NULL),
+('maria.gonzalez@email.com', 'passa123', 'DNI', '12345678', '341-555-0101', 'María', 'González', 'Av. Pellegrini 1234', NULL, NULL, NULL),
 ('juan.perez@email.com', 'pass123', 'DNI', '23456789', '341-555-0102', 'Juan', 'Pérez', 'San Martín 567', NULL, NULL, NULL),
 ('ana.rodriguez@email.com', 'pass123', 'DNI', '34567890', '341-555-0103', 'Ana', 'Rodríguez', 'Córdoba 890', NULL, NULL, NULL),
 ('carlos.lopez@email.com', 'pass123', 'DNI', '45678901', '341-555-0104', 'Carlos', 'López', 'Mitre 234', NULL, NULL, NULL),
