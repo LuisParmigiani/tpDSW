@@ -28,7 +28,7 @@ function PerfilSection() {
   };
 
   return (
-    <DashboardSection title="Configuración de cuenta">
+    <DashboardSection>
       <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-sm border border-gray-200 p-8">
         <div className="flex justify-center mb-8">
           <div className="relative">

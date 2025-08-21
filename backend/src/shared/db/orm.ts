@@ -21,10 +21,10 @@ export const syncSchema = async () => {
   const generator = orm.getSchemaGenerator();
 
   //Lineas para borrar y crear la base de datos
-  /*   await generator.dropSchema();
+  /*  await generator.dropSchema();
   await generator.createSchema(); */
 
-  //await generator.updateSchema();
+  await generator.updateSchema();
 };
 
 export { orm };
