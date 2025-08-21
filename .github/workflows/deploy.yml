@@ -37,7 +37,11 @@ jobs:
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
+          username: ${{ secrets.FTP_USERNAME }} # Ej: u797556926.reformix (cuenta de dominio) ó u797556926 (cuenta principal)
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: frontend/dist/                 # Debe terminar en /
-          server-dir: /home/u797556926/public_html/  # También terminar en /
+          # Si usas la cuenta de dominio (u797556926.reformix) cuya raíz ya es /home/u797556926/domains/reformix.site
+          # entonces basta con 'server-dir: public_html/'. Si usas la cuenta principal (u797556926) necesitas ruta absoluta completa.
+          server-dir: /home/u797556926/domains/reformix.site/public_html/  # Ajustado con 'domains/reformix.site'
+          protocol: ftp
+          log-level: verbose
