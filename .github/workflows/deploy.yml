@@ -37,27 +37,30 @@ jobs:
         run: |
           sudo apt-get update -y
           sudo apt-get install -y lftp
-          echo "Probando conexión a $FTP_SERVER como $FTP_USERNAME";
+          echo "== Modo 1: FTP plano ==";
           set +e
-          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" -e "cls -1; bye" "$FTP_SERVER" || exit 1
+          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" -e "set ftp:ssl-allow no; set net:max-retries 1; pwd; ls; bye" "$FTP_SERVER" || echo "(Fallo FTP plano)"
+          echo "== Modo 2: FTPS explícito ignorando cert ==";
+          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" -e "set ftp:ssl-force yes; set ftp:ssl-protect-data yes; set ssl:verify-certificate no; set net:max-retries 1; pwd; ls; bye" "$FTP_SERVER" || echo "(Fallo FTPS explícito)"
+          echo "Revisa arriba: si ambos muestran 530 => credenciales. Si sólo FTPS da CN mismatch puedes seguir con FTP plano o ajustar host al CN del cert.";
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
 
-      - name:  Subir a Hostinger por FTP
+      - name: Subir a Hostinger por FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}            # Debe coincidir exactamente (ej: reformix)
+          username: ${{ secrets.FTP_USERNAME }} # Debe coincidir exactamente (ej: reformix)
           password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftp                                    # Sólo cambiar a ftps si activas TLS explícito
-          local-dir: frontend/dist/                        # Contenido compilado
-          server-dir: public_html/                         # Raíz de tu dominio para este usuario
+          protocol: ftp # Sólo cambiar a ftps si activas TLS explícito
+          local-dir: frontend/dist/ # Contenido compilado
+          server-dir: public_html/ # Raíz de tu dominio para este usuario
           exclude: |
             **/.git*
             **/node_modules/**
             **/*.map
             **/story*/**
           log-level: verbose
-          dangerous-clean-slate: true                      # Borra archivos remotos que no existan local (confirma antes)
+          dangerous-clean-slate: true # Borra archivos remotos que no existan local (confirma antes)
