@@ -19,7 +19,7 @@ jobs:
           version: 8
 
       - name: 🔧 Instalar dependencias
-  run: pnpm install --no-frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
         working-directory: frontend
 
       - name: 🏗️ Construir la aplicación
