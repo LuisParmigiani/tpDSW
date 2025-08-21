@@ -39,5 +39,5 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: frontend/dist
-          server-dir: public_html
+          local-dir: frontend/dist/                 # Debe terminar en /
+          server-dir: /home/u797556926/public_html/  # También terminar en /
