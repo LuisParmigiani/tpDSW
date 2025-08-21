@@ -1,4 +1,4 @@
-import Navbar from '../Navbar/Navbar';
+import Navbar from '../Navbar/Navbar.tsx';
 import Carousel from '../Carousel/Carousel.js';
 import Comments from '../comments/Comments';
 import Footer from '../Footer/Footer';
