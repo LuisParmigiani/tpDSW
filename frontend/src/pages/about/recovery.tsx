@@ -1,4 +1,4 @@
-import Navbar from '../../components/Navbar/Navbar';
+import Navbar from '../../components/Navbar/Navbar.tsx';
 import Recovery from '../../components/recoverycard/index';
 
 function App_recovery() {

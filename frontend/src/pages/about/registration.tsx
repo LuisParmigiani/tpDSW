@@ -1,4 +1,4 @@
-import Navbar from '../../components/Navbar/Navbar';
+import Navbar from '../../components/Navbar/Navbar.tsx';
 import Registrationn from '../../components/registrationcard/registration';
 
 function Registration() {
