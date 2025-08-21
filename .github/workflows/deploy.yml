@@ -25,10 +25,7 @@ jobs:
         run: pnpm build
 
       - name: List dist
-        run: |
-          echo "Contenido dist:";
-          find frontend/dist -maxdepth 3 -type f -print | sed 's/^/ - /'
-          echo "Fin listado"
+        run: ls -la frontend/dist
 
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -38,11 +35,6 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftp
           local-dir: frontend/dist/
-          server-dir: ./
-          exclude: |
-            **/.git*
-            **/node_modules/**
-            **/*.map
-            **/story*/**
+
           log-level: verbose
-          dangerous-clean-slate: true # Este run limpia raíz (elimina carpeta public_html duplicada). Luego volver a false.
+          dangerous-clean-slate: true # SOLO este run para limpiar estructura duplicada y subir assets
