@@ -16,11 +16,11 @@ jobs:
       - name: 📦 Instalar pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8
+        version: 8
 
-        - name: 🧹 Limpiar dist y caché
-          run: rm -rf dist node_modules/.tmp
-          working-directory: frontend
+      - name: 🧹 Limpiar dist y caché
+        run: rm -rf dist node_modules/.tmp
+        working-directory: frontend
 
       - name: 🔧 Instalar dependencias
         run: pnpm install --no-frozen-lockfile
