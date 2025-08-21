@@ -8,6 +8,9 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    concurrency:
+      group: deploy-hostinger
+      cancel-in-progress: true
 
     steps:
       - name: 📥 Checkout
@@ -17,6 +20,14 @@ jobs:
         uses: pnpm/action-setup@v3
         with:
           version: 8
+
+      - name: ♻️ Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: pnpm-store-${{ hashFiles('frontend/pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-store-
 
       - name: 🧹 Limpiar dist y caché
         working-directory: frontend
@@ -32,36 +43,63 @@ jobs:
         run: pnpm build
 
       - name: 📂 Verificar build
-        run: ls -la frontend/dist
-
-      - name: 🔍 Diagnóstico credenciales FTP
-        env:
-          FTP_SERVER: ${{ secrets.FTP_SERVER }}
-          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
-          echo "Usuario => $FTP_USERNAME"
-          echo "Longitud password => ${#FTP_PASSWORD}"
-          echo "Intento FTP plano"; set +e
-          curl -s --disable-epsv ftp://$FTP_SERVER -u "$FTP_USERNAME:$FTP_PASSWORD" >/dev/null && echo "LOGIN OK (curl)" || echo "LOGIN FALLÓ (curl)"
-          command -v lftp >/dev/null || sudo apt-get update -y >/dev/null 2>&1 && sudo apt-get install -y lftp >/dev/null 2>&1
-          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" -e "set ftp:ssl-allow no; set net:max-retries 1; pwd; bye" "$FTP_SERVER" && echo "LOGIN OK (lftp)" || echo "LOGIN FALLÓ (lftp)"
-          echo "(Si falla => usuario/contraseña incorrectos o todavía no propagado en servidor)"
+          ls -la frontend/dist | head -50
+          echo "Tamaño total (bytes):" \
+            $(du -sb frontend/dist | cut -f1)
+
+      - name: 🔐 Calcular hash de contenido dist
+        id: hash
+        run: |
+          find frontend/dist -type f -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -d' ' -f1 > dist.hash
+          echo "hash=$(cat dist.hash)" >> $GITHUB_OUTPUT
+          echo "Hash dist: $(cat dist.hash)"
+
+      - name: 🗃️ Cache hash (para saltar despliegues repetidos)
+        id: cache-dist-hash
+        uses: actions/cache@v4
+        with:
+          path: dist.hash
+          key: dist-hash-${{ steps.hash.outputs.hash }}
+          restore-keys: |
+            dist-hash-
+
+      - name: 📦 Subir artifact del build
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist
 
       # Paso de despliegue FTP
       - name: 🚀 Subir a Hostinger por FTP
+        # Despliega sólo si el contenido cambió (o si se fuerza manualmente quitando esta condición)
+        if: steps.cache-dist-hash.outputs.cache-hit != 'true'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftp # Cambiar a ftps si activas TLS explícito
+          protocol: ftps # Cambiado a FTPS explícito (TLS). Si falla revertir a ftp.
           local-dir: frontend/dist/
-          server-dir: public_html/
+          server-dir: ./ # El root del usuario apunta a public_html
           exclude: |
             **/.git*
             **/node_modules/**
             **/*.map
             **/story*/**
           log-level: verbose
-          dangerous-clean-slate: false
+          dangerous-clean-slate: false # Volvemos a no borrar todo en cada deploy
+
+      - name: ⏭️ Saltado (build sin cambios)
+        if: steps.cache-dist-hash.outputs.cache-hit == 'true'
+        run: echo "Deploy omitido: hash ya desplegado." 
+
+      - name: 🔎 Health check sitio
+        if: always()
+        run: |
+          set -e
+          echo "HEAD https://reformix.site"
+          (curl -I --max-time 15 -s https://reformix.site || curl -I --max-time 15 -s http://reformix.site) | head -15
+          echo "Primeras líneas del index:";
+          (curl -s --max-time 20 https://reformix.site || curl -s --max-time 20 http://reformix.site) | head -20 || true
+          echo "Fin health check"
