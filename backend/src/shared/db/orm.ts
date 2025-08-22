@@ -3,7 +3,7 @@ import { MySqlDriver } from '@mikro-orm/mysql';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 
 const DB_URL =
-  process.env.DATABASE_URL || 'mysql://root:root@localhost:3306/homeService';
+  process.env.DATABASE_URL || 'mysql://u797556926_reformix:LUISluis123!@srv1042.hstgr.io:3306/u797556926_homeservice';
 const DEBUG = process.env.DEBUG_SQL === '1';
 
 const orm = await MikroORM.init({
