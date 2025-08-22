@@ -14,16 +14,20 @@ import { CronManager } from './shared/cron/cronManager.js';
 
 const app = express();
 
-const local = false;
+const local = true; // <--- producción: usa variables de entorno y no sincroniza esquema
 
 // cors lo que hace es dar el permiso al un puerto para hacer las peticiones al back
 // CORS dinámico (permite lista separada por comas en FRONTEND_ORIGIN)
-const allowedOrigins = local
-  ? ['http://localhost:5173']
-  : ['https://reformix.site'];
+const rawOrigins = local
+  ? 'http://localhost:5173'
+  : process.env.FRONTEND_ORIGIN || 'https://reformix.site';
+const allowedOrigins = rawOrigins.split(',').map((o) => o.trim());
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: (origin, cb) => {
+      if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+      return cb(new Error('Origen no permitido: ' + origin));
+    },
     credentials: true,
   })
 );
@@ -77,11 +81,9 @@ app.get('/health', async (req: Request, res: Response) => {
 });
 
 // Define el puerto en el que se ejecutará el servidor
-const port = local ? 3000 : 8080; // Usa el puerto de entorno o 8080 por defecto
-
-// Inicia el servidor y muestra un mensaje en la consola
+const port = local ? 3000 : Number(process.env.PORT) || 8080; // Fly asigna PORT
 app.listen(port, () => {
-  console.log(`Servidor corriendo en el puerto ${port}`);
+  console.log(`Server running on port ${port}`);
 });
 
 /* app.listen(3000, () => {
