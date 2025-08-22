@@ -2,7 +2,8 @@ import { MikroORM } from '@mikro-orm/core';
 import { MySqlDriver } from '@mikro-orm/mysql';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 
-const DB_URL = process.env.DATABASE_URL || 'mysql://root:root@localhost:3306/homeService';
+const DB_URL =
+  process.env.DATABASE_URL || 'mysql://root:root@localhost:3306/homeService';
 const DEBUG = process.env.DEBUG_SQL === '1';
 
 const orm = await MikroORM.init({
@@ -21,12 +22,7 @@ const orm = await MikroORM.init({
 
 export const syncSchema = async () => {
   const generator = orm.getSchemaGenerator();
-
-  //Lineas para borrar y crear la base de datos
-  /*   await generator.dropSchema();
-  await generator.createSchema(); */
-
-  //await generator.updateSchema();
+  await generator.updateSchema();
 };
 
 export { orm };

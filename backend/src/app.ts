@@ -23,8 +23,8 @@ const LOCAL_MODE = true; // <--- cambia aquí
 // CORS dinámico (permite lista separada por comas en FRONTEND_ORIGIN)
 const rawOrigins = LOCAL_MODE
   ? 'http://localhost:5173'
-  : (process.env.FRONTEND_ORIGIN || 'https://tu-dominio-frontend');
-const allowedOrigins = rawOrigins.split(',').map(o => o.trim());
+  : process.env.FRONTEND_ORIGIN || 'https://tu-dominio-frontend';
+const allowedOrigins = rawOrigins.split(',').map((o) => o.trim());
 app.use(
   cors({
     origin: (origin, cb) => {
