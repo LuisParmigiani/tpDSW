@@ -1,19 +1,33 @@
-name: Deploy
+name: Deploy Frontend
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Diagnostic FTP login (fail fast)
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          echo "Testing raw FTP login to $FTP_SERVER as $FTP_USERNAME"
+          echo -n "Username HEX: "; echo -n "$FTP_USERNAME" | xxd -p
+          echo -n "Password length: "; echo -n "$FTP_PASSWORD" | wc -c
+          if curl -s --disable-epsv ftp://$FTP_SERVER -u "$FTP_USERNAME:$FTP_PASSWORD" -Q "QUIT" >/dev/null 2>&1; then
+            echo "FTP credentials OK (curl)";
+          else
+            echo "FTP credentials INVALID (curl)"; exit 2;
+          fi
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v3
         with:
           version: 8
 
@@ -27,34 +41,22 @@ jobs:
 
       - name: List dist
         run: |
-          echo "Contenido dist:";
-          find frontend/dist -maxdepth 3 -type f -print | sed 's/^/ - /'
-          echo "Fin listado"
-
-      - name: FTP creds diagnostic
-        env:
-          FTP_SERVER: ${{ secrets.FTP_SERVER }}
-          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-        run: |
-          echo "Usuario visible: '$FTP_USERNAME'"
-          echo -n "Username length: "; echo -n "$FTP_USERNAME" | wc -c
-          echo -n "Password length: "; echo -n "$FTP_PASSWORD" | wc -c
-          echo -n "Username HEX: "; echo -n "$FTP_USERNAME" | xxd -p
-          echo -n "Password HEX: "; echo -n "$FTP_PASSWORD" | xxd -p
-          echo "Intento con curl (sin TLS)";
-          if curl -s --disable-epsv ftp://$FTP_SERVER -u "$FTP_USERNAME:$FTP_PASSWORD" -Q "QUIT" >/dev/null 2>&1; then
-            echo "Login OK curl";
-          else
-            echo "Login FAIL curl";
-          fi
+          echo "Dist files:"; find frontend/dist -maxdepth 3 -type f -print | sed 's/^/ - /'
 
       - name: Deploy via FTP
+        if: success()
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftp
+          protocol: ftp # Cambiar a ftps cuando credenciales validen correctamente
           local-dir: frontend/dist/
-          server-dir: public_html/
+          server-dir: public_html/ # Panel indica carpeta para subir archivos = public_html
+          exclude: |
+            **/.git*
+            **/node_modules/**
+            **/*.map
+            **/story*/**
+          log-level: verbose
+          dangerous-clean-slate: false
