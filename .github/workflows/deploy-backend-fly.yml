@@ -37,9 +37,11 @@ jobs:
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
         run: |
-          if ! command -v fly >/dev/null; then echo "Fly CLI no instalado"; exit 1; fi
+          export FLYCTL_INSTALL="$HOME/.fly"
+          export PATH="$FLYCTL_INSTALL/bin:$PATH"
+          if ! command -v flyctl >/dev/null; then echo "Fly CLI no instalado"; exit 1; fi
           sed -i "s/REEMPLAZA_CON_NOMBRE_APP_FLY/${{ secrets.FLY_APP_NAME }}/" fly.toml
-          fly deploy --config fly.toml --remote-only --strategy immediate
+          flyctl deploy --config fly.toml --remote-only --strategy immediate
 
       - name: Post URL
         if: always()
