@@ -14,7 +14,7 @@ import { CronManager } from './shared/cron/cronManager.js';
 
 const app = express();
 
-const local = true; // <--- producción: usa variables de entorno y no sincroniza esquema
+const local = false; // <--- producción: usa variables de entorno y no sincroniza esquema
 
 // cors lo que hace es dar el permiso al un puerto para hacer las peticiones al back
 // CORS dinámico (permite lista separada por comas en FRONTEND_ORIGIN)
