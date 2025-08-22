@@ -1,3 +1,4 @@
+# fly para poder configurar el back que se hagan los build y se descargue todo pnpm
 name: Deploy Backend to Fly.io
 
 on:
