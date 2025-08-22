@@ -21,16 +21,12 @@ const LOCAL_MODE = false; // <--- producción: usa variables de entorno y no sin
 
 // cors lo que hace es dar el permiso al un puerto para hacer las peticiones al back
 // CORS dinámico (permite lista separada por comas en FRONTEND_ORIGIN)
-const rawOrigins = LOCAL_MODE
-  ? 'http://localhost:5173'
-  : process.env.FRONTEND_ORIGIN || 'https://reformix.site';
-const allowedOrigins = rawOrigins.split(',').map((o) => o.trim());
+const allowedOrigins = LOCAL_MODE
+  ? ['http://localhost:5173']
+  : ['https://reformix.site'];
 app.use(
   cors({
-    origin: (origin, cb) => {
-      if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
-      return cb(new Error('Origen no permitido: ' + origin));
-    },
+    origin: allowedOrigins,
     credentials: true,
   })
 );
