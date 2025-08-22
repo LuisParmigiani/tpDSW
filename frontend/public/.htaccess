@@ -1,8 +1,12 @@
-# Rewrite rules para SPA React/Vite
-# Forzar HTTPS (opcional, descomentar si tu hosting soporta SSL configurado con el dominio)
-#RewriteEngine On
-#RewriteCond %{HTTPS} !=on
-#RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# =============================================================
+# Archivo .htaccess para hosting Apache
+#
+# Permite que una Single Page Application (SPA) hecha con React/Vite
+# funcione correctamente en Hostinger u otro hosting con Apache.
+# - Redirige todas las rutas al index.html para el routing del cliente
+# - Opcional: fuerza HTTPS si el hosting lo soporta
+# - Sirve archivos estáticos si existen
+# =============================================================
 
 RewriteEngine On
 # Si el archivo o directorio real existe, servirlo normalmente
