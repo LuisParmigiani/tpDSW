@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 // El puerto del backend donde quiere hacer las peticiones
-const local = false; // con true es en local y con false para subir a producción
+const local = true; // con true es en local y con false para subir a producción
 const API_BASE_URL = local
   ? 'http://localhost:3000/api'
   : 'https://backend-patient-morning-1303.fly.dev/api';
