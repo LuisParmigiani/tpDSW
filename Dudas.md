@@ -28,4 +28,6 @@
 - `fly restart`  
   Reinicia la app manualmente.
 
----
+- fly deploy --app backend-patient-morning-1303
+
+--

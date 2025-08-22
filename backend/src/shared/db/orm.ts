@@ -5,7 +5,7 @@ import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 const local = false;
 const DB_URL = local
   ? 'mysql://root:root@localhost:3306/homeService'
-  : 'mysql://u797556926_reformix:LUISluis123!@srv1042.hstgr.io:3306/u797556926_homeservice';
+  : 'mysql://u797556926_reformix:LUISluis123!@srv2023.hstgr.io:3306/u797556926_homeService';
 const DEBUG = local ? true : process.env.DEBUG_SQL === '1';
 
 const orm = await MikroORM.init({
