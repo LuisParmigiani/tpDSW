@@ -17,13 +17,13 @@ const app = express();
 // ====== MODO LOCAL / WEB (cambia manualmente a true/false) ======
 // true  -> entorno local (frontend localhost, permite syncSchema, crons activos)
 // false -> entorno web/producción (usa FRONTEND_ORIGIN, evita syncSchema automática)
-const LOCAL_MODE = true; // <--- cambia aquí
+const LOCAL_MODE = false; // <--- producción: usa variables de entorno y no sincroniza esquema
 
 // cors lo que hace es dar el permiso al un puerto para hacer las peticiones al back
 // CORS dinámico (permite lista separada por comas en FRONTEND_ORIGIN)
 const rawOrigins = LOCAL_MODE
   ? 'http://localhost:5173'
-  : process.env.FRONTEND_ORIGIN || 'https://tu-dominio-frontend';
+  : process.env.FRONTEND_ORIGIN || 'https://reformix.site';
 const allowedOrigins = rawOrigins.split(',').map((o) => o.trim());
 app.use(
   cors({
