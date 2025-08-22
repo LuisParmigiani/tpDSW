@@ -1,0 +1,11 @@
+node_modules
+dist
+*.log
+*.tsbuildinfo
+Dockerfile*
+fly.toml
+pnpm-store
+.git
+.gitignore
+README.md
+**/.DS_Store
