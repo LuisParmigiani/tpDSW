@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 // El puerto del backend donde quiere hacer las peticiones
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = 'https://TU_APP.fly.dev/api'; // Cambia TU_APP por el nombre real de tu app en Fly.io
 
 // ====== INTERFACES Y TIPOS ======
 

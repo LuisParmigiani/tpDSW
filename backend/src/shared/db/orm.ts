@@ -22,7 +22,7 @@ const orm = await MikroORM.init({
 
 export const syncSchema = async () => {
   const generator = orm.getSchemaGenerator();
-  await generator.updateSchema();
+    // await generator.updateSchema(); // Desactivado para producción: evita cambios automáticos en el esquema
 };
 
 export { orm };
