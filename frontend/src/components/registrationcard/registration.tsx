@@ -1,28 +1,36 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { usuariosApi } from '../../services/usuariosApi';
+import { z } from 'zod';
 
-type Usuario = {
-  nombre: string;
-  mail: string;
-  contrasena: string;
-  tipoDoc: string;
-  numeroDoc: string;
-  telefono: string;
-  apellido: string;
-  direccion: string;
-  nombreFantasia: string;
-  descripcion: string;
-};
+//Algunas validaciones no son necesarias pero las dejo para poder crear el objeto
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const usuarioSchema = z.object({
+  nombre: z.string().min(1, 'El nombre es obligatorio'),
+  mail: z.string().email('Email inválido'),
+  contrasena: z
+    .string()
+    .min(
+      6,
+      'La contraseña debe tener al menos 6 caracteres, una letra mayúscula, una letra minúscula y un número'
+    )
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/,
+      'La contraseña debe contener al menos una letra mayúscula, una letra minúscula y un número'
+    ),
+  tipoDoc: z.string().min(1, 'El tipo de documento es obligatorio'),
+  numeroDoc: z.string().regex(/^[0-9]+$/, 'Solo números'),
+  telefono: z.string().regex(/^[0-9]+$/, 'Solo números'),
+  apellido: z.string().min(1, 'El apellido es obligatorio'),
+  direccion: z.string().min(1, 'La dirección es obligatoria'),
+  nombreFantasia: z.string(),
+  descripcion: z.string(),
+});
+
+export type Usuario = z.infer<typeof usuarioSchema>;
 
 function RegisCard() {
-  // ojo para ocultar password
-  /*
-  const [imag, setimag] = useState(
-    'fa-solid fa-eye-slash absolute top-[20%] left-[300px] text-gray-500 text-[16px] cursor-pointer'
-  );
-  const [type_text, settypetext] = useState('password');
-*/
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -49,7 +57,7 @@ function RegisCard() {
         name="nombre"
         value={form.nombre}
         placeholder="Nombre"
-        className="w-full pt-[12px] pb-[12px] pr-[20px] pl-[50px] text-base border-none rounded-[30px] bg-[#f5f5f5] shadow-[inset_0_0_3px_rgba(0,0,0,0.1)] outline-none mb-4 text-black font-inter "
+        className="w-full pt-3 pb-3 pr-5 pl-12 text-base border-none rounded-3xl bg-tinte-5 shadow-inner outline-none mb-4 text-black font-inter"
         onChange={(e) => setForm({ ...form, nombre: e.target.value })}
       />
       <input
@@ -57,7 +65,7 @@ function RegisCard() {
         name="apellido"
         value={form.apellido}
         placeholder="Apellido"
-        className="w-full pt-[12px] pb-[12px] pr-[20px] pl-[50px] text-base border-none rounded-[30px] bg-[#f5f5f5] shadow-[inset_0_0_3px_rgba(0,0,0,0.1)] outline-none mb-4 text-black font-inter "
+        className="w-full pt-3 pb-3 pr-5 pl-12 text-base border-none rounded-3xl bg-tinte-5 shadow-inner outline-none mb-4 text-black font-inter"
         onChange={(e) => setForm({ ...form, apellido: e.target.value })}
       />
       <input
@@ -65,13 +73,13 @@ function RegisCard() {
         name="mail"
         value={form.mail}
         placeholder="Email"
-        className="w-full pt-[12px] pb-[12px] pr-[20px] pl-[50px] text-base border-none rounded-[30px] bg-[#f5f5f5] shadow-[inset_0_0_3px_rgba(0,0,0,0.1)] outline-none mb-4 text-black font-inter "
+        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-tinte-5 shadow-inner outline-none mb-4 text-black font-inter"
         onChange={(e) => setForm({ ...form, mail: e.target.value })}
       />
       <select
         name="tipoDoc"
         value={form.tipoDoc}
-        className="w-full pt-[12px] pb-[12px] pr-[20px] pl-[50px] text-base border-none rounded-[30px] bg-[#f5f5f5] shadow-[inset_0_0_3px_rgba(0,0,0,0.1)] outline-none mb-4 text-black font-inter "
+        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-tinte-5 shadow-inner outline-none mb-4 text-black font-inter"
         onChange={(e) => setForm({ ...form, tipoDoc: e.target.value })}
       >
         <option value="">Seleccione tipo de documento</option>
@@ -83,7 +91,7 @@ function RegisCard() {
         name="numeroDoc"
         value={form.numeroDoc}
         placeholder="Número de documento"
-        className="w-full pt-[12px] pb-[12px] pr-[20px] pl-[50px] text-base border-none rounded-[30px] bg-[#f5f5f5] shadow-[inset_0_0_3px_rgba(0,0,0,0.1)] outline-none mb-4 text-black font-inter "
+        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-tinte-5 shadow-inner outline-none mb-4 text-black font-inter"
         onChange={(e) =>
           setForm({ ...form, numeroDoc: e.target.value.toString() })
         }
@@ -93,7 +101,7 @@ function RegisCard() {
         name="contrasena"
         value={form.contrasena}
         placeholder="Contraseña"
-        className="w-full pt-[12px] pb-[12px] pr-[20px] pl-[50px] text-base border-none rounded-[30px] bg-[#f5f5f5] shadow-[inset_0_0_3px_rgba(0,0,0,0.1)] outline-none mb-4 text-black font-inter"
+        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-tinte-5 shadow-inner outline-none mb-4 text-black font-inter"
         onChange={(e) => setForm({ ...form, contrasena: e.target.value })}
       />
       <input
@@ -101,7 +109,7 @@ function RegisCard() {
         name="telefono"
         value={form.telefono}
         placeholder="Teléfono"
-        className="w-full pt-[12px] pb-[12px] pr-[20px] pl-[50px] text-base border-none rounded-[30px] bg-[#f5f5f5] shadow-[inset_0_0_3px_rgba(0,0,0,0.1)] outline-none mb-4 text-black font-inter "
+        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-tinte-5 shadow-inner outline-none mb-4 text-black font-inter "
         onChange={(e) =>
           setForm({ ...form, telefono: e.target.value.toString() })
         }
@@ -111,7 +119,7 @@ function RegisCard() {
         name="direccion"
         value={form.direccion}
         placeholder="Dirección"
-        className="w-full pt-[12px] pb-[12px] pr-[20px] pl-[50px] text-base border-none rounded-[30px] bg-[#f5f5f5] shadow-[inset_0_0_3px_rgba(0,0,0,0.1)] outline-none mb-4 text-black font-inter "
+        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-tinte-5 shadow-inner outline-none mb-4 text-black font-inter "
         onChange={(e) => setForm({ ...form, direccion: e.target.value })}
       />
     </>
@@ -124,7 +132,7 @@ function RegisCard() {
         name="nombreFantasia"
         value={form.nombreFantasia}
         placeholder="Nombre de fantasía"
-        className="w-full pt-[12px] pb-[12px] pr-[20px] pl-[50px] text-base border-none rounded-[30px] bg-[#f5f5f5] shadow-[inset_0_0_3px_rgba(0,0,0,0.1)] outline-none mb-4 text-black font-inter "
+        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-tinte-5 shadow-inner outline-none mb-4 text-black font-inter "
         onChange={(e) => setForm({ ...form, nombreFantasia: e.target.value })}
       />
       <input
@@ -132,7 +140,7 @@ function RegisCard() {
         name="descripcion"
         value={form.descripcion}
         placeholder="Descripción"
-        className="w-full pt-[12px] pb-[12px] pr-[20px] pl-[50px] text-base border-none rounded-[30px] bg-[#f5f5f5] shadow-[inset_0_0_3px_rgba(0,0,0,0.1)] outline-none mb-4 text-black font-inter "
+        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-30 bg-tinte-5 shadow-[inset_0_0_3px_rgba(0,0,0,0.1)] outline-none mb-4 text-black font-inter "
         onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
       />
     </>
@@ -140,35 +148,40 @@ function RegisCard() {
 
   const envioFormulario = async () => {
     setOpen(true);
-    if (!/^[0-9]+$/.test(form.numeroDoc)) {
-      setMessage('El número de documento debe contener solo números.');
-      return;
-    }
-    if (!/^[0-9]+$/.test(form.telefono)) {
-      setMessage('El teléfono debe contener solo números.');
+    const resultado = usuarioSchema.safeParse(form);
+    if (!resultado.success) {
+      const errores = resultado.error.issues;
+      setMessage(errores[0]?.message || 'Datos inválidos');
       return;
     }
 
     try {
-      const res = await usuariosApi.create(form);
-      if (res.data) {
-        if (
-          res.data.message.toLowerCase().includes('usuario.usuario_mail_unique')
-        ) {
-          setMessage('Ya existe un usuario con ese mail.');
-        } else if (
-          res.data.message
-            .toLowerCase()
-            .includes('usuario.usuario_numero_doc_unique')
-        ) {
-          setMessage('Ya existe un usuario con ese número de documento.');
-        } else {
-          setMessage(
-            'Ya existe un usuario con ese mail, número de documento o telefono.'
-          );
-        }
-      }
+      await usuariosApi.create(form);
+      setMessage('Usuario creado correctamente');
+      setForm({
+        nombre: '',
+        mail: '',
+        contrasena: '',
+        tipoDoc: '',
+        numeroDoc: '',
+        telefono: '',
+        apellido: '',
+        direccion: '',
+        nombreFantasia: '',
+        descripcion: '',
+      });
     } catch (error) {
+      const err = error as { response?: { data?: { message?: string } } };
+      const msg = err?.response?.data?.message?.toLowerCase() || '';
+      if (msg.includes('usuario.usuario_mail_unique')) {
+        setMessage('Ya existe un usuario con ese mail.');
+      } else if (msg.includes('usuario.usuario_numero_doc_unique')) {
+        setMessage('Ya existe un usuario con ese número de documento.');
+      } else if (msg.includes('duplicate')) {
+        setMessage('Ya existe un usuario con ese numero de telefono.');
+      } else {
+        setMessage('Error al crear usuario');
+      }
       console.error('Error al crear usuario', error);
     }
   };
@@ -204,12 +217,17 @@ function RegisCard() {
               </button>
             </div>
             <p>{message}</p>
-            <button onClick={() => setOpen(false)}>Cerrar</button>
+            <button
+              onClick={() => setOpen(false)}
+              className="mt-2 px-4 py-2 bg-naranja-1 text-white rounded hover:bg-naranja-2"
+            >
+              Cerrar
+            </button>
           </div>
         </div>
       )}
       <div className="flex flex-col min-h-screen items-center justify-center bg-white py-8 ">
-        <div className="flex flex-col md:flex-row w-full max-w-4xl mx-auto bg-[#fff5f2] rounded-[30px] shadow-lg mt-8 overflow-hidden h-[1050px] ">
+        <div className="flex flex-col md:flex-row w-full max-w-4xl mx-auto  bg-white rounded-4xl shadow-lg mt-8 overflow-hidden h-250 ">
           <div className="w-full md:w-1/2 flex flex-col justify-start items-center p-6 md:p-10 ">
             <p className="text-black font-inter text-3xl md:text-5xl mb-6 font-bold text-center ">
               Crear cuenta
@@ -232,13 +250,50 @@ function RegisCard() {
                 onClick={envioFormulario}
                 type="submit"
                 className={
-                  form.apellido === ''
-                    ? 'w-full bg-gray-300 text-white px-5 py-[10px] rounded-[15px] cursor-pointer focus:outline-none mb-5 mt-3'
-                    : 'w-full bg-naranja-1 text-white px-5 py-[10px] rounded-[15px] cursor-pointer hover:text-black focus:outline-none mb-5 mt-3 hover:shadow-lg'
+                  tipoUsuario === 'prestatario' &&
+                  ((form.nombreFantasia === '' && form.apellido === '') ||
+                    form.nombre === '' ||
+                    form.mail === '' ||
+                    form.descripcion === '' ||
+                    form.contrasena === '' ||
+                    form.tipoDoc === '' ||
+                    form.numeroDoc === '' ||
+                    form.telefono === '' ||
+                    form.direccion === '')
+                    ? 'w-full bg-gray-300 text-white px-5 py-2.5 rounded-b-2xl cursor-pointer focus:outline-none mb-5 mt-3'
+                    : tipoUsuario === 'usuario' &&
+                      (form.nombre === '' ||
+                        form.apellido === '' ||
+                        form.mail === '' ||
+                        form.contrasena === '' ||
+                        form.tipoDoc === '' ||
+                        form.numeroDoc === '' ||
+                        form.telefono === '' ||
+                        form.direccion === '')
+                    ? 'w-full bg-gray-300 text-white px-5 py-2.5 rounded-b-2xl cursor-pointer focus:outline-none mb-5 mt-3'
+                    : 'w-full bg-naranja-1 text-white px-5 py-2.5 rounded-b-2xl cursor-pointer hover:text-black focus:outline-none mb-5 mt-3 hover:shadow-lg'
                 }
                 disabled={
-                  tipoUsuario === 'prestatario' &&
-                  (form.apellido === '' || form.nombre === '')
+                  (tipoUsuario === 'prestatario' &&
+                    (form.apellido === '' ||
+                      form.nombre === '' ||
+                      form.mail === '' ||
+                      form.descripcion === '' ||
+                      form.nombreFantasia === '' ||
+                      form.contrasena === '' ||
+                      form.tipoDoc === '' ||
+                      form.numeroDoc === '' ||
+                      form.telefono === '' ||
+                      form.direccion === '')) ||
+                  (tipoUsuario === 'usuario' &&
+                    (form.apellido === '' ||
+                      form.nombre === '' ||
+                      form.mail === '' ||
+                      form.contrasena === '' ||
+                      form.tipoDoc === '' ||
+                      form.numeroDoc === '' ||
+                      form.telefono === '' ||
+                      form.direccion === ''))
                 }
               >
                 Crear cuenta
@@ -257,7 +312,7 @@ function RegisCard() {
           </div>
           <div className="w-full md:w-1/2">
             <img
-              className="w-full h-64 md:h-full object-cover rounded-b-[30px] md:rounded-tr-[30px] md:rounded-br-[30px]"
+              className="w-full h-64 md:h-full object-cover rounded-b-4xl md:rounded-tr-4xl md:rounded-br-4xl"
               src="/images/carousel2.jpg"
               alt="Registro"
             />
