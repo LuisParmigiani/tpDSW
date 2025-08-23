@@ -2,7 +2,7 @@ import { MikroORM } from '@mikro-orm/core';
 import { MySqlDriver } from '@mikro-orm/mysql';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 
-const local = false;
+const local = true;
 const DB_URL = local
   ? 'mysql://root:root@localhost:3306/homeService'
   : 'mysql://u797556926_reformix:LUISluis123!@srv2023.hstgr.io:3306/u797556926_homeService';

@@ -7,21 +7,23 @@ import CustomSelect from '../Select/CustomSelect';
 import CalificationModal from '../Modal/CalificationModal';
 import Stars from '../stars/Stars';
 import { useNavigate } from 'react-router-dom';
+import MercadoPago from '../MercadoPago/MercadoPago.tsx';
+import DevolucionPago from '../Modal/DevolucionPago.tsx';
 
 type Turno = {
   id: number;
   fechaHora: Date;
   montoFinal: number;
-  servicio: servicio;
+  servicio: Servicio;
   calificacion: number | null;
   comentario: string | null;
   estado: string;
   usuario: Usuario;
+  fechaPago: Date | null;
 };
 
-type servicio = {
+type Servicio = {
   id: number;
-  nombre: string;
   tarea: Tarea;
   usuario: Usuario;
 };
@@ -29,6 +31,10 @@ type Tarea = {
   nombreTarea: string;
   descripcionTarea: number;
   duracionTarea: number;
+  tipoServicio: {
+    id: number;
+    nombreTipo: string;
+  };
 };
 type Usuario = {
   id: number;
@@ -36,7 +42,11 @@ type Usuario = {
   nombreFantasia: string;
 };
 
-function TurnHistory() {
+type Props = {
+  estado?: string;
+};
+
+function TurnHistory({ estado }: Props) {
   const navigate = useNavigate();
   const id = 2; // aca el id del usuario
   const [turns, setTurns] = useState<Turno[] | null>(null); // Se guardan todos los turnos del usuario
@@ -173,11 +183,12 @@ function TurnHistory() {
       console.error('Error al cancelar el turno:', error);
     }
   };
+  // devolucion del pago:
 
   return (
     <>
       <Navbar />
-
+      {estado && <DevolucionPago estado={estado} />}
       {isOpen && data && (
         <CalificationModal
           data={data}
@@ -190,7 +201,7 @@ function TurnHistory() {
         />
       )}
 
-      <div className="text-black">
+      <div className="text-black min-h-2/4">
         <h1 className="text-4xl font-bold mt-6">Historial de Turnos</h1>
 
         <div className="flex flex-row gap-4 lg:-mt-11  mt-3 pl-3 mb-8  ">
@@ -219,6 +230,8 @@ function TurnHistory() {
                 { value: 'cancelados', label: 'Cancelados' },
                 { value: 'pendientes', label: 'Pendientes' },
                 { value: 'completado', label: 'Completado' },
+                { value: 'porPagar', label: 'Por Pagar' },
+                { value: 'pagado', label: 'Pagado' },
               ]}
               setOptions={setSelectedValueShow}
               setPage={setCurrentPage}
@@ -279,12 +292,20 @@ function TurnHistory() {
                       ) {
                         return (
                           <>
-                            <button
-                              onClick={() => openModal(turn)}
-                              className="bg-naranja-1  text-white hover:text-naranja-1 hover:bg-white w-full rounded-2xl border-2 border-naranja-1"
-                            >
-                              Calificar
-                            </button>
+                            {turn.fechaPago ? (
+                              <button
+                                onClick={() => openModal(turn)}
+                                className="bg-naranja-1  text-white hover:text-naranja-1 hover:bg-white w-full rounded-2xl border-2 border-naranja-1"
+                              >
+                                Calificar
+                              </button>
+                            ) : (
+                              <MercadoPago
+                                fechaHora={turn.fechaHora}
+                                montoFinal={turn.montoFinal}
+                                servicio={turn.servicio}
+                              />
+                            )}
                             <button
                               className="bg-naranja-1 text-white hover:text-naranja-1 hover:bg-white w-full rounded-2xl border-2 border-naranja-1"
                               onClick={() => {
@@ -322,10 +343,17 @@ function TurnHistory() {
                           if (turn.estado === 'completado') {
                             return (
                               <>
-                                {' '}
-                                <p className="mt-2">
-                                  Expiró el tiempo de calificación
-                                </p>
+                                {turn.fechaPago ? (
+                                  <p className="mt-2">
+                                    Expiró el tiempo de calificación
+                                  </p>
+                                ) : (
+                                  <MercadoPago
+                                    fechaHora={turn.fechaHora}
+                                    montoFinal={turn.montoFinal}
+                                    servicio={turn.servicio}
+                                  />
+                                )}{' '}
                                 <button
                                   className="bg-naranja-1 text-white hover:text-naranja-1 hover:bg-white w-full rounded-2xl border-2 border-naranja-1"
                                   onClick={() => {
