@@ -215,6 +215,7 @@ async function add(req: Request, res: Response) {
     res.status(201).json({ message: 'created new usuario', data: newUser });
   } catch (error: any) {
     res.status(500).json({ message: error.message });
+    console.error(error); // agrego para ver el error en el
   }
 }
 async function update(req: Request, res: Response) {
@@ -290,29 +291,37 @@ async function getCommentsByUserId(req: Request, res: Response) {
 }
 
 async function loginUsuario(req: Request, res: Response) {
-  const { mail, contrasena } = req.body;
-  if (!mail || !contrasena) {
+  try {
+    const mail = req.query.mail as string;
+    const contrasena = req.query.contrasena as string;
+    if (!mail || !contrasena) {
+      return res
+        .status(400)
+        .json({ message: 'Faltan datos de inicio de sesión' });
+    }
+
+    const usuario = await em.findOne(Usuario, { mail });
+    if (!usuario) {
+      return res.status(401).json({ message: 'Usuario no encontrado' });
+    }
+
+    const passwordMatch = await bcrypt.compare(contrasena, usuario.contrasena);
+    if (!passwordMatch) {
+      return res.status(401).json({ message: 'Contraseña incorrecta' });
+    }
+
+    // elimina contraseña antes de enviar el usuario, probarlo
+    const { contrasena: _, ...usuarioSinContrasena } = usuario;
+
     return res
-      .status(400)
-      .json({ message: 'Faltan datos de inicio de sesión' });
+      .status(200)
+      .json({ message: 'Login exitoso', data: usuarioSinContrasena });
+  } catch (error: any) {
+    console.error('Error en loginUsuario:', error);
+    return res
+      .status(500)
+      .json({ message: 'Error interno en login', error: error.message });
   }
-
-  const usuario = await em.findOne(Usuario, { mail });
-  if (!usuario) {
-    return res.status(401).json({ message: 'Usuario no encontrado' });
-  }
-
-  const passwordMatch = await bcrypt.compare(contrasena, usuario.contrasena);
-  if (!passwordMatch) {
-    return res.status(401).json({ message: 'Contraseña incorrecta' });
-  }
-
-  // elimina contraseña antes de enviar el usuario, probarlo
-  const { contrasena: _, ...usuarioSinContrasena } = usuario;
-
-  return res
-    .status(200)
-    .json({ message: 'Login exitoso', data: usuarioSinContrasena });
 }
 
 export {
