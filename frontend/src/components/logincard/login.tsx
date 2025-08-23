@@ -99,7 +99,7 @@ function Logincard() {
                   type="text"
                   placeholder="Email"
                   onChange={(e) => setForm({ ...form, mail: e.target.value })}
-                  className="w-full pt-3 pb-3 pr-5 pl-12 text-base border-none rounded-4xl bg-tinte-5 shadow-[inset_0_0_3px_rgba(0,0,0,0.1)] outline-none mb-4 text-black font-inter "
+                  className="w-full pt-3 pb-3 pr-5 pl-12 text-base border-none rounded-4xl bg-tinte-5 shadow-inner outline-none mb-4 text-black font-inter "
                 />
                 <i className="fa-solid fa-envelope absolute top-4 left-6 text-gray-500 text-1xl pointer-events-none"></i>
               </div>
@@ -110,7 +110,7 @@ function Logincard() {
                   onChange={(e) =>
                     setForm({ ...form, contrasena: e.target.value })
                   }
-                  className="w-full pt-3 pb-3 pr-5 pl-12 text-base border-none rounded-4xl bg-tinte-5 shadow-[inset_0_0_3px_rgba(0,0,0,0.1)] outline-none mb-4 text-black font-inter"
+                  className="w-full pt-3 pb-3 pr-5 pl-12 text-base border-none rounded-4xl bg-tinte-5 shadow-inner outline-none mb-4 text-black font-inter"
                 />
                 <i
                   className={imag + ' right-6'}
