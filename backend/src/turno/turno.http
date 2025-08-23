@@ -1,6 +1,6 @@
 ### Obtener todos los turnos
 
-GET http://localhost:3000/api/turno/turnosPorDia/16/2025-08-12
+GET http://localhost:3000/api/turno//byUser/1
 
 
 ###Obtener turno por id

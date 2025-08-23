@@ -2,6 +2,7 @@ import Navbar from '../Navbar/Navbar.tsx';
 import Carousel from '../Carousel/Carousel.js';
 import Comments from '../comments/Comments';
 import Footer from '../Footer/Footer';
+
 import { useNavigate } from 'react-router-dom';
 function Homepage() {
   const CommentOne = 1;
@@ -18,6 +19,8 @@ function Homepage() {
         <div className="absolute inset-0 w-full z-20">
           <Navbar />
         </div>
+        {/* Botón de pago Mercado Pago integrado */}
+
         <div className="w-full">
           <Carousel
             fotos={[

@@ -135,7 +135,21 @@ async function getTurnosByUserId(req: Request, res: Response) {
       calificacionFilter = { estado: 'pendiente' };
       break;
     case 'completado':
-      calificacionFilter = { estado: 'completado' };
+      calificacionFilter = {
+        estado: 'completado',
+      };
+      break;
+    case 'porPagar':
+      calificacionFilter = {
+        estado: 'completado',
+        fechaPago: { $eq: null },
+      };
+      break;
+    case 'pagado':
+      calificacionFilter = {
+        estado: 'completado',
+        fechaPago: { $ne: null },
+      };
       break;
   }
   let selectedValueOrderShow;
@@ -167,10 +181,10 @@ async function getTurnosByUserId(req: Request, res: Response) {
 
     // Buscar los turnos del usuario, populando toda la información necesaria en una sola consulta
     const turnos = await em.find(Turno, where, {
-      populate: ['servicio.tarea', 'servicio.usuario', 'usuario'],
+      populate: ['servicio.tarea.tipoServicio', 'servicio.usuario', 'usuario'],
       limit: cantItemsPerPage,
       offset: (currentPage - 1) * cantItemsPerPage,
-      orderBy: selectedValueOrderShow,
+      orderBy: [selectedValueOrderShow],
     });
 
     res.status(200).json({
