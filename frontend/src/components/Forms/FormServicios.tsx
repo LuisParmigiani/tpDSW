@@ -4,8 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useEffect } from 'react';
 import { z } from 'zod';
-import { Button } from './../Botones/FormButton.js';
-import { Form, FormControl, FormField, FormItem, FormMessage } from './Form.js';
+import { Button } from './../Botones/FormButton';
+import { Form, FormControl, FormField, FormItem, FormMessage } from './Form';
 import {
   Select,
   SelectItem,
@@ -95,10 +95,11 @@ export function ServiciosForm({
       >
         <div className="mb-4">
           <Button
+            key={1}
             type="reset"
             className={
-              'border-1 border-gray-800 min-w-10 bg-gray-500 text-white text-center py-1 px-4 rounder-md  ' +
-              'hover:bg-gray-300 hover:text-gray-800 w-25 transition duration-300 cursor-pointer'
+              'border-1 border-gray-800 min-w-10 bg-gray-500 text-white text-center py-1 px-4 rounded-md  ' +
+              'hover:bg-gray-300 hover:text-gray-800 w-25 transition duration-300 cursor-pointer hidden lg:block'
             }
             onClick={() => form.reset()}
           >
@@ -205,6 +206,19 @@ export function ServiciosForm({
           >
             Buscar
           </Button>
+          <div className="">
+            <Button
+              key={2}
+              type="reset"
+              className={
+                'border-1 border-gray-800 min-w-10 bg-gray-500 text-white text-center py-1 px-4 rounder-md  ' +
+                'hover:bg-gray-300 hover:text-gray-800 w-25 transition duration-300 cursor-pointer lg:hidden'
+              }
+              onClick={() => form.reset()}
+            >
+              Reestablecer
+            </Button>
+          </div>
         </div>
       </form>
     </Form>

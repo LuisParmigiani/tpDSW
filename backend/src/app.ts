@@ -14,10 +14,20 @@ import { CronManager } from './shared/cron/cronManager.js';
 
 const app = express();
 
+const local = false; // <--- producción: usa variables de entorno y no sincroniza esquema
+
 // cors lo que hace es dar el permiso al un puerto para hacer las peticiones al back
+// CORS dinámico (permite lista separada por comas en FRONTEND_ORIGIN)
+const rawOrigins = local
+  ? 'http://localhost:5173'
+  : process.env.FRONTEND_ORIGIN || 'https://reformix.site';
+const allowedOrigins = rawOrigins.split(',').map((o) => o.trim());
 app.use(
   cors({
-    origin: 'http://localhost:5173', // El puerto de tu frontend al que le deja hacer peticiones
+    origin: (origin, cb) => {
+      if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+      return cb(new Error('Origen no permitido: ' + origin));
+    },
     credentials: true,
   })
 );
@@ -41,13 +51,39 @@ app.use('/api/zona', zonaRouter);
 //   return res.status(404).send({ message: 'Resource not found' });
 // }); comente esto pq me tiraba error
 
-await syncSchema(); //nunca en producción
+if (local) {
+  console.log('LOCAL_MODE=true -> syncSchema habilitado');
+  await syncSchema();
+} else if (process.env.RUN_SYNC_SCHEMA === '1') {
+  console.log('RUN_SYNC_SCHEMA=1 (override) -> ejecutando syncSchema una vez');
+  await syncSchema();
+} else {
+  console.log('Producción -> syncSchema omitido');
+}
 
-// Inicializar cron jobs para testing
-await CronManager.initializeAll();
+// Cron jobs sólo si no están deshabilitados
+if (!local && process.env.DISABLE_CRONS === '1') {
+  console.log('Producción con DISABLE_CRONS=1 -> cron deshabilitado');
+} else {
+  await CronManager.initializeAll();
+  console.log('Cron jobs inicializados');
+}
 
-app.listen(3000, () => {
-  console.log('Server runnning on http://localhost:3000/');
+// Endpoint básico para verificar la salud del servidor y la conexión a la base de datos
+app.get('/health', async (req: Request, res: Response) => {
+  try {
+    // Verifica la conexión a la base de datos ejecutando una consulta simple
+    await orm.em.fork().getConnection().execute('SELECT 1');
+    return res.json({ status: 'ok', db: 'up' }); // Responde que todo está funcionando
+  } catch (e) {
+    return res.status(500).json({ status: 'error', db: 'down' }); // Responde que hay un problema
+  }
+});
+
+// Define el puerto en el que se ejecutará el servidor
+const port = local ? 3000 : Number(process.env.PORT) || 8080; // Fly asigna PORT
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
 
 /* app.listen(3000, () => {

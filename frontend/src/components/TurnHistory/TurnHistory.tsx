@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { turnosApi } from '../../services/turnosApi.js';
-import Natbar from '../Navbar/Navbar.js';
+import { turnosApi } from '../../services/turnosApi';
+import Navbar from '../Navbar/Navbar.tsx';
 import Footer from '../Footer/Footer';
 import PaginationControls from '../Pagination/PaginationControler';
 import CustomSelect from '../Select/CustomSelect';
 import CalificationModal from '../Modal/CalificationModal';
-import Stars from '../stars/Stars.js';
+import Stars from '../stars/Stars';
 import { useNavigate } from 'react-router-dom';
 
 type Turno = {
@@ -176,7 +176,7 @@ function TurnHistory() {
 
   return (
     <>
-      <Natbar />
+      <Navbar />
 
       {isOpen && data && (
         <CalificationModal

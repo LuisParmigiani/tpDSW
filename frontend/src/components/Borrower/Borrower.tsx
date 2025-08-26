@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import Comments from '../Comments/Comments';
-import { usuariosApi } from '../../services/usuariosApi.js';
-import Navbar from '../Navbar/Navbar.js';
+import Comments from '../comments/Comments';
+import { usuariosApi } from '../../services/usuariosApi';
+import Navbar from '../Navbar/Navbar.tsx';
 import Stars from '../stars/Stars';
 import Footer from '../Footer/Footer';
-import PaginationControls from '../Pagination/PaginationControler.js';
-import NewTurnModal from '../Modal/NewTurnModal.js';
+import PaginationControls from '../Pagination/PaginationControler';
+import NewTurnModal from '../Modal/NewTurnModal';
 
 type Turno = {
   id: number;

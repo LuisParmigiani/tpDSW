@@ -1,10 +1,10 @@
-import NavBar from '../../components/Navbar/Navbar.js';
-import Registrationn from '../../components/registrationcard/index.js';
+import Navbar from '../../components/Navbar/Navbar.tsx';
+import Registrationn from '../../components/registrationcard/registration';
 
 function Registration() {
   return (
     <>
-      <NavBar />
+      <Navbar />
       <Registrationn></Registrationn>
     </>
   );

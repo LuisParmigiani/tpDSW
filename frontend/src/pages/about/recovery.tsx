@@ -1,10 +1,10 @@
-import NavBar from '../../components/Navbar/Navbar.js';
-import Recovery from '../../components/recoverycard/index.js';
+import Navbar from '../../components/Navbar/Navbar.tsx';
+import Recovery from '../../components/recoverycard/index';
 
 function App_recovery() {
   return (
     <>
-      <NavBar />
+      <Navbar />
       <Recovery />
     </>
   );

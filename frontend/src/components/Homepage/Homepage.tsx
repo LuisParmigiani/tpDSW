@@ -1,20 +1,40 @@
-import Navbar from '../Navbar/Navbar.js';
+import Navbar from '../Navbar/Navbar.tsx';
 import Carousel from '../Carousel/Carousel.js';
-import Comments from './../Comments/Comments.js';
+import Comments from '../comments/Comments';
 import Footer from '../Footer/Footer';
-import { useNavigate } from 'react-router-dom';
+import { HomePageCard } from './HomePageCards.js';
 function Homepage() {
   const CommentOne = 1;
   const CommentTwo = 2;
-  const navigate = useNavigate();
-  const handleClick = (servicio: string) => {
-    navigate(
-      `/servicios?tipoServicio=${servicio}&zona=Todas&orderBy=calificacion`
-    );
-  };
+  const textos: string[] = [
+    'Plomero',
+    'Electricista',
+    'Carpintero',
+    'Pintor',
+    'Albañil',
+    'Cerrajero',
+    'Jardinero',
+    'Limpiador',
+    'Control de Plagas',
+  ];
+  const redirecciones: string[] = [
+    'Plomeria',
+    'Electricidad',
+    'Carpinteria',
+    'Pintura',
+    'Construccion',
+    'Cerrajeria',
+    'Jardineria',
+    'Limpieza Residencial',
+    'Control de Plagas',
+  ];
+  const cards = textos.map((texto, index) => (
+    <HomePageCard key={index} texto={texto} redirije={redirecciones[index]} />
+  ));
+
   return (
     <>
-      <div onClick={() => handleClick} className="flex flex-col w-full">
+      <div className="flex flex-col w-full">
         <div className="absolute inset-0 w-full z-20">
           <Navbar />
         </div>
@@ -45,212 +65,7 @@ function Homepage() {
 
       <div className="bg-[#4d4d4d] flex flex-col pb-5">
         <div className="mt-9 flex flex-row justify-around w-full gap-5 flex-wrap ">
-          <div
-            className={
-              'flex flex-col cursor-pointer items-center flex-1 max-w-80 min-w-72 min-h-80 h-auto rounded-3xl bg-[#fff5f2] shadow-[0_0_40px_0_rgba(0,0,0,0.58)] p-5 box-border justify-between ' +
-              'hover:scale-102 transition duration-300 ease-in-out hover:bg-orange-200'
-            }
-            onClick={() => handleClick('Plomería')}
-          >
-            <svg
-              width="105"
-              height="104"
-              viewBox="0 0 105 104"
-              className="fill-white mt-0 shrink-0"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle cx="52.5" cy="52" r="52" fill="white" />
-              <g clipPath="url(#clip0_4_1552)">
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M32.5625 35.75C32.5625 35.2329 32.7662 34.7369 33.1288 34.3712C33.4915 34.0055 33.9833 33.8 34.4961 33.8H49.9648C50.4777 33.8 50.9695 34.0055 51.3321 34.3712C51.6947 34.7369 51.8984 35.2329 51.8984 35.75C51.8984 36.2672 51.6947 36.7632 51.3321 37.1289C50.9695 37.4946 50.4777 37.7 49.9648 37.7H49.3203V43.55C49.3203 43.8948 49.4561 44.2255 49.6979 44.4693C49.9396 44.7131 50.2675 44.85 50.6094 44.85H56.4102C60.3418 44.85 64.1124 46.4251 66.8925 49.2288C69.6725 52.0325 71.2344 55.8351 71.2344 59.8001V66.3H71.8789C72.3917 66.3 72.8835 66.5055 73.2462 66.8712C73.6088 67.2369 73.8125 67.7329 73.8125 68.25C73.8125 68.7672 73.6088 69.2632 73.2462 69.6289C72.8835 69.9946 72.3917 70.2001 71.8789 70.2001H56.4102C55.8973 70.2001 55.4055 69.9946 55.0429 69.6289C54.6803 69.2632 54.4766 68.7672 54.4766 68.25C54.4766 67.7329 54.6803 67.2369 55.0429 66.8712C55.4055 66.5055 55.8973 66.3 56.4102 66.3H57.0547V60.4501C57.0547 60.1053 56.9189 59.7746 56.6771 59.5308C56.4354 59.287 56.1075 59.1501 55.7656 59.1501H49.9648C46.0332 59.1501 42.2626 57.575 39.4825 54.7713C36.7025 51.9676 35.1406 48.165 35.1406 44.2V37.7H34.4961C33.9833 37.7 33.4915 37.4946 33.1288 37.1289C32.7662 36.7632 32.5625 36.2672 32.5625 35.75ZM60.9219 66.3H67.3672V59.8001C67.3672 56.8694 66.2128 54.0588 64.1579 51.9865C62.1031 49.9142 59.3161 48.75 56.4102 48.75H55.1211V55.25H55.7656C57.1331 55.25 58.4447 55.7979 59.4116 56.7731C60.3786 57.7483 60.9219 59.0709 60.9219 60.4501V66.3ZM39.0078 37.7H45.4531V43.55C45.4531 44.9292 45.9964 46.2518 46.9634 47.227C47.9303 48.2022 49.2419 48.75 50.6094 48.75H51.2539V55.25H49.9648C47.0589 55.25 44.2719 54.0859 42.2171 52.0136C40.1622 49.9413 39.0078 47.1307 39.0078 44.2V37.7Z"
-                  fill="#F66731"
-                />
-              </g>
-              <defs>
-                <clipPath id="clip0_4_1552">
-                  <rect
-                    x="25"
-                    y="24"
-                    width="55"
-                    height="56"
-                    rx="25"
-                    fill="white"
-                  />
-                </clipPath>
-              </defs>
-            </svg>
-            <h3 className="w-full text-2xl font-bold text-gray-800 text-center my-4 shrink-0">
-              Plomero
-            </h3>
-            <p className="w-9/10 text-base text-gray-600 text-center grow flex items-center justify-center mb-2 leading-relaxed">
-              Contratá servicios de plomeros matriculados cerca de tu zona.
-            </p>
-          </div>
-          <div
-            className={
-              'flex flex-col cursor-pointer items-center flex-1 max-w-80 min-w-72 min-h-80 h-auto rounded-3xl bg-[#fff5f2] shadow-[0_0_40px_0_rgba(0,0,0,0.58)] p-5 box-border justify-between ' +
-              'hover:scale-102 transition duration-300 ease-in-out hover:bg-orange-200'
-            }
-            onClick={() => handleClick('Electricidad')}
-          >
-            <svg
-              width="105"
-              height="104"
-              viewBox="0 0 105 104"
-              className="fill-white mt-0 shrink-0"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle cx="52.5" cy="52" r="52" fill="white" />
-              <g clipPath="url(#clip0_4_1560)">
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M45.5 25.25C44.837 25.25 44.2011 25.5134 43.7322 25.9822C43.2634 26.4511 43 27.087 43 27.75V32.75C43 33.413 43.2634 34.0489 43.7322 34.5178C44.2011 34.9866 44.837 35.25 45.5 35.25C46.163 35.25 46.7989 34.9866 47.2678 34.5178C47.7366 34.0489 48 33.413 48 32.75V27.75C48 27.087 47.7366 26.4511 47.2678 25.9822C46.7989 25.5134 46.163 25.25 45.5 25.25ZM43 42.75H63V47.75C63 50.4022 61.9464 52.9457 60.0711 54.8211C58.1957 56.6964 55.6522 57.75 53 57.75C50.3478 57.75 47.8043 56.6964 45.9289 54.8211C44.0536 52.9457 43 50.4022 43 47.75V42.75ZM55.5 62.5425C58.9952 61.9507 62.168 60.1405 64.456 57.4329C66.744 54.7252 67.9995 51.2949 68 47.75V37.75H38V47.75C38.0005 51.2949 39.256 54.7252 41.544 57.4329C43.832 60.1405 47.0048 61.9507 50.5 62.5425V75.25C50.5 75.913 50.7634 76.5489 51.2322 77.0178C51.7011 77.4866 52.337 77.75 53 77.75C53.663 77.75 54.2989 77.4866 54.7678 77.0178C55.2366 76.5489 55.5 75.913 55.5 75.25V62.5425ZM58 27.75C58 27.087 58.2634 26.4511 58.7322 25.9822C59.2011 25.5134 59.837 25.25 60.5 25.25C61.163 25.25 61.7989 25.5134 62.2678 25.9822C62.7366 26.4511 63 27.087 63 27.75V32.75C63 33.413 62.7366 34.0489 62.2678 34.5178C61.7989 34.9866 61.163 35.25 60.5 35.25C59.837 35.25 59.2011 34.9866 58.7322 34.5178C58.2634 34.0489 58 33.413 58 32.75V27.75Z"
-                  fill="#F66731"
-                />
-              </g>
-              <defs>
-                <clipPath id="clip0_4_1560">
-                  <rect
-                    x="25"
-                    y="24"
-                    width="55"
-                    height="56"
-                    rx="25"
-                    fill="white"
-                  />
-                </clipPath>
-              </defs>
-            </svg>
-            <h3 className="w-full text-2xl font-bold text-gray-800 text-center my-4 shrink-0">
-              Electricista
-            </h3>
-            <p className="w-9/10 text-base text-gray-600 text-center grow flex items-center justify-center mb-2 leading-relaxed">
-              Arreglá tus problemas relacionados a la electricidad con nuestra
-              gran selección de calificados electricistas.
-            </p>
-          </div>
-          <div
-            className={
-              'flex flex-col cursor-pointer items-center flex-1 max-w-80 min-w-72 min-h-80 h-auto rounded-3xl bg-[#fff5f2] shadow-[0_0_40px_0_rgba(0,0,0,0.58)] p-5 box-border justify-between ' +
-              'hover:scale-102 transition duration-300 ease-in-out hover:bg-orange-200'
-            }
-            onClick={() => handleClick('Carpintería')}
-          >
-            <svg
-              width="105"
-              height="104"
-              viewBox="0 0 105 104"
-              className="fill-white mt-0 shrink-0"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle cx="52.5" cy="52" r="52" fill="white" />
-              <path
-                d="M64.7286 52.0206C64.7286 54.5625 62.6675 56.6358 60.1379 56.6358H44.8376C43.6174 56.6309 42.4488 56.1424 41.5882 55.2772C40.7277 54.412 40.2453 53.2409 40.2469 52.0206V47.4024H64.7286V52.0206ZM55.5472 70.3895C55.5472 71.7829 54.1752 72.9222 52.4878 72.9222C50.8034 72.9222 49.4253 71.7829 49.4253 70.3895V59.7136H55.5503L55.5472 70.3895ZM40.25 44.3276V30.0778H44.1149V44.3276H40.25ZM47.1743 44.3276V30.0778H50.9841V44.3276H47.1743ZM54.0466 44.3276V30.0778H57.8288V44.3276H54.0466ZM60.8882 44.3276V30.0778H64.7286V44.3276H60.8882ZM37.212 27L37.1875 52.0206C37.1851 54.0543 37.9889 56.0059 39.4229 57.448C40.8569 58.89 42.804 59.7047 44.8376 59.7136H46.3689V70.3895C46.3689 73.4826 49.1129 76 52.4878 76C55.8626 76 58.6066 73.4826 58.6066 70.3895V59.7136H60.1379C62.1715 59.7047 64.1187 58.89 65.5526 57.448C66.9866 56.0059 67.7905 54.0543 67.788 52.0206L67.8125 27H37.212Z"
-                fill="#F66731"
-              />
-            </svg>
-
-            <h3 className="w-full text-2xl font-bold text-gray-800 text-center my-4 shrink-0">
-              Carpintero.
-            </h3>
-            <p className="w-9/10 text-base text-gray-600 text-center grow flex items-center justify-center mb-2 leading-relaxed">
-              Todos los arreglos que tengan que ver con la madera estarán en
-              buenas manos con nuestros carpinteros.
-            </p>
-          </div>
-        </div>
-        <div className="mt-9 flex flex-row justify-around w-full gap-5 flex-wrap">
-          <div
-            className={
-              'flex flex-col cursor-pointer items-center flex-1 max-w-80 min-w-72 min-h-80 h-auto rounded-3xl bg-[#fff5f2] shadow-[0_0_40px_0_rgba(0,0,0,0.58)] p-5 box-border justify-between ' +
-              'hover:scale-102 transition duration-300 ease-in-out hover:bg-orange-200'
-            }
-            onClick={() => handleClick('Pintura')}
-          >
-            <svg
-              width="105"
-              height="104"
-              viewBox="0 0 105 104"
-              className="fill-white mt-0 shrink-0"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle cx="52.5" cy="52" r="52" fill="white" />
-              <path
-                d="M64.7286 52.0206C64.7286 54.5625 62.6675 56.6358 60.1379 56.6358H44.8376C43.6174 56.6309 42.4488 56.1424 41.5882 55.2772C40.7277 54.412 40.2453 53.2409 40.2469 52.0206V47.4024H64.7286V52.0206ZM55.5472 70.3895C55.5472 71.7829 54.1752 72.9222 52.4878 72.9222C50.8034 72.9222 49.4253 71.7829 49.4253 70.3895V59.7136H55.5503L55.5472 70.3895ZM40.25 44.3276V30.0778H44.1149V44.3276H40.25ZM47.1743 44.3276V30.0778H50.9841V44.3276H47.1743ZM54.0466 44.3276V30.0778H57.8288V44.3276H54.0466ZM60.8882 44.3276V30.0778H64.7286V44.3276H60.8882ZM37.212 27L37.1875 52.0206C37.1851 54.0543 37.9889 56.0059 39.4229 57.448C40.8569 58.89 42.804 59.7047 44.8376 59.7136H46.3689V70.3895C46.3689 73.4826 49.1129 76 52.4878 76C55.8626 76 58.6066 73.4826 58.6066 70.3895V59.7136H60.1379C62.1715 59.7047 64.1187 58.89 65.5526 57.448C66.9866 56.0059 67.7905 54.0543 67.788 52.0206L67.8125 27H37.212Z"
-                fill="#F66731"
-              />
-            </svg>
-
-            <h3 className="w-full text-2xl font-bold text-gray-800 text-center my-4 shrink-0">
-              Pintor.
-            </h3>
-            <p className="w-9/10 text-base text-gray-600 text-center grow flex items-center justify-center mb-2 leading-relaxed">
-              Dale vida a tu hogar con nuestros pintores profesionales.
-            </p>
-          </div>
-          <div
-            className={
-              'flex flex-col cursor-pointer items-center flex-1 max-w-80 min-w-72 min-h-80 h-auto rounded-3xl bg-[#fff5f2] shadow-[0_0_40px_0_rgba(0,0,0,0.58)] p-5 box-border justify-between ' +
-              'hover:scale-102 transition duration-300 ease-in-out hover:bg-orange-200'
-            }
-            onClick={() => handleClick('Albañilería')}
-          >
-            <svg
-              width="105"
-              height="104"
-              viewBox="0 0 105 104"
-              className="fill-white mt-0 shrink-0"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle cx="52.5" cy="52" r="52" fill="white" />
-              <path
-                d="M54.2 34C57.08 34 59.432 36.2373 59.5904 39.0561C63.95 40.4428 67.7531 43.1687 70.4509 46.8406C73.1487 50.5125 74.6016 54.9403 74.6 59.4852V62.8519H75.2C75.6774 62.8519 76.1352 63.0402 76.4728 63.3753C76.8104 63.7105 77 64.165 77 64.639V68.213C77 68.6869 76.8104 69.1415 76.4728 69.4766C76.1352 69.8117 75.6774 70 75.2 70H30.8C30.3226 70 29.8648 69.8117 29.5272 69.4766C29.1896 69.1415 29 68.6869 29 68.213V64.639C29 64.165 29.1896 63.7105 29.5272 63.3753C29.8648 63.0402 30.3226 62.8519 30.8 62.8519H31.4V59.4828C31.3989 54.9383 32.8521 50.511 35.5498 46.8396C38.2475 43.1682 42.0504 40.4426 46.4096 39.0561C46.488 37.6894 47.0901 36.4043 48.0924 35.4642C49.0946 34.5241 50.4212 34.0002 51.8 34H54.2ZM54.2 37.574H51.8C51.3226 37.574 50.8648 37.7623 50.5272 38.0974C50.1896 38.4326 50 38.8871 50 39.361V45.3178C50 45.7917 49.8104 46.2462 49.4728 46.5814C49.1352 46.9165 48.6774 47.1048 48.2 47.1048C47.7226 47.1048 47.2648 46.9165 46.9272 46.5814C46.5896 46.2462 46.4 45.7917 46.4 45.3178V42.8541C43.0377 44.1696 40.1521 46.4596 38.1189 49.4258C36.0856 52.3921 34.9989 55.8973 35 59.4852V62.8519H44V58.6822C44 58.2083 44.1896 57.7538 44.5272 57.4186C44.8648 57.0835 45.3226 56.8952 45.8 56.8952C46.2774 56.8952 46.7352 57.0835 47.0728 57.4186C47.4104 57.7538 47.6 58.2083 47.6 58.6822V62.8519H51.2V58.6822C51.2 58.2083 51.3896 57.7538 51.7272 57.4186C52.0648 57.0835 52.5226 56.8952 53 56.8952C53.4774 56.8952 53.9352 57.0835 54.2728 57.4186C54.6104 57.7538 54.8 58.2083 54.8 58.6822V62.8519H58.4V58.6822C58.4 58.2083 58.5896 57.7538 58.9272 57.4186C59.2648 57.0835 59.7226 56.8952 60.2 56.8952C60.6774 56.8952 61.1352 57.0835 61.4728 57.4186C61.8104 57.7538 62 58.2083 62 58.6822V62.8519H71V59.4828C71.0011 55.8949 69.9144 52.3897 67.8811 49.4234C65.8479 46.4572 62.9623 44.1673 59.6 42.8517V45.3178C59.6 45.7917 59.4104 46.2462 59.0728 46.5814C58.7352 46.9165 58.2774 47.1048 57.8 47.1048C57.3226 47.1048 56.8648 46.9165 56.5272 46.5814C56.1896 46.2462 56 45.7917 56 45.3178V39.361C56 38.8871 55.8104 38.4326 55.4728 38.0974C55.1352 37.7623 54.6774 37.574 54.2 37.574Z"
-                fill="#F66731"
-              />
-            </svg>
-            <h3 className="w-full text-2xl font-bold text-gray-800 text-center my-4 shrink-0">
-              Constructor.
-            </h3>
-            <p className="w-9/10 text-base text-gray-600 text-center grow flex items-center justify-center mb-2 leading-relaxed">
-              Los problemas de construcción no serán una inconveniencia para
-              nuestros albañiles.
-            </p>
-          </div>
-          <div
-            className={
-              'flex flex-col cursor-pointer items-center flex-1 max-w-80 min-w-72 min-h-80 h-auto rounded-3xl bg-[#fff5f2] shadow-[0_0_40px_0_rgba(0,0,0,0.58)] p-5 box-border justify-between ' +
-              'hover:scale-102 transition duration-300 ease-in-out hover:bg-orange-200'
-            }
-            onClick={() => handleClick('Cerrajería')}
-          >
-            <svg
-              width="105"
-              height="104"
-              viewBox="0 0 105 104"
-              className="fill-white mt-0 shrink-0"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle cx="52.5" cy="52" r="52" fill="white" />
-              <path
-                d="M60.1875 39.0625C61.7125 39.0625 63.175 39.6683 64.2534 40.7466C65.3317 41.825 65.9375 43.2875 65.9375 44.8125M71.6875 44.8125C71.6877 46.4898 71.3211 48.1468 70.6132 49.6675C69.9054 51.1881 68.8734 52.5354 67.5898 53.6151C66.3062 54.6947 64.8019 55.4805 63.1825 55.9173C61.5631 56.3542 59.8677 56.4315 58.2152 56.1438C57.1362 55.9579 55.9938 56.1936 55.2195 56.968L50.125 62.0625H45.8125V66.375H41.5V70.6875H34.3125V65.2863C34.3125 64.1421 34.7667 63.0438 35.5756 62.2369L48.032 49.7805C48.8063 49.0061 49.0421 47.8638 48.8562 46.7847C48.5844 45.2153 48.6416 43.6065 49.0241 42.0604C49.4067 40.5142 50.1062 39.0643 51.0785 37.8027C52.0507 36.5411 53.2745 35.4952 54.6721 34.7313C56.0698 33.9674 57.6109 33.5021 59.1978 33.3651C60.7847 33.228 62.3827 33.422 63.8907 33.9349C65.3986 34.4478 66.7836 35.2684 67.9578 36.3446C69.132 37.4208 70.0698 38.7292 70.7119 40.1869C71.3539 41.6445 71.6861 43.2197 71.6875 44.8125Z"
-                stroke="#F66731"
-                strokeWidth="4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-
-            <h3 className="w-full text-2xl font-bold text-gray-800 text-center my-4 shrink-0">
-              Cerrajero.
-            </h3>
-            <p className="w-9/10 text-base text-gray-600 text-center grow flex items-center justify-center mb-2 leading-relaxed">
-              En cuanto la necesidad de trabajar algo con tus cerraduras, no
-              dudes en contactar a nuestros cerrajeros.
-            </p>
-          </div>
+          {cards}
         </div>
       </div>
       <div className="bg-gradient-to-b from-gray-100 to-teal-900">

@@ -1,6 +1,6 @@
 import styles from './about.module.css';
-import Navbar from '../../components/Navbar/Navbar.js';
-import AboutContainer from '../../components/AboutContainer/index.js';
+import Navbar from '../../components/Navbar/Navbar.tsx';
+import AboutContainer from '../../components/AboutContainer/index';
 const text1 =
   'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Maiores quisquam dolorum blanditiis excepturi architecto eligendi a assumenda, repellat, ad dolorem omnis quasi sunt impedit ipsum adipisci! Nostrum id alias excepturi.';
 const text2 =

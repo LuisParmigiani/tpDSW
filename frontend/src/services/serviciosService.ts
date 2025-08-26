@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Base API configuration
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = 'https://TU_APP.fly.dev/api'; // Cambia TU_APP por el nombre real de tu app en Fly.io
 
 // Create axios instance with interceptors
 const apiClient = axios.create({

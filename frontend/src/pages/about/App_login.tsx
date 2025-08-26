@@ -1,10 +1,10 @@
-import NavBar from '../../components/Navbar/Navbar.js';
-import Logincard from '../../components/logincard/index.js';
+import Navbar from '../../components/Navbar/Navbar.tsx';
+import Logincard from '../../components/logincard/login.tsx';
 
 function App_login() {
   return (
     <>
-      <NavBar />
+      <Navbar />
       <Logincard />
     </>
   );
