@@ -38,9 +38,9 @@ mercadoPago.post('/', async (req: Request, res: Response) => {
         external_reference: turno,
         additional_recipients: [
           {
-            email: mail,
+            email: mail, // cuenta del vendedor
             type: 'secondary',
-            percentage: 50,
+            percentage: 95, // el vendedor recibe 95%
           },
         ],
       } as any,
