@@ -24,7 +24,7 @@ function Carousel({ fotos, titulo }: Props) {
         src={fotos[index]}
         alt="Foto Trabajador"
       />
-      <h1 className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-2xl text-center z-10">
+      <h1 className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-2xl text-center z-10 font-inter">
         {titulo}
       </h1>
     </div>
