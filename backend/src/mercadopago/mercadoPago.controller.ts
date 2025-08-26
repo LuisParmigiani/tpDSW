@@ -22,8 +22,7 @@ mercadoPago.post('/', async (req: Request, res: Response) => {
     }
 
     console.log('🔹 Creando preferencia con data:', req.body);
-    const mail = 'test_user_792057294485026311@testuser.com';
-    // Creamos la preferencia con split
+    // TODO: Reemplaza 'ID_DEL_VENDEDOR_SECUNDARIO' por el user_id real del vendedor secundario (mail de prueba)
     const result = await preference.create({
       body: {
         items: [
@@ -44,13 +43,11 @@ mercadoPago.post('/', async (req: Request, res: Response) => {
         notification_url:
           'https://backend-patient-morning-1303.fly.dev/webhooks/mercadopago/cambio',
         external_reference: turno || undefined,
-        additional_recipients: [
-          {
-            email: mail, // cuenta del vendedor
-            type: 'secondary',
-            percentage: 95, // vendedor recibe 95%
-          },
-        ],
+        marketplace: 'Reformix',
+        marketplace_fee: 5, // comisión que retiene tu cuenta principal (ARS)
+        // El collector principal es el vendedor secundario
+        collector_id: '123',
+        payer: 'test_user_792057294485026311@testuser.com',
       } as any,
     });
 

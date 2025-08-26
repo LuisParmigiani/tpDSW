@@ -25,6 +25,7 @@ type Turno = {
   estado: string;
   usuario: Usuario;
   pagos: Pago[];
+  hayPagoAprobado?: boolean; // Nuevo campo para indicar si tiene pagos aprobados
 };
 
 type Servicio = {
@@ -189,7 +190,7 @@ function TurnHistory({ estado }: Props) {
     }
   };
   // devolucion del pago:
-
+  console.log(selectedValueShow);
   return (
     <>
       <Navbar />
@@ -285,15 +286,17 @@ function TurnHistory({ estado }: Props) {
                     <p className="text-sm text-gray-700 font-medium">
                       Monto: ${turn.montoFinal}
                     </p>
+
                     {(() => {
-                      // Mostrar botón "Calificar" si el turno es menor a 1 mes y no fue calificado
+                      // Mostrar botón "Calificar" si el turno es menor a 1 mes y no fue calificado y fue pagado
                       const unMesPasado =
                         Date.now() - new Date(turn.fechaHora).getTime() <
                         30 * 24 * 60 * 60 * 1000; // dias, horas, minutos, segundos, milisegundos
                       if (
                         unMesPasado &&
                         turn.calificacion === null &&
-                        turn.estado === 'completado'
+                        turn.estado === 'completado' &&
+                        turn.hayPagoAprobado
                       ) {
                         return (
                           <>
@@ -326,7 +329,10 @@ function TurnHistory({ estado }: Props) {
                           </>
                         );
                       } else {
-                        if (turn.calificacion !== null) {
+                        if (
+                          turn.calificacion !== null &&
+                          turn.hayPagoAprobado
+                        ) {
                           return (
                             <>
                               <div className="justify-center flex">
@@ -349,7 +355,7 @@ function TurnHistory({ estado }: Props) {
                           if (turn.estado === 'completado') {
                             return (
                               <>
-                                {turn.pagos.length > 0 ? (
+                                {turn.hayPagoAprobado ? (
                                   <p className="mt-2">
                                     Expiró el tiempo de calificación
                                   </p>
