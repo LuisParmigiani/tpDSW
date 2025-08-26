@@ -312,7 +312,7 @@ function NewTurnModal({ prestatario, setopen }: Props) {
               setConfirmationModalOpen(false);
               setopen(false);
             }}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200 "
             aria-label="Cerrar modal"
           >
             <svg

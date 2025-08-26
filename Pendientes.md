@@ -1,5 +1,3 @@
-## Cosas que quedan por hacer 
-* hacer la tabla de servicio con tarifa base
-* hacer la tabla de turno
-* hacer las relaciones de entre entidades
-* Controler de servicio
+## Cosas que quedan por hacer
+
+- EN mercado pago cunado llamo al back lo hago en apis o lo hago en el mismo archivp
