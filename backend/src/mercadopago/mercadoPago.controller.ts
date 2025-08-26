@@ -26,12 +26,12 @@ mercadoPago.post('/', async (req: Request, res: Response) => {
           },
         ],
         back_urls: {
-          success: 'https://localhost:5173/turnHistory/success',
-          failure: 'https://localhost:5173/turnHistory/failure',
-          pending: 'https://localhost:5173/turnHistory/pending',
+          success: 'https://reformix.site/turnHistory/success',
+          failure: 'https://reformix.site/turnHistory/failure',
+          pending: 'https://reformix.site/turnHistory/pending',
         },
         auto_return: 'approved',
-        notification_url: 'https://localhost:3000/api/mercadopago/webhook',
+        notification_url: 'https://reformix.site/api/mercadopago/webhook',
       },
     });
     res.json({ preferenceId: result.id });
