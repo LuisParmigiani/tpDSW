@@ -37,4 +37,7 @@ export const usuariosApi = {
   update: (id: string, data: EntityData) => api.put(`/usuario/${id}`, data),
   delete: (id: string) => api.delete(`/usuario/${id}`),
   login: (data: EntityData) => api.get('/usuario/login', { params: data }),
+  recoverPassword: (data: EntityData) => api.post('/usuario/recuperar', data),
+  validateRecoveryCode: (data: EntityData) =>
+    api.post('/usuario/validar-codigo', data),
 };
