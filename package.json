@@ -3,5 +3,14 @@
     "@radix-ui/react-tooltip": "^1.2.7",
     "@storybook/react": "^9.0.16",
     "tpDSW": "link:"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter frontend dev\" \"pnpm --filter backend start:dev\"",
+    "build": "concurrently \"pnpm --filter frontend build\" \"pnpm --filter backend build\"",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "dev:backend": "pnpm --filter backend start:dev"
   }
 }
