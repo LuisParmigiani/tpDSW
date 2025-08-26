@@ -142,29 +142,21 @@ async function getTurnosByUserId(req: Request, res: Response) {
     case 'porPagar':
       calificacionFilter = {
         estado: 'completado',
-        $and: [
-          {
-            // No tiene pagos aprobados
-            pagos: { $none: { estado: 'aprobado' } },
-          },
-          {
-            // No tiene pagos pendientes
-            pagos: { $none: { estado: 'pendiente' } },
-          },
-        ],
+        pagos: { $none: { estado: { $in: ['approved', 'pending'] } } },
       };
       break;
     case 'pagado':
       calificacionFilter = {
         estado: 'completado',
-        pagos: { $some: { estado: 'aprobado' } },
+        pagos: { $some: { estado: { $eq: 'approved' } } },
       };
       break;
     case 'pagoPendiente':
       calificacionFilter = {
         estado: 'completado',
-        pagos: { $some: { estado: 'pendiente' } },
+        pagos: { $some: { estado: 'pending' } },
       };
+      break;
   }
   let selectedValueOrderShow;
   switch (selectedValueOrder) {
@@ -205,16 +197,28 @@ async function getTurnosByUserId(req: Request, res: Response) {
       offset: (currentPage - 1) * cantItemsPerPage,
       orderBy: [selectedValueOrderShow],
     });
-    // Determinar si hay algún pago aprobado en los turnos encontrados
-    const hayPagoAprobado = turnos.some(
-      (turno) =>
-        turno.pagos &&
-        turno.pagos.toArray().some((pago: any) => pago.estado === 'aprobado')
-    );
+
+    // Agregar el campo hasPagoAprobado a cada turno (corrigiendo espacios y mayúsculas)
+    const turnosConPagoAprobado = turnos.map((turno: any) => {
+      // Si pagos es una colección, conviértelo a array
+      const pagosArray = Array.isArray(turno.pagos)
+        ? turno.pagos
+        : turno.pagos?.toArray
+        ? turno.pagos.toArray()
+        : [];
+      return {
+        ...turno,
+        hasPagoAprobado: pagosArray.some(
+          (pago: any) =>
+            typeof pago.estado === 'string' &&
+            pago.estado.trim().toLowerCase() === 'approved'
+        ),
+      };
+    });
+
     res.status(200).json({
       message: 'found turns by user id',
-      data: turnos,
-
+      data: turnosConPagoAprobado,
       pagination: {
         totalPages: Math.ceil(totalCount / cantItemsPerPage),
         currentPage: currentPage,
