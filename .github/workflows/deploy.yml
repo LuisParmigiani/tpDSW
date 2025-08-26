@@ -111,6 +111,8 @@ jobs:
       - name: Install deps
         working-directory: frontend
         run: pnpm install --no-frozen-lockfile --prefer-offline
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Build
         working-directory: frontend
