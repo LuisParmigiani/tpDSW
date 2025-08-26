@@ -6,10 +6,7 @@ import {
 
 const webhookRouter = Router();
 
-// Webhook de MercadoPago (lo que necesitas principalmente)
-webhookRouter.post('/webhooks/mercadopago', mercadoPagoWebhook);
-
-// Ruta auxiliar para verificar estado manualmente
+webhookRouter.post('/', mercadoPagoWebhook);
 webhookRouter.post('/verificar-pago/:idMercadoPago', verificarEstadoPago);
 
 export { webhookRouter };

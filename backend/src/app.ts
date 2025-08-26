@@ -13,6 +13,7 @@ import { horarioRouter } from './horario/horario.routes.js';
 import { CronManager } from './shared/cron/cronManager.js';
 import { PagoRouter } from './pago/pago.route.js';
 import mercadoPago from './mercadopago/mercadoPago.controller.js';
+import { webhookRouter } from './mercadopago/mercadoPago.route.js';
 const app = express();
 
 const local = true; // <--- producción: usa variables de entorno y no sincroniza esquema
@@ -48,6 +49,7 @@ app.use('/api/horario', horarioRouter);
 app.use('/api/zona', zonaRouter);
 app.use('/api/mercadoPago', mercadoPago);
 app.use('/api/pago', PagoRouter);
+app.use('/webhooks/mercadopago', webhookRouter);
 // app.use((req, res) => {
 //   console.log(req)
 //   return res.status(404).send({ message: 'Resource not found' });
