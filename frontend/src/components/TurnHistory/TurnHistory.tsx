@@ -53,7 +53,7 @@ type Props = {
 
 function TurnHistory({ estado }: Props) {
   const navigate = useNavigate();
-  const id = 1; // aca el id del usuario
+  const id = 2; // aca el id del usuario
   const [turns, setTurns] = useState<Turno[] | null>(null); // Se guardan todos los turnos del usuario
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
