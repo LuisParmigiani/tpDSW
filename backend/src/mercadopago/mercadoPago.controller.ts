@@ -22,20 +22,17 @@ mercadoPago.post('/', async (req: Request, res: Response) => {
     }
 
     console.log('🔹 Creando preferencia con data:', req.body);
-
-    // Mail de la cuenta secundaria (vendedor)
-    const secondaryMail = 'test_user_792057294485026311@testuser.com';
-    console.log('🔹 Secondary email:', secondaryMail);
-
-    // Creamos la preferencia
+    const mail = 'test_user_792057294485026311@testuser.com';
+    // Creamos la preferencia con split
     const result = await preference.create({
       body: {
         items: [
           {
             id: id || 'product-001',
             title: title,
-            quantity: quantity,
-            unit_price: unit_price ? Number(unit_price) / 100 : 2000, // evita NaN
+            quantity: Number(quantity),
+            unit_price: Number(unit_price),
+            currency_id: 'ARS',
           },
         ],
         back_urls: {
@@ -49,22 +46,27 @@ mercadoPago.post('/', async (req: Request, res: Response) => {
         external_reference: turno || undefined,
         additional_recipients: [
           {
-            email: secondaryMail, // cuenta del vendedor
+            email: mail, // cuenta del vendedor
             type: 'secondary',
             percentage: 95, // vendedor recibe 95%
           },
         ],
-      } as any, // TypeScript ignora tipos que todavía no están definidos
+      } as any,
     });
 
     console.log('✅ Preferencia creada:', result);
 
-    res.json({ preferenceId: result.id, init_point: result.init_point });
+    res.json({
+      preferenceId: result.id,
+      init_point: result.init_point, // URL para redirigir al checkout
+      sandbox_init_point: result.sandbox_init_point, // URL de sandbox (si corresponde)
+    });
   } catch (error: any) {
     console.error('❌ Error al crear preferencia:', error);
-    res
-      .status(500)
-      .json({ error: 'Error al crear preferencia', details: error });
+    res.status(500).json({
+      error: 'Error al crear preferencia',
+      details: error.message || error,
+    });
   }
 });
 
