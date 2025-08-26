@@ -11,6 +11,7 @@ import { RequestContext } from '@mikro-orm/core';
 import { serviceTypeRouter } from './tipoServicio/tipoServ.route.js';
 import { horarioRouter } from './horario/horario.routes.js';
 import { CronManager } from './shared/cron/cronManager.js';
+import { PagoRouter } from './pago/pago.route.js';
 import mercadoPago from './mercadopago/mercadoPago.controller.js';
 const app = express();
 
@@ -45,7 +46,8 @@ app.use('/api/servicio', servicioRouter);
 app.use('/api/turno', turnoRouter);
 app.use('/api/horario', horarioRouter);
 app.use('/api/zona', zonaRouter);
-app.use('/api/pago', mercadoPago);
+app.use('/api/mercadoPago', mercadoPago);
+app.use('/api/pago', PagoRouter);
 // app.use((req, res) => {
 //   console.log(req)
 //   return res.status(404).send({ message: 'Resource not found' });

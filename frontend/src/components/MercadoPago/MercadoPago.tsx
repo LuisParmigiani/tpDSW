@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
-
+import { mercadoPagoApi } from '../../services/mercadoPagoApi';
 // Inicializa Mercado Pago con tu public key
 initMercadoPago('APP_USR-0e40b53e-63b6-4362-b796-1a7b894aaf33');
 
@@ -16,7 +16,7 @@ type Servicio = {
 };
 type Tarea = {
   nombreTarea: string;
-  descripcionTarea: number;
+  descripcionTarea: string;
   duracionTarea: number;
   tipoServicio: {
     id: number;
@@ -32,20 +32,19 @@ type Usuario = {
 const MercadoPago = (props: Props) => {
   const [preferenceId, setPreferenceId] = useState('');
 
-  const handlePago = () => {
-    fetch('http://localhost:3000/api/pago', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+  const handlePago = async () => {
+    try {
+      const response = await mercadoPagoApi.create({
         title: props.servicio.tarea.nombreTarea,
         description: props.servicio.tarea.descripcionTarea,
         quantity: 1,
         currency: 'ARS',
         unit_price: props.montoFinal,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => setPreferenceId(data.preferenceId));
+      });
+      setPreferenceId(response.data.preferenceId);
+    } catch (error) {
+      console.error('Error al crear la preferencia de pago:', error);
+    }
   };
 
   return (
