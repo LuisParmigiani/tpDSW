@@ -142,15 +142,29 @@ async function getTurnosByUserId(req: Request, res: Response) {
     case 'porPagar':
       calificacionFilter = {
         estado: 'completado',
-        fechaPago: { $eq: null },
+        $and: [
+          {
+            // No tiene pagos aprobados
+            pagos: { $none: { estado: 'aprobado' } },
+          },
+          {
+            // No tiene pagos pendientes
+            pagos: { $none: { estado: 'pendiente' } },
+          },
+        ],
       };
       break;
     case 'pagado':
       calificacionFilter = {
         estado: 'completado',
-        fechaPago: { $ne: null },
+        pagos: { $some: { estado: 'aprobado' } },
       };
       break;
+    case 'pagoPendiente':
+      calificacionFilter = {
+        estado: 'completado',
+        pagos: { $some: { estado: 'pendiente' } },
+      };
   }
   let selectedValueOrderShow;
   switch (selectedValueOrder) {
@@ -181,15 +195,26 @@ async function getTurnosByUserId(req: Request, res: Response) {
 
     // Buscar los turnos del usuario, populando toda la información necesaria en una sola consulta
     const turnos = await em.find(Turno, where, {
-      populate: ['servicio.tarea.tipoServicio', 'servicio.usuario', 'usuario'],
+      populate: [
+        'servicio.tarea.tipoServicio',
+        'servicio.usuario',
+        'usuario',
+        'pagos',
+      ],
       limit: cantItemsPerPage,
       offset: (currentPage - 1) * cantItemsPerPage,
       orderBy: [selectedValueOrderShow],
     });
-
+    // Determinar si hay algún pago aprobado en los turnos encontrados
+    const hayPagoAprobado = turnos.some(
+      (turno) =>
+        turno.pagos &&
+        turno.pagos.toArray().some((pago: any) => pago.estado === 'aprobado')
+    );
     res.status(200).json({
       message: 'found turns by user id',
       data: turnos,
+
       pagination: {
         totalPages: Math.ceil(totalCount / cantItemsPerPage),
         currentPage: currentPage,

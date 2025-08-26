@@ -18,7 +18,7 @@ type servicio = {
 };
 type Tarea = {
   nombreTarea: string;
-  descripcionTarea: number;
+  descripcionTarea: string;
   duracionTarea: number;
 };
 type Usuario = {

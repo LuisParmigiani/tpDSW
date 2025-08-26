@@ -10,6 +10,11 @@ import { useNavigate } from 'react-router-dom';
 import MercadoPago from '../MercadoPago/MercadoPago.tsx';
 import DevolucionPago from '../Modal/DevolucionPago.tsx';
 
+type Pago = {
+  id: number;
+  estado: string;
+};
+
 type Turno = {
   id: number;
   fechaHora: Date;
@@ -19,7 +24,7 @@ type Turno = {
   comentario: string | null;
   estado: string;
   usuario: Usuario;
-  fechaPago: Date | null;
+  pagos: Pago[];
 };
 
 type Servicio = {
@@ -29,7 +34,7 @@ type Servicio = {
 };
 type Tarea = {
   nombreTarea: string;
-  descripcionTarea: number;
+  descripcionTarea: string;
   duracionTarea: number;
   tipoServicio: {
     id: number;
@@ -48,7 +53,7 @@ type Props = {
 
 function TurnHistory({ estado }: Props) {
   const navigate = useNavigate();
-  const id = 2; // aca el id del usuario
+  const id = 1; // aca el id del usuario
   const [turns, setTurns] = useState<Turno[] | null>(null); // Se guardan todos los turnos del usuario
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -201,9 +206,8 @@ function TurnHistory({ estado }: Props) {
         />
       )}
 
-      <div className="text-black min-h-2/4">
+      <div className="text-black min-h-3/4">
         <h1 className="text-4xl font-bold mt-6">Historial de Turnos</h1>
-
         <div className="flex flex-row gap-4 lg:-mt-11  mt-3 pl-3 mb-8  ">
           <div>
             <CustomSelect
@@ -232,6 +236,7 @@ function TurnHistory({ estado }: Props) {
                 { value: 'completado', label: 'Completado' },
                 { value: 'porPagar', label: 'Por Pagar' },
                 { value: 'pagado', label: 'Pagado' },
+                { value: 'pagoPendiente', label: 'Pago Pendiente' },
               ]}
               setOptions={setSelectedValueShow}
               setPage={setCurrentPage}
@@ -292,7 +297,7 @@ function TurnHistory({ estado }: Props) {
                       ) {
                         return (
                           <>
-                            {turn.fechaPago ? (
+                            {turn.pagos.length > 0 ? (
                               <button
                                 onClick={() => openModal(turn)}
                                 className="bg-naranja-1  text-white hover:text-naranja-1 hover:bg-white w-full rounded-2xl border-2 border-naranja-1"
@@ -343,7 +348,7 @@ function TurnHistory({ estado }: Props) {
                           if (turn.estado === 'completado') {
                             return (
                               <>
-                                {turn.fechaPago ? (
+                                {turn.pagos.length > 0 ? (
                                   <p className="mt-2">
                                     Expiró el tiempo de calificación
                                   </p>
@@ -385,14 +390,13 @@ function TurnHistory({ estado }: Props) {
                           }
                         }
                       }
-                      return null;
                     })()}
                   </div>
                 </li>
               ))}
             </ul>
           ) : (
-            <p>No hay turnos.</p>
+            <p className="">No hay turnos.</p>
           )
         ) : null}
 
