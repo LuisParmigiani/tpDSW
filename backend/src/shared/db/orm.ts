@@ -27,7 +27,7 @@ export const syncSchema = async () => {
   //await generator.dropSchema();
 
   //await generator.createSchema();
-  // await generator.updateSchema(); // Desactivado para producción: evita cambios automáticos en el esquema
+  await generator.updateSchema(); // Desactivado para producción: evita cambios automáticos en el esquema
 };
 
 export { orm };
