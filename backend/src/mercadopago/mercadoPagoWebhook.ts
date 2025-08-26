@@ -67,6 +67,7 @@ async function actualizarPagoDesdeWebhook(paymentInfo: any) {
 
     if (!pagoExistente) {
       console.warn(`⚠️ Pago no encontrado en BD: ${paymentInfo.id}`);
+      const idTurno = paymentInfo.external_reference;
       const nuevoPago = emFork.create(Pago, {
         fechaHora: new Date(),
         idMercadoPago: paymentInfo.id.toString(),
@@ -85,7 +86,7 @@ async function actualizarPagoDesdeWebhook(paymentInfo: any) {
           ? new Date(paymentInfo.date_approved)
           : null,
         datosCompletos: paymentInfo,
-        turno: paymentInfo.turno,
+        turno: idTurno,
       });
 
       await emFork.persistAndFlush(nuevoPago);

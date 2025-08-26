@@ -32,6 +32,7 @@ mercadoPago.post('/', async (req: Request, res: Response) => {
         auto_return: 'approved',
         notification_url:
           'https://backend-patient-morning-1303.fly.dev/webhooks/mercadopago/cambio',
+        external_reference: req.body.turno,
       },
     });
     res.json({ preferenceId: result.id });

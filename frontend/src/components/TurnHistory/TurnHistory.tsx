@@ -309,6 +309,7 @@ function TurnHistory({ estado }: Props) {
                                 fechaHora={turn.fechaHora}
                                 montoFinal={turn.montoFinal}
                                 servicio={turn.servicio}
+                                turno={turn.id}
                               />
                             )}
                             <button
@@ -357,6 +358,7 @@ function TurnHistory({ estado }: Props) {
                                     fechaHora={turn.fechaHora}
                                     montoFinal={turn.montoFinal}
                                     servicio={turn.servicio}
+                                    turno={turn.id}
                                   />
                                 )}{' '}
                                 <button
