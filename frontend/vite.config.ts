@@ -27,7 +27,7 @@ export default defineConfig({
         secure: false,
       },
     },
-    historyApiFallback: true,
+    // ...existing code...
   },
   test: {
     globals: true,
