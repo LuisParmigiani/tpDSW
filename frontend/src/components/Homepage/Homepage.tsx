@@ -38,6 +38,8 @@ function Homepage() {
         <div className="absolute inset-0 w-full z-20">
           <Navbar />
         </div>
+        {/* Botón de pago Mercado Pago integrado */}
+
         <div className="w-full">
           <Carousel
             fotos={[
