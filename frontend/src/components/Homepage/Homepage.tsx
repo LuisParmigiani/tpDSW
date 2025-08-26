@@ -1,6 +1,6 @@
 import Navbar from '../Navbar/Navbar.tsx';
 import Carousel from '../Carousel/Carousel.js';
-import Comments from '../Comments/Comments';
+import Comments from '../Comments/Comments.js';
 import Footer from '../Footer/Footer';
 import { HomePageCard } from './HomePageCards.js';
 function Homepage() {
