@@ -22,7 +22,7 @@ mercadoPago.post('/', async (req: Request, res: Response) => {
             id: id || 'product-001',
             title: title || 'My product',
             quantity: quantity || 1,
-            unit_price: unit_price || 2000,
+            unit_price: unit_price / 100 || 2000,
           },
         ],
         back_urls: {
@@ -31,7 +31,8 @@ mercadoPago.post('/', async (req: Request, res: Response) => {
           pending: 'https://reformix.site/turnHistory/pending',
         },
         auto_return: 'approved',
-        notification_url: 'https://reformix.site/webhooks/mercadopago/cambio',
+        notification_url:
+          'https://backend-patient-morning-1303.fly.dev/webhooks/mercadopago/cambio',
       },
     });
     res.json({ preferenceId: result.id });

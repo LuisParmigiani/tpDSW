@@ -46,6 +46,7 @@ app.use(
 );
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use((req, res, next: NextFunction) => {
   RequestContext.create(orm.em, next);
