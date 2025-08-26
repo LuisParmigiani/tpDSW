@@ -13,10 +13,10 @@ mercadoPago.post('/', async (req: Request, res: Response) => {
   try {
     const { id, title, quantity, unit_price, secondaryEmail, turno } = req.body;
     console.log('Creating preference with data:', req.body);
-    console.log('Creating preference with data:', secondaryEmail);
 
+    // email del vendedor (secundario)
     const mail = 'test_user_792057294485026311@testuser.com';
-    console.log('Creating preference with secondary email:', mail);
+
     const result = await preference.create({
       body: {
         items: [
@@ -36,17 +36,24 @@ mercadoPago.post('/', async (req: Request, res: Response) => {
         notification_url:
           'https://backend-patient-morning-1303.fly.dev/webhooks/mercadopago/cambio',
         external_reference: turno,
+        marketplace: {
+          // tu cuenta principal recibe 5%
+          marketplace_fee: 5, // porcentaje para tu cuenta
+        },
         additional_recipients: [
           {
-            email: mail, // cuenta del vendedor
+            email: mail, // vendedor recibe el resto
             type: 'secondary',
-            percentage: 95, // el vendedor recibe 95%
+            percentage: 95,
           },
         ],
       } as any,
     });
+
+    console.log('Preference creada:', result.id);
     res.json({ preferenceId: result.id });
   } catch (error) {
+    console.error('Error al crear preferencia:', error);
     res
       .status(500)
       .json({ error: 'Error al crear preferencia', details: error });
