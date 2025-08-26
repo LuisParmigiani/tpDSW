@@ -7,6 +7,7 @@ import {
 
 import bcrypt from 'bcrypt';
 import { orm } from '../shared/db/orm.js';
+import nodemailer from 'nodemailer';
 const em = orm.em;
 
 function sanitizeUsuarioInput(req: Request, res: Response, next: NextFunction) {
@@ -324,6 +325,69 @@ async function loginUsuario(req: Request, res: Response) {
   }
 }
 
+//llevar todo esto a una carpeta y exportarlo
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
+  auth: {
+    user: 'santiagomalet229@gmail.com',
+    pass: 'yoxg geda hevd kxol',
+  },
+});
+
+async function recuperarContrasena(req: Request, res: Response) {
+  //linea para probar
+  console.log('POST /recuperar llamado con body:', req.body);
+  try {
+    const mail = req.body.mail as string;
+    if (!mail) {
+      return res.status(400).json({ message: 'Falta el mail' });
+    }
+
+    const usuario = await em.findOne(Usuario, { mail });
+    if (!usuario) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    //Generar codigo de 6 digitos
+    const codigo = Math.floor(100000 + Math.random() * 900000).toString();
+    codigosRecuperacion[mail] = {
+      codigo,
+      expiracion: new Date(Date.now() + 10 * 60 * 1000), // 10 minutos
+    };
+
+    await transporter.sendMail({
+      from: 'forgotpassword <santiagomalet229@gmail.com>',
+      to: mail,
+      subject: 'Recuperación de contraseña',
+      text: `Tu código de recuperación es: ${codigo} y expirará en 10 minutos`,
+    });
+    return res.status(200).json({
+      message: 'Si el usuario existe, se envió el mail de recuperación',
+    });
+  } catch (error) {
+    console.error('Error en recuperarContrasena:', error); // <--- Muestra el error real
+    return res.status(500).json({ message: 'Error interno en recuperación' });
+  }
+}
+
+const codigosRecuperacion: {
+  [mail: string]: { codigo: string; expiracion: Date };
+} = {};
+
+async function validarCodigoRecuperacion(req: Request, res: Response) {
+  const { mail, codigo } = req.body;
+  const registro = codigosRecuperacion[mail];
+  if (!registro)
+    return res.status(400).json({ message: 'No se solicitó recuperación' });
+  if (registro.expiracion < new Date())
+    return res.status(400).json({ message: 'Código expirado' });
+  if (registro.codigo !== codigo)
+    return res.status(400).json({ message: 'Código incorrecto' });
+  return res.status(200).json({ message: 'Código válido' });
+}
+
 export {
   sanitizeUsuarioInput,
   findAll,
@@ -334,4 +398,6 @@ export {
   loginUsuario,
   remove,
   getCommentsByUserId,
+  recuperarContrasena,
+  validarCodigoRecuperacion,
 };

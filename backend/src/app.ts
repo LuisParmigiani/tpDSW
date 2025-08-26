@@ -14,7 +14,7 @@ import { CronManager } from './shared/cron/cronManager.js';
 
 const app = express();
 
-const local = false; // <--- producción: usa variables de entorno y no sincroniza esquema
+const local = true; // <--- desarrollo: permite origen localhost:5173 para CORS
 
 // cors lo que hace es dar el permiso al un puerto para hacer las peticiones al back
 // CORS dinámico (permite lista separada por comas en FRONTEND_ORIGIN)

@@ -1,29 +1,136 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { usuariosApi } from '../../services/usuariosApi';
+import { z } from 'zod';
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const usuarioSchema = z.object({
+  mail: z.string().email('Ingrese un formato de email válido'),
+});
+
+export type Usuario = z.infer<typeof usuarioSchema>;
 
 function Recovery() {
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState('');
+  const [codigo, setCodigo] = useState('');
+
+  const validarCodigo = async () => {
+    try {
+      const response = await usuariosApi.validateRecoveryCode({
+        mail: form.mail,
+        codigo,
+      });
+      console.log('Código válido. Ahora puedes cambiar tu contraseña.');
+      // redirigir desde acá
+    } catch {
+      console.log('Código incorrecto o expirado');
+    }
+  };
+
+  const [form, setForm] = useState<Usuario>({
+    mail: '',
+  });
+
+  const envioFormulario = async () => {
+    const result = usuarioSchema.safeParse(form);
+    if (!result.success) {
+      setOpen(true);
+      setMessage('Ingresa un formato de email válido');
+      return;
+    }
+
+    try {
+      await usuariosApi.recoverPassword(form);
+      console.log('Recuperación de contraseña exitosa');
+      setOpen(true);
+      setMessage('Ingrese el código de recuperación que se envió a su email');
+    } catch (error) {
+      setOpen(true);
+      const err = error as { response?: { status?: number } };
+      if (err.response && err.response.status === 404) {
+        setMessage('No existe un usuario con ese email');
+        console.log('No existe un usuario con ese email');
+      } else {
+        setMessage('Error en la recuperación de contraseña');
+        console.log('Error en la recuperación de contraseña');
+      }
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-transparent">
-      <div className="flex flex-col md:flex-row w-full max-w-4xl bg-gray-100 rounded-4xl shadow-inner mt-8 overflow-hidden px-4 md:px-0">
-        <div
-          className="flex flex-col justify-center items-center w-full md:w-1/2 min-h-}
-         md:min-h-full justify-center"
-        >
-          <p className="text-black fonttext-black font-inter text-4xl mb-4 font-bold">
-            Recuperar contraseña
-          </p>
-          <p className="text-black fonttext-black font-inter text-1xl mb-4">
-            Ingresa tu email
-          </p>
-          <form className="w-full flex flex-col items-center">
-            <div className="relative inline-block w-full max-w-xs">
-              <input
-                type="text"
-                placeholder="Email"
-                className="w-full pt-3 pb-3 pr-5 pl-12 text-base border-none rounded-4xl bg-white shadow-inner outline-none mb-4 text-black font-inter"
-              />
-              <i className="fa-solid fa-envelope absolute top-6 left-4 -translate-y-1/2 text-gray-500 text-1xl pointer-events-none"></i>
+    <>
+      {open && (
+        <div className="fixed inset-0 flex items-center justify-center bg-neutral-5 backdrop-blur-md bg-opacity-40 z-50">
+          <div className="text-black bg-white p-4 rounded shadow-md">
+            <div className="flex justify-end z-30 bg-transparent w-auto">
+              <button
+                onClick={() => {
+                  setOpen(false);
+                }}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
+                aria-label="Cerrar modal"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M18 6L6 18M6 6L18 18"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
             </div>
-            {/*
+            <p>{message}</p>
+            <input
+              className="w-full pt-3 pb-3 pr-5 pl-12 text-base border-none rounded-4xl bg-gray-100 shadow-inner outline-none mb-4 text-black font-inter"
+              placeholder="Código de recuperación"
+              onChange={(e) => setCodigo(e.target.value)}
+              value={codigo}
+            />
+            <button
+              onClick={validarCodigo}
+              type="submit"
+              className="mt-2 px-4 py-2 bg-naranja-1 text-white rounded hover:bg-naranja-2"
+            >
+              Ingresar
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="min-h-screen flex items-center justify-center bg-transparent">
+        <div className="flex flex-col md:flex-row w-full max-w-4xl bg-gray-100 rounded-4xl shadow-inner mt-8 overflow-hidden px-4 md:px-0 ">
+          <div
+            className="flex flex-col justify-center items-center w-full md:w-1/2 min-h-}
+         md:min-h-full justify-center border-black p-9"
+          >
+            <p className="text-black fonttext-black font-inter text-4xl mb-4 font-bold">
+              Recuperar contraseña
+            </p>
+            <p className="text-black fonttext-black font-inter text-1xl mb-4">
+              Ingresa tu email
+            </p>
+            <form className="w-full flex flex-col items-center">
+              <div className="relative inline-block w-full max-w-xs">
+                <input
+                  type="email"
+                  placeholder="Email"
+                  className="w-full pt-3 pb-3 pr-5 pl-12 text-base border-none rounded-4xl bg-white shadow-inner outline-none mb-4 text-black font-inter"
+                  onChange={(e) =>
+                    setForm({ ...form, mail: e.target.value.toLowerCase() })
+                  }
+                />
+                <i className="fa-solid fa-envelope absolute top-6 left-4 -translate-y-1/2 text-gray-500 text-1xl pointer-events-none"></i>
+              </div>
+              {/*
             <div className="relative inline-block w-full max-w-xs">
               <input
                 type="text"
@@ -33,29 +140,39 @@ function Recovery() {
               <i className="fa-solid fa-asterisk absolute top-1/2 left-4 -translate-y-1/2 text-gray-500 text-[16px] pointer-events-none"></i>
             </div>
             */}
-          </form>
-          <button className="w-full max-w-xs bg-naranja-1 text-white px-5 py-2.5 rounded-2xl cursor-pointer hover:text-black focus:outline-none mb-5 mt-3 hover:shadow-lg">
-            Enviar mail
-          </button>
-          <p className="text-black font-inter  mb-7">
-            ¿No tienes cuenta?{' '}
-            <Link
-              to="/registration"
-              className="font-bold cursor-pointer hover:shadow-sm"
+            </form>
+            <button
+              className={
+                form.mail === ''
+                  ? 'w-full bg-gray-300 text-black-500 px-5 py-2.5 rounded-b-2xl cursor-pointer focus:outline-none mb-5 mt-3'
+                  : 'w-full bg-naranja-1 text-white px-5 py-2.5 rounded-b-2xl cursor-pointer hover:text-black focus:outline-none mb-5 mt-3 hover:shadow-lg'
+              }
+              onClick={envioFormulario}
+              type="submit"
+              disabled={form.mail === ''}
             >
-              Regístrate
-            </Link>
-          </p>
-        </div>
-        <div className="hidden md:block w-full md:w-1/2 h-64 md:h-auto">
-          <img
-            className="w-full h-full object-cover rounded-tr-4xl rounded-br-4xl shadow-inner"
-            src="/images/imagen-registration.jpg"
-            alt="Recuperar contraseña"
-          />
+              Recuperar contraseña
+            </button>
+            <p className="text-black font-inter  mb-7">
+              ¿No tienes cuenta?{' '}
+              <Link
+                to="/registration"
+                className="font-bold cursor-pointer hover:shadow-sm"
+              >
+                Regístrate
+              </Link>
+            </p>
+          </div>
+          <div className="hidden md:block w-full md:w-1/2 h-64 md:h-auto">
+            <img
+              className="w-full h-full object-cover rounded-tr-4xl rounded-br-4xl shadow-inner"
+              src="/images/imagen-registration.jpg"
+              alt="Recuperar contraseña"
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 export default Recovery;
