@@ -18,6 +18,8 @@ usuarioRouter.get(
   '/prestatarios/:tipoServicio/:zona/:orderBy',
   findPrestatariosByTipoServicioAndZona
 );
+
+usuarioRouter.get('/login', loginUsuario);
 usuarioRouter.get('/:id', findOne);
 usuarioRouter.get('/comments/:id', getCommentsByUserId);
 usuarioRouter.get('/:id', findOne);
@@ -25,4 +27,3 @@ usuarioRouter.post('/', sanitizeUsuarioInput, add);
 usuarioRouter.put('/:id', sanitizeUsuarioInput, update);
 usuarioRouter.patch('/:id', sanitizeUsuarioInput, update);
 usuarioRouter.delete('/:id', remove);
-usuarioRouter.post('/login', loginUsuario);

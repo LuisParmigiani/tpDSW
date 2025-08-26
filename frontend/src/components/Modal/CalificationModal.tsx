@@ -1,4 +1,4 @@
-import StarRating from '../stars/RatingStars.js';
+import StarRating from '../stars/RatingStars';
 
 type Turno = {
   id: number;

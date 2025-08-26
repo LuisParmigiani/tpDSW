@@ -1,14 +1,14 @@
-import Borrower from './components/Borrower/Borrower.js';
-import Homepage from './components/Homepage/Homepage.js';
-import Login from './pages/about/App_login.js';
-import Recovery from './pages/about/recovery.js';
-import Registration from './pages/about/registration.js';
+import Borrower from './components/Borrower/Borrower';
+import Homepage from './components/Homepage/Homepage';
+import Login from './pages/about/App_login';
+import Recovery from './pages/about/recovery';
+import Registration from './pages/about/registration';
 import './App.css';
-import TurnHistory from './components/TurnHistory/TurnHistory.js';
-import About from './pages/about/about.js';
+import TurnHistory from './components/TurnHistory/TurnHistory';
+import About from './pages/about/about';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Servicios from './pages/about/Servicios.js';
-import Dashboard from './pages/dashboard/dashboard-p.js';
+import Servicios from './pages/about/Servicios';
+import Dashboard from './pages/dashboard/dashboard-p';
 function App() {
   // Creación de la API DSP hay que llevarla a login
 

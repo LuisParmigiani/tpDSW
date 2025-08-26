@@ -36,4 +36,5 @@ export const usuariosApi = {
   create: (data: EntityData) => api.post('/usuario', data),
   update: (id: string, data: EntityData) => api.put(`/usuario/${id}`, data),
   delete: (id: string) => api.delete(`/usuario/${id}`),
+  login: (data: EntityData) => api.get('/usuario/login', { params: data }),
 };
