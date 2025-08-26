@@ -4,8 +4,7 @@ import express, { Request, Response } from 'express';
 const mercadoPago = express.Router();
 
 const client = new MercadoPagoConfig({
-  accessToken:
-    'APP_USR-2293500865517451-082613-979e1c2aced1aab294b9fdf13f9d5aba-2653266304',
+  accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN!,
 });
 
 const preference = new Preference(client);
