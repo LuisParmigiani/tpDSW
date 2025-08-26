@@ -2,6 +2,7 @@ import DashboardSection from '../DashboardSection/DashboardSection';
 import { useState, useEffect } from 'react';
 import SelectionBar from '../SelectionBar/SelectionBar';
 import ItemTurno from '../itemTurno/ItemTurno';
+import PaginationControls from '../../components/Pagination/PaginationControler';
 
 const mockTurnos = [
 	{
@@ -86,6 +87,14 @@ function ClientesSection() {
 	const [turnos, setTurnos] = useState(mockTurnos);
 	const [pendingAction, setPendingAction] = useState<null | 'Confirmado' | 'Cancelado'>(null);
 	const [modalVisible, setModalVisible] = useState(false);
+	const [currentPage, setCurrentPage] = useState(1);
+	const itemsPerPage = 6;
+
+	
+	const indexOfLastItem = currentPage * itemsPerPage;
+	const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+	const currentTurnos = turnos.slice(indexOfFirstItem, indexOfLastItem);
+	const totalPages = Math.ceil(turnos.length / itemsPerPage);
 
 	useEffect(() => {
 		if (selectedRows.length > 0) {
@@ -112,11 +121,17 @@ function ClientesSection() {
 	};
 
 	const handleSelectAll = () => {
-		if (selectedRows.length === mockTurnos.length) {
+		if (selectedRows.length === currentTurnos.length) {
 			setSelectedRows([]);
 		} else {
-			setSelectedRows(mockTurnos.map((_, idx) => idx));
+			setSelectedRows(currentTurnos.map((_, idx) => indexOfFirstItem + idx));
 		}
+	};
+
+	
+	const handlePageChange = (page: number) => {
+		setCurrentPage(page);
+		setSelectedRows([]); 
 	};
 
 	// Handler para actualizar estado de los seleccionados
@@ -179,12 +194,12 @@ function ClientesSection() {
 								<span className="relative flex items-center justify-center">
 									<input
 										type="checkbox"
-										checked={selectedRows.length === mockTurnos.length}
+										checked={selectedRows.length === currentTurnos.length && currentTurnos.length > 0}
 										onChange={handleSelectAll}
 										className="peer h-5 w-5 rounded border border-gray-500 bg-white appearance-none cursor-pointer focus:ring-2 focus:ring-orange-500"
 									/>
 									<span className="absolute pointer-events-none inset-0 flex items-center justify-center">
-										{selectedRows.length === mockTurnos.length && (
+										{selectedRows.length === currentTurnos.length && currentTurnos.length > 0 && (
 											<svg
 												width="20"
 												height="20"
@@ -213,17 +228,22 @@ function ClientesSection() {
 						</tr>
 					</thead>
 					<tbody>
-						{turnos.map((turno, idx) => (
+						{currentTurnos.map((turno, idx) => (
 							<ItemTurno
-								key={idx}
+								key={indexOfFirstItem + idx}
 								turno={turno}
-								idx={idx}
-								selected={selectedRows.includes(idx)}
+								idx={indexOfFirstItem + idx}
+								selected={selectedRows.includes(indexOfFirstItem + idx)}
 								onSelect={handleSelectRow}
 							/>
 						))}
 					</tbody>
 				</table>
+				<PaginationControls
+					currentPage={currentPage}
+					totalPages={totalPages}
+					onPageChange={handlePageChange}
+				/>
 				<style>{`
           .fade-in {
             opacity: 0;
