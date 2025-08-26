@@ -1,7 +1,16 @@
-import { Entity, Property, Cascade, ManyToOne, Rel } from '@mikro-orm/core';
+import {
+  Entity,
+  Property,
+  Cascade,
+  ManyToOne,
+  Rel,
+  OneToMany,
+  Collection,
+} from '@mikro-orm/core';
 import { Usuario } from '../usuario/usuario.entity.js';
 import { Servicio } from '../servicio/servicio.entity.js';
 import { BaseEntity } from '../shared/db/baseEntity.entity.js';
+import { Pago } from '../pago/pago.entity.js';
 
 @Entity()
 export class Turno extends BaseEntity {
@@ -15,11 +24,12 @@ export class Turno extends BaseEntity {
   comentario?: string;
   @Property({ nullable: true })
   montoFinal!: number;
-  @Property({ nullable: true })
-  fechaPago?: Date;
   @ManyToOne(() => Servicio, { nullable: true })
   servicio!: Rel<Servicio>;
 
   @ManyToOne(() => Usuario, { cascade: [Cascade.PERSIST], nullable: true })
   usuario!: Rel<Usuario>;
+
+  @OneToMany(() => Pago, (pago) => pago.turno)
+  pagos = new Collection<Pago>(this);
 }

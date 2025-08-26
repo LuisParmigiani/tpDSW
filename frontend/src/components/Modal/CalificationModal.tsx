@@ -13,13 +13,12 @@ type Turno = {
 
 type servicio = {
   id: number;
-  nombre: string;
   tarea: Tarea;
   usuario: Usuario;
 };
 type Tarea = {
   nombreTarea: string;
-  descripcionTarea: number;
+  descripcionTarea: string;
   duracionTarea: number;
 };
 type Usuario = {
