@@ -11,9 +11,10 @@ const preference = new Preference(client);
 
 mercadoPago.post('/', async (req: Request, res: Response) => {
   try {
-    const { id, title, quantity, unit_price } = req.body;
+    const { id, title, quantity, unit_price, secondaryEmail, turno } = req.body;
     console.log('Creating preference with data:', req.body);
-
+    console.log('Creating preference with data:', secondaryEmail);
+    const mail = 'test_user_792057294485026311@testuser.com';
     const result = await preference.create({
       body: {
         items: [
@@ -32,8 +33,17 @@ mercadoPago.post('/', async (req: Request, res: Response) => {
         auto_return: 'approved',
         notification_url:
           'https://backend-patient-morning-1303.fly.dev/webhooks/mercadopago/cambio',
-        external_reference: req.body.turno,
-      },
+        external_reference: turno,
+        additional_recipients: mail
+          ? [
+              {
+                email: mail,
+                type: 'secondary',
+                percentage: 80,
+              },
+            ]
+          : [],
+      } as any, // <-- Esto fuerza el tipo y elimina el error
     });
     res.json({ preferenceId: result.id });
   } catch (error) {
