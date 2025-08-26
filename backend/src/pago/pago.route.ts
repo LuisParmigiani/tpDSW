@@ -5,7 +5,7 @@ import {
   update,
   remove,
   sanitizePagoInput,
-} from './pago.controler.js';
+} from './pago.controller.js';
 import { Router } from 'express';
 
 export const PagoRouter = Router();

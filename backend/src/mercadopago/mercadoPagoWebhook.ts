@@ -1,4 +1,3 @@
-// controllers/webhook.controller.ts
 import { Request, Response } from 'express';
 import { MercadoPagoConfig, Payment } from 'mercadopago';
 import { Pago, EstadoPago } from '../pago/pago.entity.js';
@@ -17,7 +16,6 @@ const payment = new Payment(client);
 async function mercadoPagoWebhook(req: Request, res: Response) {
   try {
     console.log('🔔 Webhook recibido:', req.body);
-
     const { type, data } = req.body;
 
     // Verificar que es una notificación de pago
@@ -28,12 +26,6 @@ async function mercadoPagoWebhook(req: Request, res: Response) {
 
       // Obtener información completa del pago desde MercadoPago
       const paymentInfo = await payment.get({ id: paymentId });
-
-      console.log('💳 Info del pago desde MP:', {
-        id: paymentInfo.id,
-        status: paymentInfo.status,
-        status_detail: paymentInfo.status_detail,
-      });
 
       // Actualizar el pago en nuestra base de datos
       await actualizarPagoDesdeWebhook(paymentInfo);
@@ -50,9 +42,6 @@ async function mercadoPagoWebhook(req: Request, res: Response) {
     });
   } catch (error: any) {
     console.error('❌ Error procesando webhook:', error);
-
-    // Aún así responder 200 para evitar reintentos innecesarios
-    // MercadoPago reintenta si no recibe 200
     res.status(200).json({
       received: true,
       error: 'Processed with errors',
@@ -63,7 +52,8 @@ async function mercadoPagoWebhook(req: Request, res: Response) {
 
 // Función interna para actualizar pago desde webhook
 async function actualizarPagoDesdeWebhook(paymentInfo: any) {
-  const emFork = em.fork(); // Usar fork para transacciones
+  // Usar fork para transacciones para crear una nueva instancia de EntityManager
+  const emFork = em.fork();
 
   try {
     // Buscar el pago por ID de MercadoPago
@@ -77,6 +67,28 @@ async function actualizarPagoDesdeWebhook(paymentInfo: any) {
 
     if (!pagoExistente) {
       console.warn(`⚠️ Pago no encontrado en BD: ${paymentInfo.id}`);
+      const nuevoPago = emFork.create(Pago, {
+        fechaHora: new Date(),
+        idMercadoPago: paymentInfo.id.toString(),
+        idPreferencia: paymentInfo.id_preference,
+        descripcionPago: paymentInfo.description,
+        monto: paymentInfo.transaction_details?.net_received_amount,
+        estado: paymentInfo.status as EstadoPago,
+        detalleEstado: paymentInfo.status_detail,
+        cuotas: paymentInfo.installments,
+        fechaActualizacion: new Date(),
+        metodoPago: paymentInfo.payment_method_id,
+        tipoPago: paymentInfo.payment_type_id,
+        emailPagador: paymentInfo.payer?.email,
+        montoNeto: paymentInfo.transaction_details?.net_received_amount,
+        fechaAprobacion: paymentInfo.date_approved
+          ? new Date(paymentInfo.date_approved)
+          : null,
+        datosCompletos: paymentInfo,
+        turno: paymentInfo.turno,
+      });
+
+      await emFork.persistAndFlush(nuevoPago);
       return;
     }
 
@@ -137,7 +149,6 @@ async function ejecutarAccionesPorEstado(
   estadoAnterior: EstadoPago,
   nuevoEstado: EstadoPago
 ) {
-  // Solo ejecutar si cambió el estado
   if (estadoAnterior === nuevoEstado) {
     return;
   }
@@ -148,17 +159,7 @@ async function ejecutarAccionesPorEstado(
         console.log(
           `✅ Pago APROBADO - ID: ${pago.id}, Turno: ${pago.turno.id}`
         );
-
-        // 🔥 AQUÍ PUEDES AGREGAR TU LÓGICA:
-        // - Confirmar el turno
         // - Enviar email de confirmación
-        // - Enviar notificación push
-        // - Actualizar stock/disponibilidad
-        // - Generar comprobante
-
-        // Ejemplo:
-        // await enviarEmailConfirmacion(pago);
-        // await confirmarTurno(pago.turno);
 
         break;
 
@@ -167,18 +168,13 @@ async function ejecutarAccionesPorEstado(
           `❌ Pago RECHAZADO - ID: ${pago.id}, Turno: ${pago.turno.id}`
         );
 
-        // 🔥 LÓGICA PARA PAGOS RECHAZADOS:
-        // - Liberar el turno para otros usuarios
         // - Enviar email sugiriendo otro método de pago
-        // - Notificar al usuario del rechazo
 
         break;
 
       case EstadoPago.CANCELLED:
         console.log(`🚫 Pago CANCELADO - ID: ${pago.id}`);
 
-        // 🔥 LÓGICA PARA PAGOS CANCELADOS:
-        // - Liberar recursos
         // - Notificar cancelación
 
         break;
@@ -186,10 +182,7 @@ async function ejecutarAccionesPorEstado(
       case EstadoPago.PENDING:
         console.log(`⏳ Pago PENDIENTE - ID: ${pago.id}`);
 
-        // 🔥 LÓGICA PARA PAGOS PENDIENTES:
-        // - Reservar turno temporalmente
-        // - Enviar instrucciones de pago
-
+        // enviar email de recordatorio
         break;
 
       default:
@@ -197,7 +190,6 @@ async function ejecutarAccionesPorEstado(
     }
   } catch (error) {
     console.error('❌ Error ejecutando acciones por estado:', error);
-    // No lanzar error para no afectar el webhook
   }
 }
 
