@@ -8,6 +8,7 @@ type Props = {
   fechaHora: Date;
   montoFinal: number;
   servicio: Servicio;
+  turno: number;
 };
 type Servicio = {
   id: number;
@@ -40,6 +41,7 @@ const MercadoPago = (props: Props) => {
         quantity: 1,
         currency: 'ARS',
         unit_price: props.montoFinal,
+        turno: props.turno,
       });
       setPreferenceId(response.data.preferenceId);
     } catch (error) {
