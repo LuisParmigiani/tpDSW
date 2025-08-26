@@ -31,7 +31,7 @@ mercadoPago.post('/', async (req: Request, res: Response) => {
           pending: 'https://reformix.site/turnHistory/pending',
         },
         auto_return: 'approved',
-        notification_url: 'https://reformix.site/api/mercadopago/webhook',
+        notification_url: 'https://reformix.site/webhooks/mercadopago/cambio',
       },
     });
     res.json({ preferenceId: result.id });

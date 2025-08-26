@@ -6,7 +6,7 @@ import {
 
 const webhookRouter = Router();
 
-webhookRouter.post('/', mercadoPagoWebhook);
+webhookRouter.post('/cambio', mercadoPagoWebhook);
 webhookRouter.post('/verificar-pago/:idMercadoPago', verificarEstadoPago);
 
 export { webhookRouter };
