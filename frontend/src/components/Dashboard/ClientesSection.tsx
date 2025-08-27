@@ -1,100 +1,115 @@
 import DashboardSection from '../DashboardSection/DashboardSection';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import SelectionBar from '../SelectionBar/SelectionBar';
 import ItemTurno from '../itemTurno/ItemTurno';
 import PaginationControls from '../../components/Pagination/PaginationControler';
+import { turnosApi } from '../../services/turnosApi';
 
-const mockTurnos = [
-	{
-		paciente: 'Jane Cooper',
-		fecha: '30 June 2024',
-		hora: '04:30 PM',
-		estado: 'Pendiente',
-		tarea: 'Destapar cañerias',
-		avatar: 'https://randomuser.me/api/portraits/women/1.jpg',
-		monto: 1200,
-	},
-	{
-		paciente: 'Esther Howard',
-		fecha: '29 June 2024',
-		hora: '04:45 PM',
-		estado: 'Confirmado',
-		tarea: 'Instalación de aire acondicionado',
-		avatar: 'https://randomuser.me/api/portraits/women/2.jpg',
-		monto: 3500,
-	},
-	{
-		paciente: 'Guy Hawkins',
-		fecha: '28 June 2024',
-		hora: '10:30 AM',
-		estado: 'Cancelado',
-		tarea: 'Reparación de calefón',
-		avatar: 'https://randomuser.me/api/portraits/men/3.jpg',
-		monto: 1800,
-	},
-	{
-		paciente: 'Robert Fox',
-		fecha: '27 June 2024',
-		hora: '10:45 AM',
-		estado: 'Completado',
-		tarea: 'Limpieza de tanque de agua',
-		avatar: 'https://randomuser.me/api/portraits/men/4.jpg',
-		monto: 900,
-	},
-	{
-		paciente: 'Albert Flores',
-		fecha: '26 June 2024',
-		hora: '09:00 AM',
-		estado: 'Pendiente',
-		tarea: 'Cambio de grifería',
-		avatar: 'https://randomuser.me/api/portraits/men/5.jpg',
-		monto: 700,
-	},
-	{
-		paciente: 'Annette Black',
-		fecha: '25 June 2024',
-		hora: '11:15 AM',
-		estado: 'Confirmado',
-		tarea: 'Pintura de interiores',
-		avatar: 'https://randomuser.me/api/portraits/women/6.jpg',
-		monto: 2500,
-	},
-	{
-		paciente: 'Jacob Jones',
-		fecha: '24 June 2024',
-		hora: '02:00 PM',
-		estado: 'Cancelado',
-		tarea: 'Colocación de cerámicos',
-		avatar: 'https://randomuser.me/api/portraits/men/7.jpg',
-		monto: 4000,
-	},
-	{
-		paciente: 'Kristin Watson',
-		fecha: '23 June 2024',
-		hora: '03:30 PM',
-		estado: 'Completado',
-		tarea: 'Revisión eléctrica',
-		avatar: 'https://randomuser.me/api/portraits/women/8.jpg',
-		monto: 1500,
-	},
-];
+
+const PRESTADOR_ID_FIXED = '46';
+
+interface TurnoDisplay {
+	id: number;
+	paciente: string;
+	fecha: string;
+	hora: string;
+	estado: string;
+	tarea: string;
+	avatar: string;
+	monto: number;
+}
 
 function ClientesSection() {
 	const [selectedRows, setSelectedRows] = useState<number[]>([]);
 	const [showMenu, setShowMenu] = useState(false);
 	const [showBar, setShowBar] = useState(false);
 	const [fadeOut, setFadeOut] = useState(false);
-	const [turnos, setTurnos] = useState(mockTurnos);
+	const [turnos, setTurnos] = useState<TurnoDisplay[]>([]);
 	const [pendingAction, setPendingAction] = useState<null | 'Confirmado' | 'Cancelado'>(null);
 	const [modalVisible, setModalVisible] = useState(false);
 	const [currentPage, setCurrentPage] = useState(1);
+	const [totalPages, setTotalPages] = useState(1);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
 	const itemsPerPage = 6;
 
 	
-	const indexOfLastItem = currentPage * itemsPerPage;
-	const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-	const currentTurnos = turnos.slice(indexOfFirstItem, indexOfLastItem);
-	const totalPages = Math.ceil(turnos.length / itemsPerPage);
+	const convertirTurnoADisplay = (turno: unknown): TurnoDisplay => {
+		const turnoObj = turno as {
+			id: number;
+			fechaHora: string;
+			estado: string;
+			montoFinal: number;
+			usuario?: { nombre?: string; apellido?: string; mail?: string };
+			servicio?: { tarea?: { descripcionTarea?: string } };
+		};
+		
+		const fechaHora = new Date(turnoObj.fechaHora);
+		
+		return {
+			id: turnoObj.id,
+			paciente: turnoObj.usuario?.nombre && turnoObj.usuario?.apellido 
+				? `${turnoObj.usuario.nombre} ${turnoObj.usuario.apellido}`
+				: turnoObj.usuario?.mail || 'Usuario desconocido',
+			fecha: fechaHora.toLocaleDateString('es-AR', { 
+				day: 'numeric', 
+				month: 'long', 
+				year: 'numeric' 
+			}),
+			hora: fechaHora.toLocaleTimeString('es-AR', { 
+				hour: '2-digit', 
+				minute: '2-digit', 
+				hour12: true 
+			}),
+			estado: turnoObj.estado,
+			tarea: turnoObj.servicio?.tarea?.descripcionTarea || 'Tarea no especificada',
+			avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(turnoObj.usuario?.nombre || turnoObj.usuario?.mail || 'Usuario')}&background=f97316&color=ffffff`,
+			monto: turnoObj.montoFinal || 0
+		};
+	};
+
+	
+		const cargarTurnos = useCallback(async (page = 1) => {
+		try {
+			setLoading(true);
+			setError(null);
+			
+			const response = await turnosApi.getByPrestadorId(
+				PRESTADOR_ID_FIXED,
+				itemsPerPage.toString(),
+				page.toString()
+			);
+			
+			if (!response.data.data || response.data.data.length === 0) {
+				console.log('⚠️ No hay turnos para el prestador ID:', PRESTADOR_ID_FIXED);
+			}
+			
+			const turnosDisplay = response.data.data.map(convertirTurnoADisplay);
+			console.log('Turnos cargados:', turnosDisplay.length);
+			
+			setTurnos(turnosDisplay);
+			setTotalPages(response.data.pagination.totalPages);
+			
+		} catch (err: unknown) {
+			console.error('Error cargando turnos:', err);
+			console.error('Error completo:', JSON.stringify(err, null, 2));
+			setError(`Error al cargar los turnos: ${err instanceof Error ? err.message : 'Error desconocido'}`);
+		} finally {
+			setLoading(false);
+		}
+	}, [itemsPerPage]);
+
+	// Cargar turnos al montar el componente y cuando cambie la página
+	useEffect(() => {
+		cargarTurnos(currentPage);
+	}, [currentPage, cargarTurnos]);
+
+	// Los turnos actuales son todos los que se muestran (ya vienen paginados del API)
+	const currentTurnos = turnos;
+	
+	// Helper para determinar si todos los elementos de la página actual están seleccionados
+	const currentPageIndices = currentTurnos.map((_, idx) => idx);
+	const allCurrentPageSelected = currentPageIndices.length > 0 && currentPageIndices.every(idx => selectedRows.includes(idx));
 
 	useEffect(() => {
 		if (selectedRows.length > 0) {
@@ -121,17 +136,20 @@ function ClientesSection() {
 	};
 
 	const handleSelectAll = () => {
-		if (selectedRows.length === currentTurnos.length) {
+		if (allCurrentPageSelected) {
+			// Deseleccionar todos los de la página actual
 			setSelectedRows([]);
 		} else {
-			setSelectedRows(currentTurnos.map((_, idx) => indexOfFirstItem + idx));
+			// Seleccionar todos los de la página actual
+			setSelectedRows(currentPageIndices);
 		}
 	};
 
 	
 	const handlePageChange = (page: number) => {
 		setCurrentPage(page);
-		setSelectedRows([]); 
+		// Limpiar selecciones al cambiar de página (porque son datos diferentes)
+		setSelectedRows([]);
 	};
 
 	// Handler para actualizar estado de los seleccionados
@@ -139,18 +157,28 @@ function ClientesSection() {
 		setPendingAction(nuevoEstado);
 	};
 
-	const handleConfirmAction = () => {
-		if (pendingAction) {
-			setTurnos((prev) =>
-				prev.map((t, idx) =>
-					selectedRows.includes(idx) && (t.estado === 'Pendiente' || t.estado === 'Confirmado')
-						? { ...t, estado: pendingAction }
-						: t
-				)
-			);
-			setShowMenu(false);
-			setSelectedRows([]);
-			setPendingAction(null);
+	const handleConfirmAction = async () => {
+		if (pendingAction && selectedRows.length > 0) {
+			try {
+				// Obtener IDs de los turnos seleccionados que se pueden modificar
+				const turnosValidos = selectedRows
+					.map(idx => turnos[idx])
+					.filter(t => t && (t.estado === 'Pendiente' || t.estado === 'Confirmado'))
+					.map(t => t.id);
+
+				if (turnosValidos.length > 0) {
+					await turnosApi.updateMultipleEstados(turnosValidos, pendingAction);
+					// Recargar los datos después de la actualización
+					await cargarTurnos(currentPage);
+				}
+				
+				setShowMenu(false);
+				setSelectedRows([]);
+				setPendingAction(null);
+			} catch (error) {
+				console.error('Error actualizando turnos:', error);
+				setError('Error al actualizar los turnos. Por favor, intenta nuevamente.');
+			}
 		}
 	};
 
@@ -159,14 +187,48 @@ function ClientesSection() {
 	};
 
 	const getValidSelectedCount = () =>
-		selectedRows.filter(idx => turnos[idx].estado === 'Pendiente' || turnos[idx].estado === 'Confirmado').length;
+		selectedRows.filter(idx => turnos[idx] && (turnos[idx].estado === 'Pendiente' || turnos[idx].estado === 'Confirmado')).length;
 	const getInvalidSelectedCount = () =>
-		selectedRows.filter(idx => turnos[idx].estado === 'Cancelado' || turnos[idx].estado === 'Completado').length;
+		selectedRows.filter(idx => turnos[idx] && (turnos[idx].estado === 'Cancelado' || turnos[idx].estado === 'Completado')).length;
+
+	// Mostrar loading
+	if (loading) {
+		return (
+			<DashboardSection>
+				<div className="flex items-center justify-center h-64">
+					<div className="text-center">
+						<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto mb-4"></div>
+						<p className="text-gray-600">Cargando turnos...</p>
+					</div>
+				</div>
+			</DashboardSection>
+		);
+	}
+
+	// Mostrar error
+	if (error) {
+		return (
+			<DashboardSection>
+				<div className="text-center py-8">
+					<div className="text-red-500 mb-4">{error}</div>
+					<button 
+						onClick={() => cargarTurnos(currentPage)}
+						className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600"
+					>
+						Reintentar
+					</button>
+				</div>
+			</DashboardSection>
+		);
+	}
 
 	return (
 		<DashboardSection>
 			<div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
 				<h2 className="text-xl font-semibold text-gray-900">Turnos</h2>
+				<div className="text-sm text-gray-600">
+					Prestador ID: {PRESTADOR_ID_FIXED}
+				</div>
 				<div className="flex gap-2">
 					<input
 						type="text"
@@ -194,12 +256,12 @@ function ClientesSection() {
 								<span className="relative flex items-center justify-center">
 									<input
 										type="checkbox"
-										checked={selectedRows.length === currentTurnos.length && currentTurnos.length > 0}
+										checked={allCurrentPageSelected}
 										onChange={handleSelectAll}
-										className="peer h-5 w-5 rounded border border-gray-500 bg-white appearance-none cursor-pointer focus:ring-2 focus:ring-orange-500"
+										className="peer h-5 w-5 rounded border border-gray-500 bg-white appearance-none cursor-pointer focus:ring-2 focus:ring-orange-500 checked:bg-orange-500 checked:border-orange-500"
 									/>
 									<span className="absolute pointer-events-none inset-0 flex items-center justify-center">
-										{selectedRows.length === currentTurnos.length && currentTurnos.length > 0 && (
+										{allCurrentPageSelected && (
 											<svg
 												width="20"
 												height="20"
@@ -230,10 +292,10 @@ function ClientesSection() {
 					<tbody>
 						{currentTurnos.map((turno, idx) => (
 							<ItemTurno
-								key={indexOfFirstItem + idx}
+								key={turno.id}
 								turno={turno}
-								idx={indexOfFirstItem + idx}
-								selected={selectedRows.includes(indexOfFirstItem + idx)}
+								idx={idx}
+								selected={selectedRows.includes(idx)}
 								onSelect={handleSelectRow}
 							/>
 						))}

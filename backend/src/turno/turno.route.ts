@@ -7,6 +7,7 @@ import {
   update,
   remove,
   getTurnosByUserId,
+  getTurnosByPrestadorId,
   getTurnsPerDay,
 } from './turno.controler.js';
 export const turnoRouter = Router();
@@ -15,6 +16,10 @@ turnoRouter.get('/', findall);
 turnoRouter.get(
   '/byUser/:id/:cantItemsPerPage?/:currentPage?/:selectedValueShow?/:selectedValueOrder?',
   getTurnosByUserId
+);
+turnoRouter.get(
+  '/byPrestador/:id/:cantItemsPerPage?/:currentPage?/:selectedValueShow?/:selectedValueOrder?',
+  getTurnosByPrestadorId
 );
 turnoRouter.get('/turnosPorDia/:id/:date', getTurnsPerDay);
 turnoRouter.get('/:id', findone);
