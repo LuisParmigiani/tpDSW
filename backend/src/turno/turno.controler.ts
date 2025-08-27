@@ -2,6 +2,12 @@ import { Request, Response, NextFunction } from 'express';
 import { Turno } from './turno.entity.js';
 import { orm } from '../shared/db/orm.js';
 
+interface AuthRequest extends Request {
+  user?: {
+    id: string;
+    rol: string;
+  };
+}
 const em = orm.em;
 function sanitizeTurnoInput(req: Request, res: Response, next: NextFunction) {
   req.body.sanitizeTurnoInput = {
@@ -112,8 +118,8 @@ async function remove(req: Request, res: Response) {
 }
 
 // Get turns by user ID
-async function getTurnosByUserId(req: Request, res: Response) {
-  const userId = Number.parseInt(req.params.id);
+async function getTurnosByUserId(req: AuthRequest, res: Response) {
+  const userId = Number(req.user?.id); // ID del usuario autenticado que viene de la cookie
   const cantItemsPerPage = Number(req.params.cantItemsPerPage) || 10;
   const currentPage = Number(req.params.currentPage) || 1;
   const selectedValueShow = req.params.selectedValueShow || '';
@@ -208,7 +214,7 @@ async function getTurnosByUserId(req: Request, res: Response) {
         : [];
       return {
         ...turno,
-        hasPagoAprobado: pagosArray.some(
+        hayPagoAprobado: pagosArray.some(
           (pago: any) =>
             typeof pago.estado === 'string' &&
             pago.estado.trim().toLowerCase() === 'approved'
