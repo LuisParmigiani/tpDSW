@@ -55,10 +55,13 @@ export const turnosApi = {
 
   // Métodos específicos para el dashboard del prestatario
   updateMultipleEstados: async (turnoIds: number[], nuevoEstado: string) => {
+    // Convertir el estado a minúsculas antes de enviar a la BD
+    const estadoMinusculas = nuevoEstado.toLowerCase();
+    
     // Realizar actualizaciones en paralelo siguiendo el patrón de tu API
     return Promise.all(
       turnoIds.map(id => 
-        api.patch(`/turno/${id}`, { estado: nuevoEstado })
+        api.patch(`/turno/${id}`, { estado: estadoMinusculas })
       )
     );
   }
