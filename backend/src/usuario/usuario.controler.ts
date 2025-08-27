@@ -388,6 +388,37 @@ async function validarCodigoRecuperacion(req: Request, res: Response) {
   return res.status(200).json({ message: 'Código válido' });
 }
 
+async function cambiarPassword(req: Request, res: Response) {
+  const { mail, codigo, nuevaContrasena } = req.body;
+  if (!mail || !codigo || !nuevaContrasena) {
+    return res.status(400).json({ message: 'Faltan datos' });
+  }
+
+  const registro = codigosRecuperacion[mail];
+  if (!registro) {
+    return res.status(400).json({ message: 'No se solicitó recuperación' });
+  }
+  if (registro.expiracion < new Date()) {
+    return res.status(400).json({ message: 'Código expirado' });
+  }
+  if (registro.codigo !== codigo) {
+    return res.status(400).json({ message: 'Código incorrecto' });
+  }
+
+  const usuario = await em.findOne(Usuario, { mail });
+  if (!usuario) {
+    return res.status(404).json({ message: 'Usuario no encontrado' });
+  }
+
+  usuario.contrasena = await bcrypt.hash(nuevaContrasena, 10);
+  await em.flush();
+
+  // Elimina el código usado
+  delete codigosRecuperacion[mail];
+
+  return res.status(200).json({ message: 'Contraseña cambiada correctamente' });
+}
+
 export {
   sanitizeUsuarioInput,
   findAll,
@@ -400,4 +431,5 @@ export {
   getCommentsByUserId,
   recuperarContrasena,
   validarCodigoRecuperacion,
+  cambiarPassword,
 };
