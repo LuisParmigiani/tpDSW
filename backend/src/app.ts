@@ -17,6 +17,7 @@ import { CronManager } from './shared/cron/cronManager.js';
 import { PagoRouter } from './pago/pago.route.js';
 import mercadoPago from './mercadopago/mercadoPago.controller.js';
 import { webhookRouter } from './mercadopago/mercadoPago.route.js';
+import cookieParser from 'cookie-parser';
 
 //Tuve que recrear __dirname xq no estaba definido xq estamos usando ES Modules y no COmmonJS
 const __filename = fileURLToPath(import.meta.url);
@@ -45,7 +46,9 @@ app.use(
   })
 );
 
+app.use(cookieParser());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use((req, res, next: NextFunction) => {
   RequestContext.create(orm.em, next);
