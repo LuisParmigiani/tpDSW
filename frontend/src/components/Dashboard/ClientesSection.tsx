@@ -6,7 +6,48 @@ import PaginationControls from '../../components/Pagination/PaginationControler'
 import { turnosApi } from '../../services/turnosApi';
 
 
-const PRESTADOR_ID_FIXED = '46';
+const PRESTADOR_ID_FIXED = '47';
+
+// Función auxiliar para capitalizar la primera letra
+const capitalizeFirstLetter = (string: string) => {
+	if (!string) return string;
+	return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+};
+
+// Función para convertir datos del API al formato que usa el componente
+const convertirTurnoADisplay = (turno: unknown): TurnoDisplay => {
+	const turnoObj = turno as {
+		id: number;
+		fechaHora: string;
+		estado: string;
+		montoFinal: number;
+		usuario?: { nombre?: string; apellido?: string; mail?: string };
+		servicio?: { tarea?: { descripcionTarea?: string } };
+	};
+	
+	const fechaHora = new Date(turnoObj.fechaHora);
+	
+	return {
+		id: turnoObj.id,
+		paciente: turnoObj.usuario?.nombre && turnoObj.usuario?.apellido 
+			? `${turnoObj.usuario.nombre} ${turnoObj.usuario.apellido}`
+			: turnoObj.usuario?.mail || 'Usuario desconocido',
+		fecha: fechaHora.toLocaleDateString('es-AR', { 
+			day: 'numeric', 
+			month: 'long', 
+			year: 'numeric' 
+		}),
+		hora: fechaHora.toLocaleTimeString('es-AR', { 
+			hour: '2-digit', 
+			minute: '2-digit', 
+			hour12: true 
+		}),
+		estado: capitalizeFirstLetter(turnoObj.estado),
+		tarea: turnoObj.servicio?.tarea?.descripcionTarea || 'Tarea no especificada',
+		avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(turnoObj.usuario?.nombre || turnoObj.usuario?.mail || 'Usuario')}&background=f97316&color=ffffff`,
+		monto: turnoObj.montoFinal || 0
+	};
+};
 
 interface TurnoDisplay {
 	id: number;
@@ -33,43 +74,7 @@ function ClientesSection() {
 	const [error, setError] = useState<string | null>(null);
 	const itemsPerPage = 6;
 
-	
-	const convertirTurnoADisplay = (turno: unknown): TurnoDisplay => {
-		const turnoObj = turno as {
-			id: number;
-			fechaHora: string;
-			estado: string;
-			montoFinal: number;
-			usuario?: { nombre?: string; apellido?: string; mail?: string };
-			servicio?: { tarea?: { descripcionTarea?: string } };
-		};
-		
-		const fechaHora = new Date(turnoObj.fechaHora);
-		
-		return {
-			id: turnoObj.id,
-			paciente: turnoObj.usuario?.nombre && turnoObj.usuario?.apellido 
-				? `${turnoObj.usuario.nombre} ${turnoObj.usuario.apellido}`
-				: turnoObj.usuario?.mail || 'Usuario desconocido',
-			fecha: fechaHora.toLocaleDateString('es-AR', { 
-				day: 'numeric', 
-				month: 'long', 
-				year: 'numeric' 
-			}),
-			hora: fechaHora.toLocaleTimeString('es-AR', { 
-				hour: '2-digit', 
-				minute: '2-digit', 
-				hour12: true 
-			}),
-			estado: turnoObj.estado,
-			tarea: turnoObj.servicio?.tarea?.descripcionTarea || 'Tarea no especificada',
-			avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(turnoObj.usuario?.nombre || turnoObj.usuario?.mail || 'Usuario')}&background=f97316&color=ffffff`,
-			monto: turnoObj.montoFinal || 0
-		};
-	};
-
-	
-		const cargarTurnos = useCallback(async (page = 1) => {
+	const cargarTurnos = useCallback(async (page = 1) => {
 		try {
 			setLoading(true);
 			setError(null);
@@ -160,11 +165,32 @@ function ClientesSection() {
 	const handleConfirmAction = async () => {
 		if (pendingAction && selectedRows.length > 0) {
 			try {
-				// Obtener IDs de los turnos seleccionados que se pueden modificar
+				// Obtener IDs de los turnos seleccionados que se pueden modificar según las reglas de negocio
 				const turnosValidos = selectedRows
 					.map(idx => turnos[idx])
-					.filter(t => t && (t.estado === 'Pendiente' || t.estado === 'Confirmado'))
+					.filter(t => {
+						if (!t) return false;
+						
+						// Reglas de negocio:
+						// - Pendiente: puede cambiar a Confirmado o Cancelado
+						// - Confirmado: solo puede cambiar a Cancelado
+						// - Cancelado/Completado: no se pueden cambiar
+						
+						if (t.estado.toLowerCase() === 'pendiente') {
+							// Pendiente puede cambiar a cualquiera de los dos estados
+							return true;
+						} else if (t.estado.toLowerCase() === 'confirmado') {
+							// Confirmado solo puede cambiar a Cancelado
+							return pendingAction === 'Cancelado';
+						}
+						
+						// Cancelado y Completado no se pueden cambiar
+						return false;
+					})
 					.map(t => t.id);
+
+				console.log('Turnos válidos para actualizar:', turnosValidos);
+				console.log('Nuevo estado:', pendingAction);
 
 				if (turnosValidos.length > 0) {
 					await turnosApi.updateMultipleEstados(turnosValidos, pendingAction);
@@ -187,9 +213,36 @@ function ClientesSection() {
 	};
 
 	const getValidSelectedCount = () =>
-		selectedRows.filter(idx => turnos[idx] && (turnos[idx].estado === 'Pendiente' || turnos[idx].estado === 'Confirmado')).length;
+		selectedRows.filter(idx => {
+			const turno = turnos[idx];
+			if (!turno) return false;
+			
+			if (turno.estado.toLowerCase() === 'pendiente') {
+				// Pendiente puede cambiar a cualquier estado
+				return true;
+			} else if (turno.estado.toLowerCase() === 'confirmado') {
+				// Confirmado solo puede cambiar a Cancelado
+				return pendingAction === 'Cancelado';
+			}
+			
+			return false;
+		}).length;
+		
 	const getInvalidSelectedCount = () =>
-		selectedRows.filter(idx => turnos[idx] && (turnos[idx].estado === 'Cancelado' || turnos[idx].estado === 'Completado')).length;
+		selectedRows.filter(idx => {
+			const turno = turnos[idx];
+			if (!turno) return false;
+			
+			// Los inválidos son los que no se pueden cambiar según las reglas
+			if (turno.estado.toLowerCase() === 'cancelado' || turno.estado.toLowerCase() === 'completado') {
+				return true;
+			} else if (turno.estado.toLowerCase() === 'confirmado' && pendingAction === 'Confirmado') {
+				// Confirmado no puede cambiar a Confirmado
+				return true;
+			}
+			
+			return false;
+		}).length;
 
 	// Mostrar loading
 	if (loading) {
