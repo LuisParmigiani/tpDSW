@@ -4,10 +4,12 @@ import {
   getTurnosByServicioIdHelper,
   getTurnsPerDay,
 } from '../turno/turno.controler.js';
+import jwt from 'jsonwebtoken';
 
 import bcrypt from 'bcrypt';
 import { orm } from '../shared/db/orm.js';
 const em = orm.em;
+const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
 
 function sanitizeUsuarioInput(req: Request, res: Response, next: NextFunction) {
   req.body.sanitizeUsuarioInput = {
@@ -312,7 +314,20 @@ async function loginUsuario(req: Request, res: Response) {
 
     // elimina contraseña antes de enviar el usuario, probarlo
     const { contrasena: _, ...usuarioSinContrasena } = usuario;
+    if (usuarioSinContrasena) {
+      const rol =
+        usuarioSinContrasena.nombreFantasia === null ? 'cliente' : 'prestador';
+      const token = jwt.sign({ id: usuarioSinContrasena.id, rol }, JWT_SECRET, {
+        expiresIn: '1d',
+      });
 
+      // 🔹 Guardamos el token en una cookie segura
+      res.cookie('token', token, {
+        httpOnly: true, // No accesible desde JS
+        secure: true, // Solo por HTTPS (en local podés poner false)
+        sameSite: 'strict',
+      });
+    }
     return res
       .status(200)
       .json({ message: 'Login exitoso', data: usuarioSinContrasena });
