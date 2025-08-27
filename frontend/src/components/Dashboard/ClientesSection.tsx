@@ -85,12 +85,7 @@ function ClientesSection() {
 				page.toString()
 			);
 			
-			if (!response.data.data || response.data.data.length === 0) {
-				console.log('⚠️ No hay turnos para el prestador ID:', PRESTADOR_ID_FIXED);
-			}
-			
 			const turnosDisplay = response.data.data.map(convertirTurnoADisplay);
-			console.log('Turnos cargados:', turnosDisplay.length);
 			
 			setTurnos(turnosDisplay);
 			setTotalPages(response.data.pagination.totalPages);
@@ -189,9 +184,6 @@ function ClientesSection() {
 					})
 					.map(t => t.id);
 
-				console.log('Turnos válidos para actualizar:', turnosValidos);
-				console.log('Nuevo estado:', pendingAction);
-
 				if (turnosValidos.length > 0) {
 					await turnosApi.updateMultipleEstados(turnosValidos, pendingAction);
 					// Recargar los datos después de la actualización
@@ -279,9 +271,6 @@ function ClientesSection() {
 		<DashboardSection>
 			<div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
 				<h2 className="text-xl font-semibold text-gray-900">Turnos</h2>
-				<div className="text-sm text-gray-600">
-					Prestador ID: {PRESTADOR_ID_FIXED}
-				</div>
 				<div className="flex gap-2">
 					<input
 						type="text"

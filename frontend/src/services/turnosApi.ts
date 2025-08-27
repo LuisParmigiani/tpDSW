@@ -20,9 +20,6 @@ export const turnosApi = {
       url += `/${selectedValueOrder}`;
     }
     
-    console.log('🔗 URL construida:', url);
-    console.log('🔗 URL completa con base:', `API_BASE_URL${url}`);
-    
     return api.get(url);
   },
   getByPrestadorId: (
@@ -40,8 +37,6 @@ export const turnosApi = {
     if (selectedValueOrder) {
       url += `/${selectedValueOrder}`;
     }
-    
-    console.log('🔗 URL prestatario construida:', url);
     
     return api.get(url);
   },
