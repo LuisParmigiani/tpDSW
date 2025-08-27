@@ -40,4 +40,6 @@ export const usuariosApi = {
   recoverPassword: (data: EntityData) => api.post('/usuario/recuperar', data),
   validateRecoveryCode: (data: EntityData) =>
     api.post('/usuario/validar-codigo', data),
+  cambiarPassword: (data: EntityData) =>
+    api.post('/usuario/cambiar-password', data),
 };

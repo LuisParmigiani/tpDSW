@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { usuariosApi } from '../../services/usuariosApi';
 import { z } from 'zod';
 
@@ -15,14 +15,33 @@ function Recovery() {
   const [message, setMessage] = useState('');
   const [codigo, setCodigo] = useState('');
 
+  const navigate = useNavigate();
+
+  //Estados para el temporizador de recuperación
+  const [tiempoRestante, setTiempoRestante] = useState(0);
+  const [timerActivo, setTimerActivo] = useState(false);
+
+  //animación de cuenta atrás en temporizador de recuperación
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (timerActivo && tiempoRestante > 0) {
+      interval = setInterval(() => {
+        setTiempoRestante((prev) => prev - 1);
+      }, 1000);
+    } else if (tiempoRestante === 0) {
+      setTimerActivo(false);
+    }
+    return () => clearInterval(interval);
+  }, [timerActivo, tiempoRestante]);
+
   const validarCodigo = async () => {
     try {
-      const response = await usuariosApi.validateRecoveryCode({
+      await usuariosApi.validateRecoveryCode({
         mail: form.mail,
         codigo,
       });
       console.log('Código válido. Ahora puedes cambiar tu contraseña.');
-      // redirigir desde acá
+      navigate('/changepassword', { state: { mail: form.mail, codigo } });
     } catch {
       console.log('Código incorrecto o expirado');
     }
@@ -36,6 +55,7 @@ function Recovery() {
     const result = usuarioSchema.safeParse(form);
     if (!result.success) {
       setOpen(true);
+      setCodigo('');
       setMessage('Ingresa un formato de email válido');
       return;
     }
@@ -44,9 +64,13 @@ function Recovery() {
       await usuariosApi.recoverPassword(form);
       console.log('Recuperación de contraseña exitosa');
       setOpen(true);
+      setCodigo('');
       setMessage('Ingrese el código de recuperación que se envió a su email');
+      setTiempoRestante(20); // 5 minutos
+      setTimerActivo(true);
     } catch (error) {
       setOpen(true);
+      setCodigo('');
       const err = error as { response?: { status?: number } };
       if (err.response && err.response.status === 404) {
         setMessage('No existe un usuario con ese email');
@@ -62,7 +86,7 @@ function Recovery() {
     <>
       {open && (
         <div className="fixed inset-0 flex items-center justify-center bg-neutral-5 backdrop-blur-md bg-opacity-40 z-50">
-          <div className="text-black bg-white p-4 rounded shadow-md">
+          <div className="text-black bg-white p-4 rounded shadow-md max-w-xl w-full text-center">
             <div className="flex justify-end z-30 bg-transparent w-auto">
               <button
                 onClick={() => {
@@ -88,19 +112,46 @@ function Recovery() {
                 </svg>
               </button>
             </div>
-            <p>{message}</p>
+            <p className="break-words whitespace-pre-line">{message}</p>
             <input
               className="w-full pt-3 pb-3 pr-5 pl-12 text-base border-none rounded-4xl bg-gray-100 shadow-inner outline-none mb-4 text-black font-inter"
               placeholder="Código de recuperación"
               onChange={(e) => setCodigo(e.target.value)}
               value={codigo}
             />
+            {timerActivo && (
+              <p className="text-sm text-gray-500 mb-2">
+                Podrá pedir otro código en {Math.floor(tiempoRestante / 60)}:
+                {(tiempoRestante % 60).toString().padStart(2, '0')} minutos
+              </p>
+            )}
             <button
               onClick={validarCodigo}
               type="submit"
-              className="mt-2 px-4 py-2 bg-naranja-1 text-white rounded hover:bg-naranja-2"
+              className={
+                codigo === ''
+                  ? 'mt-2 px-4 py-2 bg-gray-200 text-black rounded'
+                  : 'mt-2 px-4 py-2 bg-naranja-1 text-white rounded hover:bg-naranja-2'
+              }
+              disabled={codigo === ''}
             >
               Ingresar
+            </button>
+            <button
+              onClick={() => {
+                envioFormulario();
+                setTiempoRestante(20); // reinicia a 10 minutos
+                setTimerActivo(true);
+              }}
+              type="button"
+              className={
+                timerActivo
+                  ? 'mt-2 ml-2 px-4 py-2 bg-gray-200 text-black rounded '
+                  : 'mt-2 ml-2 px-4 py-2 bg-naranja-1 text-white rounded hover:bg-naranja-2'
+              }
+              disabled={timerActivo}
+            >
+              Reenviar código
             </button>
           </div>
         </div>
@@ -130,29 +181,25 @@ function Recovery() {
                 />
                 <i className="fa-solid fa-envelope absolute top-6 left-4 -translate-y-1/2 text-gray-500 text-1xl pointer-events-none"></i>
               </div>
-              {/*
-            <div className="relative inline-block w-full max-w-xs">
-              <input
-                type="text"
-                placeholder="Código de verificación"
-                className="w-full pt-3 pb-3 pr-5 pl-12 text-base border-none rounded-[30px] bg-[#f5f5f5] shadow-[inset_0_0_3px_rgba(0,0,0,0.1)] outline-none mb-4 text-black font-inter"
-              />
-              <i className="fa-solid fa-asterisk absolute top-1/2 left-4 -translate-y-1/2 text-gray-500 text-[16px] pointer-events-none"></i>
-            </div>
-            */}
             </form>
             <button
               className={
-                form.mail === ''
+                form.mail === '' || timerActivo
                   ? 'w-full bg-gray-300 text-black-500 px-5 py-2.5 rounded-b-2xl cursor-pointer focus:outline-none mb-5 mt-3'
                   : 'w-full bg-naranja-1 text-white px-5 py-2.5 rounded-b-2xl cursor-pointer hover:text-black focus:outline-none mb-5 mt-3 hover:shadow-lg'
               }
               onClick={envioFormulario}
               type="submit"
-              disabled={form.mail === ''}
+              disabled={form.mail === '' || timerActivo}
             >
               Recuperar contraseña
             </button>
+            {timerActivo && (
+              <p className="text-sm text-gray-500 mb-2">
+                Podrás pedir otro código en {Math.floor(tiempoRestante / 60)}:
+                {(tiempoRestante % 60).toString().padStart(2, '0')} minutos
+              </p>
+            )}
             <p className="text-black font-inter  mb-7">
               ¿No tienes cuenta?{' '}
               <Link
