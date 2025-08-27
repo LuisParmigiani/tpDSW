@@ -1,14 +1,13 @@
-
 POST http://localhost:3000/api/pago
 Content-Type: application/json
 
 {
-  "fechaHora": "2025-08-23T19:30:00.000Z",
-  "idMercadoPago": "123456789",
+  "fechaHora": "2025-02-23T19:30:00.000Z",
+  "idMercadoPago": "129136789",
   "descripcionPago": "Pago confirmado por calificación",
-  "monto": 1000,
-  "estado": "aprobado",
+  "monto": 10000,
+  "estado": "pending",
   "cuotas": 1,
-  "fechaActualizacion": "2025-08-23T19:30:00.000Z",
-  "turno": 30
+  "fechaActualizacion": "2025-07-23T19:30:00.000Z",
+  "turno": 41
 }

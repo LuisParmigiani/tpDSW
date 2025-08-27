@@ -99,7 +99,7 @@ export function ServiciosForm({
             type="reset"
             className={
               'border-1 border-gray-800 min-w-10 bg-gray-500 text-white text-center py-1 px-4 rounded-md  ' +
-              'hover:bg-gray-300 hover:text-gray-800 w-25 transition duration-300 cursor-pointer hidden lg:block'
+              'hover:bg-gray-300 hover:text-gray-800 w-30 transition duration-300 cursor-pointer hidden lg:block'
             }
             onClick={() => form.reset()}
           >
@@ -201,7 +201,7 @@ export function ServiciosForm({
             className={
               'bg-naranja-1 border-2 border-naranja-1 text-white text-center py-1 px-4 rounded-md hover:bg-white ' +
               'hover:border-naranja-1 hover:border-2 hover:text-naranja-1 hover:text-primary transition-duration-300 ' +
-              'box-border cursor-pointer w-25'
+              'box-border cursor-pointer w-30'
             }
           >
             Buscar
@@ -212,7 +212,7 @@ export function ServiciosForm({
               type="reset"
               className={
                 'border-1 border-gray-800 min-w-10 bg-gray-500 text-white text-center py-1 px-4 rounder-md  ' +
-                'hover:bg-gray-300 hover:text-gray-800 w-25 transition duration-300 cursor-pointer lg:hidden'
+                'hover:bg-gray-300 hover:text-gray-800 w-30 transition duration-300 cursor-pointer lg:hidden'
               }
               onClick={() => form.reset()}
             >

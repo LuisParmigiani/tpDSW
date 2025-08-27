@@ -5,14 +5,13 @@ export const turnosApi = {
   getAll: () => api.get('/turno'),
   getById: (id: string) => api.get(`/turno/${id}`),
   getByUserId: (
-    id: string,
     cantItemsPerPage: string,
     currentPage: string,
     selectedValueShow?: string,
     selectedValueOrder?: string
   ) => {
     // Construir la URL con parámetros en la ruta como espera el backend
-    let url = `/turno/byUser/${id}/${cantItemsPerPage}/${currentPage}`;
+    let url = `/turno/byUser/${cantItemsPerPage}/${currentPage}`;
     if (selectedValueShow) {
       url += `/${selectedValueShow}`;
     }

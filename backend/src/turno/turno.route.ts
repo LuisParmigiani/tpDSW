@@ -10,11 +10,13 @@ import {
   getTurnosByPrestadorId,
   getTurnsPerDay,
 } from './turno.controler.js';
+import { verifyToken } from '../shared/middleware/auth.middleware.js';
 export const turnoRouter = Router();
 
 turnoRouter.get('/', findall);
 turnoRouter.get(
-  '/byUser/:id/:cantItemsPerPage?/:currentPage?/:selectedValueShow?/:selectedValueOrder?',
+  '/byUser/:cantItemsPerPage?/:currentPage?/:selectedValueShow?/:selectedValueOrder?',
+  verifyToken,
   getTurnosByUserId
 );
 turnoRouter.get(

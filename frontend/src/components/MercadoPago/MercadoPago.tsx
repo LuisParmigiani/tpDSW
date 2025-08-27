@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
 import { mercadoPagoApi } from '../../services/mercadoPagoApi';
 // Inicializa Mercado Pago con tu public key
-initMercadoPago('APP_USR-0e40b53e-63b6-4362-b796-1a7b894aaf33');
+initMercadoPago('APP_USR-88fb13a3-185f-4cb7-a979-07c48e7fe2e4');
 
 type Props = {
   fechaHora: Date;
   montoFinal: number;
   servicio: Servicio;
+  turno: number;
 };
 type Servicio = {
   id: number;
@@ -40,6 +41,7 @@ const MercadoPago = (props: Props) => {
         quantity: 1,
         currency: 'ARS',
         unit_price: props.montoFinal,
+        turno: props.turno,
       });
       setPreferenceId(response.data.preferenceId);
     } catch (error) {
