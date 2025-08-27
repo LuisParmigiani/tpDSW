@@ -46,10 +46,10 @@ const ItemTurno: React.FC<ItemTurnoProps> = ({ turno, idx, selected, onSelect })
       <td className="py-3 px-4 text-left">
         <span
           className={`px-2 py-1 rounded-full text-xs font-semibold
-            ${turno.estado === 'Pendiente' ? 'bg-yellow-100 text-yellow-700'
-              : turno.estado === 'Confirmado' ? 'bg-blue-100 text-blue-700'
-              : turno.estado === 'Cancelado' ? 'bg-red-100 text-red-700'
-              : turno.estado === 'Completado' ? 'bg-green-100 text-green-700'
+            ${turno.estado.toLowerCase() === 'pendiente' ? 'bg-yellow-100 text-yellow-800'
+              : turno.estado.toLowerCase() === 'confirmado' ? 'bg-blue-100 text-blue-800'
+              : turno.estado.toLowerCase() === 'cancelado' ? 'bg-red-100 text-red-800'
+              : turno.estado.toLowerCase() === 'completado' ? 'bg-green-100 text-green-800'
               : 'bg-gray-100 text-gray-700'}
           `}
         >
