@@ -12,7 +12,7 @@ const useAuth = () => {
   console.log('useAuth renderizado');
   const verificarAuth = async () => {
     try {
-      const response = await fetch('/api/auth/verificar', {
+      const response = await fetch('https://backend-patient-morning-1303.fly.dev/api/auth/verificar', {
         credentials: 'include',
       });
 
@@ -23,8 +23,8 @@ const useAuth = () => {
         setUsuario(null);
       }
       console.log('useAuth entre al try');
-    } catch {
-      console.log('useAuth entre al catch');
+    } catch (error) {
+      console.log('useAuth entre al catch', error);
       setUsuario(null);
     } finally {
       console.log('useAuth entre al finally');
