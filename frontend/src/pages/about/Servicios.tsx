@@ -19,6 +19,7 @@ type Usuario = {
     nombreTipo: string;
     descripcionTipo: string;
   }>;
+  tareas: Array<{ nombreTarea: string }>;
   zonas: Array<{ id: number; descripcionZona: string }>;
   calificacion: number;
 
@@ -26,13 +27,27 @@ type Usuario = {
 };
 type Filtros = {
   servicio: string;
+  tarea?: string;
   zona: string;
   ordenarPor: string;
+};
+type TipoServicioResponse = {
+  id: number;
+  nombreTipo: string;
+  descripcionTipo: string;
+  tareas: Array<{
+    id: number;
+    nombreTarea: string;
+    descripcionTarea: string;
+    duracionTarea: number;
+    tipoServicio: number;
+  }>;
 };
 
 type TipoServicio = {
   nombreTipo: string;
   descripcionTipo: string;
+  tareas: Array<{ id: number; nombreTarea: string }>;
 };
 type Zona = {
   id: number;
@@ -41,6 +56,7 @@ type Zona = {
 
 type FormValues = {
   servicio: string;
+  tarea?: string;
   zona: string;
   ordenarPor: string;
 };
@@ -48,11 +64,13 @@ function FiltrosDeServicios() {
   // Get URL parameters
   const [searchParams] = useSearchParams();
   const servicioParam = searchParams.get('tipoServicio') || '';
+  const tareaParam = searchParams.get('tarea') || '';
   const zonaParam = searchParams.get('zona') || '';
   const orderByParam = searchParams.get('orderBy') || '';
 
   const [filtrosForm, setFiltrosForm] = useState<Filtros>({
     servicio: '',
+    tarea: '',
     zona: '',
     ordenarPor: '',
   });
@@ -73,13 +91,26 @@ function FiltrosDeServicios() {
   useEffect(() => {
     const fetchServicios = async () => {
       try {
-        const response = await tiposServicioApi.getAll();
-        const servs = response.data.data;
-        servs.push({
+        const response = await tiposServicioApi.getAllWithTareas();
+        const tipoServs = response.data.data;
+        const tareasDelTipo: Array<{ id: number; nombreTarea: string }> = [];
+        tipoServs.forEach((element: TipoServicioResponse) => {
+          element.tareas.forEach(
+            (tarea: { id: number; nombreTarea: string }) => {
+              const tareaResponse = {
+                id: tarea.id,
+                nombreTarea: tarea.nombreTarea,
+              };
+              tareasDelTipo.push(tareaResponse);
+            }
+          );
+        });
+        tipoServs.push({
           nombreTipo: 'Todos',
           descripcionTipo: 'Todos los servicios',
+          tareas: tareasDelTipo,
         });
-        setTipoServicios(servs); // Use the modified array
+        setTipoServicios(tipoServs); // Use the modified array
       } catch (error) {
         console.error('Error fetching servicios:', error);
         return [];
@@ -104,9 +135,10 @@ function FiltrosDeServicios() {
     fetchZonas();
     // Hago que es muestren todos de manera default:
 
-    if (servicioParam && zonaParam && orderByParam) {
+    if (servicioParam && tareaParam && zonaParam && orderByParam) {
       setFiltrosForm({
         servicio: servicioParam,
+        tarea: tareaParam,
         zona: zonaParam,
         ordenarPor: orderByParam,
       });
@@ -119,13 +151,14 @@ function FiltrosDeServicios() {
       }));
     }
     setSubmit(true); // Trigger the search after fetching
-  }, [orderByParam, servicioParam, zonaParam]);
+  }, [orderByParam, servicioParam, tareaParam, zonaParam]);
 
   useEffect(() => {
     if (!submit) return;
 
     const fetchUsuarios = async (
       servicio: string,
+      tarea: string | undefined,
       zona: string,
       ordenarPor: string,
       cantPrestPorPagina: string,
@@ -139,11 +172,12 @@ function FiltrosDeServicios() {
       try {
         setIsLoading(true);
         console.log(
-          `Fetching usuarios for servicio: ${servicio}, zona: ${zona} and ordered by: ${ordenarPor}`
+          `Fetching usuarios for servicio: ${servicio},tarea: ${tarea}, zona: ${zona} and ordered by: ${ordenarPor}`
         );
         console.log(cantPrestPorPagina, currentPage);
         const response = await usuariosApi.getPrestatariosByTipoServicioAndZona(
           servicio,
+          tarea || '',
           zona,
           ordenarPor,
           cantPrestPorPagina,
@@ -165,6 +199,7 @@ function FiltrosDeServicios() {
 
     fetchUsuarios(
       filtrosForm.servicio,
+      filtrosForm.tarea,
       filtrosForm.zona,
       filtrosForm.ordenarPor,
       cantPrestPorPagina,
@@ -173,6 +208,7 @@ function FiltrosDeServicios() {
   }, [
     submit,
     filtrosForm.servicio,
+    filtrosForm.tarea,
     filtrosForm.zona,
     filtrosForm.ordenarPor,
     currentPage,

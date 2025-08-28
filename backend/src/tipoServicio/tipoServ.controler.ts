@@ -35,6 +35,14 @@ async function findAll(_req: Request, res: Response) {
     res.status(500).json({ message: error.message });
   }
 }
+async function findAllWithTareas(_req: Request, res: Response) {
+  try {
+    const types = await em.find(TipoServicio, {}, { populate: ['tareas'] });
+    res.status(200).json({ message: 'found all services', data: types });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+}
 
 async function findOne(req: Request, res: Response) {
   try {
@@ -93,4 +101,12 @@ async function remove(req: Request, res: Response) {
   }
 }
 
-export { sanitizeServiceTypeInput, findAll, findOne, add, update, remove };
+export {
+  sanitizeServiceTypeInput,
+  findAll,
+  findAllWithTareas,
+  findOne,
+  add,
+  update,
+  remove,
+};
