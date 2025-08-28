@@ -1,5 +1,5 @@
 import DashboardSection from '../DashboardSection/DashboardSection';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import SelectionBar from '../SelectionBar/SelectionBar';
 import ItemTurno from '../itemTurno/ItemTurno';
 import PaginationControls from '../../components/Pagination/PaginationControler';
@@ -33,9 +33,9 @@ const convertirTurnoADisplay = (turno: unknown): TurnoDisplay => {
 			? `${turnoObj.usuario.nombre} ${turnoObj.usuario.apellido}`
 			: turnoObj.usuario?.mail || 'Usuario desconocido',
 		fecha: fechaHora.toLocaleDateString('es-AR', { 
-			day: 'numeric', 
-			month: 'long', 
-			year: 'numeric' 
+			day: '2-digit', 
+			month: '2-digit', 
+			year: '2-digit' 
 		}),
 		hora: fechaHora.toLocaleTimeString('es-AR', { 
 			hour: '2-digit', 
@@ -45,7 +45,7 @@ const convertirTurnoADisplay = (turno: unknown): TurnoDisplay => {
 		estado: capitalizeFirstLetter(turnoObj.estado),
 		tarea: turnoObj.servicio?.tarea?.descripcionTarea || 'Tarea no especificada',
 		avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(turnoObj.usuario?.nombre || turnoObj.usuario?.mail || 'Usuario')}&background=f97316&color=ffffff`,
-		monto: turnoObj.montoFinal || 0
+		monto: Number(turnoObj.montoFinal) || 0
 	};
 };
 
@@ -72,17 +72,57 @@ function ClientesSection() {
 	const [totalPages, setTotalPages] = useState(1);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const [sortBy, setSortBy] = useState<string>('');
+	const [estadoFilters, setEstadoFilters] = useState<string[]>([]);
+	const [showEstadoDropdown, setShowEstadoDropdown] = useState(false);
+	const dropdownRef = useRef<HTMLDivElement>(null);
 	const itemsPerPage = 6;
 
-	const cargarTurnos = useCallback(async (page = 1) => {
+	const cargarTurnos = useCallback(async (page = 1, ordenamiento = sortBy, filtrosEstado = estadoFilters) => {
 		try {
 			setLoading(true);
 			setError(null);
 			
+			// Mapear las opciones del frontend a los valores que espera el backend
+			let backendOrderValue = '';
+			switch (ordenamiento) {
+				case 'fecha':
+					backendOrderValue = 'fechaD'; // Fecha descendente (más reciente primero)
+					break;
+				case 'fechaAsc':
+					backendOrderValue = 'fechaA'; // Fecha ascendente (más antigua primero)
+					break;
+				case 'monto':
+					backendOrderValue = 'montoD'; // Monto descendente (mayor primero)
+					break;
+				case 'montoMenor':
+					backendOrderValue = 'montoA'; // Monto ascendente (menor primero)
+					break;
+				default:
+					backendOrderValue = ''; // Sin ordenamiento específico
+			}
+			
+			// Determinar filtro de estado para el backend
+			let backendFilterValue = '';
+			if (filtrosEstado.length === 1) {
+				// Si solo hay un filtro seleccionado, usar el filtro específico
+				const estado = filtrosEstado[0].toLowerCase();
+				if (estado === 'pendiente') backendFilterValue = 'pendientes';
+				else if (estado === 'confirmado') backendFilterValue = 'confirmados';
+				else if (estado === 'cancelado') backendFilterValue = 'cancelados';
+				else if (estado === 'completado') backendFilterValue = 'completado';
+			} else if (filtrosEstado.length > 1) {
+				// Para múltiples filtros, enviamos los estados separados por coma
+				backendFilterValue = 'multipleStates:' + filtrosEstado.map(e => e.toLowerCase()).join(',');
+			}
+			// Si no hay filtros, no aplicar filtro específico (mostrar todos)
+			
 			const response = await turnosApi.getByPrestadorId(
 				PRESTADOR_ID_FIXED,
 				itemsPerPage.toString(),
-				page.toString()
+				page.toString(),
+				backendFilterValue || 'all', // selectedValueShow - usar 'all' si está vacío
+				backendOrderValue // selectedValueOrder - nuestro ordenamiento
 			);
 			
 			const turnosDisplay = response.data.data.map(convertirTurnoADisplay);
@@ -97,7 +137,7 @@ function ClientesSection() {
 		} finally {
 			setLoading(false);
 		}
-	}, [itemsPerPage]);
+	}, [itemsPerPage, sortBy, estadoFilters]);
 
 	// Cargar turnos al montar el componente y cuando cambie la página
 	useEffect(() => {
@@ -128,6 +168,20 @@ function ClientesSection() {
 			setTimeout(() => setModalVisible(false), 200);
 		}
 	}, [pendingAction, modalVisible]);
+
+	// Cerrar dropdown cuando se hace clic fuera
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+				setShowEstadoDropdown(false);
+			}
+		};
+
+		document.addEventListener('mousedown', handleClickOutside);
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside);
+		};
+	}, []);
 
 	const handleSelectRow = (idx: number) => {
 		setSelectedRows((prev) =>
@@ -236,6 +290,37 @@ function ClientesSection() {
 			return false;
 		}).length;
 
+	// Función para manejar el cambio de ordenamiento
+	const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+		const newSortBy = event.target.value;
+		setSortBy(newSortBy);
+		
+		// Recargar los datos con el nuevo ordenamiento desde la primera página
+		setCurrentPage(1);
+		cargarTurnos(1, newSortBy);
+	};
+
+	// Funciones para manejar los filtros de estado
+	const handleEstadoFilterChange = (estado: string) => {
+		const newFilters = estadoFilters.includes(estado)
+			? estadoFilters.filter(f => f !== estado)
+			: [...estadoFilters, estado];
+			
+		setEstadoFilters(newFilters);
+		
+		// Recargar los datos con los nuevos filtros desde la primera página
+		setCurrentPage(1);
+		cargarTurnos(1, sortBy, newFilters);
+	};
+
+	const clearEstadoFilters = () => {
+		setEstadoFilters([]);
+		setCurrentPage(1);
+		cargarTurnos(1, sortBy, []);
+	};
+
+	const estadosDisponibles = ['Pendiente', 'Confirmado', 'Cancelado', 'Completado'];
+
 	// Mostrar loading
 	if (loading) {
 		return (
@@ -277,21 +362,80 @@ function ClientesSection() {
 						placeholder="Buscar..."
 						className="border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
 					/>
-					<select className="border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+					<select 
+						value={sortBy}
+						onChange={handleSortChange}
+						className="border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+					>
 						<option value="" className="text-gray-700 bg-white">
 							Ordenar por
 						</option>
 						<option value="fecha" className="text-gray-700 bg-white">
-							Fecha
+							Fecha (más reciente)
 						</option>
-						<option value="estado" className="text-gray-700 bg-white">
-							Estado
+						<option value="fechaAsc" className="text-gray-700 bg-white">
+							Fecha (más antigua)
+						</option>
+						<option value="monto" className="text-gray-700 bg-white">
+							Monto (mayor)
+						</option>
+						<option value="montoMenor" className="text-gray-700 bg-white">
+							Monto (menor)
 						</option>
 					</select>
+					
+					{/* Dropdown de filtrar por estado */}
+					<div className="relative" ref={dropdownRef}>
+						<button
+							onClick={() => setShowEstadoDropdown(!showEstadoDropdown)}
+							className="border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 flex items-center gap-2"
+						>
+							<span>
+								Filtrar por {estadoFilters.length > 0 && `(${estadoFilters.length})`}
+							</span>
+							<svg 
+								className={`w-4 h-4 transition-transform ${showEstadoDropdown ? 'rotate-180' : ''}`} 
+								fill="none" 
+								stroke="currentColor" 
+								viewBox="0 0 24 24"
+							>
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+							</svg>
+						</button>
+						
+						{showEstadoDropdown && (
+							<div className="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+								<div className="p-3">
+									<div className="flex justify-between items-center mb-2">
+										<span className="text-sm font-medium text-gray-700">Estados</span>
+										{estadoFilters.length > 0 && (
+											<button
+												onClick={clearEstadoFilters}
+												className="text-xs text-orange-600 hover:text-orange-700"
+											>
+												Limpiar
+											</button>
+										)}
+									</div>
+									{estadosDisponibles.map(estado => (
+										<label key={estado} className="flex items-center gap-2 py-1 cursor-pointer hover:bg-gray-50 rounded px-1">
+											<input
+												type="checkbox"
+												checked={estadoFilters.includes(estado)}
+												onChange={() => handleEstadoFilterChange(estado)}
+												className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+											/>
+											<span className="text-sm text-gray-700">{estado}</span>
+										</label>
+									))}
+								</div>
+							</div>
+						)}
+					</div>
 				</div>
 			</div>
 			<div className="overflow-x-auto bg-white rounded-lg shadow relative">
-				<table className="min-w-full text-sm">
+				<table className="min-w-full text-sm table-fixed">
 					<thead>
 						<tr className="bg-gray-100 text-gray-700">
 							<th className="py-3 px-4 text-center">
@@ -343,11 +487,13 @@ function ClientesSection() {
 						))}
 					</tbody>
 				</table>
-				<PaginationControls
-					currentPage={currentPage}
-					totalPages={totalPages}
-					onPageChange={handlePageChange}
-				/>
+				<div className="mt-4 min-h-[60px] flex items-center justify-start">
+					<PaginationControls
+						currentPage={currentPage}
+						totalPages={totalPages}
+						onPageChange={handlePageChange}
+					/>
+				</div>
 				<style>{`
           .fade-in {
             opacity: 0;

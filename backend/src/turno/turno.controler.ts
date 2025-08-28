@@ -140,6 +140,9 @@ async function getTurnosByUserId(req: AuthRequest, res: Response) {
     case 'pendientes':
       calificacionFilter = { estado: 'pendiente' };
       break;
+    case 'confirmados':
+      calificacionFilter = { estado: 'confirmado' };
+      break;
     case 'completado':
       calificacionFilter = {
         estado: 'completado',
@@ -327,13 +330,18 @@ async function getTurnsPerDay(req: Request, res: Response) {
   }
 }
 
-// Nueva función para obtener turnos como PRESTATARIO (quien ofrece servicios)
+
 async function getTurnosByPrestadorId(req: Request, res: Response) {
   const prestadorId = Number.parseInt(req.params.id);
   const cantItemsPerPage = Number(req.params.cantItemsPerPage) || 10;
   const currentPage = Number(req.params.currentPage) || 1;
   const selectedValueShow = req.params.selectedValueShow || '';
   const selectedValueOrder = req.params.selectedValueOrder || '';
+
+  console.log('=== DEBUG ORDENAMIENTO ===');
+  console.log('selectedValueOrder recibido:', selectedValueOrder);
+  console.log('selectedValueShow recibido:', selectedValueShow);
+  console.log('isMultipleStatesFilter:', selectedValueShow.startsWith('multipleStates:'));
 
   // Determinar el filtro de calificación según selectedValueShow
   let calificacionFilter: any = {};
@@ -349,6 +357,9 @@ async function getTurnosByPrestadorId(req: Request, res: Response) {
       break;
     case 'pendientes':
       calificacionFilter = { estado: 'pendiente' };
+      break;
+    case 'confirmados':
+      calificacionFilter = { estado: 'confirmado' };
       break;
     case 'completado':
       calificacionFilter = {
@@ -379,24 +390,61 @@ async function getTurnosByPrestadorId(req: Request, res: Response) {
         estado: 'completado',
         pagos: { $some: { estado: 'pendiente' } },
       };
-  }
-  
-  let selectedValueOrderShow;
-  switch (selectedValueOrder) {
-    case 'fechaA':
-      selectedValueOrderShow = { fechaHora: 1 };
       break;
-    case 'calificacionM':
-      selectedValueOrderShow = { fechaHora: -1 };
-      break;
-    case 'calificacionB':
-      selectedValueOrderShow = { calificacion: -1 };
-      break;
-    case 'calificacionP':
-      selectedValueOrderShow = { calificacion: 1 };
+    case 'all':
+      // Sin filtro específico
+      calificacionFilter = {};
       break;
     default:
-      selectedValueOrderShow = { fechaHora: -1 };
+      // Manejar filtros múltiples: multipleStates:pendiente,confirmado,cancelado
+      if (selectedValueShow.startsWith('multipleStates:')) {
+        const estados = selectedValueShow.replace('multipleStates:', '').split(',');
+        calificacionFilter = { 
+          estado: { $in: estados } 
+        };
+      }
+      break;
+  }
+  
+  // Variable para detectar si hay múltiples estados filtrados
+  const isMultipleStatesFilter = selectedValueShow.startsWith('multipleStates:');
+  
+  let selectedValueOrderShow;
+  
+  // Si hay múltiples estados filtrados, usar ordenamiento personalizado por estado
+  if (isMultipleStatesFilter) {
+    // Para múltiples estados, haremos el ordenamiento en JavaScript después de la consulta
+    // Por ahora usamos ordenamiento por fecha como base
+    selectedValueOrderShow = { fechaHora: -1 };
+  } else {
+    // Ordenamiento normal para filtros únicos
+    switch (selectedValueOrder) {
+      case 'fechaA':
+        selectedValueOrderShow = { fechaHora: 1 };
+        break;
+      case 'fechaD':
+        selectedValueOrderShow = { fechaHora: -1 };
+        break;
+      case 'montoA':
+        selectedValueOrderShow = { montoFinal: 1 };
+        console.log('Aplicando ordenamiento por monto ascendente');
+        break;
+      case 'montoD':
+        selectedValueOrderShow = { montoFinal: -1 };
+        console.log('Aplicando ordenamiento por monto descendente');
+        break;
+      case 'calificacionM':
+        selectedValueOrderShow = { fechaHora: -1 };
+        break;
+      case 'calificacionB':
+        selectedValueOrderShow = { calificacion: -1 };
+        break;
+      case 'calificacionP':
+        selectedValueOrderShow = { calificacion: 1 };
+        break;
+      default:
+        selectedValueOrderShow = { id: -1 }; // Ordenar por ID descendente (entradas más recientes primero)
+    }
   }
 
   // Buscar turnos donde el PRESTATARIO (servicio.usuario) es el prestadorId
@@ -409,18 +457,86 @@ async function getTurnosByPrestadorId(req: Request, res: Response) {
     // Total de turnos para el paginado
     const totalCount = await em.count(Turno, where);
 
-    // Buscar los turnos del prestatario
-    const turnos = await em.find(Turno, where, {
-      populate: [
-        'servicio.tarea.tipoServicio',
-        'servicio.usuario',
-        'usuario',
-        'pagos',
-      ],
-      limit: cantItemsPerPage,
-      offset: (currentPage - 1) * cantItemsPerPage,
-      orderBy: [selectedValueOrderShow],
-    });
+    let turnos;
+    
+    if (isMultipleStatesFilter) {
+      // Para múltiples filtros, obtenemos TODOS los turnos primero
+      const allTurnos = await em.find(Turno, where, {
+        populate: [
+          'servicio.tarea.tipoServicio',
+          'servicio.usuario',
+          'usuario',
+          'pagos',
+        ],
+        // Sin limit ni offset - obtenemos todos
+      });
+      
+      // Aplicar ordenamiento personalizado a TODOS los turnos
+      allTurnos.sort((a, b) => {
+        // Definir el orden de prioridad para los estados
+        const estadoOrder: { [key: string]: number } = {
+          'pendiente': 1,
+          'confirmado': 2,
+          'completado': 3,
+          'cancelado': 4
+        };
+        
+        const prioridadA = estadoOrder[a.estado] || 5;
+        const prioridadB = estadoOrder[b.estado] || 5;
+        
+        // Primero ordenar por prioridad de estado
+        if (prioridadA !== prioridadB) {
+          return prioridadA - prioridadB;
+        }
+        
+        // Si tienen el mismo estado, aplicar el ordenamiento seleccionado por el usuario
+        switch (selectedValueOrder) {
+          case 'fechaA':
+            return new Date(a.fechaHora).getTime() - new Date(b.fechaHora).getTime();
+          case 'fechaD':
+            return new Date(b.fechaHora).getTime() - new Date(a.fechaHora).getTime();
+          case 'montoA':
+            return (a.montoFinal || 0) - (b.montoFinal || 0);
+          case 'montoD':
+            return (b.montoFinal || 0) - (a.montoFinal || 0);
+          case 'calificacionP':
+            return (a.calificacion || 0) - (b.calificacion || 0);
+          case 'calificacionB':
+            return (b.calificacion || 0) - (a.calificacion || 0);
+          default:
+            // Por defecto, ordenar por ID descendente (entradas más recientes primero)
+            return (b.id || 0) - (a.id || 0);
+        }
+      });
+      
+      // Aplicar paginación DESPUÉS del ordenamiento
+      const startIndex = (currentPage - 1) * cantItemsPerPage;
+      const endIndex = startIndex + cantItemsPerPage;
+      turnos = allTurnos.slice(startIndex, endIndex);
+      
+    } else {
+      // Para filtros únicos, usar la consulta normal con paginación en BD
+      turnos = await em.find(Turno, where, {
+        populate: [
+          'servicio.tarea.tipoServicio',
+          'servicio.usuario',
+          'usuario',
+          'pagos',
+        ],
+        limit: cantItemsPerPage,
+        offset: (currentPage - 1) * cantItemsPerPage,
+        orderBy: selectedValueOrderShow,
+      });
+    }
+    
+    // Log para debuggear ordenamiento por monto
+    if (selectedValueOrder.includes('monto')) {
+      console.log('Valores de montoFinal encontrados:', turnos.map(t => ({ 
+        id: t.id, 
+        montoFinal: t.montoFinal, 
+        estado: t.estado 
+      })));
+    }
     
     const hayPagoAprobado = turnos.some(
       (turno) =>
