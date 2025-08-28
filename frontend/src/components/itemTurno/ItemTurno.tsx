@@ -16,9 +16,16 @@ type ItemTurnoProps = {
 };
 
 const ItemTurno: React.FC<ItemTurnoProps> = ({ turno, idx, selected, onSelect }) => {
+  const handleRowClick = () => {
+    onSelect(idx);
+  };
+
   return (
-    <tr className="border-b hover:bg-gray-50">
-      <td className="py-3 px-4 text-center">
+    <tr 
+      className="border-b hover:bg-gray-50 h-16 cursor-pointer transition-colors duration-150" 
+      onClick={handleRowClick}
+    > {/* Altura fija + cursor pointer + hover */}
+      <td className="py-3 px-4 text-center" onClick={(e) => e.stopPropagation()}>
         <span className="relative flex items-center justify-center">
           <input
             type="checkbox"
@@ -35,14 +42,26 @@ const ItemTurno: React.FC<ItemTurnoProps> = ({ turno, idx, selected, onSelect })
           </span>
         </span>
       </td>
-      <td className="py-3 px-4 flex items-center gap-2 text-left">
-        <img src={turno.avatar} alt={turno.paciente} className="w-8 h-8 rounded-full object-cover" />
-        <span className="font-medium text-gray-900">{turno.paciente}</span>
+      <td className="py-3 px-4 text-left">
+        <div className="flex items-center gap-2 min-w-0"> {/* min-w-0 para permitir truncamiento */}
+          <img src={turno.avatar} alt={turno.paciente} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+          <span className="font-medium text-gray-900 truncate max-w-[120px]" title={turno.paciente}>
+            {turno.paciente}
+          </span>
+        </div>
       </td>
-      <td className="py-3 px-4 text-gray-900 font-medium text-left">{turno.fecha}</td>
-      <td className="py-3 px-4 text-gray-900 font-medium text-left">{turno.hora}</td>
-      <td className="py-3 px-4 text-gray-900 font-medium text-left min-w-[220px]">{turno.tarea}</td>
-      <td className="py-3 px-4 text-gray-900 font-medium text-left">{turno.monto ? `$${turno.monto}` : '-'}</td>
+      <td className="py-3 px-4 text-gray-900 font-medium text-left">
+        <div className="truncate max-w-[100px]" title={turno.fecha}>
+          {turno.fecha}
+        </div>
+      </td>
+      <td className="py-3 px-4 text-gray-900 font-medium text-left whitespace-nowrap">{turno.hora}</td>
+      <td className="py-3 px-4 text-gray-900 font-medium text-left">
+        <div className="truncate max-w-[200px]" title={turno.tarea}>
+          {turno.tarea}
+        </div>
+      </td>
+      <td className="py-3 px-4 text-gray-900 font-medium text-left whitespace-nowrap">{turno.monto ? `$${turno.monto}` : '-'}</td>
       <td className="py-3 px-4 text-left">
         <span
           className={`px-2 py-1 rounded-full text-xs font-semibold

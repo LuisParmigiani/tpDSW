@@ -11,12 +11,13 @@ export const turnosApi = {
     selectedValueOrder?: string
   ) => {
     // Construir la URL con parámetros en la ruta como espera el backend
-    let url = `/turno/byUser/${cantItemsPerPage}/${currentPage}`;
-    if (selectedValueShow) {
-      url += `/${selectedValueShow}`;
-    }
-    if (selectedValueOrder) {
-      url += `/${selectedValueOrder}`;
+    // Usar 'all' como valor por defecto para selectedValueShow si está vacío
+    const filterValue = selectedValueShow || 'all';
+    const orderValue = selectedValueOrder || '';
+    
+    let url = `/turno/byUser/${cantItemsPerPage}/${currentPage}/${filterValue}`;
+    if (orderValue) {
+      url += `/${orderValue}`;
     }
 
     return api.get(url, { withCredentials: true });
@@ -30,9 +31,11 @@ export const turnosApi = {
   ) => {
     // Construir la URL para obtener turnos como prestatario
     let url = `/turno/byPrestador/${id}/${cantItemsPerPage}/${currentPage}`;
-    if (selectedValueShow) {
-      url += `/${selectedValueShow}`;
-    }
+    
+    // Siempre agregar selectedValueShow (vacío si no hay filtro)
+    url += `/${selectedValueShow || ''}`;
+    
+    // Agregar selectedValueOrder solo si hay uno
     if (selectedValueOrder) {
       url += `/${selectedValueOrder}`;
     }
