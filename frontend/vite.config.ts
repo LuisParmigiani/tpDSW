@@ -27,6 +27,7 @@ export default defineConfig({
         secure: false,
       },
     },
+    // ...existing code...
   },
   test: {
     globals: true,

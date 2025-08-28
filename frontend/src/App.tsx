@@ -27,6 +27,18 @@ function App() {
           <Route path="/TurnHistory" element={<TurnHistory />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/changepassword" element={<ChangePassword />} />
+          <Route
+            path="/turnHistory/success"
+            element={<TurnHistory estado="success" />}
+          />
+          <Route
+            path="/turnHistory/failure"
+            element={<TurnHistory estado="failure" />}
+          />
+          <Route
+            path="/turnHistory/pending"
+            element={<TurnHistory estado="pending" />}
+          />
         </Routes>
       </Router>
     </>

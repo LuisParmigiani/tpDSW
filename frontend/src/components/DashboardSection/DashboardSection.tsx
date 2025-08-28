@@ -1,13 +1,13 @@
-interface DashboardSectionProps {
-  title: string;
+type DashboardSectionProps = {
   children: React.ReactNode;
   className?: string;
-}
+  title?: string;
+};
 
-function DashboardSection({ title, children, className = "" }: DashboardSectionProps) {
+function DashboardSection({ children, className = "", title }: DashboardSectionProps) {
   return (
     <div className={`bg-white rounded-lg shadow p-6 ${className}`}>
-      <h2 className="text-xl font-semibold mb-4">{title}</h2>
+      {title && <h2 className="text-xl font-semibold text-gray-900 mb-4">{title}</h2>}
       {children}
     </div>
   );

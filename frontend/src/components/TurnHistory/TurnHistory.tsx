@@ -7,28 +7,40 @@ import CustomSelect from '../Select/CustomSelect';
 import CalificationModal from '../Modal/CalificationModal';
 import Stars from '../stars/Stars';
 import { useNavigate } from 'react-router-dom';
+import MercadoPago from '../MercadoPago/MercadoPago.tsx';
+import DevolucionPago from '../Modal/DevolucionPago.tsx';
+
+type Pago = {
+  id: number;
+  estado: string;
+};
 
 type Turno = {
   id: number;
   fechaHora: Date;
   montoFinal: number;
-  servicio: servicio;
+  servicio: Servicio;
   calificacion: number | null;
   comentario: string | null;
   estado: string;
   usuario: Usuario;
+  pagos: Pago[];
+  hayPagoAprobado?: boolean; // Nuevo campo para indicar si tiene pagos aprobados
 };
 
-type servicio = {
+type Servicio = {
   id: number;
-  nombre: string;
   tarea: Tarea;
   usuario: Usuario;
 };
 type Tarea = {
   nombreTarea: string;
-  descripcionTarea: number;
+  descripcionTarea: string;
   duracionTarea: number;
+  tipoServicio: {
+    id: number;
+    nombreTipo: string;
+  };
 };
 type Usuario = {
   id: number;
@@ -36,9 +48,12 @@ type Usuario = {
   nombreFantasia: string;
 };
 
-function TurnHistory() {
+type Props = {
+  estado?: string;
+};
+
+function TurnHistory({ estado }: Props) {
   const navigate = useNavigate();
-  const id = 2; // aca el id del usuario
   const [turns, setTurns] = useState<Turno[] | null>(null); // Se guardan todos los turnos del usuario
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -61,12 +76,11 @@ function TurnHistory() {
 
   // buscar todos los turnos del usuario con la informcaion del mismo.
   useEffect(() => {
-    const turn = async (id: number) => {
+    const turn = async () => {
       setLoading(true);
       setError(null);
       try {
         const res = await turnosApi.getByUserId(
-          id.toString(),
           cantItemsPerPage,
           currentPage.toString(),
           selectedValueShow,
@@ -85,10 +99,8 @@ function TurnHistory() {
         setLoading(false);
       }
     };
-    if (id) {
-      turn(id);
-    }
-  }, [id, currentPage, selectedValueShow, selectedValueOrder]);
+    turn();
+  }, [currentPage, selectedValueShow, selectedValueOrder]);
 
   //modal para calificar
   const openModal = (modalData: Turno) => {
@@ -173,11 +185,12 @@ function TurnHistory() {
       console.error('Error al cancelar el turno:', error);
     }
   };
-
+  // devolucion del pago:
+  console.log(selectedValueShow);
   return (
     <>
       <Navbar />
-
+      {estado && <DevolucionPago estado={estado} />}
       {isOpen && data && (
         <CalificationModal
           data={data}
@@ -190,9 +203,8 @@ function TurnHistory() {
         />
       )}
 
-      <div className="text-black">
+      <div className="text-black min-h-3/4">
         <h1 className="text-4xl font-bold mt-6">Historial de Turnos</h1>
-
         <div className="flex flex-row gap-4 lg:-mt-11  mt-3 pl-3 mb-8  ">
           <div>
             <CustomSelect
@@ -219,6 +231,9 @@ function TurnHistory() {
                 { value: 'cancelados', label: 'Cancelados' },
                 { value: 'pendientes', label: 'Pendientes' },
                 { value: 'completado', label: 'Completado' },
+                { value: 'porPagar', label: 'Por Pagar' },
+                { value: 'pagado', label: 'Pagado' },
+                { value: 'pagoPendiente', label: 'Pago Pendiente' },
               ]}
               setOptions={setSelectedValueShow}
               setPage={setCurrentPage}
@@ -267,15 +282,42 @@ function TurnHistory() {
                     <p className="text-sm text-gray-700 font-medium">
                       Monto: ${turn.montoFinal}
                     </p>
+                    {/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */}
                     {(() => {
-                      // Mostrar botón "Calificar" si el turno es menor a 1 mes y no fue calificado
+                      // Mostrar botón "Calificar" si el turno es menor a 1 mes y no fue calificado y fue pagado.
                       const unMesPasado =
                         Date.now() - new Date(turn.fechaHora).getTime() <
                         30 * 24 * 60 * 60 * 1000; // dias, horas, minutos, segundos, milisegundos
+
                       if (
-                        unMesPasado &&
-                        turn.calificacion === null &&
+                        !turn.hayPagoAprobado &&
                         turn.estado === 'completado'
+                      ) {
+                        return (
+                          <>
+                            <MercadoPago
+                              fechaHora={turn.fechaHora}
+                              montoFinal={turn.montoFinal}
+                              servicio={turn.servicio}
+                              turno={turn.id}
+                            />
+                            <button
+                              className="bg-naranja-1 text-white hover:text-naranja-1 hover:bg-white w-full rounded-2xl border-2 border-naranja-1"
+                              onClick={() => {
+                                // Navegar a la ruta con el ID dinámico
+                                navigate(
+                                  `/borrower/${turn.servicio.usuario.id}`
+                                );
+                              }}
+                            >
+                              Volver a contratar
+                            </button>
+                          </>
+                        );
+                      } else if (
+                        unMesPasado && // verifico si no paso mas de un mes
+                        turn.calificacion === null && // verifico que no tenga ya calificacion
+                        turn.estado === 'completado' // verifico que este completado
                       ) {
                         return (
                           <>
@@ -299,6 +341,7 @@ function TurnHistory() {
                           </>
                         );
                       } else {
+                        // Se pone la calificacion puesta por el usuario Si es que la tiene.
                         if (turn.calificacion !== null) {
                           return (
                             <>
@@ -319,10 +362,10 @@ function TurnHistory() {
                             </>
                           );
                         } else {
+                          // Si el turno no paso por todos los otros if y entra aca se interpreta que ya paso un mes por lo que ya no puede calificar.
                           if (turn.estado === 'completado') {
                             return (
                               <>
-                                {' '}
                                 <p className="mt-2">
                                   Expiró el tiempo de calificación
                                 </p>
@@ -340,6 +383,7 @@ function TurnHistory() {
                               </>
                             );
                           } else {
+                            // Si el turno no paso por todos los otros if y entra aca se interpreta que el turno esta confirmado o pendiente por lo que todavia se puede cancelar.
                             if (turn.estado !== 'cancelado') {
                               return (
                                 <>
@@ -357,14 +401,15 @@ function TurnHistory() {
                           }
                         }
                       }
-                      return null;
                     })()}
                   </div>
                 </li>
               ))}
             </ul>
           ) : (
-            <p>No hay turnos.</p>
+            <p className="">
+              No hay turnos para las características solicitadas.
+            </p>
           )
         ) : null}
 

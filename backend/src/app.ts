@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import { usuarioRouter } from './usuario/usuario.route.js';
@@ -11,11 +14,22 @@ import { RequestContext } from '@mikro-orm/core';
 import { serviceTypeRouter } from './tipoServicio/tipoServ.route.js';
 import { horarioRouter } from './horario/horario.routes.js';
 import { CronManager } from './shared/cron/cronManager.js';
+import { PagoRouter } from './pago/pago.route.js';
+import mercadoPago from './mercadopago/mercadoPago.controller.js';
+import { webhookRouter } from './mercadopago/mercadoPago.route.js';
+import cookieParser from 'cookie-parser';
 
+//Tuve que recrear __dirname xq no estaba definido xq estamos usando ES Modules y no COmmonJS
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.join(__dirname, '../../.env') });
 const app = express();
+// Como las variables de env son siempre string, tiene que comparar si es igual a 'true', entonces almacena el booleano de js
 
-const local = true; // <--- desarrollo: permite origen localhost:5173 para CORS
-
+console.log('env:', process.env.LOCAL);
+const local = process.env.LOCAL === 'true';
+console.log('local:', local);
 // cors lo que hace es dar el permiso al un puerto para hacer las peticiones al back
 // CORS dinámico (permite lista separada por comas en FRONTEND_ORIGIN)
 const rawOrigins = local
@@ -32,7 +46,9 @@ app.use(
   })
 );
 
+app.use(cookieParser());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use((req, res, next: NextFunction) => {
   RequestContext.create(orm.em, next);
@@ -45,7 +61,9 @@ app.use('/api/servicio', servicioRouter);
 app.use('/api/turno', turnoRouter);
 app.use('/api/horario', horarioRouter);
 app.use('/api/zona', zonaRouter);
-
+app.use('/api/mercadoPago', mercadoPago);
+app.use('/api/pago', PagoRouter);
+app.use('/webhooks/mercadopago', webhookRouter);
 // app.use((req, res) => {
 //   console.log(req)
 //   return res.status(404).send({ message: 'Resource not found' });
@@ -81,6 +99,7 @@ app.get('/health', async (req: Request, res: Response) => {
 });
 
 // Define el puerto en el que se ejecutará el servidor
+console.log(local);
 const port = local ? 3000 : Number(process.env.PORT) || 8080; // Fly asigna PORT
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
