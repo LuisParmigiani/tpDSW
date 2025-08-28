@@ -296,19 +296,17 @@ async function loginUsuario(req: Request, res: Response) {
     const mail = req.query.mail as string;
     const contrasena = req.query.contrasena as string;
     if (!mail || !contrasena) {
-      return res
-        .status(400)
-        .json({ message: 'Faltan datos de inicio de sesión' });
+      return res.status(400).json();
     }
 
     const usuario = await em.findOne(Usuario, { mail });
     if (!usuario) {
-      return res.status(401).json({ message: 'Usuario no encontrado' });
+      return res.status(401).json();
     }
 
     const passwordMatch = await bcrypt.compare(contrasena, usuario.contrasena);
     if (!passwordMatch) {
-      return res.status(401).json({ message: 'Contraseña incorrecta' });
+      return res.status(401).json();
     }
 
     // elimina contraseña antes de enviar el usuario, probarlo
@@ -325,7 +323,7 @@ async function loginUsuario(req: Request, res: Response) {
   }
 }
 
-//llevar todo esto a una carpeta y exportarlo
+//configuración mailer
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 587,
@@ -337,38 +335,30 @@ const transporter = nodemailer.createTransport({
 });
 
 async function recuperarContrasena(req: Request, res: Response) {
-  //linea para probar
-  console.log('POST /recuperar llamado con body:', req.body);
   try {
     const mail = req.body.mail as string;
-    if (!mail) {
-      return res.status(400).json({ message: 'Falta el mail' });
-    }
 
     const usuario = await em.findOne(Usuario, { mail });
     if (!usuario) {
-      return res.status(404).json({ message: 'Usuario no encontrado' });
+      return res.status(404).json();
     }
 
     //Generar codigo de 6 digitos
     const codigo = Math.floor(100000 + Math.random() * 900000).toString();
     codigosRecuperacion[mail] = {
       codigo,
-      expiracion: new Date(Date.now() + 10 * 60 * 1000), // 10 minutos
+      expiracion: new Date(Date.now() + 5 * 60 * 1000), // código vence en 5 minutos
     };
 
     await transporter.sendMail({
-      from: 'forgotpassword <santiagomalet229@gmail.com>',
+      from: 'forgotpassword <reformixoficial@gmail.com>',
       to: mail,
       subject: 'Recuperación de contraseña',
-      text: `Tu código de recuperación es: ${codigo} y expirará en 10 minutos`,
+      text: `Tu código de recuperación es: ${codigo} y expirará en 5 minutos`,
     });
-    return res.status(200).json({
-      message: 'Si el usuario existe, se envió el mail de recuperación',
-    });
+    return res.status(200).json(); //Manda mail de recuperación
   } catch (error) {
-    console.error('Error en recuperarContrasena:', error); // <--- Muestra el error real
-    return res.status(500).json({ message: 'Error interno en recuperación' });
+    return res.status(500).json();
   }
 }
 
@@ -379,44 +369,25 @@ const codigosRecuperacion: {
 async function validarCodigoRecuperacion(req: Request, res: Response) {
   const { mail, codigo } = req.body;
   const registro = codigosRecuperacion[mail];
-  if (!registro)
-    return res.status(400).json({ message: 'No se solicitó recuperación' });
-  if (registro.expiracion < new Date())
-    return res.status(400).json({ message: 'Código expirado' });
-  if (registro.codigo !== codigo)
-    return res.status(400).json({ message: 'Código incorrecto' });
-  return res.status(200).json({ message: 'Código válido' });
+  if (registro.expiracion < new Date() || registro.codigo !== codigo)
+    return res.status(400).json(); //codigo incorrecto
+  return res.status(200).json(); //codigo valido
 }
 
 async function cambiarPassword(req: Request, res: Response) {
   const { mail, codigo, nuevaContrasena } = req.body;
-  if (!mail || !codigo || !nuevaContrasena) {
-    return res.status(400).json({ message: 'Faltan datos' });
-  }
 
   const registro = codigosRecuperacion[mail];
-  if (!registro) {
-    return res.status(400).json({ message: 'No se solicitó recuperación' });
-  }
-  if (registro.expiracion < new Date()) {
-    return res.status(400).json({ message: 'Código expirado' });
-  }
-  if (registro.codigo !== codigo) {
-    return res.status(400).json({ message: 'Código incorrecto' });
-  }
 
   const usuario = await em.findOne(Usuario, { mail });
-  if (!usuario) {
-    return res.status(404).json({ message: 'Usuario no encontrado' });
-  }
 
-  usuario.contrasena = await bcrypt.hash(nuevaContrasena, 10);
+  usuario!.contrasena = await bcrypt.hash(nuevaContrasena, 10);
   await em.flush();
 
   // Elimina el código usado
   delete codigosRecuperacion[mail];
 
-  return res.status(200).json({ message: 'Contraseña cambiada correctamente' });
+  return res.status(200).json(); //se cambió la password
 }
 
 export {

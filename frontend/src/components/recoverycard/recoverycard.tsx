@@ -43,7 +43,6 @@ function Recovery() {
         mail: form.mail,
         codigo,
       });
-      console.log('Código válido. Ahora puedes cambiar tu contraseña.');
       navigate('/changepassword', { state: { mail: form.mail, codigo } });
     } catch {
       setValidado(false);
@@ -56,7 +55,6 @@ function Recovery() {
   });
 
   const envioFormulario = async () => {
-    setValidado(true);
     const result = usuarioSchema.safeParse(form);
     if (!result.success) {
       setOpen(true);
@@ -79,10 +77,10 @@ function Recovery() {
       const err = error as { response?: { status?: number } };
       if (err.response && err.response.status === 404) {
         setMessage('No existe un usuario con ese email');
-        console.log('No existe un usuario con ese email');
       } else {
-        setMessage('Error en la recuperación de contraseña');
-        console.log('Error en la recuperación de contraseña');
+        setMessage(
+          'Error en la recuperación de contraseña, por favor vuelva a intentar'
+        );
       }
       setTimerActivo(false);
       setTiempoRestante(0);
@@ -98,6 +96,7 @@ function Recovery() {
               <button
                 onClick={() => {
                   setOpen(false);
+                  setValidado(true);
                 }}
                 className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
                 aria-label="Cerrar modal"
@@ -177,14 +176,17 @@ function Recovery() {
                 </button>
               </>
             )}
-            {message === 'Ingresa un formato de email válido' && (
-              <button
-                onClick={() => setOpen(false)}
-                className="mt-4 px-4 py-2 bg-naranja-1 text-white rounded hover:bg-naranja-2"
-              >
-                Cerrar
-              </button>
-            )}
+            {message === 'Ingresa un formato de email válido' ||
+              message ===
+                'Error en la recuperación de contraseña, por favor vuelva a intentar' ||
+              (message === 'No existe un usuario con ese email' && (
+                <button
+                  onClick={() => setOpen(false)}
+                  className="mt-4 px-4 py-2 bg-naranja-1 text-white rounded hover:bg-naranja-2"
+                >
+                  Cerrar
+                </button>
+              ))}
           </div>
         </div>
       )}
