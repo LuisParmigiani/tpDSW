@@ -364,8 +364,8 @@ async function loginUsuario(req: Request, res: Response) {
       const local = process.env.LOCAL === 'true';
       res.cookie('token', token, {
         httpOnly: true,
-        secure: local,
-        sameSite: !local ? 'lax' : 'none', // 'none' solo si secure=true
+        secure: !local,
+        sameSite: local ? 'lax' : 'none', // 'none' solo si secure=true
         path: '/',
       });
     }
