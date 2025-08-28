@@ -53,6 +53,7 @@ type Props = {
 
 function TurnHistory({ estado }: Props) {
   const { usuario, loading: authLoading } = useProtectRoute(['cliente']);
+  const [abrirDevolucion, setAbrirDevolucion] = useState(true);
   const navigate = useNavigate();
   const [turns, setTurns] = useState<Turno[] | null>(null); // Se guardan todos los turnos del usuario
   const [loading, setLoading] = useState(false);
@@ -206,7 +207,12 @@ function TurnHistory({ estado }: Props) {
   return (
     <>
       <Navbar />
-      {estado && <DevolucionPago estado={estado} />}
+      {estado && abrirDevolucion && (
+        <DevolucionPago
+          estado={estado}
+          cerrar={() => setAbrirDevolucion(false)}
+        />
+      )}
       {isOpen && data && (
         <CalificationModal
           data={data}
@@ -270,6 +276,7 @@ function TurnHistory({ estado }: Props) {
             <ul className="flex flex-row flex-wrap items-center justify-center w-full m-auto ">
               {turns.map((turn) => (
                 <TurnCard
+                  key={turn.id}
                   navigate={navigate}
                   turn={turn}
                   openModal={openModal}

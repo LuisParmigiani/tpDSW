@@ -361,9 +361,10 @@ async function loginUsuario(req: Request, res: Response) {
       });
 
       // 🔹 Guardamos el token en una cookie segura
+      const isLocal = process.env.LOCAL === 'true';
       res.cookie('token', token, {
         httpOnly: true, // No accesible desde JS
-        secure: true, // Solo por HTTPS (en local podés poner false)
+        secure: !isLocal, // Solo por HTTPS en producción, false en local
         sameSite: 'none', //permite el uso de cookies en diferentes sitios
       });
     }

@@ -28,15 +28,15 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/changepassword" element={<ChangePassword />} />
           <Route
-            path="/turnHistory/success"
+            path="/historial/success"
             element={<TurnHistory estado="success" />}
           />
           <Route
-            path="/turnHistory/failure"
+            path="/historial/failure"
             element={<TurnHistory estado="failure" />}
           />
           <Route
-            path="/turnHistory/pending"
+            path="/historial/pending"
             element={<TurnHistory estado="pending" />}
           />
         </Routes>
