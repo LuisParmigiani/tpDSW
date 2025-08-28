@@ -61,7 +61,7 @@ interface TurnoDisplay {
 }
 
 function ClientesSection() {
-	const [selectedRows, setSelectedRows] = useState<number[]>([]);
+	const [selectedTurnoIds, setSelectedTurnoIds] = useState<number[]>([]); // Cambio: usar IDs en lugar de índices
 	const [showMenu, setShowMenu] = useState(false);
 	const [showBar, setShowBar] = useState(false);
 	const [fadeOut, setFadeOut] = useState(false);
@@ -71,6 +71,7 @@ function ClientesSection() {
 	const [currentPage, setCurrentPage] = useState(1);
 	const [totalPages, setTotalPages] = useState(1);
 	const [loading, setLoading] = useState(true);
+	const [pageLoading, setPageLoading] = useState(false); // Loading específico para cambios de página
 	const [error, setError] = useState<string | null>(null);
 	const [sortBy, setSortBy] = useState<string>('');
 	const [estadoFilters, setEstadoFilters] = useState<string[]>([]);
@@ -78,9 +79,13 @@ function ClientesSection() {
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	const itemsPerPage = 6;
 
-	const cargarTurnos = useCallback(async (page = 1, ordenamiento = sortBy, filtrosEstado = estadoFilters) => {
+	const cargarTurnos = useCallback(async (page = 1, ordenamiento = sortBy, filtrosEstado = estadoFilters, isPageChange = false) => {
 		try {
-			setLoading(true);
+			if (isPageChange) {
+				setPageLoading(true); // Solo para cambios de página
+			} else {
+				setLoading(true); // Para carga inicial o cambios de filtros/ordenamiento
+			}
 			setError(null);
 			
 			// Mapear las opciones del frontend a los valores que espera el backend
@@ -135,31 +140,39 @@ function ClientesSection() {
 			console.error('Error completo:', JSON.stringify(err, null, 2));
 			setError(`Error al cargar los turnos: ${err instanceof Error ? err.message : 'Error desconocido'}`);
 		} finally {
-			setLoading(false);
+			if (isPageChange) {
+				setPageLoading(false);
+			} else {
+				setLoading(false);
+			}
 		}
 	}, [itemsPerPage, sortBy, estadoFilters]);
 
 	// Cargar turnos al montar el componente y cuando cambie la página
 	useEffect(() => {
-		cargarTurnos(currentPage);
-	}, [currentPage, cargarTurnos]);
+		if (currentPage === 1) {
+			cargarTurnos(currentPage, sortBy, estadoFilters, false); // Carga inicial, no es cambio de página
+		} else {
+			cargarTurnos(currentPage, sortBy, estadoFilters, true); // Es cambio de página
+		}
+	}, [currentPage, cargarTurnos, sortBy, estadoFilters]);
 
 	// Los turnos actuales son todos los que se muestran (ya vienen paginados del API)
 	const currentTurnos = turnos;
 	
 	// Helper para determinar si todos los elementos de la página actual están seleccionados
-	const currentPageIndices = currentTurnos.map((_, idx) => idx);
-	const allCurrentPageSelected = currentPageIndices.length > 0 && currentPageIndices.every(idx => selectedRows.includes(idx));
+	const currentPageTurnoIds = currentTurnos.map(turno => turno.id);
+	const allCurrentPageSelected = currentPageTurnoIds.length > 0 && currentPageTurnoIds.every(id => selectedTurnoIds.includes(id));
 
 	useEffect(() => {
-		if (selectedRows.length > 0) {
+		if (selectedTurnoIds.length > 0) {
 			setShowBar(true);
 			setFadeOut(false);
 		} else if (showBar) {
 			setFadeOut(true);
 			setTimeout(() => setShowBar(false), 300);
 		}
-	}, [selectedRows, showBar]);
+	}, [selectedTurnoIds, showBar]);
 
 	useEffect(() => {
 		if (pendingAction) {
@@ -184,26 +197,27 @@ function ClientesSection() {
 	}, []);
 
 	const handleSelectRow = (idx: number) => {
-		setSelectedRows((prev) =>
-			prev.includes(idx) ? prev.filter((i) => i !== idx) : [...prev, idx]
-		);
+		const turnoId = turnos[idx]?.id;
+		if (turnoId) {
+			setSelectedTurnoIds((prev) =>
+				prev.includes(turnoId) ? prev.filter((id) => id !== turnoId) : [...prev, turnoId]
+			);
+		}
 	};
 
 	const handleSelectAll = () => {
 		if (allCurrentPageSelected) {
 			// Deseleccionar todos los de la página actual
-			setSelectedRows([]);
+			setSelectedTurnoIds(prev => prev.filter(id => !currentPageTurnoIds.includes(id)));
 		} else {
 			// Seleccionar todos los de la página actual
-			setSelectedRows(currentPageIndices);
+			setSelectedTurnoIds(prev => [...new Set([...prev, ...currentPageTurnoIds])]);
 		}
 	};
-
 	
 	const handlePageChange = (page: number) => {
 		setCurrentPage(page);
-		// Limpiar selecciones al cambiar de página (porque son datos diferentes)
-		setSelectedRows([]);
+		// NO limpiar selecciones al cambiar de página - mantener los IDs seleccionados
 	};
 
 	// Handler para actualizar estado de los seleccionados
@@ -212,23 +226,39 @@ function ClientesSection() {
 	};
 
 	const handleConfirmAction = async () => {
-		if (pendingAction && selectedRows.length > 0) {
+		if (pendingAction && selectedTurnoIds.length > 0) {
 			try {
-				// Obtener IDs de los turnos seleccionados que se pueden modificar según las reglas de negocio
-				const turnosValidos = selectedRows
-					.map(idx => turnos[idx])
-					.filter(t => {
-						if (!t) return false;
+				console.log('Iniciando actualización de turnos:', selectedTurnoIds);
+				
+				// Obtener los turnos seleccionados por ID para validar las reglas de negocio
+				const turnosPromises = selectedTurnoIds.map(id => turnosApi.getById(id.toString()));
+				const turnosResponses = await Promise.all(turnosPromises);
+				
+				console.log('Respuestas de turnos:', turnosResponses);
+				
+				// Extraer los datos de los turnos y validar
+				const turnosValidos = turnosResponses
+					.map(response => {
+						console.log('Estructura completa de response:', response);
+						console.log('response.data:', response.data);
+						return response.data;
+					})
+					.filter(turno => {
+						console.log('Validando turno:', turno);
+						if (!turno || !turno.estado) {
+							console.log('Turno inválido o sin estado:', turno);
+							return false;
+						}
 						
 						// Reglas de negocio:
 						// - Pendiente: puede cambiar a Confirmado o Cancelado
 						// - Confirmado: solo puede cambiar a Cancelado
 						// - Cancelado/Completado: no se pueden cambiar
 						
-						if (t.estado.toLowerCase() === 'pendiente') {
+						if (turno.estado.toLowerCase() === 'pendiente') {
 							// Pendiente puede cambiar a cualquiera de los dos estados
 							return true;
-						} else if (t.estado.toLowerCase() === 'confirmado') {
+						} else if (turno.estado.toLowerCase() === 'confirmado') {
 							// Confirmado solo puede cambiar a Cancelado
 							return pendingAction === 'Cancelado';
 						}
@@ -236,19 +266,25 @@ function ClientesSection() {
 						// Cancelado y Completado no se pueden cambiar
 						return false;
 					})
-					.map(t => t.id);
+					.map(turno => turno.id);
+
+				console.log('Turnos válidos para actualizar:', turnosValidos);
 
 				if (turnosValidos.length > 0) {
 					await turnosApi.updateMultipleEstados(turnosValidos, pendingAction);
-					// Recargar los datos después de la actualización
-					await cargarTurnos(currentPage);
+					console.log('Turnos actualizados exitosamente');
+					// Recargar los datos después de la actualización con filtros y ordenamiento actuales
+					await cargarTurnos(currentPage, sortBy, estadoFilters, false);
+				} else {
+					console.log('No hay turnos válidos para actualizar');
 				}
 				
 				setShowMenu(false);
-				setSelectedRows([]);
+				setSelectedTurnoIds([]);
 				setPendingAction(null);
 			} catch (error) {
-				console.error('Error actualizando turnos:', error);
+				console.error('Error completo actualizando turnos:', error);
+				console.error('Stack trace:', error instanceof Error ? error.stack : 'No stack trace');
 				setError('Error al actualizar los turnos. Por favor, intenta nuevamente.');
 			}
 		}
@@ -258,9 +294,10 @@ function ClientesSection() {
 		setPendingAction(null);
 	};
 
-	const getValidSelectedCount = () =>
-		selectedRows.filter(idx => {
-			const turno = turnos[idx];
+	const getValidSelectedCount = () => {
+		// Solo contar turnos que están en la página actual para mostrar información visual
+		const turnosSeleccionados = turnos.filter(turno => selectedTurnoIds.includes(turno.id));
+		return turnosSeleccionados.filter(turno => {
 			if (!turno) return false;
 			
 			if (turno.estado.toLowerCase() === 'pendiente') {
@@ -273,10 +310,12 @@ function ClientesSection() {
 			
 			return false;
 		}).length;
+	};
 		
-	const getInvalidSelectedCount = () =>
-		selectedRows.filter(idx => {
-			const turno = turnos[idx];
+	const getInvalidSelectedCount = () => {
+		// Solo contar turnos que están en la página actual para mostrar información visual
+		const turnosSeleccionados = turnos.filter(turno => selectedTurnoIds.includes(turno.id));
+		return turnosSeleccionados.filter(turno => {
 			if (!turno) return false;
 			
 			// Los inválidos son los que no se pueden cambiar según las reglas
@@ -289,6 +328,7 @@ function ClientesSection() {
 			
 			return false;
 		}).length;
+	};
 
 	// Función para manejar el cambio de ordenamiento
 	const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -297,7 +337,7 @@ function ClientesSection() {
 		
 		// Recargar los datos con el nuevo ordenamiento desde la primera página
 		setCurrentPage(1);
-		cargarTurnos(1, newSortBy);
+		cargarTurnos(1, newSortBy, estadoFilters, false); // Cambio de ordenamiento, no es cambio de página
 	};
 
 	// Funciones para manejar los filtros de estado
@@ -310,13 +350,13 @@ function ClientesSection() {
 		
 		// Recargar los datos con los nuevos filtros desde la primera página
 		setCurrentPage(1);
-		cargarTurnos(1, sortBy, newFilters);
+		cargarTurnos(1, sortBy, newFilters, false); // Cambio de filtros, no es cambio de página
 	};
 
 	const clearEstadoFilters = () => {
 		setEstadoFilters([]);
 		setCurrentPage(1);
-		cargarTurnos(1, sortBy, []);
+		cargarTurnos(1, sortBy, [], false); // Limpiar filtros, no es cambio de página
 	};
 
 	const estadosDisponibles = ['Pendiente', 'Confirmado', 'Cancelado', 'Completado'];
@@ -481,7 +521,7 @@ function ClientesSection() {
 								key={turno.id}
 								turno={turno}
 								idx={idx}
-								selected={selectedRows.includes(idx)}
+								selected={selectedTurnoIds.includes(turno.id)}
 								onSelect={handleSelectRow}
 							/>
 						))}
@@ -520,10 +560,10 @@ function ClientesSection() {
         `}</style>
 				{showBar && (
 					<SelectionBar
-						selectedCount={selectedRows.length}
+						selectedCount={selectedTurnoIds.length}
 						onDeselectAll={() => {
 							setFadeOut(true);
-							setTimeout(() => setSelectedRows([]), 300);
+							setTimeout(() => setSelectedTurnoIds([]), 300);
 						}}
 						showMenu={showMenu}
 						setShowMenu={setShowMenu}
