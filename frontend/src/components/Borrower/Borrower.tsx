@@ -143,10 +143,10 @@ function Borrower() {
       {isOpen && prestatario && (
         <NewTurnModal prestatario={prestatario} setopen={setIsOpen} />
       )}
-      <div className="flex flex-col items-center    ">
-        <div className="lg:flex items-center h-11/12  px-8 py-10 bg-tinte-5 shadow-2xl mt-20 mb-30  lg:w-9/12 lg:h-100 rounded-2xl ">
+      <div className="flex flex-col items-center   justify-center ">
+        <div className="lg:flex items-center h-11/12  px-8 py-10 bg-tinte-5 shadow-2xl mt-20 mb-30  lg:w-220 lg:h-100 rounded-2xl ">
           <img
-            className="shadow-2xl rounded-xl object-cover  h-52 w-52 lg:h-auto lg:w-85 lg:mx-5"
+            className="shadow-2xl rounded-xl object-cover m-auto h-52 w-52 lg:h-auto lg:w-85 lg:mx-5"
             src={'../images/fotoUserId.png'}
             alt="foto de perfil del prestatario"
           />
