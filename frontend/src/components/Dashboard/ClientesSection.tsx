@@ -228,63 +228,18 @@ function ClientesSection() {
 	const handleConfirmAction = async () => {
 		if (pendingAction && selectedTurnoIds.length > 0) {
 			try {
-				console.log('Iniciando actualización de turnos:', selectedTurnoIds);
+				// Actualizar directamente los turnos seleccionados
+				// El backend se encargará de validar qué turnos se pueden actualizar
+				await turnosApi.updateMultipleEstados(selectedTurnoIds, pendingAction);
 				
-				// Obtener los turnos seleccionados por ID para validar las reglas de negocio
-				const turnosPromises = selectedTurnoIds.map(id => turnosApi.getById(id.toString()));
-				const turnosResponses = await Promise.all(turnosPromises);
-				
-				console.log('Respuestas de turnos:', turnosResponses);
-				
-				// Extraer los datos de los turnos y validar
-				const turnosValidos = turnosResponses
-					.map(response => {
-						console.log('Estructura completa de response:', response);
-						console.log('response.data:', response.data);
-						return response.data;
-					})
-					.filter(turno => {
-						console.log('Validando turno:', turno);
-						if (!turno || !turno.estado) {
-							console.log('Turno inválido o sin estado:', turno);
-							return false;
-						}
-						
-						// Reglas de negocio:
-						// - Pendiente: puede cambiar a Confirmado o Cancelado
-						// - Confirmado: solo puede cambiar a Cancelado
-						// - Cancelado/Completado: no se pueden cambiar
-						
-						if (turno.estado.toLowerCase() === 'pendiente') {
-							// Pendiente puede cambiar a cualquiera de los dos estados
-							return true;
-						} else if (turno.estado.toLowerCase() === 'confirmado') {
-							// Confirmado solo puede cambiar a Cancelado
-							return pendingAction === 'Cancelado';
-						}
-						
-						// Cancelado y Completado no se pueden cambiar
-						return false;
-					})
-					.map(turno => turno.id);
-
-				console.log('Turnos válidos para actualizar:', turnosValidos);
-
-				if (turnosValidos.length > 0) {
-					await turnosApi.updateMultipleEstados(turnosValidos, pendingAction);
-					console.log('Turnos actualizados exitosamente');
-					// Recargar los datos después de la actualización con filtros y ordenamiento actuales
-					await cargarTurnos(currentPage, sortBy, estadoFilters, false);
-				} else {
-					console.log('No hay turnos válidos para actualizar');
-				}
+				// Recargar los datos después de la actualización
+				await cargarTurnos(currentPage, sortBy, estadoFilters, false);
 				
 				setShowMenu(false);
 				setSelectedTurnoIds([]);
 				setPendingAction(null);
 			} catch (error) {
-				console.error('Error completo actualizando turnos:', error);
-				console.error('Stack trace:', error instanceof Error ? error.stack : 'No stack trace');
+				console.error('Error actualizando turnos:', error);
 				setError('Error al actualizar los turnos. Por favor, intenta nuevamente.');
 			}
 		}
