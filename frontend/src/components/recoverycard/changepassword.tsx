@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { usuariosApi } from '../../services/usuariosApi';
-import { Link } from 'react-router-dom';
 import { z } from 'zod';
 
 const schema = z.object({
@@ -23,10 +22,14 @@ const schema = z.object({
 export type Usuario = z.infer<typeof schema>;
 
 function ChangePassword() {
+  const navigate = useNavigate();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
+  // Para mostrar/ocultar contraseña
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const location = useLocation();
   // inntenta obtener mail y codigo del estado o de localStorage para que el usuario
@@ -87,23 +90,43 @@ function ChangePassword() {
             <div className="w-full flex flex-col items-center">
               <div className="relative inline-block w-full max-w-xs mb-4">
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   placeholder="Nueva contraseña"
                   className="w-full pt-3 pb-3 pr-5 pl-12 text-base border-none rounded-4xl bg-white shadow-inner outline-none text-black font-inter"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
                 <i className="fa-solid fa-lock absolute top-6 left-4 -translate-y-1/2 text-gray-500 text-1xl pointer-events-none"></i>
+                <i
+                  className={`fa-solid ${
+                    showPassword ? 'fa-eye' : 'fa-eye-slash'
+                  } absolute top-6 right-4 -translate-y-1/2 text-gray-500 text-1xl cursor-pointer`}
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  aria-label={
+                    showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
+                  }
+                ></i>
               </div>
               <div className="relative inline-block w-full max-w-xs mb-4">
                 <input
-                  type="password"
+                  type={showConfirmPassword ? 'text' : 'password'}
                   placeholder="Confirmar contraseña"
                   className="w-full pt-3 pb-3 pr-5 pl-12 text-base border-none rounded-4xl bg-white shadow-inner outline-none text-black font-inter"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                 />
                 <i className="fa-solid fa-lock absolute top-6 left-4 -translate-y-1/2 text-gray-500 text-1xl pointer-events-none"></i>
+                <i
+                  className={`fa-solid ${
+                    showConfirmPassword ? 'fa-eye' : 'fa-eye-slash'
+                  } absolute top-6 right-4 -translate-y-1/2 text-gray-500 text-1xl cursor-pointer`}
+                  onClick={() => setShowConfirmPassword((prev) => !prev)}
+                  aria-label={
+                    showConfirmPassword
+                      ? 'Ocultar contraseña'
+                      : 'Mostrar contraseña'
+                  }
+                ></i>
               </div>
             </div>
             <button
@@ -118,20 +141,11 @@ function ChangePassword() {
             >
               Confirmar cambio
             </button>
-            <p className="text-black font-inter mb-7 mt-4">
-              ¿No tienes cuenta?{' '}
-              <Link
-                to="/registration"
-                className="font-bold cursor-pointer hover:shadow-sm"
-              >
-                Regístrate
-              </Link>
-            </p>
           </div>
           <div className="hidden md:block w-full md:w-1/2 h-64 md:h-auto">
             <img
               className="w-full h-full object-cover rounded-tr-4xl rounded-br-4xl shadow-inner"
-              src="/images/imagen-registration.jpg"
+              src="/images/carousel1.jpg"
               alt="Cambiar contraseña"
             />
           </div>
@@ -167,7 +181,12 @@ function ChangePassword() {
             </div>
             <p>{message}</p>
             <button
-              onClick={() => setOpen(false)}
+              onClick={() => {
+                if (message === 'Contraseña cambiada con éxito') {
+                  navigate('/login');
+                }
+                setOpen(false);
+              }}
               className="mt-2 px-4 py-2 bg-naranja-1 text-white rounded hover:bg-naranja-2"
             >
               Cerrar
