@@ -7,7 +7,7 @@ import CustomSelect from '../Select/CustomSelect';
 import CalificationModal from '../Modal/CalificationModal';
 import { useNavigate } from 'react-router-dom';
 import DevolucionPago from '../Modal/DevolucionPago.tsx';
-import { useProtectRoute } from '../../../useProtectRoute.tsx';
+import { useProtectRoute } from '../../cookie/useProtectRoute.tsx';
 import TurnCard from './turnCard';
 type Pago = {
   id: number;
