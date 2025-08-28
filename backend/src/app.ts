@@ -18,6 +18,7 @@ import { PagoRouter } from './pago/pago.route.js';
 import mercadoPago from './mercadopago/mercadoPago.controller.js';
 import { webhookRouter } from './mercadopago/mercadoPago.route.js';
 import cookieParser from 'cookie-parser';
+import authRoutes from './shared/middleware/auth.routes.js';
 
 //Tuve que recrear __dirname xq no estaba definido xq estamos usando ES Modules y no COmmonJS
 const __filename = fileURLToPath(import.meta.url);
@@ -64,6 +65,8 @@ app.use('/api/zona', zonaRouter);
 app.use('/api/mercadoPago', mercadoPago);
 app.use('/api/pago', PagoRouter);
 app.use('/webhooks/mercadopago', webhookRouter);
+app.use('/api/auth', authRoutes);
+
 // app.use((req, res) => {
 //   console.log(req)
 //   return res.status(404).send({ message: 'Resource not found' });

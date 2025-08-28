@@ -19,6 +19,7 @@ export const usuariosApi = {
     return api.get(url);
   },
   getById: (id: string) => api.get(`/usuario/${id}`),
+  getByCookie: () => api.get(`/usuario/cookie`, { withCredentials: true }),
   getCommentsByUserId: (
     userId: string,
     maxItems?: string,
