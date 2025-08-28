@@ -1,6 +1,8 @@
 ### GET all tipos de servicio 
 http://localhost:3000/api/serviceTypes
 
+### Get con tareas
+http://localhost:3000/api/serviceTypes/withTasks
 
 ### POST a character
 

@@ -15,7 +15,7 @@ export const usuarioRouter = Router();
 
 usuarioRouter.get('/', findAll);
 usuarioRouter.get(
-  '/prestatarios/:tipoServicio/:zona/:orderBy',
+  '/prestatarios/:tipoServicio/:tarea?/:zona/:orderBy',
   findPrestatariosByTipoServicioAndZona
 );
 

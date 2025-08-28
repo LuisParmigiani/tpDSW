@@ -5,6 +5,7 @@ export const usuariosApi = {
   getAll: () => api.get('/usuario'),
   getPrestatariosByTipoServicioAndZona: (
     tipoServicio: string,
+    tarea: string,
     zona: string,
     orderBy: string,
     maxItems?: string,
@@ -13,7 +14,8 @@ export const usuariosApi = {
     const params = new URLSearchParams(); // crea los parámetros para pasarlos en la consulta
     if (maxItems !== undefined) params.append('maxItems', maxItems);
     if (page !== undefined) params.append('page', page);
-    const url = `/usuario/prestatarios/${tipoServicio}/${zona}/${orderBy}${
+    if (tarea === undefined || tarea === '') tarea = ' '; // Si tarea es undefined, asigna un string vacío para que la URL sea válida
+    const url = `/usuario/prestatarios/${tipoServicio}/${tarea}/${zona}/${orderBy}${
       params ? `?${params}` : ''
     }`;
     return api.get(url);

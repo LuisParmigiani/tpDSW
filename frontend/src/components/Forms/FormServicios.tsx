@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { z } from 'zod';
 import { Button } from './../Botones/FormButton';
 import { Form, FormControl, FormField, FormItem, FormMessage } from './Form';
+import ComboInput from './ComboInput';
 import {
   Select,
   SelectItem,
@@ -16,6 +17,7 @@ import {
 
 type Filtros = {
   servicio: string;
+  tarea?: string;
   zona: string;
   ordenarPor: string;
 };
@@ -24,6 +26,7 @@ const formSchema = z.object({
   servicio: z.string().min(1, {
     message: 'Por favor selecciona un servicio.',
   }),
+  tarea: z.string().optional(),
   zona: z.string().min(1, {
     message: 'Por favor selecciona una zona.',
   }),
@@ -37,9 +40,18 @@ type FormValues = z.infer<typeof formSchema>;
 
 // Define props for the component
 type ServiciosFormProps = {
-  tipoServicios: Array<{ nombreTipo: string; descripcionTipo: string }>;
+  tipoServicios: Array<{
+    nombreTipo: string;
+    descripcionTipo: string;
+    tareas: Array<{ id: number; nombreTarea: string }>;
+  }>;
   zonas: Array<{ id: number; descripcionZona: string }>;
-  onSubmit: (values: FormValues) => void;
+  onSubmit: (values: {
+    servicio: string;
+    tarea?: string;
+    zona: string;
+    ordenarPor: string;
+  }) => void;
   filtrosForm?: Filtros;
 };
 
@@ -53,6 +65,7 @@ export function ServiciosForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       servicio: filtrosForm?.servicio || '',
+      tarea: filtrosForm?.tarea || '',
       zona: filtrosForm?.zona || '',
       ordenarPor: filtrosForm?.ordenarPor || '',
     },
@@ -61,21 +74,17 @@ export function ServiciosForm({
   // Reset form values when filtrosForm prop changes
   useEffect(() => {
     console.log('FormServicios: filtrosForm changed:', filtrosForm);
-    console.log(
-      'FormServicios: tipoServicios available:',
-      tipoServicios.length
-    );
-    console.log('FormServicios: zonas available:', zonas.length);
-
     if (filtrosForm && tipoServicios.length > 0 && zonas.length > 0) {
       console.log('FormServicios: Resetting form with values:', {
         servicio: filtrosForm.servicio,
+        tarea: filtrosForm.tarea,
         zona: filtrosForm.zona,
         ordenarPor: filtrosForm.ordenarPor,
       });
 
       form.reset({
         servicio: filtrosForm.servicio || '',
+        tarea: filtrosForm.tarea || '',
         zona: filtrosForm.zona || '',
         ordenarPor: filtrosForm.ordenarPor || '',
       });
@@ -85,6 +94,16 @@ export function ServiciosForm({
   const handleSubmit = (values: FormValues) => {
     console.log('Form values:', values);
     onSubmit(values);
+  };
+
+  const todasLasTareas: Array<{ id: number; nombreTarea: string }> = [];
+  tipoServicios[tipoServicios.length - 1]?.tareas.forEach(
+    (tarea: { id: number; nombreTarea: string }) => {
+      todasLasTareas.push({ id: tarea.id, nombreTarea: tarea.nombreTarea });
+    }
+  );
+  const handleTareaSelect = (item: { id: number; nombreTarea: string }) => {
+    form.setValue('tarea', item.nombreTarea);
   };
 
   return (
@@ -98,8 +117,8 @@ export function ServiciosForm({
             key={1}
             type="reset"
             className={
-              'border-1 border-gray-800 min-w-10 bg-gray-500 text-white text-center py-1 px-4 rounded-md  ' +
-              'hover:bg-gray-300 hover:text-gray-800 w-30 transition duration-300 cursor-pointer hidden lg:block'
+              'border-1 !hidden border-gray-800 min-w-10 bg-gray-500 text-white text-center py-1 px-4 rounded-md  ' +
+              'hover:bg-gray-300 hover:text-gray-800 w-30 transition duration-300 cursor-pointer lg:!inline-block '
             }
             onClick={() => form.reset()}
           >
@@ -133,8 +152,13 @@ export function ServiciosForm({
             </FormItem>
           )}
         />
+        <ComboInput
+          items={todasLasTareas}
+          placeholder="Buscar por tarea..."
+          onSelect={handleTareaSelect}
+          className=""
+        />
 
-        {/* Zona Field */}
         <FormField
           control={form.control}
           name="zona"
@@ -206,7 +230,7 @@ export function ServiciosForm({
           >
             Buscar
           </Button>
-          <div className="">
+          <div className="mt-2 lg:mt-0 ">
             <Button
               key={2}
               type="reset"
