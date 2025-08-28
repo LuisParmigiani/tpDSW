@@ -57,7 +57,7 @@ function RegisCard() {
         name="nombre"
         value={form.nombre}
         placeholder="Nombre"
-        className="w-full pt-3 pb-3 pr-5 pl-12 text-base border-none rounded-3xl bg-tinte-5 shadow-inner outline-none mb-4 text-black font-inter"
+        className="w-full pt-3 pb-3 pr-5 pl-12 text-base border-none rounded-3xl bg-white shadow-inner outline-none mb-4 text-black font-inter"
         onChange={(e) => setForm({ ...form, nombre: e.target.value })}
       />
       <input
@@ -65,7 +65,7 @@ function RegisCard() {
         name="apellido"
         value={form.apellido}
         placeholder="Apellido"
-        className="w-full pt-3 pb-3 pr-5 pl-12 text-base border-none rounded-3xl bg-tinte-5 shadow-inner outline-none mb-4 text-black font-inter"
+        className="w-full pt-3 pb-3 pr-5 pl-12 text-base border-none rounded-3xl bg-white shadow-inner outline-none mb-4 text-black font-inter"
         onChange={(e) => setForm({ ...form, apellido: e.target.value })}
       />
       <input
@@ -73,13 +73,13 @@ function RegisCard() {
         name="mail"
         value={form.mail}
         placeholder="Email"
-        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-tinte-5 shadow-inner outline-none mb-4 text-black font-inter"
+        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-white shadow-inner outline-none mb-4 text-black font-inter"
         onChange={(e) => setForm({ ...form, mail: e.target.value })}
       />
       <select
         name="tipoDoc"
         value={form.tipoDoc}
-        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-tinte-5 shadow-inner outline-none mb-4 text-black font-inter"
+        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-white shadow-inner outline-none mb-4 text-black font-inter"
         onChange={(e) => setForm({ ...form, tipoDoc: e.target.value })}
       >
         <option value="">Seleccione tipo de documento</option>
@@ -91,7 +91,7 @@ function RegisCard() {
         name="numeroDoc"
         value={form.numeroDoc}
         placeholder="Número de documento"
-        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-tinte-5 shadow-inner outline-none mb-4 text-black font-inter"
+        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-white shadow-inner outline-none mb-4 text-black font-inter"
         onChange={(e) =>
           setForm({ ...form, numeroDoc: e.target.value.toString() })
         }
@@ -101,7 +101,7 @@ function RegisCard() {
         name="contrasena"
         value={form.contrasena}
         placeholder="Contraseña"
-        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-tinte-5 shadow-inner outline-none mb-4 text-black font-inter"
+        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-white shadow-inner outline-none mb-4 text-black font-inter"
         onChange={(e) => setForm({ ...form, contrasena: e.target.value })}
       />
       <input
@@ -109,7 +109,7 @@ function RegisCard() {
         name="telefono"
         value={form.telefono}
         placeholder="Teléfono"
-        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-tinte-5 shadow-inner outline-none mb-4 text-black font-inter "
+        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-white shadow-inner outline-none mb-4 text-black font-inter "
         onChange={(e) =>
           setForm({ ...form, telefono: e.target.value.toString() })
         }
@@ -119,7 +119,7 @@ function RegisCard() {
         name="direccion"
         value={form.direccion}
         placeholder="Dirección"
-        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-tinte-5 shadow-inner outline-none mb-4 text-black font-inter "
+        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-white shadow-inner outline-none mb-4 text-black font-inter "
         onChange={(e) => setForm({ ...form, direccion: e.target.value })}
       />
     </>
@@ -132,7 +132,7 @@ function RegisCard() {
         name="nombreFantasia"
         value={form.nombreFantasia}
         placeholder="Nombre de fantasía"
-        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-tinte-5 shadow-inner outline-none mb-4 text-black font-inter "
+        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-white shadow-inner outline-none mb-4 text-black font-inter "
         onChange={(e) => setForm({ ...form, nombreFantasia: e.target.value })}
       />
       <input
@@ -140,7 +140,7 @@ function RegisCard() {
         name="descripcion"
         value={form.descripcion}
         placeholder="Descripción"
-        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-30 bg-tinte-5 shadow-[inset_0_0_3px_rgba(0,0,0,0.1)] outline-none mb-4 text-black font-inter "
+        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-white shadow-inner outline-none mb-4 text-black font-inter "
         onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
       />
     </>
@@ -227,7 +227,7 @@ function RegisCard() {
         </div>
       )}
       <div className="flex flex-col min-h-screen items-center justify-center bg-white py-8 ">
-        <div className="flex flex-col md:flex-row w-full max-w-4xl mx-auto  bg-white rounded-4xl shadow-lg mt-8 overflow-hidden h-250 ">
+        <div className="flex flex-col md:flex-row w-full max-w-4xl mx-auto  bg-gray-100 rounded-4xl shadow-lg mt-8 overflow-hidden h-250 ">
           <div className="w-full md:w-1/2 flex flex-col justify-start items-center p-6 md:p-10 ">
             <p className="text-black font-inter text-3xl md:text-5xl mb-6 font-bold text-center ">
               Crear cuenta
@@ -270,7 +270,7 @@ function RegisCard() {
                         form.numeroDoc === '' ||
                         form.telefono === '' ||
                         form.direccion === '')
-                    ? 'w-full bg-gray-300 text-white px-5 py-2.5 rounded-b-2xl cursor-pointer focus:outline-none mb-5 mt-3'
+                    ? 'w-full bg-gray-300 text-black-500 px-5 py-2.5 rounded-b-2xl cursor-pointer focus:outline-none mb-5 mt-3'
                     : 'w-full bg-naranja-1 text-white px-5 py-2.5 rounded-b-2xl cursor-pointer hover:text-black focus:outline-none mb-5 mt-3 hover:shadow-lg'
                 }
                 disabled={

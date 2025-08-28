@@ -1,5 +1,5 @@
 import Navbar from '../../components/Navbar/Navbar.tsx';
-import Recovery from '../../components/recoverycard/index';
+import Recovery from '../../components/recoverycard/recoverycard';
 
 function App_recovery() {
   return (
