@@ -21,6 +21,9 @@ function Recovery() {
   const [tiempoRestante, setTiempoRestante] = useState(0);
   const [timerActivo, setTimerActivo] = useState(false);
 
+  //Estado para mostrar un mensaje en caso de ingresar codigo de rec erroneo
+  const [validado, setValidado] = useState(true);
+
   //animación de cuenta atrás en temporizador de recuperación
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -43,6 +46,7 @@ function Recovery() {
       console.log('Código válido. Ahora puedes cambiar tu contraseña.');
       navigate('/changepassword', { state: { mail: form.mail, codigo } });
     } catch {
+      setValidado(false);
       console.log('Código incorrecto o expirado');
     }
   };
@@ -52,6 +56,7 @@ function Recovery() {
   });
 
   const envioFormulario = async () => {
+    setValidado(true);
     const result = usuarioSchema.safeParse(form);
     if (!result.success) {
       setOpen(true);
@@ -79,6 +84,8 @@ function Recovery() {
         setMessage('Error en la recuperación de contraseña');
         console.log('Error en la recuperación de contraseña');
       }
+      setTimerActivo(false);
+      setTiempoRestante(0);
     }
   };
 
@@ -113,46 +120,71 @@ function Recovery() {
               </button>
             </div>
             <p className="break-words whitespace-pre-line">{message}</p>
-            <input
-              className="w-full pt-3 pb-3 pr-5 pl-12 text-base border-none rounded-4xl bg-gray-100 shadow-inner outline-none mb-4 text-black font-inter"
-              placeholder="Código de recuperación"
-              onChange={(e) => setCodigo(e.target.value)}
-              value={codigo}
-            />
-            {timerActivo && (
-              <p className="text-sm text-gray-500 mb-2">
-                Podrá pedir otro código en {Math.floor(tiempoRestante / 60)}:
-                {(tiempoRestante % 60).toString().padStart(2, '0')} minutos
-              </p>
+            {message ===
+              'Ingrese el código de recuperación que se envió a su email' && (
+              <>
+                <input
+                  className="w-full pt-3 pb-3 pr-5 pl-12 text-base border-none rounded-4xl bg-gray-100 shadow-inner outline-none mt-4 mb-4 text-black font-inter"
+                  placeholder="Código de recuperación"
+                  onChange={(e) => setCodigo(e.target.value)}
+                  value={codigo}
+                />
+                <div className="w-full" style={{ minHeight: 28 }}>
+                  {!validado && (
+                    <p className="text-red-500 mt-2">
+                      El código ingresado es incorrecto o expiró.
+                    </p>
+                  )}
+                </div>
+                <div className="w-full" style={{ minHeight: 32 }}>
+                  {timerActivo && (
+                    <p className="text-sm text-gray-500 mb-2">
+                      Podrá pedir otro código en{' '}
+                      {Math.floor(tiempoRestante / 60)}:
+                      {(tiempoRestante % 60).toString().padStart(2, '0')}{' '}
+                      minutos
+                    </p>
+                  )}
+                </div>
+                <button
+                  onClick={validarCodigo}
+                  type="submit"
+                  className={
+                    codigo === ''
+                      ? 'mt-2 px-4 py-2 bg-gray-200 text-black rounded'
+                      : 'mt-2 px-4 py-2 bg-naranja-1 text-white rounded hover:bg-naranja-2'
+                  }
+                  disabled={codigo === ''}
+                >
+                  Ingresar
+                </button>
+                <button
+                  onClick={() => {
+                    envioFormulario();
+                    setTiempoRestante(20); // reinicia a 10 minutos
+                    setTimerActivo(true);
+                    setValidado(true);
+                  }}
+                  type="button"
+                  className={
+                    timerActivo
+                      ? 'mt-2 ml-2 px-4 py-2 bg-gray-200 text-black rounded '
+                      : 'mt-2 ml-2 px-4 py-2 bg-naranja-1 text-white rounded hover:bg-naranja-2'
+                  }
+                  disabled={timerActivo}
+                >
+                  Reenviar código
+                </button>
+              </>
             )}
-            <button
-              onClick={validarCodigo}
-              type="submit"
-              className={
-                codigo === ''
-                  ? 'mt-2 px-4 py-2 bg-gray-200 text-black rounded'
-                  : 'mt-2 px-4 py-2 bg-naranja-1 text-white rounded hover:bg-naranja-2'
-              }
-              disabled={codigo === ''}
-            >
-              Ingresar
-            </button>
-            <button
-              onClick={() => {
-                envioFormulario();
-                setTiempoRestante(20); // reinicia a 10 minutos
-                setTimerActivo(true);
-              }}
-              type="button"
-              className={
-                timerActivo
-                  ? 'mt-2 ml-2 px-4 py-2 bg-gray-200 text-black rounded '
-                  : 'mt-2 ml-2 px-4 py-2 bg-naranja-1 text-white rounded hover:bg-naranja-2'
-              }
-              disabled={timerActivo}
-            >
-              Reenviar código
-            </button>
+            {message === 'Ingresa un formato de email válido' && (
+              <button
+                onClick={() => setOpen(false)}
+                className="mt-4 px-4 py-2 bg-naranja-1 text-white rounded hover:bg-naranja-2"
+              >
+                Cerrar
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -194,12 +226,14 @@ function Recovery() {
             >
               Recuperar contraseña
             </button>
-            {timerActivo && (
-              <p className="text-sm text-gray-500 mb-2">
-                Podrás pedir otro código en {Math.floor(tiempoRestante / 60)}:
-                {(tiempoRestante % 60).toString().padStart(2, '0')} minutos
-              </p>
-            )}
+            <div style={{ minHeight: 24 }}>
+              {timerActivo && (
+                <p className="text-sm text-gray-500 mb-2">
+                  Podrás pedir otro código en {Math.floor(tiempoRestante / 60)}:
+                  {(tiempoRestante % 60).toString().padStart(2, '0')} minutos
+                </p>
+              )}
+            </div>
             <p className="text-black font-inter  mb-7">
               ¿No tienes cuenta?{' '}
               <Link
