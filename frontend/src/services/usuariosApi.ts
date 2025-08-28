@@ -24,6 +24,7 @@ export const usuariosApi = {
     userId: string,
     maxItems?: string,
     page?: string,
+
     orderBy?: string
   ) => {
     const params = new URLSearchParams(); // crea los parámetros para pasarlos en la consulta
