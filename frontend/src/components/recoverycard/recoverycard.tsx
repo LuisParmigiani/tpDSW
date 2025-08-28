@@ -69,7 +69,7 @@ function Recovery() {
       setOpen(true);
       setCodigo('');
       setMessage('Ingrese el código de recuperación que se envió a su email');
-      setTiempoRestante(20); // 5 minutos
+      setTiempoRestante(300); // setea tiempo de 5 minutos hasta poder pedir otro codigo
       setTimerActivo(true);
     } catch (error) {
       setOpen(true);
@@ -176,17 +176,17 @@ function Recovery() {
                 </button>
               </>
             )}
-            {message === 'Ingresa un formato de email válido' ||
+            {(message === 'Ingresa un formato de email válido' ||
               message ===
                 'Error en la recuperación de contraseña, por favor vuelva a intentar' ||
-              (message === 'No existe un usuario con ese email' && (
-                <button
-                  onClick={() => setOpen(false)}
-                  className="mt-4 px-4 py-2 bg-naranja-1 text-white rounded hover:bg-naranja-2"
-                >
-                  Cerrar
-                </button>
-              ))}
+              message === 'No existe un usuario con ese email') && (
+              <button
+                onClick={() => setOpen(false)}
+                className="mt-4 px-4 py-2 bg-naranja-1 text-white rounded hover:bg-naranja-2"
+              >
+                Cerrar
+              </button>
+            )}
           </div>
         </div>
       )}

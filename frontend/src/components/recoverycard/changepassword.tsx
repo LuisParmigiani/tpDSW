@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { usuariosApi } from '../../services/usuariosApi';
+import Navbar from '../Navbar/Navbar'; // Ajusta la ruta según la ubicación real de tu Navbar
 import { z } from 'zod';
 
 const schema = z.object({
@@ -82,6 +83,7 @@ function ChangePassword() {
 
   return (
     <>
+      <Navbar />
       <div className="min-h-screen flex items-center justify-center bg-transparent">
         <div className="flex flex-col md:flex-row w-full max-w-4xl bg-gray-100 rounded-4xl shadow-inner mt-8 overflow-hidden px-4 md:px-0">
           <div className="flex flex-col justify-center items-center w-full md:w-1/2 min-h-full p-9">
