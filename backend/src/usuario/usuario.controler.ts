@@ -325,7 +325,7 @@ async function loginUsuario(req: Request, res: Response) {
       res.cookie('token', token, {
         httpOnly: true, // No accesible desde JS
         secure: true, // Solo por HTTPS (en local podés poner false)
-        sameSite: 'strict',
+        sameSite: 'none', //permite el uso de cookies en diferentes sitios
       });
     }
     return res
