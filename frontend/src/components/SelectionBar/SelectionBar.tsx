@@ -20,11 +20,11 @@ const SelectionBar: React.FC<SelectionBarProps> = ({
   children,
 }) => (
   <div className={`fixed left-1/2 bottom-8 transform -translate-x-1/2 z-50 flex items-center justify-center ${fadeOut ? 'fade-out' : 'fade-in'}`}>
-    <div className="bg-gray-900 text-white rounded-lg shadow-2xl px-6 py-2 flex items-center gap-6 min-w-[320px] max-w-md">
-      <span className="font-semibold">Seleccionados: {selectedCount}</span>
+    <div className="bg-gray-900 text-white rounded-lg shadow-2xl px-6 py-2 flex items-center gap-4 min-w-[320px] max-w-md">
+      <span className="font-semibold whitespace-nowrap">Seleccionados: {selectedCount}</span>
       <div className="relative">
         <button
-          className="bg-transparent text-white px-4 py-2 rounded transition font-medium hover:underline flex items-center gap-2"
+          className="bg-transparent text-white px-4 py-2 rounded transition font-medium hover:underline flex items-center gap-2 whitespace-nowrap"
           onClick={() => setShowMenu(!showMenu)}
         >
           Actualizar estado
