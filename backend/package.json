@@ -20,6 +20,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "22.15.21",
     "@types/node-cron": "^3.0.11",
+    "@types/nodemailer": "^7.0.1",
     "tsc-watch": "6.0.4",
     "typescript": "5.1.3"
   },
@@ -40,6 +41,7 @@
     "mikro-orm": "^6.4.16",
     "mysql2": "^3.14.2",
     "node-cron": "^4.2.1",
+    "nodemailer": "^7.0.5",
     "reflect-metadata": "0.2.2",
     "uuid": "^11.1.0"
   }

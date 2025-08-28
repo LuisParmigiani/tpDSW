@@ -13,7 +13,7 @@ POST http://localhost:3000/api/turno
 Content-Type: application/json
 
 {
-  "fechaHora": "2025-08-29T15:10:00.000Z",
+  "fechaHora": "2025-08-29T18:16:00.000Z",
   "estado": "pendiente",
   "montoFinal": 1500,
   "servicio": 1,
