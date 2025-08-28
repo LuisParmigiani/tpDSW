@@ -18,8 +18,8 @@ export const turnosApi = {
     if (selectedValueOrder) {
       url += `/${selectedValueOrder}`;
     }
-    
-    return api.get(url);
+
+    return api.get(url, { withCredentials: true });
   },
   getByPrestadorId: (
     id: string,
@@ -36,7 +36,7 @@ export const turnosApi = {
     if (selectedValueOrder) {
       url += `/${selectedValueOrder}`;
     }
-    
+
     return api.get(url);
   },
   create: (data: EntityData) => api.post('/turno', data),
@@ -45,18 +45,17 @@ export const turnosApi = {
   delete: (id: string) => api.delete(`/turno/${id}`),
   getTurnsPerDay: (id: string, date: string) =>
     api.get(`turno/turnosPorDia/${id}/${date}`),
-  
 
   // Métodos específicos para el dashboard del prestatario
   updateMultipleEstados: async (turnoIds: number[], nuevoEstado: string) => {
     // Convertir el estado a minúsculas antes de enviar a la BD
     const estadoMinusculas = nuevoEstado.toLowerCase();
-    
+
     // Realizar actualizaciones en paralelo siguiendo el patrón de tu API
     return Promise.all(
-      turnoIds.map(id => 
+      turnoIds.map((id) =>
         api.patch(`/turno/${id}`, { estado: estadoMinusculas })
       )
     );
-  }
+  },
 };
