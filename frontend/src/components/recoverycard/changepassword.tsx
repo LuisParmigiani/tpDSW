@@ -25,8 +25,11 @@ function ChangePassword() {
   const navigate = useNavigate();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
+  //Para el modal
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
+
   // Para mostrar/ocultar contraseña
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -72,7 +75,8 @@ function ChangePassword() {
       localStorage.removeItem('recoveryCodigo');
     } catch {
       setOpen(true);
-      setMessage('Error al cambiar la contraseña');
+      setMessage('Error al cambiar la contraseña, por favor vuelva a intentar');
+      navigate('/login');
     }
   };
 
