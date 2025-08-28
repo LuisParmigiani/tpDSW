@@ -23,7 +23,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/recovery" element={<Recovery />} />
           <Route path="/registration" element={<Registration />} />
-          <Route path="/TurnHistory" element={<TurnHistory />} />
+          <Route path="/historial" element={<TurnHistory />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route
             path="/turnHistory/success"

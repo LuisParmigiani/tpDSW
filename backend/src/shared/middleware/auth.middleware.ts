@@ -8,6 +8,7 @@ interface AuthRequest extends Request {
     rol: string;
   };
 }
+
 // Middleware para verificar el token de la cookie
 
 export const verifyToken = (
@@ -15,21 +16,19 @@ export const verifyToken = (
   res: Response,
   next: NextFunction
 ) => {
+  const token = req.cookies?.token;
+  if (!token) {
+    req.user = undefined;
+    return next();
+  }
   try {
-    const token = req.cookies?.token;
-
-    if (!token) {
-      return res.status(401).json({ message: 'No autorizado' });
-    }
-
     const decoded = jwt.verify(token, JWT_SECRET) as {
       id: string;
       rol: string;
     };
-
-    req.user = decoded; // ahora TypeScript lo reconoce ✅
-    next();
+    req.user = decoded;
   } catch (error) {
-    return res.status(401).json({ message: 'Token inválido o expirado' });
+    req.user = undefined;
   }
+  next();
 };

@@ -40,6 +40,7 @@ export const turnosApi = {
     return api.get(url);
   },
   create: (data: EntityData) => api.post('/turno', data),
+  createCookie: (data: EntityData) => api.post('/turno/cookie', data),
   update: (id: string, data: EntityData) => api.put(`/turno/${id}`, data),
   patch: (id: string, data: EntityData) => api.patch(`/turno/${id}`, data),
   delete: (id: string) => api.delete(`/turno/${id}`),
