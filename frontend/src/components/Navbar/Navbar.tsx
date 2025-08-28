@@ -1,7 +1,7 @@
 import { usuariosApi } from '../../services/usuariosApi';
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { useRoleReturn } from '../../../useProtectRoute.tsx';
+import { useRoleReturn } from '../../cookie/useProtectRoute';
 type Usuario = {
   nombre: string;
   foto: string;
