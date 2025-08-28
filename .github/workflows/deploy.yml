@@ -88,14 +88,31 @@ jobs:
           fi
           echo "Protocolo final: $(grep PROTOCOL= $GITHUB_ENV | tail -1 | cut -d= -f2)"
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
         with:
           version: 8
 
+      - name: Configure pnpm for deployment
+        working-directory: frontend
+        run: |
+          pnpm config set registry https://registry.npmjs.org/
+          pnpm config set fetch-retries 5
+          pnpm config set fetch-retry-factor 2
+          pnpm config set fetch-retry-mintimeout 10000
+          pnpm config set fetch-retry-maxtimeout 60000
+
       - name: Install deps
         working-directory: frontend
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --no-frozen-lockfile --prefer-offline
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Build
         working-directory: frontend

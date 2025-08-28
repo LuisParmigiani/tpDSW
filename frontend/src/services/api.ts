@@ -2,11 +2,13 @@
 import axios from 'axios';
 
 // El puerto del backend donde quiere hacer las peticiones
-const local = true; // con true es en local y con false para subir a producción
+// Como las variables de env son siempre string, tiene que comparar si es igual a 'true', entonces almacena el booleano de js
+const local = import.meta.env.VITE_LOCAL === 'true';
 const API_BASE_URL = local
   ? 'http://localhost:3000/api'
   : 'https://backend-patient-morning-1303.fly.dev/api';
 
+console.log('API_BASE_URL:', API_BASE_URL);
 // ====== INTERFACES Y TIPOS ======
 
 /**

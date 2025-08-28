@@ -2,6 +2,12 @@ import { Request, Response, NextFunction } from 'express';
 import { Turno } from './turno.entity.js';
 import { orm } from '../shared/db/orm.js';
 
+interface AuthRequest extends Request {
+  user?: {
+    id: string;
+    rol: string;
+  };
+}
 const em = orm.em;
 function sanitizeTurnoInput(req: Request, res: Response, next: NextFunction) {
   req.body.sanitizeTurnoInput = {
@@ -112,8 +118,8 @@ async function remove(req: Request, res: Response) {
 }
 
 // Get turns by user ID
-async function getTurnosByUserId(req: Request, res: Response) {
-  const userId = Number.parseInt(req.params.id);
+async function getTurnosByUserId(req: AuthRequest, res: Response) {
+  const userId = Number(req.user?.id); // ID del usuario autenticado que viene de la cookie
   const cantItemsPerPage = Number(req.params.cantItemsPerPage) || 10;
   const currentPage = Number(req.params.currentPage) || 1;
   const selectedValueShow = req.params.selectedValueShow || '';
@@ -135,7 +141,27 @@ async function getTurnosByUserId(req: Request, res: Response) {
       calificacionFilter = { estado: 'pendiente' };
       break;
     case 'completado':
-      calificacionFilter = { estado: 'completado' };
+      calificacionFilter = {
+        estado: 'completado',
+      };
+      break;
+    case 'porPagar':
+      calificacionFilter = {
+        estado: 'completado',
+        pagos: { $none: { estado: { $in: ['approved', 'pending'] } } },
+      };
+      break;
+    case 'pagado':
+      calificacionFilter = {
+        estado: 'completado',
+        pagos: { $some: { estado: { $eq: 'approved' } } },
+      };
+      break;
+    case 'pagoPendiente':
+      calificacionFilter = {
+        estado: 'completado',
+        pagos: { $some: { estado: 'pending' } },
+      };
       break;
   }
   let selectedValueOrderShow;
@@ -167,15 +193,38 @@ async function getTurnosByUserId(req: Request, res: Response) {
 
     // Buscar los turnos del usuario, populando toda la información necesaria en una sola consulta
     const turnos = await em.find(Turno, where, {
-      populate: ['servicio.tarea', 'servicio.usuario', 'usuario'],
+      populate: [
+        'servicio.tarea.tipoServicio',
+        'servicio.usuario',
+        'usuario',
+        'pagos',
+      ],
       limit: cantItemsPerPage,
       offset: (currentPage - 1) * cantItemsPerPage,
-      orderBy: selectedValueOrderShow,
+      orderBy: [selectedValueOrderShow],
+    });
+
+    // Agregar el campo hasPagoAprobado a cada turno (corrigiendo espacios y mayúsculas)
+    const turnosConPagoAprobado = turnos.map((turno: any) => {
+      // Si pagos es una colección, conviértelo a array
+      const pagosArray = Array.isArray(turno.pagos)
+        ? turno.pagos
+        : turno.pagos?.toArray
+        ? turno.pagos.toArray()
+        : [];
+      return {
+        ...turno,
+        hayPagoAprobado: pagosArray.some(
+          (pago: any) =>
+            typeof pago.estado === 'string' &&
+            pago.estado.trim().toLowerCase() === 'approved'
+        ),
+      };
     });
 
     res.status(200).json({
       message: 'found turns by user id',
-      data: turnos,
+      data: turnosConPagoAprobado,
       pagination: {
         totalPages: Math.ceil(totalCount / cantItemsPerPage),
         currentPage: currentPage,
@@ -278,6 +327,122 @@ async function getTurnsPerDay(req: Request, res: Response) {
   }
 }
 
+// Nueva función para obtener turnos como PRESTATARIO (quien ofrece servicios)
+async function getTurnosByPrestadorId(req: Request, res: Response) {
+  const prestadorId = Number.parseInt(req.params.id);
+  const cantItemsPerPage = Number(req.params.cantItemsPerPage) || 10;
+  const currentPage = Number(req.params.currentPage) || 1;
+  const selectedValueShow = req.params.selectedValueShow || '';
+  const selectedValueOrder = req.params.selectedValueOrder || '';
+
+  // Determinar el filtro de calificación según selectedValueShow
+  let calificacionFilter: any = {};
+  switch (selectedValueShow) {
+    case 'faltanCalificar':
+      calificacionFilter = { calificacion: null, estado: 'completado' };
+      break;
+    case 'calificados':
+      calificacionFilter = { calificacion: { $ne: null } };
+      break;
+    case 'cancelados':
+      calificacionFilter = { estado: 'cancelado' };
+      break;
+    case 'pendientes':
+      calificacionFilter = { estado: 'pendiente' };
+      break;
+    case 'completado':
+      calificacionFilter = {
+        estado: 'completado',
+      };
+      break;
+    case 'porPagar':
+      calificacionFilter = {
+        estado: 'completado',
+        $and: [
+          {
+            pagos: { $none: { estado: 'aprobado' } },
+          },
+          {
+            pagos: { $none: { estado: 'pendiente' } },
+          },
+        ],
+      };
+      break;
+    case 'pagado':
+      calificacionFilter = {
+        estado: 'completado',
+        pagos: { $some: { estado: 'aprobado' } },
+      };
+      break;
+    case 'pagoPendiente':
+      calificacionFilter = {
+        estado: 'completado',
+        pagos: { $some: { estado: 'pendiente' } },
+      };
+  }
+  
+  let selectedValueOrderShow;
+  switch (selectedValueOrder) {
+    case 'fechaA':
+      selectedValueOrderShow = { fechaHora: 1 };
+      break;
+    case 'calificacionM':
+      selectedValueOrderShow = { fechaHora: -1 };
+      break;
+    case 'calificacionB':
+      selectedValueOrderShow = { calificacion: -1 };
+      break;
+    case 'calificacionP':
+      selectedValueOrderShow = { calificacion: 1 };
+      break;
+    default:
+      selectedValueOrderShow = { fechaHora: -1 };
+  }
+
+  // Buscar turnos donde el PRESTATARIO (servicio.usuario) es el prestadorId
+  const where = {
+    servicio: { usuario: { id: prestadorId } },
+    ...calificacionFilter,
+  };
+  
+  try {
+    // Total de turnos para el paginado
+    const totalCount = await em.count(Turno, where);
+
+    // Buscar los turnos del prestatario
+    const turnos = await em.find(Turno, where, {
+      populate: [
+        'servicio.tarea.tipoServicio',
+        'servicio.usuario',
+        'usuario',
+        'pagos',
+      ],
+      limit: cantItemsPerPage,
+      offset: (currentPage - 1) * cantItemsPerPage,
+      orderBy: [selectedValueOrderShow],
+    });
+    
+    const hayPagoAprobado = turnos.some(
+      (turno) =>
+        turno.pagos &&
+        turno.pagos.toArray().some((pago: any) => pago.estado === 'aprobado')
+    );
+    
+    res.status(200).json({
+      message: 'found turns by prestador id',
+      data: turnos,
+      pagination: {
+        totalPages: Math.ceil(totalCount / cantItemsPerPage),
+        currentPage: currentPage,
+        totalItems: totalCount,
+        itemsPerPage: cantItemsPerPage,
+      },
+    });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
 export {
   sanitizeTurnoInput,
   findall,
@@ -287,5 +452,6 @@ export {
   remove,
   getTurnosByServicioIdHelper,
   getTurnosByUserId,
+  getTurnosByPrestadorId,
   getTurnsPerDay,
 };
