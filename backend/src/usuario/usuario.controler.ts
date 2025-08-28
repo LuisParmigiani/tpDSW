@@ -213,30 +213,13 @@ async function findOne(req: Request, res: Response) {
 async function findOneByCookie(req: AuthRequest, res: Response) {
   try {
     // Si el id viene por params, úsalo. Si no, usa el id del usuario autenticado.
-    const id = req.params.id
-      ? Number.parseInt(req.params.id)
-      : req.user && req.user.id
-      ? Number.parseInt(req.user.id)
-      : null;
+    const id = req.user?.id;
 
     if (!id) {
       return res.status(400).json({ message: 'Usuario no autenticado' });
     }
 
-    const user = await em.findOneOrFail(
-      Usuario,
-      { id },
-      {
-        populate: [
-          'turnos',
-          'servicios',
-          'servicios.tarea',
-          'servicios.tarea.tipoServicio',
-          'tiposDeServicio',
-          'horarios',
-        ],
-      }
-    );
+    const user = await em.findOneOrFail(Usuario, { id: Number(id) }, {});
     res.status(200).json({ message: 'found one usuario', data: user });
   } catch (error: any) {
     res.status(500).json({ message: error.message });

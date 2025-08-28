@@ -8,7 +8,6 @@ type Rol = 'cliente' | 'prestador';
 export const useProtectRoute = (rolesPermitidos?: Rol[]) => {
   const { usuario, loading } = useAuth();
   const navigate = useNavigate();
-  console.log('useProtectRoute renderizado');
   useEffect(() => {
     if (loading) return; // Esperar a que termine de cargar
 
@@ -21,7 +20,6 @@ export const useProtectRoute = (rolesPermitidos?: Rol[]) => {
 
     // Si se especificaron roles y el usuario no los tiene
     if (rolesPermitidos && !rolesPermitidos.includes(usuario.rol)) {
-      console.log('useProtectRoute: usuario no tiene acceso');
       navigate('/'); // Redirigir al inicio
       return;
     }
@@ -31,8 +29,6 @@ export const useProtectRoute = (rolesPermitidos?: Rol[]) => {
 };
 
 export const useRoleReturn = () => {
-  console.log('useRoleReturn renderizado');
   const { usuario } = useAuth();
-  console.log('useRoleReturn: usuario', usuario);
   return usuario?.rol ?? '';
 };
