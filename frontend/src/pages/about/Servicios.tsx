@@ -93,7 +93,7 @@ function FiltrosDeServicios() {
       try {
         const response = await tiposServicioApi.getAllWithTareas();
         const tipoServs = response.data.data;
-        const tareasDelTipo: Array<{ id: number; nombreTarea: string }> = [];
+        const todasLasTareas: Array<{ id: number; nombreTarea: string }> = [];
         tipoServs.forEach((element: TipoServicioResponse) => {
           element.tareas.forEach(
             (tarea: { id: number; nombreTarea: string }) => {
@@ -101,14 +101,14 @@ function FiltrosDeServicios() {
                 id: tarea.id,
                 nombreTarea: tarea.nombreTarea,
               };
-              tareasDelTipo.push(tareaResponse);
+              todasLasTareas.push(tareaResponse);
             }
           );
         });
         tipoServs.push({
           nombreTipo: 'Todos',
           descripcionTipo: 'Todos los servicios',
-          tareas: tareasDelTipo,
+          tareas: todasLasTareas,
         });
         setTipoServicios(tipoServs); // Use the modified array
       } catch (error) {

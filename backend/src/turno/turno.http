@@ -26,12 +26,12 @@ Content-Type: application/json
 
 ###Hacemos un PUT
 
-PUT http://localhost:3000/api/turno/902
+PUT http://localhost:3000/api/turno/1
 Content-Type: application/json
 
 {
   "calificacion": 4,
-  "comentario": "Excelente servicio"
+  "comentario": "Ojala que se muera"
 }
 
 ### Hacemos un patch

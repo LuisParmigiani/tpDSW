@@ -2,7 +2,7 @@
 http://localhost:3000/api/serviceTypes
 
 ### Get con tareas
-http://localhost:3000/api/serviceTypes/withTasks
+http://localhost:3000/api/serviceTypes/With-Tareas
 
 ### POST a character
 

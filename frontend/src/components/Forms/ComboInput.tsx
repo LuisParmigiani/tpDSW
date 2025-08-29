@@ -5,9 +5,10 @@ import React, {
   KeyboardEvent,
   MouseEvent,
   ChangeEvent,
+  forwardRef,
+  useImperativeHandle,
 } from 'react';
-import { Search, File, Folder, X } from 'lucide-react';
-import { Item } from '@radix-ui/react-select';
+import { Search, X } from 'lucide-react';
 
 // Type definitions
 interface ComboItem {
@@ -22,107 +23,120 @@ interface ComboInputProps {
   className?: string;
 }
 
-const ComboInput: React.FC<ComboInputProps> = ({
-  items = [],
-  placeholder = 'Buscar por tarea...',
-  onSelect,
-  className = '',
-}) => {
-  const [inputValue, setInputValue] = useState<string>('');
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [selectedIndex, setSelectedIndex] = useState<number>(0);
-  const [filteredItems, setFilteredItems] = useState<ComboItem[]>([]);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+export interface ComboInputRef {
+  clearInput: () => void;
+}
 
-  //! Ver después si le pongo alguna lista default.
-  const defaultItems: ComboItem[] = [];
+const ComboInput = forwardRef<ComboInputRef, ComboInputProps>(
+  (
+    {
+      items = [],
+      placeholder = 'Buscar por tarea...',
+      onSelect,
+      className = '',
+    },
+    ref
+  ) => {
+    const [inputValue, setInputValue] = useState<string>('');
+    const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [selectedIndex, setSelectedIndex] = useState<number>(0);
+    const [filteredItems, setFilteredItems] = useState<ComboItem[]>([]);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const sampleItems = items.length > 0 ? items : defaultItems;
+    //! Ver después si le pongo alguna lista default.
+    const defaultItems: ComboItem[] = [];
 
-  useEffect(() => {
-    if (inputValue.trim() === '') {
-      setFilteredItems(sampleItems);
-    } else {
-      const filtered = sampleItems.filter((item: ComboItem) =>
-        item.nombreTarea.toLowerCase().includes(inputValue.toLowerCase())
-      );
-      setFilteredItems(filtered);
-    }
-    setSelectedIndex(0);
-  }, [inputValue, sampleItems]);
+    const sampleItems = items.length > 0 ? items : defaultItems;
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    setInputValue(e.target.value);
-    setIsOpen(true);
-  };
-
-  const handleInputFocus = (): void => {
-    setIsOpen(true);
-  };
-
-  const handleItemClick = (item: ComboItem): void => {
-    setInputValue(item.nombreTarea);
-    setIsOpen(false);
-    console.log('Selected item:', item);
-    onSelect?.(item);
-  };
-
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>): void => {
-    if (!isOpen) return;
-
-    switch (e.key) {
-      case 'ArrowDown':
-        e.preventDefault();
-        setSelectedIndex((prev: number) =>
-          prev < filteredItems.length - 1 ? prev + 1 : 0
+    useEffect(() => {
+      if (inputValue.trim() === '') {
+        setFilteredItems(sampleItems);
+      } else {
+        const filtered = sampleItems.filter((item: ComboItem) =>
+          item.nombreTarea.toLowerCase().includes(inputValue.toLowerCase())
         );
-        break;
-      case 'ArrowUp':
-        e.preventDefault();
-        setSelectedIndex((prev: number) =>
-          prev > 0 ? prev - 1 : filteredItems.length - 1
-        );
-        break;
-      case 'Enter':
-        e.preventDefault();
-        if (filteredItems[selectedIndex]) {
-          handleItemClick(filteredItems[selectedIndex]);
-        }
-        break;
-      case 'Escape':
-        setIsOpen(false);
-        inputRef.current?.blur();
-        break;
-    }
-  };
+        setFilteredItems(filtered);
+      }
+      setSelectedIndex(0);
+    }, [inputValue, sampleItems]);
 
-  const clearInput = (): void => {
-    setInputValue('');
-    setIsOpen(false);
-    inputRef.current?.focus();
-  };
-
-  const handleClickOutside = (e: Event): void => {
-    const target = e.target as Node;
-    if (
-      inputRef.current &&
-      !inputRef.current.contains(target) &&
-      dropdownRef.current &&
-      !dropdownRef.current.contains(target)
-    ) {
-      setIsOpen(false);
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
+      setInputValue(e.target.value);
+      setIsOpen(true);
     };
-  }, []);
-  //!Podria fijarme como ponerle íconos que correspondan al tipo de servicio, estaría muy bueno
-  /*   const getIcon = (type: ComboItem['type']): React.ReactElement => {
+
+    const handleInputFocus = (): void => {
+      setIsOpen(true);
+    };
+
+    const handleItemClick = (item: ComboItem): void => {
+      setInputValue(item.nombreTarea);
+      setIsOpen(false);
+      console.log('Selected item:', item);
+      onSelect?.(item);
+    };
+
+    const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>): void => {
+      if (!isOpen) return;
+
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault();
+          setSelectedIndex((prev: number) =>
+            prev < filteredItems.length - 1 ? prev + 1 : 0
+          );
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          setSelectedIndex((prev: number) =>
+            prev > 0 ? prev - 1 : filteredItems.length - 1
+          );
+          break;
+        case 'Enter':
+          e.preventDefault();
+          if (filteredItems[selectedIndex]) {
+            handleItemClick(filteredItems[selectedIndex]);
+          }
+          break;
+        case 'Escape':
+          setIsOpen(false);
+          inputRef.current?.blur();
+          break;
+      }
+    };
+
+    const clearInput = (): void => {
+      setInputValue('');
+      setIsOpen(false);
+      inputRef.current?.focus();
+    };
+
+    // Expose clearInput function through ref
+    useImperativeHandle(ref, () => ({
+      clearInput,
+    }));
+
+    const handleClickOutside = (e: Event): void => {
+      const target = e.target as Node;
+      if (
+        inputRef.current &&
+        !inputRef.current.contains(target) &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(target)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    useEffect(() => {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }, []);
+    //!Podria fijarme como ponerle íconos que correspondan al tipo de servicio, estaría muy bueno
+    /*   const getIcon = (type: ComboItem['type']): React.ReactElement => {
     return type === 'folder' ? (
       <Folder className="w-4 h-4 text-blue-500" />
     ) : (
@@ -130,40 +144,39 @@ const ComboInput: React.FC<ComboInputProps> = ({
     );
   }; */
 
-  const highlightMatch = (
-    text: string,
-    query: string
-  ): (React.ReactElement | string)[] => {
-    if (!query.trim()) return [text];
+    const highlightMatch = (
+      text: string,
+      query: string
+    ): (React.ReactElement | string)[] => {
+      if (!query.trim()) return [text];
 
-    const regex = new RegExp(`(${query})`, 'gi');
-    const parts = text.split(regex);
+      const regex = new RegExp(`(${query})`, 'gi');
+      const parts = text.split(regex);
 
-    return parts.map((part: string, i: number) =>
-      regex.test(part) ? (
-        <span key={i} className="bg-yellow-200 text-yellow-800">
-          {part}
-        </span>
-      ) : (
-        part
-      )
-    );
-  };
-
-  const handleItemMouseClick =
-    (item: ComboItem) =>
-    (e: MouseEvent<HTMLDivElement>): void => {
-      e.preventDefault();
-      handleItemClick(item);
+      return parts.map((part: string, i: number) =>
+        regex.test(part) ? (
+          <span key={i} className="bg-yellow-200 text-yellow-800">
+            {part}
+          </span>
+        ) : (
+          part
+        )
+      );
     };
-  console.log('Items:', items);
-  return (
-    <div className={`w-full max-w-2xl mx-auto p-8 ${className}`}>
+
+    const handleItemMouseClick =
+      (item: ComboItem) =>
+      (e: MouseEvent<HTMLDivElement>): void => {
+        e.preventDefault();
+        handleItemClick(item);
+      };
+    console.log('Items:', items);
+    return (
       <div className="relative">
         {/* Input Field */}
-        <div className="relative">
+        <div className={`relative ${className}`}>
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-5 w-5 text-gray-400" />
+            <Search className="h-3 w-5 text-gray-700" />
           </div>
           <input
             ref={inputRef}
@@ -173,7 +186,7 @@ const ComboInput: React.FC<ComboInputProps> = ({
             onFocus={handleInputFocus}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
-            className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg text-secondary focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white shadow-sm"
+            className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg text-secondary focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white shadow-sm"
           />
           {inputValue && (
             <button
@@ -190,7 +203,7 @@ const ComboInput: React.FC<ComboInputProps> = ({
         {isOpen && (
           <div
             ref={dropdownRef}
-            className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-96 overflow-y-auto"
+            className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-96 overflow-y-auto"
           >
             {filteredItems.length === 0 ? (
               <div className="px-4 py-8 text-center text-gray-500">
@@ -237,8 +250,10 @@ const ComboInput: React.FC<ComboInputProps> = ({
           </div>
         )}
       </div>
-    </div>
-  );
-};
+    );
+  }
+);
+
+ComboInput.displayName = 'ComboInput';
 
 export default ComboInput;
