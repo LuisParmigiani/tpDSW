@@ -2,11 +2,11 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { z } from 'zod';
 import { Button } from './../Botones/FormButton';
 import { Form, FormControl, FormField, FormItem, FormMessage } from './Form';
-import ComboInput from './ComboInput';
+import ComboInput, { ComboInputRef } from './ComboInput';
 import {
   Select,
   SelectItem,
@@ -61,6 +61,8 @@ export function ServiciosForm({
   onSubmit,
   filtrosForm, // Added to accept initial filter values
 }: ServiciosFormProps) {
+  const comboInputRef = useRef<ComboInputRef>(null);
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -91,17 +93,19 @@ export function ServiciosForm({
     }
   }, [filtrosForm, form, tipoServicios, zonas]);
 
+  // Calculate tareas based on selected service
+  const tareasTipo: Array<{ id: number; nombreTarea: string }> = (() => {
+    const tipoSeleccionado = tipoServicios.find(
+      (tipo) => tipo.nombreTipo === form.watch('servicio')
+    );
+    return tipoSeleccionado ? tipoSeleccionado.tareas : [];
+  })();
+
   const handleSubmit = (values: FormValues) => {
     console.log('Form values:', values);
     onSubmit(values);
   };
 
-  const todasLasTareas: Array<{ id: number; nombreTarea: string }> = [];
-  tipoServicios[tipoServicios.length - 1]?.tareas.forEach(
-    (tarea: { id: number; nombreTarea: string }) => {
-      todasLasTareas.push({ id: tarea.id, nombreTarea: tarea.nombreTarea });
-    }
-  );
   const handleTareaSelect = (item: { id: number; nombreTarea: string }) => {
     form.setValue('tarea', item.nombreTarea);
   };
@@ -120,7 +124,10 @@ export function ServiciosForm({
               'border-1 !hidden border-gray-800 min-w-10 bg-gray-500 text-white text-center py-1 px-4 rounded-md  ' +
               'hover:bg-gray-300 hover:text-gray-800 w-30 transition duration-300 cursor-pointer lg:!inline-block '
             }
-            onClick={() => form.reset()}
+            onClick={() => {
+              form.reset();
+              comboInputRef.current?.clearInput();
+            }}
           >
             Reestablecer
           </Button>
@@ -153,10 +160,11 @@ export function ServiciosForm({
           )}
         />
         <ComboInput
-          items={todasLasTareas}
+          ref={comboInputRef}
+          items={tareasTipo}
           placeholder="Buscar por tarea..."
           onSelect={handleTareaSelect}
-          className=""
+          className=" w-full mb-5 "
         />
 
         <FormField
@@ -238,7 +246,10 @@ export function ServiciosForm({
                 'border-1 border-gray-800 min-w-10 bg-gray-500 text-white text-center py-1 px-4 rounder-md  ' +
                 'hover:bg-gray-300 hover:text-gray-800 w-30 transition duration-300 cursor-pointer lg:hidden'
               }
-              onClick={() => form.reset()}
+              onClick={() => {
+                form.reset();
+                comboInputRef.current?.clearInput();
+              }}
             >
               Reestablecer
             </Button>
