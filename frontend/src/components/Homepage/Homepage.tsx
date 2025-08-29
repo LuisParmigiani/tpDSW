@@ -39,7 +39,19 @@ function Homepage() {
           <Navbar />
         </div>
         {/* Botón de pago Mercado Pago integrado */}
-
+        <div className="flex justify-center mt-8">
+          <button
+            className="bg-naranja-1 text-white px-6 py-3 rounded-lg font-bold shadow-lg hover:bg-orange-600 transition"
+            onClick={() => {
+              window.location.href =
+                import.meta.env.VITE_LOCAL === 'true'
+                  ? 'http://localhost:3000/api/mp/connect'
+                  : 'https://backend-patient-morning-1303.fly.dev/api/mp/connect';
+            }}
+          >
+            Probar Mercado Pago OAuth
+          </button>
+        </div>
         <div className="w-full">
           <Carousel
             fotos={[
