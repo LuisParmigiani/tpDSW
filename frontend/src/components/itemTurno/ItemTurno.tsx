@@ -2,7 +2,7 @@ import React from 'react';
 
 type ItemTurnoProps = {
   turno: {
-    paciente: string;
+    cliente: string;
     fecha: string;
     hora: string;
     estado: string;
@@ -44,9 +44,9 @@ const ItemTurno: React.FC<ItemTurnoProps> = ({ turno, idx, selected, onSelect })
       </td>
       <td className="py-3 px-4 text-left">
         <div className="flex items-center gap-2 min-w-0"> {/* min-w-0 para permitir truncamiento */}
-          <img src={turno.avatar} alt={turno.paciente} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
-          <span className="font-medium text-gray-900 truncate max-w-[120px]" title={turno.paciente}>
-            {turno.paciente}
+          <img src={turno.avatar} alt={turno.cliente} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+          <span className="font-medium text-gray-900 truncate max-w-[120px]" title={turno.cliente}>
+            {turno.cliente}
           </span>
         </div>
       </td>
