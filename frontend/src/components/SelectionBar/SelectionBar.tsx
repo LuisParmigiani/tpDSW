@@ -6,6 +6,7 @@ type SelectionBarProps = {
   fadeOut: boolean;
   onConfirm?: () => void;
   onCancel?: () => void;
+  onComplete?: () => void;
   children?: React.ReactNode;
 }
 
@@ -17,25 +18,31 @@ const SelectionBar: React.FC<SelectionBarProps> = ({
   fadeOut,
   onConfirm,
   onCancel,
+  onComplete,
   children,
 }) => (
   <div className={`fixed left-1/2 bottom-8 transform -translate-x-1/2 z-50 flex items-center justify-center ${fadeOut ? 'fade-out' : 'fade-in'}`}>
-    <div className="bg-gray-900 text-white rounded-lg shadow-2xl px-6 py-2 flex items-center gap-4 min-w-[320px] max-w-md">
+    <div className="text-white rounded-lg shadow-2xl px-6 py-2 flex items-center gap-4 min-w-[320px] max-w-md" style={{
+      background: 'linear-gradient(to right, rgba(17, 24, 39, 1), rgba(17, 24, 39, 0.8))'
+    }}>
       <span className="font-semibold whitespace-nowrap">Seleccionados: {selectedCount}</span>
       <div className="relative">
         <button
           className="bg-transparent text-white px-4 py-2 rounded transition font-medium hover:underline flex items-center gap-2 whitespace-nowrap"
           onClick={() => setShowMenu(!showMenu)}
         >
-          Actualizar estado
+          Actualizar
           <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
             <path d="M6 12L10 8L14 12" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </button>
         {showMenu && (
-          <div className="absolute bottom-full left-0 mb-2 bg-gray-900 border border-gray-700 rounded shadow-lg py-2 w-40 z-50">
+          <div className="absolute bottom-full left-0 mb-2 border border-gray-700 rounded shadow-lg py-2 w-40 z-50" style={{
+            background: 'linear-gradient(to right, rgba(17, 24, 39, 1), rgba(17, 24, 39, 0.8))'
+          }}>
             <button className="block w-full text-left px-4 py-2 text-white hover:bg-gray-800" onClick={() => { if (onConfirm) { onConfirm(); } setShowMenu(false); }}>Confirmar</button>
             <button className="block w-full text-left px-4 py-2 text-white hover:bg-gray-800" onClick={() => { if (onCancel) { onCancel(); } setShowMenu(false); }}>Cancelar</button>
+            <button className="block w-full text-left px-4 py-2 text-white hover:bg-gray-800" onClick={() => { if (onComplete) { onComplete(); } setShowMenu(false); }}>Completar</button>
           </div>
         )}
       </div>
