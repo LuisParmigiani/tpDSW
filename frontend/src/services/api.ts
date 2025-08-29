@@ -48,11 +48,3 @@ api.interceptors.response.use(
  * Realiza una petición GET a /mp/connect
  * Retorna la respuesta del backend
  */
-export const connectMP = async () => {
-  try {
-    const response = await api.get('/mp/connect');
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
