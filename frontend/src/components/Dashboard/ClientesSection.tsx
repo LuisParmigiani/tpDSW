@@ -29,7 +29,7 @@ const convertirTurnoADisplay = (turno: unknown): TurnoDisplay => {
 	
 	return {
 		id: turnoObj.id,
-		paciente: turnoObj.usuario?.nombre && turnoObj.usuario?.apellido 
+		cliente: turnoObj.usuario?.nombre && turnoObj.usuario?.apellido 
 			? `${turnoObj.usuario.nombre} ${turnoObj.usuario.apellido}`
 			: turnoObj.usuario?.mail || 'Usuario desconocido',
 		fecha: fechaHora.toLocaleDateString('es-AR', { 
@@ -51,7 +51,7 @@ const convertirTurnoADisplay = (turno: unknown): TurnoDisplay => {
 
 interface TurnoDisplay {
 	id: number;
-	paciente: string;
+	cliente: string;
 	fecha: string;
 	hora: string;
 	estado: string;
@@ -75,11 +75,13 @@ function ClientesSection() {
 	const [error, setError] = useState<string | null>(null);
 	const [sortBy, setSortBy] = useState<string>('');
 	const [estadoFilters, setEstadoFilters] = useState<string[]>([]);
+	const [searchQuery, setSearchQuery] = useState<string>('');
+	const [activeSearchQuery, setActiveSearchQuery] = useState<string>(''); // La búsqueda actualmente aplicada
 	const [showEstadoDropdown, setShowEstadoDropdown] = useState(false);
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	const itemsPerPage = 6;
 
-	const cargarTurnos = useCallback(async (page = 1, ordenamiento = sortBy, filtrosEstado = estadoFilters, isPageChange = false) => {
+	const cargarTurnos = useCallback(async (page = 1, ordenamiento = sortBy, filtrosEstado = estadoFilters, isPageChange = false, searchTerm = '') => {
 		try {
 			if (isPageChange) {
 				setPageLoading(true); // Solo para cambios de página
@@ -127,7 +129,8 @@ function ClientesSection() {
 				itemsPerPage.toString(),
 				page.toString(),
 				backendFilterValue || 'all', // selectedValueShow - usar 'all' si está vacío
-				backendOrderValue // selectedValueOrder - nuestro ordenamiento
+				backendOrderValue, // selectedValueOrder - nuestro ordenamiento
+				searchTerm // searchQuery - parámetro de búsqueda
 			);
 			
 			const turnosDisplay = response.data.data.map(convertirTurnoADisplay);
@@ -146,16 +149,40 @@ function ClientesSection() {
 				setLoading(false);
 			}
 		}
-	}, [itemsPerPage, sortBy, estadoFilters]);
+	}, [itemsPerPage, sortBy, estadoFilters]); // Remover searchQuery de las dependencias
 
 	// Cargar turnos al montar el componente y cuando cambie la página
 	useEffect(() => {
 		if (currentPage === 1) {
-			cargarTurnos(currentPage, sortBy, estadoFilters, false); // Carga inicial, no es cambio de página
+			cargarTurnos(currentPage, sortBy, estadoFilters, false, activeSearchQuery); // Mantener búsqueda activa
 		} else {
-			cargarTurnos(currentPage, sortBy, estadoFilters, true); // Es cambio de página
+			cargarTurnos(currentPage, sortBy, estadoFilters, true, activeSearchQuery); // Mantener búsqueda activa
 		}
-	}, [currentPage, cargarTurnos, sortBy, estadoFilters]);
+	}, [currentPage, cargarTurnos, sortBy, estadoFilters, activeSearchQuery]);
+
+	// Función para manejar la búsqueda al presionar Enter
+	const handleSearch = () => {
+		setCurrentPage(1); // Reset a página 1
+		setActiveSearchQuery(searchQuery); // Guardar la búsqueda activa (puede ser vacía para limpiar)
+		cargarTurnos(1, sortBy, estadoFilters, false, searchQuery); // Cargar con búsqueda
+	};
+
+	// Función para manejar el Enter en el input de búsqueda
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === 'Enter') {
+			handleSearch();
+		}
+	};
+
+	// useEffect para limpiar la búsqueda automáticamente cuando el campo esté vacío
+	useEffect(() => {
+		if (searchQuery.trim() === '' && activeSearchQuery !== '') {
+			// El usuario borró todo el texto, limpiar la búsqueda activa
+			setActiveSearchQuery('');
+			setCurrentPage(1);
+			cargarTurnos(1, sortBy, estadoFilters, false, '');
+		}
+	}, [searchQuery, activeSearchQuery, sortBy, estadoFilters, cargarTurnos]);
 
 	// Los turnos actuales son todos los que se muestran (ya vienen paginados del API)
 	const currentTurnos = turnos;
@@ -233,7 +260,7 @@ function ClientesSection() {
 				await turnosApi.updateMultipleEstados(selectedTurnoIds, pendingAction);
 				
 				// Recargar los datos después de la actualización
-				await cargarTurnos(currentPage, sortBy, estadoFilters, false);
+				await cargarTurnos(currentPage, sortBy, estadoFilters, false, activeSearchQuery);  // Mantener búsqueda activa
 				
 				setShowMenu(false);
 				setSelectedTurnoIds([]);
@@ -249,41 +276,67 @@ function ClientesSection() {
 		setPendingAction(null);
 	};
 
-	const getValidSelectedCount = () => {
-		// Solo contar turnos que están en la página actual para mostrar información visual
-		const turnosSeleccionados = turnos.filter(turno => selectedTurnoIds.includes(turno.id));
-		return turnosSeleccionados.filter(turno => {
-			if (!turno) return false;
+	// Estado para contar turnos válidos/inválidos cross-page
+	const [validSelectedCount, setValidSelectedCount] = useState(0);
+	const [invalidSelectedCount, setInvalidSelectedCount] = useState(0);
+
+	// Función para calcular turnos válidos/inválidos cross-page
+	const calculateSelectedCounts = useCallback(async () => {
+		if (selectedTurnoIds.length === 0 || !pendingAction) {
+			setValidSelectedCount(0);
+			setInvalidSelectedCount(0);
+			return;
+		}
+
+		try {
+			// Obtener todos los turnos seleccionados por ID
+			const turnosPromises = selectedTurnoIds.map(id => turnosApi.getById(id.toString()));
+			const turnosResponses = await Promise.all(turnosPromises);
 			
-			if (turno.estado.toLowerCase() === 'pendiente') {
-				// Pendiente puede cambiar a cualquier estado
-				return true;
-			} else if (turno.estado.toLowerCase() === 'confirmado') {
-				// Confirmado solo puede cambiar a Cancelado
-				return pendingAction === 'Cancelado';
-			}
-			
-			return false;
-		}).length;
-	};
-		
-	const getInvalidSelectedCount = () => {
-		// Solo contar turnos que están en la página actual para mostrar información visual
-		const turnosSeleccionados = turnos.filter(turno => selectedTurnoIds.includes(turno.id));
-		return turnosSeleccionados.filter(turno => {
-			if (!turno) return false;
-			
-			// Los inválidos son los que no se pueden cambiar según las reglas
-			if (turno.estado.toLowerCase() === 'cancelado' || turno.estado.toLowerCase() === 'completado') {
-				return true;
-			} else if (turno.estado.toLowerCase() === 'confirmado' && pendingAction === 'Confirmado') {
-				// Confirmado no puede cambiar a Confirmado
-				return true;
-			}
-			
-			return false;
-		}).length;
-	};
+			let validCount = 0;
+			let invalidCount = 0;
+
+			turnosResponses.forEach(response => {
+				const turno = response.data.data || response.data;
+				if (!turno || !turno.estado) {
+					invalidCount++;
+					return;
+				}
+
+				const estado = turno.estado.toLowerCase();
+				
+				// Reglas de negocio para validación
+				if (estado === 'pendiente') {
+					// Pendiente puede cambiar a cualquier estado
+					validCount++;
+				} else if (estado === 'confirmado') {
+					// Confirmado solo puede cambiar a Cancelado
+					if (pendingAction === 'Cancelado') {
+						validCount++;
+					} else {
+						invalidCount++;
+					}
+				} else {
+					// Cancelado y Completado no se pueden cambiar
+					invalidCount++;
+				}
+			});
+
+			setValidSelectedCount(validCount);
+			setInvalidSelectedCount(invalidCount);
+		} catch (error) {
+			console.error('Error calculando turnos válidos/inválidos:', error);
+			setValidSelectedCount(0);
+			setInvalidSelectedCount(selectedTurnoIds.length);
+		}
+	}, [selectedTurnoIds, pendingAction]);
+
+	// Ejecutar cálculo cuando cambia pendingAction o selectedTurnoIds
+	useEffect(() => {
+		if (pendingAction) {
+			calculateSelectedCounts();
+		}
+	}, [pendingAction, calculateSelectedCounts]);
 
 	// Función para manejar el cambio de ordenamiento
 	const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -292,7 +345,7 @@ function ClientesSection() {
 		
 		// Recargar los datos con el nuevo ordenamiento desde la primera página
 		setCurrentPage(1);
-		cargarTurnos(1, newSortBy, estadoFilters, false); // Cambio de ordenamiento, no es cambio de página
+		cargarTurnos(1, newSortBy, estadoFilters, false, activeSearchQuery); // Mantener búsqueda activa
 	};
 
 	// Funciones para manejar los filtros de estado
@@ -305,13 +358,13 @@ function ClientesSection() {
 		
 		// Recargar los datos con los nuevos filtros desde la primera página
 		setCurrentPage(1);
-		cargarTurnos(1, sortBy, newFilters, false); // Cambio de filtros, no es cambio de página
+		cargarTurnos(1, sortBy, newFilters, false, activeSearchQuery); // Mantener búsqueda activa
 	};
 
 	const clearEstadoFilters = () => {
 		setEstadoFilters([]);
 		setCurrentPage(1);
-		cargarTurnos(1, sortBy, [], false); // Limpiar filtros, no es cambio de página
+		cargarTurnos(1, sortBy, [], false, activeSearchQuery); // Mantener búsqueda activa
 	};
 
 	const estadosDisponibles = ['Pendiente', 'Confirmado', 'Cancelado', 'Completado'];
@@ -337,7 +390,7 @@ function ClientesSection() {
 				<div className="text-center py-8">
 					<div className="text-red-500 mb-4">{error}</div>
 					<button 
-						onClick={() => cargarTurnos(currentPage)}
+						onClick={() => cargarTurnos(currentPage, sortBy, estadoFilters, false, activeSearchQuery)}  // Mantener búsqueda activa
 						className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600"
 					>
 						Reintentar
@@ -354,7 +407,10 @@ function ClientesSection() {
 				<div className="flex gap-2">
 					<input
 						type="text"
-						placeholder="Buscar..."
+						placeholder="Buscar cliente..."
+						value={searchQuery}
+						onChange={(e) => setSearchQuery(e.target.value)}
+						onKeyDown={handleKeyDown}
 						className="border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
 					/>
 					<select 
@@ -471,23 +527,52 @@ function ClientesSection() {
 						</tr>
 					</thead>
 					<tbody>
-						{currentTurnos.map((turno, idx) => (
-							<ItemTurno
-								key={turno.id}
-								turno={turno}
-								idx={idx}
-								selected={selectedTurnoIds.includes(turno.id)}
-								onSelect={handleSelectRow}
-							/>
-						))}
+						{currentTurnos.length > 0 ? (
+							currentTurnos.map((turno, idx) => (
+								<ItemTurno
+									key={turno.id}
+									turno={turno}
+									idx={idx}
+									selected={selectedTurnoIds.includes(turno.id)}
+									onSelect={handleSelectRow}
+								/>
+							))
+						) : (
+							<tr>
+								<td colSpan={7} className="py-4 text-center">
+									<p className="text-gray-400 opacity-60 mt-8">
+										{activeSearchQuery 
+											? "No se encontraron turnos que coincidan con tu búsqueda."
+											: "No hay turnos disponibles."
+										}
+									</p>
+								</td>
+							</tr>
+						)}
 					</tbody>
 				</table>
-				<div className="mt-4 min-h-[60px] flex items-center justify-start">
+				<div className={`mt-2 flex items-center justify-between ${currentTurnos.length > 0 ? 'min-h-[60px]' : 'min-h-[20px]'}`}>
 					<PaginationControls
 						currentPage={currentPage}
 						totalPages={totalPages}
 						onPageChange={handlePageChange}
 					/>
+					{/* SelectionBar integrado a la derecha de la paginación */}
+					{showBar && (
+						<SelectionBar
+							selectedCount={selectedTurnoIds.length}
+							onDeselectAll={() => {
+								setFadeOut(true);
+								setTimeout(() => setSelectedTurnoIds([]), 300);
+							}}
+							showMenu={showMenu}
+							setShowMenu={setShowMenu}
+							fadeOut={fadeOut}
+							onConfirm={() => handleUpdateEstado('Confirmado')}
+							onCancel={() => handleUpdateEstado('Cancelado')}
+							inline={true}
+						/>
+					)}
 				</div>
 				<style>{`
           .fade-in {
@@ -513,28 +598,14 @@ function ClientesSection() {
             }
           }
         `}</style>
-				{showBar && (
-					<SelectionBar
-						selectedCount={selectedTurnoIds.length}
-						onDeselectAll={() => {
-							setFadeOut(true);
-							setTimeout(() => setSelectedTurnoIds([]), 300);
-						}}
-						showMenu={showMenu}
-						setShowMenu={setShowMenu}
-						fadeOut={fadeOut}
-						onConfirm={() => handleUpdateEstado('Confirmado')}
-						onCancel={() => handleUpdateEstado('Cancelado')}
-					/>
-				)}
 				{(pendingAction || modalVisible) && (
 					<div className="fixed inset-0 z-50 flex items-center justify-center">
 						<div className={`absolute inset-0 bg-black opacity-20 transition-opacity duration-200 ${pendingAction ? 'opacity-20' : 'opacity-0'}`}></div>
 						<div className={`relative bg-white border border-gray-300 rounded-lg shadow-lg p-6 min-w-[300px] flex flex-col items-center ${pendingAction ? 'animate-fadeInModal' : 'animate-fadeOutModal'}` }>
 							<span className="text-lg font-semibold mb-4 text-gray-900">¿Seguro que quieres {pendingAction === 'Confirmado' ? 'confirmar' : 'cancelar'} los turnos seleccionados?</span>
-							<span className="text-sm text-gray-700 mb-2">{getValidSelectedCount()} turno(s) se pueden actualizar.</span>
-							{getInvalidSelectedCount() > 0 && (
-								<span className="text-sm text-red-500 mb-2">{getInvalidSelectedCount()} turno(s) no se pueden modificar por estar cancelados o completados.</span>
+							<span className="text-sm text-gray-700 mb-2">Se van a actualizar {validSelectedCount} turno(s).</span>
+							{invalidSelectedCount > 0 && (
+								<span className="text-sm text-red-500 mb-2">{invalidSelectedCount} turno(s) no se pueden actualizar debido a su estado.</span>
 							)}
 							<div className="flex gap-4">
 								<button className="bg-orange-500 text-white px-4 py-2 rounded font-medium hover:bg-orange-600 cursor-pointer" onClick={handleConfirmAction}>Sí, {pendingAction === 'Confirmado' ? 'confirmar' : 'cancelar'}</button>

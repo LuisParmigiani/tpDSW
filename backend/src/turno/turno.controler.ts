@@ -336,11 +336,14 @@ async function getTurnosByPrestadorId(req: Request, res: Response) {
   const cantItemsPerPage = Number(req.params.cantItemsPerPage) || 10;
   const currentPage = Number(req.params.currentPage) || 1;
   const selectedValueShow = req.params.selectedValueShow || '';
-  const selectedValueOrder = req.params.selectedValueOrder || '';
+  // Tratar 'none' como placeholder vacío para selectedValueOrder
+  const selectedValueOrder = req.params.selectedValueOrder === 'none' ? '' : (req.params.selectedValueOrder || '');
+  const searchQuery = req.params.searchQuery || '';
 
   console.log('=== DEBUG ORDENAMIENTO ===');
   console.log('selectedValueOrder recibido:', selectedValueOrder);
   console.log('selectedValueShow recibido:', selectedValueShow);
+  console.log('searchQuery recibido:', searchQuery);
   console.log('isMultipleStatesFilter:', selectedValueShow.startsWith('multipleStates:'));
 
   // Determinar el filtro de calificación según selectedValueShow
@@ -448,10 +451,22 @@ async function getTurnosByPrestadorId(req: Request, res: Response) {
   }
 
   // Buscar turnos donde el PRESTATARIO (servicio.usuario) es el prestadorId
-  const where = {
+  let where: any = {
     servicio: { usuario: { id: prestadorId } },
     ...calificacionFilter,
   };
+  
+  // Agregar filtro de búsqueda por nombre y apellido del cliente si se proporciona
+  if (searchQuery && searchQuery.trim() !== '') {
+    const searchTerm = searchQuery.trim();
+    where.usuario = {
+      ...where.usuario,
+      $or: [
+        { nombre: { $like: `%${searchTerm}%` } },
+        { apellido: { $like: `%${searchTerm}%` } },
+      ]
+    };
+  }
   
   try {
     // Total de turnos para el paginado

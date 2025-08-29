@@ -27,19 +27,34 @@ export const turnosApi = {
     cantItemsPerPage: string,
     currentPage: string,
     selectedValueShow?: string,
-    selectedValueOrder?: string
+    selectedValueOrder?: string,
+    searchQuery?: string
   ) => {
-    // Construir la URL para obtener turnos como prestatario
-    let url = `/turno/byPrestador/${id}/${cantItemsPerPage}/${currentPage}`;
+    // Construir la URL usando un array para evitar dobles barras
+    const parts = [
+      'turno',
+      'byPrestador',
+      id,
+      cantItemsPerPage,
+      currentPage,
+      selectedValueShow || 'all'
+    ];
     
-    // Siempre agregar selectedValueShow (vacío si no hay filtro)
-    url += `/${selectedValueShow || ''}`;
-    
-    // Agregar selectedValueOrder solo si hay uno
-    if (selectedValueOrder) {
-      url += `/${selectedValueOrder}`;
+    // Agregar selectedValueOrder solo si hay valor o si necesitamos searchQuery
+    if (selectedValueOrder && selectedValueOrder !== '') {
+      parts.push(selectedValueOrder);
+    } else if (searchQuery && searchQuery.trim() !== '') {
+      // Si hay searchQuery pero no selectedValueOrder, usar placeholder
+      parts.push('none'); // placeholder que el backend reconocerá como vacío
     }
-
+    
+    // Agregar searchQuery si hay
+    if (searchQuery && searchQuery.trim() !== '') {
+      parts.push(encodeURIComponent(searchQuery.trim()));
+    }
+    
+    const url = '/' + parts.join('/');
+    console.log('URL construida:', url);
     return api.get(url);
   },
   create: (data: EntityData) => api.post('/turno', data),
