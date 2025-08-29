@@ -66,7 +66,7 @@ function ClientesSection() {
 	const [showBar, setShowBar] = useState(false);
 	const [fadeOut, setFadeOut] = useState(false);
 	const [turnos, setTurnos] = useState<TurnoDisplay[]>([]);
-	const [pendingAction, setPendingAction] = useState<null | 'Confirmado' | 'Cancelado'>(null);
+	const [pendingAction, setPendingAction] = useState<null | 'Confirmado' | 'Cancelado' | 'Completado'>(null);
 	const [modalVisible, setModalVisible] = useState(false);
 	const [currentPage, setCurrentPage] = useState(1);
 	const [totalPages, setTotalPages] = useState(1);
@@ -134,6 +134,12 @@ function ClientesSection() {
 			);
 			
 			const turnosDisplay = response.data.data.map(convertirTurnoADisplay);
+			
+			// Log para debuggear datos recibidos
+			console.log('=== DATOS RECIBIDOS DEL BACKEND ===');
+			console.log('Total turnos recibidos:', response.data.data.length);
+			console.log('Datos completos del backend:', response.data.data);
+			console.log('Turnos después de conversión:', turnosDisplay.map((t: TurnoDisplay) => ({ id: t.id, estado: t.estado })));
 			
 			setTurnos(turnosDisplay);
 			setTotalPages(response.data.pagination.totalPages);
@@ -248,23 +254,69 @@ function ClientesSection() {
 	};
 
 	// Handler para actualizar estado de los seleccionados
-	const handleUpdateEstado = (nuevoEstado: 'Confirmado' | 'Cancelado') => {
+	const handleUpdateEstado = (nuevoEstado: 'Confirmado' | 'Cancelado' | 'Completado') => {
 		setPendingAction(nuevoEstado);
+		setModalVisible(true);
+		// calculateSelectedCounts se ejecutará automáticamente por el useEffect
 	};
 
 	const handleConfirmAction = async () => {
 		if (pendingAction && selectedTurnoIds.length > 0) {
 			try {
-				// Actualizar directamente los turnos seleccionados
-				// El backend se encargará de validar qué turnos se pueden actualizar
-				await turnosApi.updateMultipleEstados(selectedTurnoIds, pendingAction);
+				// Obtener todos los turnos seleccionados desde el backend para validar
+				const turnosPromises = selectedTurnoIds.map(id => turnosApi.getById(id.toString()));
+				const turnosResponses = await Promise.all(turnosPromises);
+				
+				const turnosValidos: number[] = [];
+				
+				turnosResponses.forEach(response => {
+					const turno = response.data.data || response.data;
+					if (!turno || !turno.estado) return;
+					
+					const estado = turno.estado.toLowerCase();
+					
+					// Verificar que no esté completado o cancelado
+					if (estado === 'completado' || estado === 'cancelado') {
+						return;
+					}
+					
+					// Validar transiciones específicas
+					let esValido = false;
+					if (pendingAction === 'Confirmado' && estado === 'pendiente') {
+						esValido = true;
+					} else if (pendingAction === 'Cancelado' && (estado === 'pendiente' || estado === 'confirmado')) {
+						esValido = true;
+					} else if (pendingAction === 'Completado' && estado === 'confirmado') {
+						esValido = true;
+					}
+					
+					if (esValido) {
+						turnosValidos.push(turno.id);
+					}
+				});
+				
+				// Log estados ANTES de la actualización
+				console.log('=== ANTES DE LA ACTUALIZACIÓN ===');
+				console.log('Acción pendiente:', pendingAction);
+				console.log('IDs válidos seleccionados:', turnosValidos);
+				console.log('Total turnos válidos:', turnosValidos.length);
+				
+				// Actualizar solo los turnos válidos
+				if (turnosValidos.length > 0) {
+					await turnosApi.updateMultipleEstados(turnosValidos, pendingAction.toLowerCase());
+				}
 				
 				// Recargar los datos después de la actualización
-				await cargarTurnos(currentPage, sortBy, estadoFilters, false, activeSearchQuery);  // Mantener búsqueda activa
+				await cargarTurnos(currentPage, sortBy, estadoFilters, false, activeSearchQuery);
+				
+				// Log estados DESPUÉS de la actualización
+				console.log('=== DESPUÉS DE LA ACTUALIZACIÓN ===');
+				console.log('Actualización completada');
 				
 				setShowMenu(false);
 				setSelectedTurnoIds([]);
 				setPendingAction(null);
+				setModalVisible(false);
 			} catch (error) {
 				console.error('Error actualizando turnos:', error);
 				setError('Error al actualizar los turnos. Por favor, intenta nuevamente.');
@@ -274,6 +326,7 @@ function ClientesSection() {
 
 	const handleCancelAction = () => {
 		setPendingAction(null);
+		setModalVisible(false);
 	};
 
 	// Estado para contar turnos válidos/inválidos cross-page
@@ -305,19 +358,25 @@ function ClientesSection() {
 
 				const estado = turno.estado.toLowerCase();
 				
-				// Reglas de negocio para validación
-				if (estado === 'pendiente') {
-					// Pendiente puede cambiar a cualquier estado
+				// Verificar que no esté completado o cancelado (no se pueden alterar)
+				if (estado === 'completado' || estado === 'cancelado') {
+					invalidCount++;
+					return;
+				}
+				
+				// Validar transiciones específicas
+				let esValido = false;
+				if (pendingAction === 'Confirmado' && estado === 'pendiente') {
+					esValido = true;
+				} else if (pendingAction === 'Cancelado' && (estado === 'pendiente' || estado === 'confirmado')) {
+					esValido = true;
+				} else if (pendingAction === 'Completado' && estado === 'confirmado') {
+					esValido = true;
+				}
+				
+				if (esValido) {
 					validCount++;
-				} else if (estado === 'confirmado') {
-					// Confirmado solo puede cambiar a Cancelado
-					if (pendingAction === 'Cancelado') {
-						validCount++;
-					} else {
-						invalidCount++;
-					}
 				} else {
-					// Cancelado y Completado no se pueden cambiar
 					invalidCount++;
 				}
 			});
@@ -551,28 +610,12 @@ function ClientesSection() {
 						)}
 					</tbody>
 				</table>
-				<div className={`mt-2 flex items-center justify-between ${currentTurnos.length > 0 ? 'min-h-[60px]' : 'min-h-[20px]'}`}>
+				<div className={`mt-2 flex items-center justify-end ${currentTurnos.length > 0 ? 'min-h-[60px]' : 'min-h-[20px]'}`}>
 					<PaginationControls
 						currentPage={currentPage}
 						totalPages={totalPages}
 						onPageChange={handlePageChange}
 					/>
-					{/* SelectionBar integrado a la derecha de la paginación */}
-					{showBar && (
-						<SelectionBar
-							selectedCount={selectedTurnoIds.length}
-							onDeselectAll={() => {
-								setFadeOut(true);
-								setTimeout(() => setSelectedTurnoIds([]), 300);
-							}}
-							showMenu={showMenu}
-							setShowMenu={setShowMenu}
-							fadeOut={fadeOut}
-							onConfirm={() => handleUpdateEstado('Confirmado')}
-							onCancel={() => handleUpdateEstado('Cancelado')}
-							inline={true}
-						/>
-					)}
 				</div>
 				<style>{`
           .fade-in {
@@ -598,17 +641,32 @@ function ClientesSection() {
             }
           }
         `}</style>
+				{showBar && (
+					<SelectionBar
+						selectedCount={selectedTurnoIds.length}
+						onDeselectAll={() => {
+							setFadeOut(true);
+							setTimeout(() => setSelectedTurnoIds([]), 300);
+						}}
+						showMenu={showMenu}
+						setShowMenu={setShowMenu}
+						fadeOut={fadeOut}
+						onConfirm={() => handleUpdateEstado('Confirmado')}
+						onCancel={() => handleUpdateEstado('Cancelado')}
+						onComplete={() => handleUpdateEstado('Completado')}
+					/>
+				)}
 				{(pendingAction || modalVisible) && (
 					<div className="fixed inset-0 z-50 flex items-center justify-center">
 						<div className={`absolute inset-0 bg-black opacity-20 transition-opacity duration-200 ${pendingAction ? 'opacity-20' : 'opacity-0'}`}></div>
 						<div className={`relative bg-white border border-gray-300 rounded-lg shadow-lg p-6 min-w-[300px] flex flex-col items-center ${pendingAction ? 'animate-fadeInModal' : 'animate-fadeOutModal'}` }>
-							<span className="text-lg font-semibold mb-4 text-gray-900">¿Seguro que quieres {pendingAction === 'Confirmado' ? 'confirmar' : 'cancelar'} los turnos seleccionados?</span>
+							<span className="text-lg font-semibold mb-4 text-gray-900">¿Seguro que quieres {pendingAction === 'Confirmado' ? 'confirmar' : pendingAction === 'Cancelado' ? 'cancelar' : 'completar'} los turnos seleccionados?</span>
 							<span className="text-sm text-gray-700 mb-2">Se van a actualizar {validSelectedCount} turno(s).</span>
 							{invalidSelectedCount > 0 && (
 								<span className="text-sm text-red-500 mb-2">{invalidSelectedCount} turno(s) no se pueden actualizar debido a su estado.</span>
 							)}
 							<div className="flex gap-4">
-								<button className="bg-orange-500 text-white px-4 py-2 rounded font-medium hover:bg-orange-600 cursor-pointer" onClick={handleConfirmAction}>Sí, {pendingAction === 'Confirmado' ? 'confirmar' : 'cancelar'}</button>
+								<button className="bg-orange-500 text-white px-4 py-2 rounded font-medium hover:bg-orange-600 cursor-pointer" onClick={handleConfirmAction}>Sí, {pendingAction === 'Confirmado' ? 'confirmar' : pendingAction === 'Cancelado' ? 'cancelar' : 'completar'}</button>
 								<button className="bg-gray-200 text-gray-700 px-4 py-2 rounded font-medium hover:bg-gray-300 cursor-pointer" onClick={handleCancelAction}>Cancelar</button>
 							</div>
 						</div>
