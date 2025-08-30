@@ -4,6 +4,8 @@ import SelectionBar from '../SelectionBar/SelectionBar';
 import ItemTurno from '../itemTurno/ItemTurno';
 import PaginationControls from '../../components/Pagination/PaginationControler';
 import { turnosApi } from '../../services/turnosApi';
+import TurnoDetailsModal from '../Modal/TurnoDetailsModal';
+import ConfirmationModal from '../Modal/ConfirmationModal';
 
 
 const PRESTADOR_ID_FIXED = '47';
@@ -71,20 +73,24 @@ function ClientesSection() {
 	const [currentPage, setCurrentPage] = useState(1);
 	const [totalPages, setTotalPages] = useState(1);
 	const [loading, setLoading] = useState(true);
-	const [pageLoading, setPageLoading] = useState(false); // Loading específico para cambios de página
 	const [error, setError] = useState<string | null>(null);
 	const [sortBy, setSortBy] = useState<string>('');
 	const [estadoFilters, setEstadoFilters] = useState<string[]>([]);
 	const [searchQuery, setSearchQuery] = useState<string>('');
 	const [activeSearchQuery, setActiveSearchQuery] = useState<string>(''); // La búsqueda actualmente aplicada
 	const [showEstadoDropdown, setShowEstadoDropdown] = useState(false);
+	const [showDetailsModal, setShowDetailsModal] = useState(false);
+	const [selectedTurnoDetails, setSelectedTurnoDetails] = useState<TurnoDisplay | null>(null);
+	const [showErrorMessage, setShowErrorMessage] = useState(false);
+	const [isErrorAnimating, setIsErrorAnimating] = useState(false);
+	const [errorMessage, setErrorMessage] = useState('');
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	const itemsPerPage = 6;
 
 	const cargarTurnos = useCallback(async (page = 1, ordenamiento = sortBy, filtrosEstado = estadoFilters, isPageChange = false, searchTerm = '') => {
 		try {
 			if (isPageChange) {
-				setPageLoading(true); // Solo para cambios de página
+				setLoading(true); // Solo para cambios de página
 			} else {
 				setLoading(true); // Para carga inicial o cambios de filtros/ordenamiento
 			}
@@ -135,12 +141,6 @@ function ClientesSection() {
 			
 			const turnosDisplay = response.data.data.map(convertirTurnoADisplay);
 			
-			// Log para debuggear datos recibidos
-			console.log('=== DATOS RECIBIDOS DEL BACKEND ===');
-			console.log('Total turnos recibidos:', response.data.data.length);
-			console.log('Datos completos del backend:', response.data.data);
-			console.log('Turnos después de conversión:', turnosDisplay.map((t: TurnoDisplay) => ({ id: t.id, estado: t.estado })));
-			
 			setTurnos(turnosDisplay);
 			setTotalPages(response.data.pagination.totalPages);
 			
@@ -149,11 +149,7 @@ function ClientesSection() {
 			console.error('Error completo:', JSON.stringify(err, null, 2));
 			setError(`Error al cargar los turnos: ${err instanceof Error ? err.message : 'Error desconocido'}`);
 		} finally {
-			if (isPageChange) {
-				setPageLoading(false);
-			} else {
-				setLoading(false);
-			}
+			setLoading(false);
 		}
 	}, [itemsPerPage, sortBy, estadoFilters]); // Remover searchQuery de las dependencias
 
@@ -260,6 +256,45 @@ function ClientesSection() {
 		// calculateSelectedCounts se ejecutará automáticamente por el useEffect
 	};
 
+	// Handler para mostrar detalles del turno seleccionado
+	const handleShowDetails = async () => {
+		if (selectedTurnoIds.length === 0) {
+			showAnimatedError('No hay turnos seleccionados');
+			return;
+		}
+
+		if (selectedTurnoIds.length > 1) {
+			showAnimatedError('Solo puedes ver detalles de un turno a la vez');
+			return;
+		}
+
+		try {
+			// Buscar el turno en los datos locales primero
+			const turnoId = selectedTurnoIds[0];
+			const turnoLocal = turnos.find(t => t.id === turnoId);
+			
+			if (turnoLocal) {
+				// Usar datos locales que ya tienen la descripción de la tarea
+				setSelectedTurnoDetails(turnoLocal);
+				setShowDetailsModal(true);
+			} else {
+				// Si no está en los datos locales, obtener del backend
+				// (esto puede pasar con turnos de otras páginas)
+				const response = await turnosApi.getById(turnoId.toString());
+				const turnoData = response.data.data || response.data;
+				
+				if (turnoData) {
+					const turnoDisplay = convertirTurnoADisplay(turnoData);
+					setSelectedTurnoDetails(turnoDisplay);
+					setShowDetailsModal(true);
+				}
+			}
+		} catch (error) {
+			console.error('Error obteniendo detalles del turno:', error);
+			showAnimatedError('Error al obtener los detalles del turno');
+		}
+	};
+
 	const handleConfirmAction = async () => {
 		if (pendingAction && selectedTurnoIds.length > 0) {
 			try {
@@ -295,12 +330,6 @@ function ClientesSection() {
 					}
 				});
 				
-				// Log estados ANTES de la actualización
-				console.log('=== ANTES DE LA ACTUALIZACIÓN ===');
-				console.log('Acción pendiente:', pendingAction);
-				console.log('IDs válidos seleccionados:', turnosValidos);
-				console.log('Total turnos válidos:', turnosValidos.length);
-				
 				// Actualizar solo los turnos válidos
 				if (turnosValidos.length > 0) {
 					await turnosApi.updateMultipleEstados(turnosValidos, pendingAction.toLowerCase());
@@ -308,10 +337,6 @@ function ClientesSection() {
 				
 				// Recargar los datos después de la actualización
 				await cargarTurnos(currentPage, sortBy, estadoFilters, false, activeSearchQuery);
-				
-				// Log estados DESPUÉS de la actualización
-				console.log('=== DESPUÉS DE LA ACTUALIZACIÓN ===');
-				console.log('Actualización completada');
 				
 				setShowMenu(false);
 				setSelectedTurnoIds([]);
@@ -332,6 +357,19 @@ function ClientesSection() {
 	// Estado para contar turnos válidos/inválidos cross-page
 	const [validSelectedCount, setValidSelectedCount] = useState(0);
 	const [invalidSelectedCount, setInvalidSelectedCount] = useState(0);
+
+	// Función helper para mostrar mensajes de error con animación
+	const showAnimatedError = (message: string) => {
+		setErrorMessage(message);
+		setShowErrorMessage(true);
+		setTimeout(() => setIsErrorAnimating(true), 10);
+		
+		// Después de 3 segundos, iniciar animación de salida
+		setTimeout(() => {
+			setIsErrorAnimating(false);
+			setTimeout(() => setShowErrorMessage(false), 200);
+		}, 3000);
+	};
 
 	// Función para calcular turnos válidos/inválidos cross-page
 	const calculateSelectedCounts = useCallback(async () => {
@@ -641,6 +679,13 @@ function ClientesSection() {
             }
           }
         `}</style>
+				{showErrorMessage && (
+					<div className={`fixed left-1/2 bottom-24 transform -translate-x-1/2 z-50 bg-red-100 border border-red-200 text-red-800 px-4 py-2 rounded-lg shadow-lg transition-all duration-200 ${
+						isErrorAnimating ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
+					}`}>
+						{errorMessage}
+					</div>
+				)}
 				{showBar && (
 					<SelectionBar
 						selectedCount={selectedTurnoIds.length}
@@ -654,40 +699,26 @@ function ClientesSection() {
 						onConfirm={() => handleUpdateEstado('Confirmado')}
 						onCancel={() => handleUpdateEstado('Cancelado')}
 						onComplete={() => handleUpdateEstado('Completado')}
+						onShowDetails={handleShowDetails}
 					/>
 				)}
-				{(pendingAction || modalVisible) && (
-					<div className="fixed inset-0 z-50 flex items-center justify-center">
-						<div className={`absolute inset-0 bg-black opacity-20 transition-opacity duration-200 ${pendingAction ? 'opacity-20' : 'opacity-0'}`}></div>
-						<div className={`relative bg-white border border-gray-300 rounded-lg shadow-lg p-6 min-w-[300px] flex flex-col items-center ${pendingAction ? 'animate-fadeInModal' : 'animate-fadeOutModal'}` }>
-							<span className="text-lg font-semibold mb-4 text-gray-900">¿Seguro que quieres {pendingAction === 'Confirmado' ? 'confirmar' : pendingAction === 'Cancelado' ? 'cancelar' : 'completar'} los turnos seleccionados?</span>
-							<span className="text-sm text-gray-700 mb-2">Se van a actualizar {validSelectedCount} turno(s).</span>
-							{invalidSelectedCount > 0 && (
-								<span className="text-sm text-red-500 mb-2">{invalidSelectedCount} turno(s) no se pueden actualizar debido a su estado.</span>
-							)}
-							<div className="flex gap-4">
-								<button className="bg-orange-500 text-white px-4 py-2 rounded font-medium hover:bg-orange-600 cursor-pointer" onClick={handleConfirmAction}>Sí, {pendingAction === 'Confirmado' ? 'confirmar' : pendingAction === 'Cancelado' ? 'cancelar' : 'completar'}</button>
-								<button className="bg-gray-200 text-gray-700 px-4 py-2 rounded font-medium hover:bg-gray-300 cursor-pointer" onClick={handleCancelAction}>Cancelar</button>
-							</div>
-						</div>
-						<style>{`
-      @keyframes fadeInModal {
-        from { opacity: 0; transform: scale(0.95); }
-        to { opacity: 1; transform: scale(1); }
-      }
-      @keyframes fadeOutModal {
-        from { opacity: 1; transform: scale(1); }
-        to { opacity: 0; transform: scale(0.95); }
-      }
-      .animate-fadeInModal {
-        animation: fadeInModal 0.2s ease;
-      }
-      .animate-fadeOutModal {
-        animation: fadeOutModal 0.2s ease;
-      }
-    `}</style>
-					</div>
-				)}
+				
+				{/* Modal de confirmación */}
+				<ConfirmationModal
+					isVisible={modalVisible}
+					pendingAction={pendingAction}
+					validSelectedCount={validSelectedCount}
+					invalidSelectedCount={invalidSelectedCount}
+					onConfirm={handleConfirmAction}
+					onCancel={handleCancelAction}
+				/>
+				
+				{/* Modal de detalles del turno */}
+				<TurnoDetailsModal
+					isVisible={showDetailsModal}
+					turnoDetails={selectedTurnoDetails}
+					onClose={() => setShowDetailsModal(false)}
+				/>
 			</div>
 		</DashboardSection>
 	);
