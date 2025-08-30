@@ -31,7 +31,7 @@ Content-Type: application/json
 
 {
   "calificacion": 4,
-  "comentario": "Ojala que se muera"
+  "comentario": "Go to hell"
 }
 
 ### Hacemos un patch
