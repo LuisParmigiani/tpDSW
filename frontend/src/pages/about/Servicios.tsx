@@ -7,6 +7,7 @@ import { zonasApi } from '../../services/zonasApi';
 import { usuariosApi } from '../../services/usuariosApi';
 import { ServiciosForm } from '../../components/Forms/FormServicios';
 import PaginationControls from '../../components/Pagination/PaginationControler';
+import FilterSideBar from '../../components/Forms/FilterSideBar.tsx';
 
 // FIX 1: Complete Usuario type to match ServicioCard props
 type Usuario = {
@@ -25,7 +26,7 @@ type Usuario = {
 
   // Add other properties your backend returns
 };
-type Filtros = {
+export type Filtros = {
   servicio: string;
   tarea?: string;
   zona: string;
@@ -44,12 +45,12 @@ type TipoServicioResponse = {
   }>;
 };
 
-type TipoServicio = {
+export type TipoServicio = {
   nombreTipo: string;
   descripcionTipo: string;
   tareas: Array<{ id: number; nombreTarea: string }>;
 };
-type Zona = {
+export type Zona = {
   id: number;
   descripcionZona: string;
 };
@@ -367,13 +368,26 @@ function FiltrosDeServicios() {
 
   return (
     <>
-      <ServiciosForm
-        tipoServicios={tipoServicios}
-        zonas={zonas}
-        onSubmit={handleFormSubmit}
-        filtrosForm={filtrosForm}
-      />
-      {renderContent()}
+      <div className="flex h-screen bg-gray-100">
+        <FilterSideBar
+          tipoServicios={tipoServicios}
+          zonas={zonas}
+          filtrosForm={filtrosForm}
+          onSubmit={handleFormSubmit}
+        />
+
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-5">
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-semibold text-gray-800 capitalize mx-auto">
+                Resultados
+              </h1>
+            </div>
+          </header>
+
+          <main className="flex-1 overflow-y-auto p-6">{renderContent()}</main>
+        </div>
+      </div>
     </>
   );
 }
