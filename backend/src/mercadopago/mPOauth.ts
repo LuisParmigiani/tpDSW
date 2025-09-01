@@ -8,6 +8,8 @@ import { orm } from '../shared/db/orm.js';
 import jwt from 'jsonwebtoken';
 import { putOauth, getOauth } from '../usuario/usuario.controler.js';
 const em = orm.em;
+// URL del frontend (fallback para dev)
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 // tus credenciales de app
 const MP_CLIENT_ID = process.env.MP_CLIENT_ID; // ID de cliente de MercadoPago
 const MP_CLIENT_SECRET = process.env.MP_CLIENT_SECRET; // Secreto de cliente de MercadoPago
@@ -37,14 +39,24 @@ async function connect(req: Request, res: Response) {
       userId = decoded.id; // Obtiene el ID de usuario del token
     }
 
-  // Generar PKCE code_verifier y code_challenge
-  const codeVerifier = crypto.randomBytes(32).toString('hex');
-  const base64url = (buf: Buffer) => buf.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-  const codeChallenge = base64url(crypto.createHash('sha256').update(codeVerifier).digest());
-  // Incluir userId y codeVerifier en state para callback
-  const state = Buffer.from(JSON.stringify({ userId, codeVerifier })).toString('base64');
+    // Generar PKCE code_verifier y code_challenge
+    const codeVerifier = crypto.randomBytes(32).toString('hex');
+    const base64url = (buf: Buffer) =>
+      buf
+        .toString('base64')
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+    const codeChallenge = base64url(
+      crypto.createHash('sha256').update(codeVerifier).digest()
+    );
+    // Incluir userId y codeVerifier en state para callback
+    const state = Buffer.from(
+      JSON.stringify({ userId, codeVerifier })
+    ).toString('base64');
 
-    const url = `https://auth.mercadopago.com/authorization?response_type=code&client_id=${MP_CLIENT_ID}` +
+    const url =
+      `https://auth.mercadopago.com/authorization?response_type=code&client_id=${MP_CLIENT_ID}` +
       `&redirect_uri=${encodeURIComponent(MP_REDIRECT_URI!)}` +
       `&state=${state}` +
       `&code_challenge=${codeChallenge}` +
@@ -77,7 +89,6 @@ async function callback(req: Request, res: Response) {
   if (!code) return res.status(400).send('Falta code'); // Retorna error si falta el código
 
   try {
-
     // Preparar los parámetros para solicitar el token con PKCE
     const params = querystring.stringify({
       grant_type: 'authorization_code',
@@ -100,8 +111,9 @@ async function callback(req: Request, res: Response) {
     console.log('=== TOKENS DEL VENDEDOR ===');
     console.log(body); // Muestra los tokens en consola
     const mpTokenExpiration = new Date(Date.now() + body.expires_in * 1000);
-    putOauth(
-      body.id_usuario,
+    // Save tokens for the authenticated local user
+    await putOauth(
+      userId,
       body.access_token,
       body.refresh_token,
       body.user_id,
@@ -110,7 +122,9 @@ async function callback(req: Request, res: Response) {
     );
     console.log('Tokens guardados para usuario:', userId); // Muestra mensaje en consola
     // Redirigir al frontend con éxito (NO enviar tokens sensibles)
-    res.redirect(`${process.env.FRONTEND_URL}/dashboard?mp_connected=true`); // Redirige al frontend indicando éxito
+    // Evitar doble slash si FRONTEND_URL termina con '/'
+    const baseUrl = FRONTEND_URL.replace(/\/+$/, '');
+    res.redirect(`${baseUrl}/dashboard?mp_connected=true`); // Redirige al frontend indicando éxito
   } catch (err) {
     const error = err as any;
     console.error('Error en callback:', error.response?.data || error.message);
