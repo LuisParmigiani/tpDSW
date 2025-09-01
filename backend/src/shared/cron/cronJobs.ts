@@ -22,6 +22,9 @@ export class CronJobs {
     // Cambiar estado de turnos no confirmados (diariamente a medianoche)
     this.changestate();
 
+    // Inicializar el recordatorio de turnos
+    this.reminder();
+
     console.log(
       `✅ Cron jobs inicializados correctamente (Timezone: ${CRON_CONFIG.timezone})`
     );
@@ -62,6 +65,10 @@ export class CronJobs {
       '0 0 * * *', // Real pasa cada media noche
       //'* * * * *', // Para probar se ejecuta todos los minutos.
       async () => {
+        console.log(
+          '🔄 [changestate] Cron job ejecutado:',
+          new Date().toISOString()
+        );
         console.log('🔄 Cambiando estado de turnos no confirmados:');
 
         try {
@@ -91,6 +98,43 @@ export class CronJobs {
           );
         } catch (error) {
           console.error('❌ Error en changestate:', error);
+        }
+      },
+      this.getCronOptions()
+    );
+  }
+  static reminder(): void {
+    cron.schedule(
+      '0,30 * * * *', // Cada 30 minutos, empezando en 00:00
+      async () => {
+        const now = new Date();
+        const reminderTime = new Date(now);
+        reminderTime.setDate(now.getDate() + 1); // Mañana, misma hora que ahora
+        reminderTime.setMinutes(now.getMinutes() < 30 ? 30 : 0); // Ajusta a 00 o 30
+        reminderTime.setSeconds(0, 0); // Segundos en 00
+        console.log(
+          '🔄 [reminder] Cron job ejecutado:',
+          reminderTime.toISOString()
+        );
+        console.log('🔔 Enviando recordatorios de turnos:');
+
+        try {
+          const em = orm.em.fork(); // Crear una instancia del EntityManager
+
+          // Obtener turnos que comienzan mañana a esta hora
+          const turnos = await em.find(Turno, {
+            estado: { $ne: 'cancelado' },
+            fechaHora: reminderTime, // Solo los que arrancan exactamente mañana a esta hora
+          });
+
+          // Enviar recordatorios
+          for (const turno of turnos) {
+            console.log(`📅 Recordatorio enviado para el turno: ${turno.id}`);
+          }
+
+          console.log(`✅ ${turnos.length} recordatorios enviados`);
+        } catch (error) {
+          console.error('❌ Error en reminder:', error);
         }
       },
       this.getCronOptions()

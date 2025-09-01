@@ -19,10 +19,12 @@ export const usuariosApi = {
     return api.get(url);
   },
   getById: (id: string) => api.get(`/usuario/${id}`),
+  getByCookie: () => api.get(`/usuario/cookie`, { withCredentials: true }),
   getCommentsByUserId: (
     userId: string,
     maxItems?: string,
     page?: string,
+
     orderBy?: string
   ) => {
     const params = new URLSearchParams(); // crea los parámetros para pasarlos en la consulta
@@ -37,4 +39,9 @@ export const usuariosApi = {
   update: (id: string, data: EntityData) => api.put(`/usuario/${id}`, data),
   delete: (id: string) => api.delete(`/usuario/${id}`),
   login: (data: EntityData) => api.get('/usuario/login', { params: data }),
+  recoverPassword: (data: EntityData) => api.post('/usuario/recuperar', data),
+  validateRecoveryCode: (data: EntityData) =>
+    api.post('/usuario/validar-codigo', data),
+  cambiarPassword: (data: EntityData) =>
+    api.post('/usuario/cambiar-password', data),
 };

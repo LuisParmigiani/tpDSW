@@ -9,6 +9,7 @@ import About from './pages/about/about';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Servicios from './pages/about/Servicios';
 import Dashboard from './pages/dashboard/dashboard-p';
+import ChangePassword from './components/recoverycard/changepassword';
 function App() {
   // Creación de la API DSP hay que llevarla a login
 
@@ -23,18 +24,19 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/recovery" element={<Recovery />} />
           <Route path="/registration" element={<Registration />} />
-          <Route path="/TurnHistory" element={<TurnHistory />} />
+          <Route path="/historial" element={<TurnHistory />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/changepassword" element={<ChangePassword />} />
           <Route
-            path="/turnHistory/success"
+            path="/historial/success"
             element={<TurnHistory estado="success" />}
           />
           <Route
-            path="/turnHistory/failure"
+            path="/historial/failure"
             element={<TurnHistory estado="failure" />}
           />
           <Route
-            path="/turnHistory/pending"
+            path="/historial/pending"
             element={<TurnHistory estado="pending" />}
           />
         </Routes>

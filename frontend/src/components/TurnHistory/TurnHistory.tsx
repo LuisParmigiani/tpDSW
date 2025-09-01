@@ -5,11 +5,10 @@ import Footer from '../Footer/Footer';
 import PaginationControls from '../Pagination/PaginationControler';
 import CustomSelect from '../Select/CustomSelect';
 import CalificationModal from '../Modal/CalificationModal';
-import Stars from '../stars/Stars';
 import { useNavigate } from 'react-router-dom';
-import MercadoPago from '../MercadoPago/MercadoPago.tsx';
 import DevolucionPago from '../Modal/DevolucionPago.tsx';
-
+import { useProtectRoute } from '../../cookie/useProtectRoute.tsx';
+import TurnCard from './turnCard';
 type Pago = {
   id: number;
   estado: string;
@@ -53,6 +52,8 @@ type Props = {
 };
 
 function TurnHistory({ estado }: Props) {
+  const { usuario, loading: authLoading } = useProtectRoute(['cliente']);
+  const [abrirDevolucion, setAbrirDevolucion] = useState(true);
   const navigate = useNavigate();
   const [turns, setTurns] = useState<Turno[] | null>(null); // Se guardan todos los turnos del usuario
   const [loading, setLoading] = useState(false);
@@ -63,12 +64,10 @@ function TurnHistory({ estado }: Props) {
   // Variables para la calificacion
   const [startRating, setStartRating] = useState<number>(5);
   const [comentario, setComentario] = useState<string>('');
-
   // orden de los turnos
   const [selectedValueOrder, setSelectedValueOrder] = useState('');
   // Filtros de los turnos
   const [selectedValueShow, setSelectedValueShow] = useState('');
-
   // Variables de paginacion:
   const cantItemsPerPage = '9'; // Cantidad de turnos por pagina
   const [currentPage, setCurrentPage] = useState(1); // Página actual
@@ -76,6 +75,7 @@ function TurnHistory({ estado }: Props) {
 
   // buscar todos los turnos del usuario con la informcaion del mismo.
   useEffect(() => {
+    if (authLoading || !usuario) return;
     const turn = async () => {
       setLoading(true);
       setError(null);
@@ -100,7 +100,13 @@ function TurnHistory({ estado }: Props) {
       }
     };
     turn();
-  }, [currentPage, selectedValueShow, selectedValueOrder]);
+  }, [
+    authLoading,
+    usuario,
+    currentPage,
+    selectedValueShow,
+    selectedValueOrder,
+  ]);
 
   //modal para calificar
   const openModal = (modalData: Turno) => {
@@ -109,6 +115,7 @@ function TurnHistory({ estado }: Props) {
     setComentario(modalData.comentario || '');
     setIsOpen(true);
   };
+  // Cerrar modal
   const closeModal = () => {
     setIsOpen(false);
     setData(null);
@@ -116,9 +123,10 @@ function TurnHistory({ estado }: Props) {
     setStartRating(5);
     setComentario('');
   };
+
+  // Guardar calificación
   const SaveRating = async () => {
     if (data) {
-      // aca va la api
       const dataForUpdate = {
         calificacion: startRating,
         comentario: comentario,
@@ -156,7 +164,6 @@ function TurnHistory({ estado }: Props) {
   useEffect(() => {
     if (isOpen && data) {
       console.log('Modal abierto con datos:', data);
-
       document.body.style.overflow = 'hidden';
       // Para cerrar el modal con la tecla Escape
       const handleEsc = (event: KeyboardEvent) => {
@@ -185,12 +192,27 @@ function TurnHistory({ estado }: Props) {
       console.error('Error al cancelar el turno:', error);
     }
   };
-  // devolucion del pago:
-  console.log(selectedValueShow);
+
+  if (authLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p>Cargando...</p>
+      </div>
+    );
+  }
+  if (!usuario) {
+    // No autorizado, no renderizar nada (la redirección ya se maneja en el hook)
+    return null;
+  }
   return (
     <>
       <Navbar />
-      {estado && <DevolucionPago estado={estado} />}
+      {estado && abrirDevolucion && (
+        <DevolucionPago
+          estado={estado}
+          cerrar={() => setAbrirDevolucion(false)}
+        />
+      )}
       {isOpen && data && (
         <CalificationModal
           data={data}
@@ -253,157 +275,13 @@ function TurnHistory({ estado }: Props) {
           turns.length > 0 ? (
             <ul className="flex flex-row flex-wrap items-center justify-center w-full m-auto ">
               {turns.map((turn) => (
-                <li
+                <TurnCard
                   key={turn.id}
-                  className="flex flex-row items-center w-98  m-6 rounded-xl shadow-md p-6 h-55  hover:shadow-xl transition-shadow"
-                >
-                  <div className="mr-6 flex-shrink-0">
-                    <img
-                      className="h-20 w-20  object-cover border-2 border-gray-300"
-                      src="/images/fotoUserId.png"
-                      alt="Foto de perfil de usuario"
-                    />
-                  </div>
-                  <div className="flex flex-col mx-auto gap-1  ml-3 items-start w-full">
-                    <h2 className="text-lg font-bold text-gray-800 mb-1">
-                      {turn.servicio.usuario?.nombreFantasia}
-                    </h2>
-                    <p className="text-sm text-gray-600 mb-1">
-                      Fecha:{' '}
-                      {new Date(turn.fechaHora).toLocaleDateString('es-AR', {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                      })}
-                    </p>
-                    <p className="text-sm text-gray-600 mb-1">
-                      Servicio: {turn.servicio.tarea.nombreTarea}
-                    </p>
-                    <p className="text-sm text-gray-700 font-medium">
-                      Monto: ${turn.montoFinal}
-                    </p>
-                    {/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */}
-                    {(() => {
-                      // Mostrar botón "Calificar" si el turno es menor a 1 mes y no fue calificado y fue pagado.
-                      const unMesPasado =
-                        Date.now() - new Date(turn.fechaHora).getTime() <
-                        30 * 24 * 60 * 60 * 1000; // dias, horas, minutos, segundos, milisegundos
-
-                      if (
-                        !turn.hayPagoAprobado &&
-                        turn.estado === 'completado'
-                      ) {
-                        return (
-                          <>
-                            <MercadoPago
-                              fechaHora={turn.fechaHora}
-                              montoFinal={turn.montoFinal}
-                              servicio={turn.servicio}
-                              turno={turn.id}
-                            />
-                            <button
-                              className="bg-naranja-1 text-white hover:text-naranja-1 hover:bg-white w-full rounded-2xl border-2 border-naranja-1"
-                              onClick={() => {
-                                // Navegar a la ruta con el ID dinámico
-                                navigate(
-                                  `/borrower/${turn.servicio.usuario.id}`
-                                );
-                              }}
-                            >
-                              Volver a contratar
-                            </button>
-                          </>
-                        );
-                      } else if (
-                        unMesPasado && // verifico si no paso mas de un mes
-                        turn.calificacion === null && // verifico que no tenga ya calificacion
-                        turn.estado === 'completado' // verifico que este completado
-                      ) {
-                        return (
-                          <>
-                            <button
-                              onClick={() => openModal(turn)}
-                              className="bg-naranja-1  text-white hover:text-naranja-1 hover:bg-white w-full rounded-2xl border-2 border-naranja-1"
-                            >
-                              Calificar
-                            </button>
-                            <button
-                              className="bg-naranja-1 text-white hover:text-naranja-1 hover:bg-white w-full rounded-2xl border-2 border-naranja-1"
-                              onClick={() => {
-                                // Navegar a la ruta con el ID dinámico
-                                navigate(
-                                  `/borrower/${turn.servicio.usuario.id}`
-                                );
-                              }}
-                            >
-                              Volver a contratar
-                            </button>
-                          </>
-                        );
-                      } else {
-                        // Se pone la calificacion puesta por el usuario Si es que la tiene.
-                        if (turn.calificacion !== null) {
-                          return (
-                            <>
-                              <div className="justify-center flex">
-                                <Stars cant={turn.calificacion} />
-                              </div>
-                              <button
-                                className="bg-naranja-1 text-white hover:text-naranja-1 hover:bg-white w-full rounded-2xl border-2 border-naranja-1"
-                                onClick={() => {
-                                  // Navegar a la ruta con el ID dinámico
-                                  navigate(
-                                    `/borrower/${turn.servicio.usuario.id}`
-                                  );
-                                }}
-                              >
-                                Volver a contratar
-                              </button>
-                            </>
-                          );
-                        } else {
-                          // Si el turno no paso por todos los otros if y entra aca se interpreta que ya paso un mes por lo que ya no puede calificar.
-                          if (turn.estado === 'completado') {
-                            return (
-                              <>
-                                <p className="mt-2">
-                                  Expiró el tiempo de calificación
-                                </p>
-                                <button
-                                  className="bg-naranja-1 text-white hover:text-naranja-1 hover:bg-white w-full rounded-2xl border-2 border-naranja-1"
-                                  onClick={() => {
-                                    // Navegar a la ruta con el ID dinámico
-                                    navigate(
-                                      `/borrower/${turn.servicio.usuario.id}`
-                                    );
-                                  }}
-                                >
-                                  Volver a contratar
-                                </button>
-                              </>
-                            );
-                          } else {
-                            // Si el turno no paso por todos los otros if y entra aca se interpreta que el turno esta confirmado o pendiente por lo que todavia se puede cancelar.
-                            if (turn.estado !== 'cancelado') {
-                              return (
-                                <>
-                                  <p> Estado: {turn.estado}</p>
-                                  <button
-                                    onClick={() => cancelarTurno(turn.id)}
-                                    className="bg-naranja-1  text-white hover:text-naranja-1 hover:bg-white w-full rounded-2xl border-2 border-naranja-1"
-                                  >
-                                    Cancelar
-                                  </button>
-                                </>
-                              );
-                            }
-                            return <p> Estado: {turn.estado}</p>;
-                          }
-                        }
-                      }
-                    })()}
-                  </div>
-                </li>
+                  navigate={navigate}
+                  turn={turn}
+                  openModal={openModal}
+                  cancelarTurno={cancelarTurno}
+                />
               ))}
             </ul>
           ) : (

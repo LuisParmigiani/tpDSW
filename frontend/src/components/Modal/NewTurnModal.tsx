@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import CustomSelect from '../Select/CustomSelect';
 import { turnosApi } from '../../services/turnosApi';
+import { useRoleReturn } from '../../cookie/useProtectRoute.tsx';
+
 // cuando apriero esc que se salga del menu
 type Usuario = {
   id: number;
@@ -47,6 +49,8 @@ type Props = {
 };
 
 function NewTurnModal({ prestatario, setopen }: Props) {
+  //Ver si inicio seccion
+  const rol = useRoleReturn();
   //Variable de tipo opciones definida antes para los selects
   const serviciosoptions: Option[] = [];
   const [tareasOptions, setTareasOptions] = useState<Option[]>([]);
@@ -175,8 +179,10 @@ function NewTurnModal({ prestatario, setopen }: Props) {
 
         // Ahora generar horarios con los turnos ocupados
         generateHorarios(
-          prestatario.horarios[new Date(dayForTurn).getDay()].horaDesde,
-          prestatario.horarios[new Date(dayForTurn).getDay()].horaHasta,
+          prestatario.horarios?.[new Date(dayForTurn).getDay()]?.horaDesde ??
+            '',
+          prestatario.horarios?.[new Date(dayForTurn).getDay()]?.horaHasta ??
+            '',
           turnosOcupados
         );
       }
@@ -252,7 +258,7 @@ function NewTurnModal({ prestatario, setopen }: Props) {
     }
 
     return (
-      <div className="grid grid-cols-3  sm:grid-cols-6 sm:gap-2 mt-2 mb-4 w-full">
+      <div className="grid grid-cols-3  md:grid-cols-6 sm:gap-2 mt-2 mb-4 w-full ">
         {botonesDias}
       </div>
     );
@@ -270,13 +276,12 @@ function NewTurnModal({ prestatario, setopen }: Props) {
         (s) => s.tarea.nombreTarea === selectedTask
       );
       const precio = services?.precio || 100;
-      await turnosApi.create({
-        Usuario: 2, //aca va el token del usuario regitrado ,
+      await turnosApi.createCookie({
         servicio: services?.id,
         tarea: services?.tarea.id,
         fechaHora: `${dayForTurn}T${horarioSelected}:00`,
         estado: 'pendiente',
-        montoFinal: precio * 0.02 + precio,
+        montoFinal: precio * 0.05 + precio,
       });
       setSelectedService('');
       setSelectedTask('');
@@ -381,10 +386,20 @@ function NewTurnModal({ prestatario, setopen }: Props) {
             </button>
 
             <button
-              className="bg-green-700 border-2 w-full  border-green-700 text-white rounded-md py-2 px-4 hover:bg-white hover:text-green-700 text-center "
+              className={
+                rol === ''
+                  ? 'bg-gray-300 border-2 w-full border-gray-500 text-white rounded-md py-2 px-4 text-center relative group'
+                  : 'bg-green-700 border-2 w-full border-green-700 text-white rounded-md py-2 px-4 hover:bg-white hover:text-green-700 text-center'
+              }
               onClick={guardarTurno}
+              disabled={rol === ''}
             >
               Confirmar
+              {rol === '' && (
+                <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none w-50">
+                  Inicia sesión para poder sacar un turno
+                </span>
+              )}
             </button>
           </div>
         </div>
@@ -393,7 +408,7 @@ function NewTurnModal({ prestatario, setopen }: Props) {
         className={
           confirmationModalOpen
             ? 'hidden'
-            : 'bg-white md:rounded-lg md:shadow-2xl py-10 items-start text-black lg:w-6/12 md:w-9/12 flex flex-col lg:min-h-6/12 md:h-auto w-full h-screen sm:max-h-[85vh] sm:h-auto overflow-y-auto gap-4'
+            : 'bg-white md:rounded-lg md:shadow-2xl py-10 items-start text-black lg:w-6/12 md:w-180 flex flex-col lg:min-h-6/12  w-full h-screen md:max-h-[85vh]  md:h-auto overflow-y-auto gap-4'
         }
         onClick={(e) => {
           e.stopPropagation(); // desactiva que cuando hagas click se salga en la parte blanca
@@ -505,7 +520,7 @@ function NewTurnModal({ prestatario, setopen }: Props) {
             <div className="grid grid-cols-4 gap-2 mt-5 px-7">
               {horariosManana.map((horario) => (
                 <button
-                  key={horario}
+                  key={`manana-${horario}`}
                   className={
                     minutosAHora(horario) === horarioSelected
                       ? 'bg-naranja-1 border-none rounded-md text-white px-6 py-2 hover:bg-neutral-200 border-2 border-naranja-1 hover:text-naranja-1 transition-colors duration-300'
@@ -522,7 +537,7 @@ function NewTurnModal({ prestatario, setopen }: Props) {
             <div className="grid grid-cols-4 gap-2 mt-5 px-7">
               {horariosTarde.map((horario) => (
                 <button
-                  key={horario}
+                  key={`tarde-${horario}`}
                   className={
                     minutosAHora(horario) === horarioSelected
                       ? 'bg-naranja-1 border-none rounded-md text-white px-6 py-2 hover:bg-neutral-200 border-2 border-naranja-1 hover:text-naranja-1 transition-colors duration-300'
