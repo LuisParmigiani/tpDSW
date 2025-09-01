@@ -5,9 +5,9 @@ import ServicioCard from '../../components/servicios.cards/ServicioCard';
 import { tiposServicioApi } from '../../services/tipoSericiosApi';
 import { zonasApi } from '../../services/zonasApi';
 import { usuariosApi } from '../../services/usuariosApi';
-import { ServiciosForm } from '../../components/Forms/FormServicios';
 import PaginationControls from '../../components/Pagination/PaginationControler';
 import FilterSideBar from '../../components/Forms/FilterSideBar.tsx';
+import { string } from 'zod';
 
 // FIX 1: Complete Usuario type to match ServicioCard props
 type Usuario = {
@@ -134,9 +134,10 @@ function FiltrosDeServicios() {
     //!Todo esto se hace apenas carga la página, ya que el useEffect está vacío
     fetchServicios();
     fetchZonas();
-    // Hago que es muestren todos de manera default:
+  }, []);
 
-    if (servicioParam && tareaParam && zonaParam && orderByParam) {
+  useEffect(() => {
+    if (servicioParam || tareaParam || zonaParam || orderByParam) {
       setFiltrosForm({
         servicio: servicioParam,
         tarea: tareaParam,
@@ -172,9 +173,6 @@ function FiltrosDeServicios() {
 
       try {
         setIsLoading(true);
-        console.log(
-          `Fetching usuarios for servicio: ${servicio},tarea: ${tarea}, zona: ${zona} and ordered by: ${ordenarPor}`
-        );
         console.log(cantPrestPorPagina, currentPage);
         const response = await usuariosApi.getPrestatariosByTipoServicioAndZona(
           servicio,
@@ -186,9 +184,14 @@ function FiltrosDeServicios() {
         );
         setUsuarios(response.data.data);
         setTotalPages(response.data.pagination.totalPages);
-
-        console.log('Usuarios fetched:', response.data.data);
-        console.log(response.data.pagination);
+        //Paso los parametros de la consulta por url para que no se borre el form
+        if (response.data.searchParams) {
+          const url = new URL(window.location.href);
+          Object.entries(response.data.searchParams).forEach(([key, value]) => {
+            url.searchParams.set(key, String(value));
+          });
+          window.history.replaceState({}, '', url.toString());
+        }
       } catch (err: unknown) {
         console.error('Error: ', err);
         setError('Error al cargar los prestadores de servicios');
@@ -337,7 +340,7 @@ function FiltrosDeServicios() {
 
       return (
         <>
-          <div className="flex flex-wrap flex-col xl:flex-row gap-5 mx-8 mt-8 align-middle justify-items-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mx-8 mt-8 justify-items-center">
             {cards}
           </div>
           <div className="flex justify-center mt-8">
@@ -368,7 +371,7 @@ function FiltrosDeServicios() {
 
   return (
     <>
-      <div className="flex h-screen bg-gray-100">
+      <div className="flex flex-col lg:flex-row bg-gray-100 min-h-screen">
         <FilterSideBar
           tipoServicios={tipoServicios}
           zonas={zonas}
@@ -376,16 +379,14 @@ function FiltrosDeServicios() {
           onSubmit={handleFormSubmit}
         />
 
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-5">
-            <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-semibold text-gray-800 capitalize mx-auto">
-                Resultados
-              </h1>
-            </div>
+        <div className="flex-1 flex flex-col">
+          <header className="bg-white border-b sticky top-0 z-10 border-gray-200 h-21">
+            <h1 className="text-2xl mt-auto font-semibold text-gray-800 capitalize mx-auto pt-6">
+              Resultados
+            </h1>
           </header>
 
-          <main className="flex-1 overflow-y-auto p-6">{renderContent()}</main>
+          <main className="p-6 flex-1">{renderContent()}</main>
         </div>
       </div>
     </>

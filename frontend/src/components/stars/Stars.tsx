@@ -1,8 +1,9 @@
 type Props = {
   cant: number;
+  className?: string;
 };
 
-function Stars({ cant }: Props) {
+function Stars({ cant, className }: Props) {
   const stars = [];
   for (let i = 0; i < 5; i++) {
     if (i < cant) {
@@ -69,7 +70,14 @@ function Stars({ cant }: Props) {
     }
   }
   return (
-    <div className="flex flex-row items-center max-h-auto mx-14">{stars}</div>
+    <div
+      className={
+        'flex flex-row items-center max-h-auto mx-14 ' +
+        (className ? className : '')
+      }
+    >
+      {stars}
+    </div>
   );
 }
 

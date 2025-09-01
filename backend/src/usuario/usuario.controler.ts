@@ -212,6 +212,15 @@ async function findPrestatariosByTipoServicioAndZona(
         maxItems,
         totalPages,
       },
+      searchParams: {
+        tipoServicio: filtroTipoServicio || 'Todos',
+        zona: filtroZona || 'Todas',
+        tarea: filtroTarea || 'Todas',
+        orderBy: orderBy || 'calificacion',
+        page: page,
+        maxItems: maxItems,
+        totalPages: totalPages,
+      },
     });
   } catch (error: any) {
     res.status(500).json({ message: error.message });

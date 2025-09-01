@@ -29,12 +29,7 @@ export interface ComboInputRef {
 
 const ComboInput = forwardRef<ComboInputRef, ComboInputProps>(
   (
-    {
-      items = [],
-      placeholder = 'Buscar por tarea...',
-      onSelect,
-      className = '',
-    },
+    { items = [], placeholder = 'Buscar tarea', onSelect, className = '' },
     ref
   ) => {
     const [inputValue, setInputValue] = useState<string>('');
@@ -109,7 +104,7 @@ const ComboInput = forwardRef<ComboInputRef, ComboInputProps>(
     const clearInput = (): void => {
       setInputValue('');
       setIsOpen(false);
-      inputRef.current?.focus();
+      inputRef.current?.blur();
     };
 
     // Expose clearInput function through ref
@@ -176,7 +171,7 @@ const ComboInput = forwardRef<ComboInputRef, ComboInputProps>(
         {/* Input Field */}
         <div className={`relative ${className}`}>
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-3 w-5 text-gray-700" />
+            <Search className="h-3 w-4 text-gray-700" />
           </div>
           <input
             ref={inputRef}
