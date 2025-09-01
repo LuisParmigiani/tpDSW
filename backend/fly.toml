@@ -14,10 +14,10 @@ primary_region = 'gru'
 
 [[services]]
   protocol = 'tcp'
-  internal_port = 3000        # 👈 Cambiado de 8080 → 3000
+  internal_port = 8080        # Ajustado para coincidir con EXPOSE y código en producción
   auto_stop_machines = 'stop'
   auto_start_machines = true
-  min_machines_running = 0
+  min_machines_running = 1
   processes = ['app']
 
   [[services.ports]]
@@ -38,7 +38,7 @@ primary_region = 'gru'
     timeout = '2s'
     grace_period = '10s'
     method = 'get'
-    path = '/health'
+  path = '/health'
     protocol = 'http'
 
 [[vm]]
