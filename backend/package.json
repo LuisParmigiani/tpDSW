@@ -50,9 +50,10 @@
     "node-fetch": "^3.3.2",
     "nodemailer": "^7.0.5",
     "oauth": "^0.10.2",
-    "pg": "^8.16.3",
     "openai": "^5.16.0",
+    "pg": "^8.16.3",
     "reflect-metadata": "0.2.2",
+    "update": "^0.7.4",
     "uuid": "^11.1.0"
   }
 }
