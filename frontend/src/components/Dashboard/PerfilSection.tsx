@@ -1,4 +1,5 @@
 import DashboardSection from '../DashboardSection/DashboardSection';
+import ProfilePicture from '../ProfilePic/ProfilePicture';
 import { useState } from 'react';
 
 function PerfilSection() {
@@ -15,45 +16,17 @@ function PerfilSection() {
     setProfileData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageUrl = e.target?.result as string;
-        setProfileData(prev => ({ ...prev, profileImage: imageUrl }));
-      };
-      reader.readAsDataURL(file);
-    }
+  const handleImageChange = (imageUrl: string) => {
+    setProfileData(prev => ({ ...prev, profileImage: imageUrl }));
   };
 
   return (
     <DashboardSection>
       <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-        <div className="flex justify-center mb-8">
-          <div className="relative">
-            <img 
-              src={profileData.profileImage} 
-              alt="Profile" 
-              className="w-24 h-24 rounded-full object-cover border-4 border-gray-100"
-            />
-            <label 
-              htmlFor="profileImage" 
-              className="absolute bottom-0 right-1/2 transform translate-x-1/2 translate-y-1/2 bg-orange-500 text-white rounded-full p-2 cursor-pointer hover:bg-orange-600 transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-              </svg>
-            </label>
-            <input 
-              type="file" 
-              id="profileImage" 
-              accept="image/*" 
-              onChange={handleImageChange}
-              className="hidden" 
-            />
-          </div>
-        </div>
+          <ProfilePicture 
+            src={profileData.profileImage}
+            onImageChange={handleImageChange}
+          />
 
         
         <div className="space-y-6">
