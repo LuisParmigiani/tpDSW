@@ -1,15 +1,16 @@
 import dotenv from 'dotenv';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import 'dotenv/config';
 import { MikroORM } from '@mikro-orm/core';
 import { MySqlDriver } from '@mikro-orm/mysql';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-dotenv.config({ path: path.join(__dirname, './../../../../.env') });
+// Cargar .env solo en desarrollo
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config({ path: path.join(__dirname, './../../../../.env') });
+}
 
 console.log('process.env.LOCAL:', process.env.LOCAL);
 const local = process.env.LOCAL === 'true';
@@ -46,7 +47,7 @@ export const syncSchema = async () => {
   //await generator.dropSchema();
   //await generator.createSchema();
 
-  // await generator.updateSchema();
+  await generator.updateSchema();
 };
 
 export { orm };
