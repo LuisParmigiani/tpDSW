@@ -2,7 +2,6 @@ import Navbar from '../Navbar/Navbar.tsx';
 import Carousel from '../Carousel/Carousel.tsx';
 import Comments from '../Comments/Comments.tsx';
 import Footer from '../Footer/Footer';
-import { mercadoPagoApi } from '../../services/mercadoPagoApi.ts';
 import { HomePageCard } from './HomePageCards.js';
 function Homepage() {
   const CommentOne = 1;
@@ -38,20 +37,9 @@ function Homepage() {
       <div className="flex flex-col w-full">
         <div className="absolute inset-0 w-full z-20">
           <Navbar />
-<<<<<<< HEAD
-        </div>
-
-=======
-          <button
-            className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
-            onClick={() => mercadoPagoApi.connect(1)}
-          >
-            Conectar Mercado Pago
-          </button>
         </div>
         {/* Botón de pago Mercado Pago integrado */}
         <div className="flex justify-center mt-8"></div>
->>>>>>> mp
         <div className="w-full">
           <Carousel
             fotos={[
