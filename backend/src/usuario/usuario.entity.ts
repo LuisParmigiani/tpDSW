@@ -45,16 +45,16 @@ export class Usuario extends BaseEntity {
   // Campos para MercadoPago OAuth
   @Property({ nullable: true })
   mpAccessToken?: string;
-  
+
   @Property({ nullable: true })
   mpRefreshToken?: string;
-  
+
   @Property({ nullable: true })
   mpUserId?: string;
-  
+
   @Property({ nullable: true })
   mpPublicKey?: string;
-  
+
   @Property({ nullable: true })
   mpTokenExpiration?: Date;
 
