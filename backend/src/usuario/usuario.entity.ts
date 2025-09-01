@@ -42,6 +42,22 @@ export class Usuario extends BaseEntity {
   @Property({ nullable: true })
   foto?: string; // aca se pone la ruta de la foto
 
+  // Campos para MercadoPago OAuth
+  @Property({ nullable: true })
+  mpAccessToken?: string;
+  
+  @Property({ nullable: true })
+  mpRefreshToken?: string;
+  
+  @Property({ nullable: true })
+  mpUserId?: string;
+  
+  @Property({ nullable: true })
+  mpPublicKey?: string;
+  
+  @Property({ nullable: true })
+  mpTokenExpiration?: Date;
+
   // Relación con Servicio
   @OneToMany(() => Servicio, (servicio) => servicio.usuario, {
     cascade: [Cascade.ALL],

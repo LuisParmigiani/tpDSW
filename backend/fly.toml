@@ -1,17 +1,7 @@
 # =============================================================
-# Sirve para definir cómo Fly.io debe construir, desplegar y ejecutar
-# tu aplicación backend en la nube. Aquí se especifican:
-# - El nombre de la app y la región principal
-# - El Dockerfile a usar para construir la imagen
-# - Variables de entorno (como NODE_ENV)
-# - Puertos y protocolos expuestos
-# - Chequeos de salud para saber si el backend está activo
-# - Recursos de la máquina virtual (CPU, RAM)
+# Configuración de Fly.io para backend-patient-morning-1303
+# Ajustado para que la app escuche en el puerto 3000 (según logs)
 # =============================================================
-# fly.toml app configuration file generated for backend-patient-morning-1303 on 2025-08-22T09:30:59-03:00
-#
-# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
 
 app = 'backend-patient-morning-1303'
 primary_region = 'gru'
@@ -24,7 +14,7 @@ primary_region = 'gru'
 
 [[services]]
   protocol = 'tcp'
-  internal_port = 8080
+  internal_port = 3000        # 👈 Cambiado de 8080 → 3000
   auto_stop_machines = 'stop'
   auto_start_machines = true
   min_machines_running = 0
