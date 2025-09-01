@@ -116,7 +116,8 @@ async function callback(req: Request, res: Response) {
       userId,
       body.access_token,
       body.refresh_token,
-      body.user_id,
+      // Convert numeric MercadoPago user_id to string
+      String(body.user_id),
       body.public_key,
       mpTokenExpiration
     );
