@@ -7,7 +7,6 @@ import { zonasApi } from '../../services/zonasApi';
 import { usuariosApi } from '../../services/usuariosApi';
 import PaginationControls from '../../components/Pagination/PaginationControler';
 import FilterSideBar from '../../components/Forms/FilterSideBar.tsx';
-import { string } from 'zod';
 
 // FIX 1: Complete Usuario type to match ServicioCard props
 type Usuario = {
@@ -185,17 +184,36 @@ function FiltrosDeServicios() {
         setUsuarios(response.data.data);
         setTotalPages(response.data.pagination.totalPages);
         //Paso los parametros de la consulta por url para que no se borre el form
-        if (response.data.searchParams) {
-          const url = new URL(window.location.href);
-          Object.entries(response.data.searchParams).forEach(([key, value]) => {
-            url.searchParams.set(key, String(value));
-          });
-          window.history.replaceState({}, '', url.toString());
+      } catch (err: any) {
+        console.error('Full error object:', err); // Add this to see the actual structure
+
+        // Handle different error structures
+        let errorMessage = '';
+
+        if (err?.response?.data?.message) {
+          // Axios error structure
+          errorMessage = err.response.data.message;
+        } else if (err?.data?.message) {
+          // Your current expected structure
+          errorMessage = err.data.message;
+        } else if (err?.message) {
+          // Standard Error object
+          errorMessage = err.message;
+        } else {
+          // Fallback
+          errorMessage = 'Unknown error occurred';
         }
-      } catch (err: unknown) {
-        console.error('Error: ', err);
-        setError('Error al cargar los prestadores de servicios');
-        setUsuarios([]);
+
+        if (
+          errorMessage ===
+          'No prestatarios found for the given tipoServicio and zona'
+        ) {
+          console.log('No prestatarios found for the filters');
+          setUsuarios([]);
+        } else {
+          console.error('Error: ', err);
+          setError('Error al cargar los prestadores de servicios');
+        }
       } finally {
         setIsLoading(false);
       }
@@ -220,7 +238,6 @@ function FiltrosDeServicios() {
 
   // FIX 6: Fixed form submission logic
   const handleFormSubmit = (values: FormValues) => {
-    console.log('handling form submit with values:', values);
     setFiltrosForm(values);
     setSubmit(true);
     setError(null); // Clear previous errors when submitting
@@ -387,7 +404,7 @@ function FiltrosDeServicios() {
     }
 
     // Show empty state only if we've submitted the form (to avoid showing it initially)
-    if (submit) {
+    if (submit && usuarios.length === 0) {
       return <EmptyState />;
     }
 

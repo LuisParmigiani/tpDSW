@@ -66,7 +66,7 @@ function Homepage() {
       </div>
 
       <div className="bg-[#4d4d4d] flex flex-col pb-5">
-        <div className="mt-9 flex flex-row justify-around w-full gap-5 flex-wrap ">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mx-8 mt-8 justify-items-center">
           {cards}
         </div>
       </div>
