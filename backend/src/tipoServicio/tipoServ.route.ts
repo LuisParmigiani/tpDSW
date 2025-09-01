@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   sanitizeServiceTypeInput,
   findAll,
+  findAllWithTareas,
   findOne,
   add,
   update,
@@ -11,6 +12,7 @@ import {
 export const serviceTypeRouter = Router();
 
 serviceTypeRouter.get('/', findAll);
+serviceTypeRouter.get('/With-Tareas', findAllWithTareas);
 serviceTypeRouter.get('/:id', findOne);
 serviceTypeRouter.post('/', sanitizeServiceTypeInput, add);
 serviceTypeRouter.put('/:id', sanitizeServiceTypeInput, update);
