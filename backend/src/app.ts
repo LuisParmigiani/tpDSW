@@ -75,12 +75,27 @@ app.use('/api/mercadopago/webhooks', webhookRouter);
 //   return res.status(404).send({ message: 'Resource not found' });
 // }); comente esto pq me tiraba error
 
+// manejo de sincronización de esquema con seguridad para no bloquear en producción
 if (local) {
   console.log('LOCAL_MODE=true -> syncSchema habilitado');
-  await syncSchema();
+  try {
+    await syncSchema();
+  } catch (e) {
+    console.warn(
+      'syncSchema error, omitiendo:',
+      e instanceof Error ? e.message : e
+    );
+  }
 } else if (process.env.RUN_SYNC_SCHEMA === '1') {
   console.log('RUN_SYNC_SCHEMA=1 (override) -> ejecutando syncSchema una vez');
-  await syncSchema();
+  try {
+    await syncSchema();
+  } catch (e) {
+    console.warn(
+      'syncSchema error, omitiendo:',
+      e instanceof Error ? e.message : e
+    );
+  }
 } else {
   console.log('Producción -> syncSchema omitido');
 }
