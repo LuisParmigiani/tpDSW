@@ -2,7 +2,6 @@ import Navbar from '../Navbar/Navbar.tsx';
 import Carousel from '../Carousel/Carousel.tsx';
 import Comments from '../Comments/Comments.tsx';
 import Footer from '../Footer/Footer';
-import { mercadoPagoApi } from '../../services/mercadoPagoApi.ts';
 import { HomePageCard } from './HomePageCards.js';
 function Homepage() {
   const CommentOne = 1;
@@ -40,7 +39,10 @@ function Homepage() {
           <Navbar />
           <button
             className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
-            onClick={() => mercadoPagoApi.connect(1)}
+            onClick={() =>
+              (window.location.href =
+                'https://backend-patient-morning-1303.fly.dev/api/mercadopago/oauth/connect?userId=2')
+            }
           >
             Conectar Mercado Pago
           </button>
