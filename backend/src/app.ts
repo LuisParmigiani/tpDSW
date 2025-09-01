@@ -104,10 +104,16 @@ app.get('/health', async (req: Request, res: Response) => {
 });
 
 // Define el puerto en el que se ejecutará el servidor
-console.log(local);
-const port = local ? 3000 : Number(process.env.PORT) || 8080; // Fly asigna PORT
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+// console.log(local);
+// const port = local ? 3000 : Number(process.env.PORT) || 8080; // Fly asigna PORT
+// app.listen(port, () => {
+//   console.log(`Server running on port ${port}`);
+// });
+
+const PORT = Number(process.env.PORT) || 3000;
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });
 
 /* app.listen(3000, () => {
