@@ -6,7 +6,7 @@ import { MikroORM } from '@mikro-orm/core';
 import { MySqlDriver } from '@mikro-orm/mysql';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 
-// Como las variables de env son siempre string, tiene que comparar si es igual a 'true', entonces almacena el booleano de js
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, './../../../../.env') });
@@ -43,8 +43,8 @@ export const syncSchema = async () => {
   // await generator.updateSchema(); // Desactivado para producción: evita cambios automáticos en el esquema
 
   //Lineas para borrar y crear la base de datos
-  // await generator.dropSchema();
-  // await generator.createSchema();
+  //await generator.dropSchema();
+  //await generator.createSchema();
 
   // await generator.updateSchema();
 };

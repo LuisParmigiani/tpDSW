@@ -21,7 +21,7 @@ turnoRouter.get(
   getTurnosByUserId
 );
 turnoRouter.get(
-  '/byPrestador/:id/:cantItemsPerPage?/:currentPage?/:selectedValueShow?/:selectedValueOrder?',
+  '/byPrestador/:id/:cantItemsPerPage?/:currentPage?/:selectedValueShow?/:selectedValueOrder?/:searchQuery?',
   getTurnosByPrestadorId
 );
 turnoRouter.get('/turnosPorDia/:id/:date', getTurnsPerDay);
