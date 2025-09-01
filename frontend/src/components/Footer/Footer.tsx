@@ -110,9 +110,7 @@ function Footer() {
       {/* Sección de la empresa */}
       <div className="flex flex-col items-center flex-1 lg:m-0 mb-10">
         <div className="flex flex-row items-center justify-center gap-10 mb-4 mr-6">
-          <h4 className="text-2xl font-bold m-0 text-center ">
-            Nombre de la Empresa
-          </h4>
+          <h4 className="text-2xl font-bold m-0 text-center ">Reformix</h4>
           <svg
             width="24"
             height="24"

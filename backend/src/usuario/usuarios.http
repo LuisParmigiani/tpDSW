@@ -1,11 +1,11 @@
 ### Obtener turnos de usuario por ID y fecha
-GET http://localhost:3000/api/usuario/17
+GET http://localhost:3000/api/usuario
 
 ### Obtener un usuario específico
 GET http://localhost:3000/api/usuario/comments/47
 
 ### Obtengo los prestatarios por tipo de servicio y zona
-GET http://localhost:3000/api/usuario/prestatarios/Plomeria/Norte/Calificacion?maxItems=6&page=2
+GET http://localhost:3000/api/usuario/prestatarios/Plomeria/ /Todas/Calificacion?maxItems=6&page=1
 
 ### Cargamos un usuario
 POST http://localhost:3000/api/usuario

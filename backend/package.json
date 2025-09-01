@@ -51,6 +51,7 @@
     "nodemailer": "^7.0.5",
     "oauth": "^0.10.2",
     "pg": "^8.16.3",
+    "openai": "^5.16.0",
     "reflect-metadata": "0.2.2",
     "uuid": "^11.1.0"
   }

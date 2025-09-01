@@ -33,7 +33,7 @@ function sanitizeUsuarioInput(req: Request, res: Response, next: NextFunction) {
     descripcion: req.body.descripcion,
     foto: req.body.foto,
     turnos: req.body.turnos,
-    tareas: req.body.tareas,
+    tarea: req.body.tarea,
     servicios: req.body.servicios,
     tiposDeServicio: req.body.tiposDeServicio,
     horarios: req.body.horarios,
@@ -68,7 +68,15 @@ async function findAll(req: Request, res: Response) {
     const users = await em.find(
       Usuario,
       {},
-      { populate: ['turnos', 'servicios', 'tiposDeServicio', 'horarios'] }
+      {
+        populate: [
+          'turnos',
+          'servicios',
+          'tiposDeServicio',
+          'horarios',
+          'servicios.tarea',
+        ],
+      }
     );
     res.status(200).json({ message: 'found all Usuarios', data: users });
   } catch (error: any) {
@@ -83,6 +91,7 @@ async function findPrestatariosByTipoServicioAndZona(
   try {
     const nombreTipoServicio = req.params.tipoServicio;
     const nombreZona = req.params.zona;
+    const tarea = req.params.tarea;
     const orderBy = req.params.orderBy as string;
     const maxItems = Number(req.query.maxItems) || 6;
     const page = Number(req.query.page) || 1;
@@ -90,6 +99,10 @@ async function findPrestatariosByTipoServicioAndZona(
     let filtroTipoServicio = '';
     if (nombreTipoServicio !== 'Todos') {
       filtroTipoServicio = nombreTipoServicio;
+    }
+    let filtroTarea = '';
+    if (tarea && tarea.trim() !== '' && tarea !== undefined) {
+      filtroTarea = tarea;
     }
     let filtroZona = '';
     if (nombreZona !== 'Todas') {
@@ -102,13 +115,24 @@ async function findPrestatariosByTipoServicioAndZona(
     if (filtroTipoServicio) {
       whereClause.tiposDeServicio = { nombreTipo: filtroTipoServicio };
     }
+    if (filtroTarea) {
+      whereClause.servicios = {
+        tarea: { nombreTarea: filtroTarea },
+      };
+    }
     if (filtroZona) {
       whereClause.zonas = { descripcion_zona: filtroZona };
     }
     //! Por un tema de performance se tendría que calcular y guardar en algún lado la calificación, apra no tener que calcular todas las calificaciones
     //! y ordenar 30 objetos cada vez que se llama
     const [prestatarios, total] = await em.findAndCount(Usuario, whereClause, {
-      populate: ['tiposDeServicio', 'zonas', 'servicios', 'servicios.turnos'],
+      populate: [
+        'tiposDeServicio',
+        'zonas',
+        'servicios',
+        'servicios.turnos',
+        'servicios.tarea',
+      ],
       //Pasar order by después.
     });
 
@@ -124,6 +148,15 @@ async function findPrestatariosByTipoServicioAndZona(
       let countCalificaciones = 0;
 
       const servicios = prest.servicios.getItems();
+      const tareas: {
+        nombreTarea: string;
+      }[] = [];
+      //Armo una colección de tareas del prestatario, le saque los atributos que no me servían
+      servicios.forEach((s) => {
+        tareas.push({
+          nombreTarea: s.tarea.nombreTarea,
+        });
+      });
       for (const servicio of servicios) {
         if (servicio.turnos !== null && servicio.turnos !== undefined) {
           const turnos = servicio.turnos;
@@ -139,6 +172,13 @@ async function findPrestatariosByTipoServicioAndZona(
         }
       }
       // Build a plain object with all needed properties
+      /*       "tarea": {
+            "id": 11,
+            "nombreTarea": "Reparación de canillas",
+            "descripcionTarea": "Arreglo de grifería",
+            "duracionTarea": 60,
+            "tipoServicio": 2
+          }, */
       return {
         id: prest.id,
         nombre: prest.nombre,
@@ -147,6 +187,7 @@ async function findPrestatariosByTipoServicioAndZona(
         descripcion: prest.descripcion,
         foto: prest.foto,
         tiposDeServicio: prest.tiposDeServicio.getItems(),
+        tareas: tareas,
         calificacion:
           countCalificaciones > 0
             ? totalCalificaciones / countCalificaciones

@@ -22,7 +22,7 @@ export default function ServicioCard({
   return (
     <div
       className={
-        ' w-76 min-w-76 max-w-76 mx-auto rounded-3xl flex-shrink-0 flex-grow-0 border-2 py-5 px-8 border-secondary h-5/12 min-h-5/12 max-h-5/12 bg-white shadow-2xl hover:border-gray-700 transition duration-400  hover:bg-gray-100 hover:scale-102 flex flex-col'
+        ' w-full max-w-sm overflow-hidden mx-auto rounded-3xl flex-shrink-0 flex-grow-0 border-2 py-5 px-8 border-secondary  bg-white shadow-2xl hover:border-gray-700 transition duration-400  hover:bg-gray-100 hover:scale-102 flex flex-col'
       }
       key={id}
     >
@@ -47,7 +47,7 @@ export default function ServicioCard({
           {rubros}
         </p>
         <div className="flex-grow mt-2"></div>
-        <Stars cant={puntuacion} />
+        <Stars cant={puntuacion} className="!mx-auto" />
       </div>
       <Boton
         texto="CONTRATAR"
