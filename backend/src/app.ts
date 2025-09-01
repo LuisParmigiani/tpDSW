@@ -16,7 +16,6 @@ import { horarioRouter } from './horario/horario.routes.js';
 import { CronManager } from './shared/cron/cronManager.js';
 import { PagoRouter } from './pago/pago.route.js';
 import mercadoPago from './mercadopago/mercadoPago.controller.js';
-import mercadoPagoOauthRouter from './mercadopago/mercadoPagoOauth.js';
 import { webhookRouter } from './mercadopago/mercadoPago.route.js';
 import cookieParser from 'cookie-parser';
 import authRoutes from './shared/middleware/auth.routes.js';
@@ -25,6 +24,7 @@ import authRoutes from './shared/middleware/auth.routes.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Cargar .env solo en desarrollo local
 dotenv.config({ path: path.join(__dirname, '../../.env') });
 const app = express();
 // Como las variables de env son siempre string, tiene que comparar si es igual a 'true', entonces almacena el booleano de js
@@ -63,23 +63,39 @@ app.use('/api/servicio', servicioRouter);
 app.use('/api/turno', turnoRouter);
 app.use('/api/horario', horarioRouter);
 app.use('/api/zona', zonaRouter);
-app.use('/api/mercadoPago', mercadoPago);
-app.use('/api/mp', mercadoPagoOauthRouter);
 app.use('/api/pago', PagoRouter);
-app.use('/webhooks/mercadopago', webhookRouter);
 app.use('/api/auth', authRoutes);
+
+// MercadoPago routes - agrupadas
+app.use('/api/mercadopago', mercadoPago);
+app.use('/api/mercadopago/webhooks', webhookRouter);
 
 // app.use((req, res) => {
 //   console.log(req)
 //   return res.status(404).send({ message: 'Resource not found' });
 // }); comente esto pq me tiraba error
 
+// manejo de sincronización de esquema con seguridad para no bloquear en producción
 if (local) {
   console.log('LOCAL_MODE=true -> syncSchema habilitado');
-  await syncSchema();
+  try {
+    await syncSchema();
+  } catch (e) {
+    console.warn(
+      'syncSchema error, omitiendo:',
+      e instanceof Error ? e.message : e
+    );
+  }
 } else if (process.env.RUN_SYNC_SCHEMA === '1') {
   console.log('RUN_SYNC_SCHEMA=1 (override) -> ejecutando syncSchema una vez');
-  await syncSchema();
+  try {
+    await syncSchema();
+  } catch (e) {
+    console.warn(
+      'syncSchema error, omitiendo:',
+      e instanceof Error ? e.message : e
+    );
+  }
 } else {
   console.log('Producción -> syncSchema omitido');
 }
@@ -104,16 +120,10 @@ app.get('/health', async (req: Request, res: Response) => {
 });
 
 // Define el puerto en el que se ejecutará el servidor
-// console.log(local);
-// const port = local ? 3000 : Number(process.env.PORT) || 8080; // Fly asigna PORT
-// app.listen(port, () => {
-//   console.log(`Server running on port ${port}`);
-// });
-
-const PORT = Number(process.env.PORT) || 3000;
-
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+console.log(local);
+const port = local ? 3000 : Number(process.env.PORT) || 8080; // Fly asigna PORT
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
 
 /* app.listen(3000, () => {
