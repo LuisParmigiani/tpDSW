@@ -1,8 +1,9 @@
 type Props = {
   estado: string;
+  cerrar: () => void;
 };
 
-function DevolucionPago({ estado }: Props) {
+function DevolucionPago({ estado, cerrar }: Props) {
   let message;
   let modalstyle;
   let buttonstyle;
@@ -31,7 +32,7 @@ function DevolucionPago({ estado }: Props) {
           className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200 ml-auto -mt-13"
           aria-label="Cerrar modal"
           onClick={() => {
-            estado = '';
+            cerrar();
           }}
         >
           <svg
@@ -52,7 +53,10 @@ function DevolucionPago({ estado }: Props) {
         </button>
         <h2>{message}</h2>
 
-        <button className={`${buttonstyle} text-white rounded-md p-2`}>
+        <button
+          className={`${buttonstyle} text-white rounded-md p-2`}
+          onClick={cerrar}
+        >
           Cerrar
         </button>
       </div>

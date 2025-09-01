@@ -61,6 +61,24 @@ async function findone(req: Request, res: Response) {
 }
 
 // Create a new turn
+async function addWithCookie(req: AuthRequest, res: Response) {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ message: 'User not authenticated' });
+    }
+    const id = req.user.id;
+    const sanitizedInput = req.body.sanitizeTurnoInput;
+    sanitizedInput.usuario = id; // Asignar el ID del usuario autenticado
+    const newTurn = em.create(Turno, sanitizedInput);
+    await em.persistAndFlush(newTurn);
+    res
+      .status(201)
+      .json({ message: 'Turn created successfully', data: newTurn });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
 async function add(req: Request, res: Response) {
   try {
     const sanitizedInput = req.body.sanitizeTurnoInput;
@@ -304,14 +322,12 @@ async function getTurnosByServicioIdHelper(params: {
 async function getTurnsPerDay(req: Request, res: Response) {
   const userId = req.params.id; // ID del usuario
   const date = req.params.date; // fecha seleccionada para hacer la búsqueda
-
+  console.log(date);
   try {
-    const start = new Date(date);
-    start.setHours(0, 0, 0, 0);
-    const end = new Date(date);
-    end.setHours(23, 59, 59, 999);
+    const start = new Date(date + 'T00:00:00');
 
-    // Usar MikroORM con sintaxis SQL estándar compatible con MySQL
+    const end = new Date(date + 'T23:59:59.999Z');
+
     const id = Number.parseInt(userId);
     const turnos = await em.find(
       Turno,
@@ -321,6 +337,7 @@ async function getTurnsPerDay(req: Request, res: Response) {
           $gte: start, // Inicio del rango
           $lte: end, // Fin del rango
         },
+        estado: { $ne: 'cancelado' },
       },
       { populate: ['servicio.tarea'] }
     );
@@ -558,7 +575,7 @@ async function getTurnosByPrestadorId(req: Request, res: Response) {
         turno.pagos &&
         turno.pagos.toArray().some((pago: any) => pago.estado === 'aprobado')
     );
-    
+
     res.status(200).json({
       message: 'found turns by prestador id',
       data: turnos,
@@ -585,4 +602,5 @@ export {
   getTurnosByUserId,
   getTurnosByPrestadorId,
   getTurnsPerDay,
+  addWithCookie,
 };

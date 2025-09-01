@@ -1,7 +1,7 @@
 import { usuariosApi } from '../../services/usuariosApi';
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-
+import { useRoleReturn } from '../../cookie/useProtectRoute';
 type Usuario = {
   nombre: string;
   foto: string;
@@ -13,11 +13,10 @@ type Option = {
 };
 
 function Navbar() {
-  const id = undefined; // Aca tine q ir el id del usuario logueado, por ahora lo dejamos undefined
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [showNav, setShowNav] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
-
+  const rol = useRoleReturn();
   const handleToggleNav = () => {
     setShowNav((prev) => !prev);
   };
@@ -35,24 +34,41 @@ function Navbar() {
       document.body.style.overflow = 'unset';
     };
   }, [showNav]);
-  const options: Option[] = [
-    {
-      nombre: 'Servicios',
-      url: '/servicios',
-    },
-    {
-      nombre: 'Experiencias',
-      url: '/experiencias',
-    },
-    {
-      nombre: 'Dashboard',
-      url: '/dashboard',
-    },
-    {
-      nombre: 'Sobre nosotros',
-      url: '/about',
-    },
-  ];
+
+  const options: Option[] =
+    rol === 'cliente'
+      ? [
+          {
+            nombre: 'Servicios',
+            url: '/servicios',
+          },
+          {
+            nombre: 'Historia de turnos',
+            url: '/historial',
+          },
+          {
+            nombre: 'Dashboard',
+            url: '/dashboard',
+          },
+          {
+            nombre: 'Sobre nosotros',
+            url: '/about',
+          },
+        ]
+      : [
+          {
+            nombre: 'Servicios',
+            url: '/servicios',
+          },
+          {
+            nombre: 'Dashboard',
+            url: '/dashboard',
+          },
+          {
+            nombre: 'Sobre nosotros',
+            url: '/about',
+          },
+        ];
   const showOptions = options.map((option) => (
     <li
       key={option.nombre}
@@ -68,18 +84,16 @@ function Navbar() {
     </li>
   ));
   useEffect(() => {
-    const getUsuario = async (id: string) => {
+    const getUsuario = async () => {
       try {
-        const res = await usuariosApi.getById(id.toString());
+        const res = await usuariosApi.getByCookie();
         setUsuario(res.data.data);
       } catch (err) {
         console.error('Error al cargar usuario:', err);
       }
     };
-    if (id) {
-      getUsuario(id);
-    }
-  }, [id]);
+    if (rol != '') getUsuario();
+  }, [rol]);
 
   // Renderizado del componente Navbar
   return (
@@ -99,7 +113,7 @@ function Navbar() {
             {/* muestra si esta registrado o no */}
             <div className="hidden lg:flex items-center justify-end ml-auto ">
               {usuario ? (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 bg-naranja-1 px-4 p-2 rounded-3xl">
                   <span className="text-sm font-medium">{usuario.nombre}</span>
                   <img
                     src={'/images/fotoUserId.png'}

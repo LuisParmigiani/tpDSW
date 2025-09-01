@@ -9,6 +9,7 @@ import {
   getTurnosByUserId,
   getTurnosByPrestadorId,
   getTurnsPerDay,
+  addWithCookie,
 } from './turno.controler.js';
 import { verifyToken } from '../shared/middleware/auth.middleware.js';
 export const turnoRouter = Router();
@@ -26,6 +27,7 @@ turnoRouter.get(
 turnoRouter.get('/turnosPorDia/:id/:date', getTurnsPerDay);
 turnoRouter.get('/:id', findone);
 turnoRouter.post('/', sanitizeTurnoInput, add);
+turnoRouter.post('/cookie', sanitizeTurnoInput, verifyToken, addWithCookie);
 turnoRouter.put('/:id', sanitizeTurnoInput, update);
 turnoRouter.patch('/:id', sanitizeTurnoInput, update);
 turnoRouter.delete('/:id', remove);

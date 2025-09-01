@@ -88,7 +88,7 @@ function Logincard() {
         </div>
       )}
       <div className="flex flex-col min-h-screen items-center justify-center bg-white py-8">
-        <div className="flex flex-col md:flex-row w-full max-w-4xl mx-auto bg-tinte-5 rounded-4xl shadow-lg mt-8 overflow-hidden">
+        <div className="flex flex-col md:flex-row w-full max-w-4xl mx-auto bg-gray-100 rounded-4xl shadow-lg mt-8 overflow-hidden">
           <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-6 md:p-10">
             <p className="text-black font-inter text-3xl md:text-5xl mb-6 font-bold text-center">
               ¡Bienvenido!
@@ -99,7 +99,7 @@ function Logincard() {
                   type="text"
                   placeholder="Email"
                   onChange={(e) => setForm({ ...form, mail: e.target.value })}
-                  className="w-full pt-3 pb-3 pr-5 pl-12 text-base border-none rounded-4xl bg-tinte-5 shadow-inner outline-none mb-4 text-black font-inter "
+                  className="w-full pt-3 pb-3 pr-5 pl-12 text-base border-none rounded-4xl bg-white shadow-inner outline-none mb-4 text-black font-inter "
                 />
                 <i className="fa-solid fa-envelope absolute top-4 left-6 text-gray-500 text-1xl pointer-events-none"></i>
               </div>
@@ -110,7 +110,7 @@ function Logincard() {
                   onChange={(e) =>
                     setForm({ ...form, contrasena: e.target.value })
                   }
-                  className="w-full pt-3 pb-3 pr-5 pl-12 text-base border-none rounded-4xl bg-tinte-5 shadow-inner outline-none mb-4 text-black font-inter"
+                  className="w-full pt-3 pb-3 pr-5 pl-12 text-base border-none rounded-4xl bg-white shadow-inner outline-none mb-4 text-black font-inter"
                 />
                 <i
                   className={imag + ' right-6'}
@@ -123,7 +123,7 @@ function Logincard() {
                 type="submit"
                 className={
                   form.mail === '' || form.contrasena === ''
-                    ? 'w-full bg-gray-300 text-white px-5 py-2.5 rounded-b-2xl cursor-pointer focus:outline-none mb-5 mt-3'
+                    ? 'w-full bg-gray-300 text-black-500 px-5 py-2.5 rounded-b-2xl cursor-pointer focus:outline-none mb-5 mt-3 '
                     : 'w-full bg-naranja-1 text-white px-5 py-2.5 rounded-b-2xl cursor-pointer hover:text-black focus:outline-none mb-5 mt-3 hover:shadow-lg'
                 }
                 disabled={form.mail === '' || form.contrasena === ''}

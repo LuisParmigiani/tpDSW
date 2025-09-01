@@ -8,8 +8,16 @@ import jwt from 'jsonwebtoken';
 
 import bcrypt from 'bcrypt';
 import { orm } from '../shared/db/orm.js';
+import nodemailer from 'nodemailer';
 const em = orm.em;
 const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
+
+interface AuthRequest extends Request {
+  user?: {
+    id: string;
+    rol: string;
+  };
+}
 
 function sanitizeUsuarioInput(req: Request, res: Response, next: NextFunction) {
   req.body.sanitizeUsuarioInput = {
@@ -202,6 +210,22 @@ async function findOne(req: Request, res: Response) {
   }
 }
 
+async function findOneByCookie(req: AuthRequest, res: Response) {
+  try {
+    // Si el id viene por params, úsalo. Si no, usa el id del usuario autenticado.
+    const id = req.user?.id;
+
+    if (!id) {
+      return res.status(400).json({ message: 'Usuario no autenticado' });
+    }
+
+    const user = await em.findOneOrFail(Usuario, { id: Number(id) }, {});
+    res.status(200).json({ message: 'found one usuario', data: user });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
 async function add(req: Request, res: Response) {
   try {
     // encripta password
@@ -297,19 +321,17 @@ async function loginUsuario(req: Request, res: Response) {
     const mail = req.query.mail as string;
     const contrasena = req.query.contrasena as string;
     if (!mail || !contrasena) {
-      return res
-        .status(400)
-        .json({ message: 'Faltan datos de inicio de sesión' });
+      return res.status(400).json();
     }
 
     const usuario = await em.findOne(Usuario, { mail });
     if (!usuario) {
-      return res.status(401).json({ message: 'Usuario no encontrado' });
+      return res.status(401).json();
     }
 
     const passwordMatch = await bcrypt.compare(contrasena, usuario.contrasena);
     if (!passwordMatch) {
-      return res.status(401).json({ message: 'Contraseña incorrecta' });
+      return res.status(401).json();
     }
 
     // elimina contraseña antes de enviar el usuario, probarlo
@@ -322,10 +344,12 @@ async function loginUsuario(req: Request, res: Response) {
       });
 
       // 🔹 Guardamos el token en una cookie segura
+      const local = process.env.LOCAL === 'true';
       res.cookie('token', token, {
-        httpOnly: true, // No accesible desde JS
-        secure: true, // Solo por HTTPS (en local podés poner false)
-        sameSite: 'none', //permite el uso de cookies en diferentes sitios
+        httpOnly: true,
+        secure: !local,
+        sameSite: local ? 'lax' : 'none', // 'none' solo si secure=true
+        path: '/',
       });
     }
     return res
@@ -339,6 +363,73 @@ async function loginUsuario(req: Request, res: Response) {
   }
 }
 
+//configuración mailer
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
+  auth: {
+    user: 'reformixoficial@gmail.com',
+    pass: 'mkyg zmvc hjux pkqr',
+  },
+});
+
+async function recuperarContrasena(req: Request, res: Response) {
+  try {
+    const mail = req.body.mail as string;
+
+    const usuario = await em.findOne(Usuario, { mail });
+    if (!usuario) {
+      return res.status(404).json();
+    }
+
+    //Generar codigo de 6 digitos
+    const codigo = Math.floor(100000 + Math.random() * 900000).toString();
+    codigosRecuperacion[mail] = {
+      codigo,
+      expiracion: new Date(Date.now() + 5 * 60 * 1000), // código vence en 5 minutos
+    };
+
+    await transporter.sendMail({
+      from: 'forgotpassword <reformixoficial@gmail.com>',
+      to: mail,
+      subject: 'Recuperación de contraseña',
+      text: `Tu código de recuperación es: ${codigo} y expirará en 5 minutos`,
+    });
+    return res.status(200).json(); //Manda mail de recuperación
+  } catch (error) {
+    return res.status(500).json();
+  }
+}
+
+const codigosRecuperacion: {
+  [mail: string]: { codigo: string; expiracion: Date };
+} = {};
+
+async function validarCodigoRecuperacion(req: Request, res: Response) {
+  const { mail, codigo } = req.body;
+  const registro = codigosRecuperacion[mail];
+  if (registro.expiracion < new Date() || registro.codigo !== codigo)
+    return res.status(400).json(); //codigo incorrecto
+  return res.status(200).json(); //codigo valido
+}
+
+async function cambiarPassword(req: Request, res: Response) {
+  const { mail, codigo, nuevaContrasena } = req.body;
+
+  const registro = codigosRecuperacion[mail];
+
+  const usuario = await em.findOne(Usuario, { mail });
+
+  usuario!.contrasena = await bcrypt.hash(nuevaContrasena, 10);
+  await em.flush();
+
+  // Elimina el código usado
+  delete codigosRecuperacion[mail];
+
+  return res.status(200).json(); //se cambió la password
+}
+
 export {
   sanitizeUsuarioInput,
   findAll,
@@ -349,4 +440,8 @@ export {
   loginUsuario,
   remove,
   getCommentsByUserId,
+  findOneByCookie,
+  recuperarContrasena,
+  validarCodigoRecuperacion,
+  cambiarPassword,
 };
