@@ -337,21 +337,53 @@ function FiltrosDeServicios() {
           />
         );
       });
-
-      return (
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mx-8 mt-8 justify-items-center">
-            {cards}
-          </div>
-          <div className="flex justify-center mt-8">
-            <PaginationControls
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
-          </div>
-        </>
-      );
+      //cambio la cantidad de columnas dependiendo de la cantidad de cartas
+      if (cards.length === 1) {
+        return (
+          <>
+            <div className="grid grid-cols-1 gap-6 mx-8 mt-8 justify-items-center">
+              {cards}
+            </div>
+            <div className="flex justify-center mt-8">
+              <PaginationControls
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            </div>
+          </>
+        );
+      } else if (cards.length === 2) {
+        return (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mx-8 mt-8 justify-items-center">
+              {cards}
+            </div>
+            <div className="flex justify-center mt-8">
+              <PaginationControls
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            </div>
+          </>
+        );
+      } else {
+        return (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mx-8 mt-8 justify-items-center">
+              {cards}
+            </div>
+            <div className="flex justify-center mt-8">
+              <PaginationControls
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            </div>
+          </>
+        );
+      }
     }
 
     // Show empty state only if we've submitted the form (to avoid showing it initially)
@@ -378,7 +410,6 @@ function FiltrosDeServicios() {
           filtrosForm={filtrosForm}
           onSubmit={handleFormSubmit}
         />
-
         <div className="flex-1 flex flex-col">
           <header className="bg-white border-b sticky top-0 z-10 border-gray-200 h-21">
             <h1 className="text-2xl mt-auto font-semibold text-gray-800 capitalize mx-auto pt-6">
