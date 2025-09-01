@@ -2,6 +2,7 @@ import DashboardSection from '../DashboardSection/DashboardSection';
 import TipoServicioCard, { TipoServicioData } from '../DashboardTipoCard';
 import { useState, useEffect, useCallback } from 'react';
 import { tiposServicioApi } from '../../services/tipoSericiosApi';
+import { tareasApi } from '../../services/tareasApi';
 
 // Tipos de datos
 type Tarea = {
@@ -10,6 +11,7 @@ type Tarea = {
   tipoServicioId: number;
   seleccionada: boolean;
   precio: number;
+  duracion?: number; // Duración en minutos
 };
 
 // Función para convertir datos del API al formato del componente
@@ -88,24 +90,132 @@ function ServiciosSection() {
     }
   }, []);
 
+  // Cargar tareas desde la API
+  const cargarTareas = useCallback(async () => {
+    try {
+      console.log('Iniciando carga de tareas...');
+      const response = await tareasApi.getAll();
+      
+      console.log('Respuesta completa del API de tareas:', response);
+      console.log('response.data:', response.data);
+      
+      if (response.data && response.data.data) {
+        console.log('Datos de tareas a convertir:', response.data.data);
+        console.log('Muestra de las primeras 3 tareas sin procesar:', response.data.data.slice(0, 3));
+        
+        const tareasConvertidas = response.data.data.map((tarea: {
+          id: number;
+          nombreTarea?: string;
+          descripcionTarea?: string;
+          duracionTarea?: number;
+          tipoServicio?: number | { id: number }; // Puede ser número directo o objeto
+          tipoServicioId?: number;
+          tipo_servicio_id?: number;
+        }) => {
+          console.log('Procesando tarea:', tarea);
+          // Si tipoServicio es un número, usarlo directamente; si es objeto, usar .id
+          let tipoServicioId: number;
+          if (typeof tarea.tipoServicio === 'number') {
+            tipoServicioId = tarea.tipoServicio;
+          } else if (tarea.tipoServicio && typeof tarea.tipoServicio === 'object') {
+            tipoServicioId = tarea.tipoServicio.id;
+          } else {
+            tipoServicioId = tarea.tipoServicioId || tarea.tipo_servicio_id || 0;
+          }
+          
+          console.log(`Tarea ID ${tarea.id}: tipoServicioId calculado = ${tipoServicioId}`);
+          
+          return {
+            id: tarea.id,
+            descripcion: tarea.nombreTarea || tarea.descripcionTarea || `Tarea ${tarea.id}`,
+            tipoServicioId: tipoServicioId,
+            seleccionada: false, // Por defecto no seleccionada
+            precio: 0, // Precio inicial
+            duracion: tarea.duracionTarea || 0 // Guardamos la duración también
+          };
+        });
+        console.log('Tareas convertidas finales:', tareasConvertidas);
+        console.log('Muestra de las primeras 5 tareas convertidas:', tareasConvertidas.slice(0, 5));
+        setTareas(tareasConvertidas);
+      } else if (Array.isArray(response.data)) {
+        console.log('La respuesta de tareas es un array directo:', response.data);
+        console.log('Muestra de las primeras 3 tareas sin procesar:', response.data.slice(0, 3));
+        
+        const tareasConvertidas = response.data.map((tarea: {
+          id: number;
+          nombreTarea?: string;
+          descripcionTarea?: string;
+          duracionTarea?: number;
+          tipoServicio?: number | { id: number }; // Puede ser número directo o objeto
+          tipoServicioId?: number;
+          tipo_servicio_id?: number;
+        }) => {
+          console.log('Procesando tarea:', tarea);
+          // Si tipoServicio es un número, usarlo directamente; si es objeto, usar .id
+          let tipoServicioId: number;
+          if (typeof tarea.tipoServicio === 'number') {
+            tipoServicioId = tarea.tipoServicio;
+          } else if (tarea.tipoServicio && typeof tarea.tipoServicio === 'object') {
+            tipoServicioId = tarea.tipoServicio.id;
+          } else {
+            tipoServicioId = tarea.tipoServicioId || tarea.tipo_servicio_id || 0;
+          }
+          
+          console.log(`Tarea ID ${tarea.id}: tipoServicioId calculado = ${tipoServicioId}`);
+          
+          return {
+            id: tarea.id,
+            descripcion: tarea.nombreTarea || tarea.descripcionTarea || `Tarea ${tarea.id}`,
+            tipoServicioId: tipoServicioId,
+            seleccionada: false,
+            precio: 0,
+            duracion: tarea.duracionTarea || 0
+          };
+        });
+        setTareas(tareasConvertidas);
+      } else {
+        console.error('Estructura de respuesta de tareas inesperada:', response);
+      }
+    } catch (err) {
+      console.error('Error cargando tareas:', err);
+      // No mostramos error para tareas, solo logueamos
+    }
+  }, []);
+
   // Cargar tipos de servicio al montar el componente
   useEffect(() => {
     cargarTiposServicio();
-  }, [cargarTiposServicio]);
+    cargarTareas(); // Cargar también las tareas
+  }, [cargarTiposServicio, cargarTareas]);
 
   // Actualizar tareas visibles cuando cambian los tipos de servicio activos
   useEffect(() => {
+    console.log('=== DEBUG: Actualizando tareas visibles ===');
+    console.log('Tipos de servicio:', tiposServicio);
+    console.log('Tareas cargadas:', tareas);
+    
     const tiposActivos = tiposServicio.filter(tipo => tipo.activo).map(tipo => tipo.id);
-    const nuevasTareasVisibles = tareas.filter(tarea => tiposActivos.includes(tarea.tipoServicioId));
+    console.log('Tipos activos (IDs):', tiposActivos);
+    
+    const nuevasTareasVisibles = tareas.filter(tarea => {
+      const coincide = tiposActivos.includes(tarea.tipoServicioId);
+      console.log(`Tarea ${tarea.id} (${tarea.descripcion}) con tipoServicioId ${tarea.tipoServicioId}: ${coincide ? 'INCLUIDA' : 'EXCLUIDA'}`);
+      return coincide;
+    });
+    
+    console.log('Tareas visibles resultantes:', nuevasTareasVisibles);
     setTareasVisibles(nuevasTareasVisibles);
   }, [tiposServicio, tareas]);
 
   const handleTipoServicioChange = (tipoId: number) => {
-    setTiposServicio(prev => 
-      prev.map(tipo => 
+    console.log(`=== Cambiando estado del tipo de servicio ${tipoId} ===`);
+    setTiposServicio(prev => {
+      const nuevosTimpos = prev.map(tipo => 
         tipo.id === tipoId ? { ...tipo, activo: !tipo.activo } : tipo
-      )
-    );
+      );
+      console.log('Nuevos tipos de servicio:', nuevosTimpos);
+      return nuevosTimpos;
+    });
   };
 
   const handleTareaChange = (tareaId: number, campo: 'seleccionada' | 'precio', valor: boolean | number) => {
