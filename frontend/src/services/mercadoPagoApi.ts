@@ -5,7 +5,7 @@ export const mercadoPagoApi = {
 
   // OAuth endpoints
   connect: (userId: number) =>
-    api.get('/mercadopago/oauth/connect', { params: { userId } }),
+    api.get('/mercadopago/webhooks/oauth/connect', { params: { userId } }),
   callback: (params: Record<string, string>) =>
     api.get('/mercadopago/oauth/callback', { params }),
   refresh: () => api.post('/mercadopago/oauth/refresh'),
