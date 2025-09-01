@@ -111,8 +111,11 @@ async function callback(req: Request, res: Response) {
     res.redirect(`${process.env.FRONTEND_URL}/dashboard?mp_connected=true`); // Redirige al frontend indicando éxito
   } catch (err) {
     const error = err as any;
-    console.error('Error en callback:', error.response?.data || error.message); // Muestra el error en consola
-    res.status(500).send('Error en callback OAuth'); // Retorna error si falla el proceso
+    console.error('Error en callback:', error.response?.data || error.message);
+    // Devolver detalle de la respuesta de MercadoPago en JSON para debug
+    return res
+      .status(500)
+      .json({ error: error.response?.data || error.message });
   }
 }
 
