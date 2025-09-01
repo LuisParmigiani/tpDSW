@@ -42,12 +42,3 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-///
-<<<<<<< HEAD
-/**
- * Realiza una petición GET a /mp/connect
- * Retorna la respuesta del backend
- */
-=======
->>>>>>> mp
