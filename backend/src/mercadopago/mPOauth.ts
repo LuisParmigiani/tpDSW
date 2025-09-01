@@ -3,6 +3,7 @@ dotenv.config(); // Carga las variables de entorno desde el archivo .env
 import { Request, Response } from 'express';
 import axios from 'axios';
 import querystring from 'querystring'; // Importa querystring para formatear datos en formato x-www-form-urlencoded
+import crypto from 'crypto'; // Para generar PKCE code_verifier y code_challenge
 import { orm } from '../shared/db/orm.js';
 import jwt from 'jsonwebtoken';
 import { putOauth, getOauth } from '../usuario/usuario.controler.js';
@@ -36,10 +37,18 @@ async function connect(req: Request, res: Response) {
       userId = decoded.id; // Obtiene el ID de usuario del token
     }
 
-    // Guardar el userId en la sesión o estado para el callback
-    const state = Buffer.from(JSON.stringify({ userId })).toString('base64'); // Codifica el userId en base64 para el parámetro state
+  // Generar PKCE code_verifier y code_challenge
+  const codeVerifier = crypto.randomBytes(32).toString('hex');
+  const base64url = (buf: Buffer) => buf.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  const codeChallenge = base64url(crypto.createHash('sha256').update(codeVerifier).digest());
+  // Incluir userId y codeVerifier en state para callback
+  const state = Buffer.from(JSON.stringify({ userId, codeVerifier })).toString('base64');
 
-    const url = `https://auth.mercadopago.com/authorization?response_type=code&client_id=${MP_CLIENT_ID}&redirect_uri=${MP_REDIRECT_URI}&state=${state}`; // Construye la URL de autorización de MercadoPago
+    const url = `https://auth.mercadopago.com/authorization?response_type=code&client_id=${MP_CLIENT_ID}` +
+      `&redirect_uri=${encodeURIComponent(MP_REDIRECT_URI!)}` +
+      `&state=${state}` +
+      `&code_challenge=${codeChallenge}` +
+      `&code_challenge_method=S256`;
     console.log('Redirigiendo a:', url); // Muestra la URL en consola
     res.redirect(url); // Redirige al usuario a MercadoPago para autorizar
   } catch (error) {
@@ -49,18 +58,12 @@ async function connect(req: Request, res: Response) {
 }
 
 async function callback(req: Request, res: Response) {
-  // Soporte de userId en query (para indicar usuario explícitamente)
+  // Decodificar el state para obtener userId y codeVerifier
   const state = req.query.state as string;
-  let userId: number;
-  if (req.query.userId) {
-    userId = Number(req.query.userId);
-    if (isNaN(userId)) return res.status(400).send('userId inválido');
-  } else {
-    if (!state) return res.status(400).send('Falta state');
-    // Decodificar el state para obtener el userId
-    const stateData = JSON.parse(Buffer.from(state, 'base64').toString());
-    userId = stateData.userId;
-  }
+  if (!state) return res.status(400).send('Falta state');
+  const stateData = JSON.parse(Buffer.from(state, 'base64').toString());
+  const userId = stateData.userId;
+  const codeVerifier = stateData.codeVerifier;
   let code: string = '';
   if (typeof req.query.code === 'string') {
     code = req.query.code; // Si el código es string, lo asigna
@@ -74,17 +77,16 @@ async function callback(req: Request, res: Response) {
   if (!code) return res.status(400).send('Falta code'); // Retorna error si falta el código
 
   try {
-    // Decodificar el state para obtener el userId
-    const stateData = JSON.parse(Buffer.from(state, 'base64').toString()); // Decodifica el state en base64 y lo convierte a objeto
-    const userId = stateData.userId; // Obtiene el userId
 
+    // Preparar los parámetros para solicitar el token con PKCE
     const params = querystring.stringify({
       grant_type: 'authorization_code',
       client_id: MP_CLIENT_ID,
       client_secret: MP_CLIENT_SECRET,
       code: code,
       redirect_uri: MP_REDIRECT_URI,
-    }); // Prepara los parámetros para solicitar el token
+      code_verifier: codeVerifier,
+    });
 
     const tokenResp = await axios.post(
       'https://api.mercadopago.com/oauth/token',
