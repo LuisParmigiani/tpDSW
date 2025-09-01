@@ -16,7 +16,6 @@ import { horarioRouter } from './horario/horario.routes.js';
 import { CronManager } from './shared/cron/cronManager.js';
 import { PagoRouter } from './pago/pago.route.js';
 import mercadoPago from './mercadopago/mercadoPago.controller.js';
-import mercadoPagoOauthRouter from './mercadopago/mercadoPagoOauth.js';
 import { webhookRouter } from './mercadopago/mercadoPago.route.js';
 import cookieParser from 'cookie-parser';
 import authRoutes from './shared/middleware/auth.routes.js';
@@ -63,11 +62,12 @@ app.use('/api/servicio', servicioRouter);
 app.use('/api/turno', turnoRouter);
 app.use('/api/horario', horarioRouter);
 app.use('/api/zona', zonaRouter);
-app.use('/api/mercadoPago', mercadoPago);
-app.use('/api/mp', mercadoPagoOauthRouter);
 app.use('/api/pago', PagoRouter);
-app.use('/webhooks/mercadopago', webhookRouter);
 app.use('/api/auth', authRoutes);
+
+// MercadoPago routes - agrupadas
+app.use('/api/mercadopago', mercadoPago);
+app.use('/api/mercadopago/webhooks', webhookRouter);
 
 // app.use((req, res) => {
 //   console.log(req)
@@ -104,6 +104,7 @@ app.get('/health', async (req: Request, res: Response) => {
 });
 
 // Define el puerto en el que se ejecutará el servidor
+<<<<<<< HEAD
 // console.log(local);
 // const port = local ? 3000 : Number(process.env.PORT) || 8080; // Fly asigna PORT
 // app.listen(port, () => {
@@ -114,6 +115,13 @@ const PORT = Number(process.env.PORT) || 3000;
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running on port ${PORT}`);
+=======
+console.log(local);
+
+const port = local ? 3000 : Number(process.env.PORT) || 8080; // Fly asigna PORT
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+>>>>>>> mp
 });
 
 /* app.listen(3000, () => {

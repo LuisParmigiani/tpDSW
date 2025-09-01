@@ -44,7 +44,10 @@ api.interceptors.response.use(
 );
 
 ///
+<<<<<<< HEAD
 /**
  * Realiza una petición GET a /mp/connect
  * Retorna la respuesta del backend
  */
+=======
+>>>>>>> mp

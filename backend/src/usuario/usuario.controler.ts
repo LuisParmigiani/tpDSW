@@ -430,6 +430,37 @@ async function cambiarPassword(req: Request, res: Response) {
   return res.status(200).json(); //se cambió la password
 }
 
+async function putOauth(
+  id: number,
+  access_token: string,
+  refresh_token: string,
+  user_id: string,
+  public_key: string,
+  mpTokenExpiration: Date
+) {
+  try {
+    const updateUser = await em.findOneOrFail(Usuario, { id });
+    em.assign(updateUser, {
+      mpAccessToken: access_token, // Guarda el access token
+      mpRefreshToken: refresh_token, // Guarda el refresh token
+      mpUserId: user_id, // Guarda el user_id de MercadoPago
+      mpPublicKey: public_key, // Guarda la public key
+      mpTokenExpiration: mpTokenExpiration,
+    });
+    await em.flush();
+    console.log('Tokens de MercadoPago actualizados');
+  } catch (error: any) {
+    console.error('Error en putOauth:', error);
+  }
+}
+async function getOauth(id: number) {
+  try {
+    const user = await em.findOneOrFail(Usuario, { id }, {});
+    return user;
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+}
 export {
   sanitizeUsuarioInput,
   findAll,
@@ -444,4 +475,6 @@ export {
   recuperarContrasena,
   validarCodigoRecuperacion,
   cambiarPassword,
+  putOauth,
+  getOauth,
 };
