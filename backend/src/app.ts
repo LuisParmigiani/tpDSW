@@ -73,7 +73,8 @@ app.use('/api/auth', authRoutes);
 
 // MercadoPago routes - agrupadas
 app.use('/api/mercadopago', mercadoPago);
-app.use('/api/mercadopago/webhooks', webhookRouter);
+// Rutas de MercadoPago (webhooks y OAuth)
+app.use('/api/mercadopago', webhookRouter);
 
 if (local) {
   console.log('LOCAL_MODE=true -> syncSchema habilitado');

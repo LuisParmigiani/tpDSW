@@ -13,8 +13,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 console.log('process.env.LOCAL:', process.env.LOCAL);
-const local =
-  typeof process !== 'undefined' && process.env && process.env.LOCAL === 'true';
+const local = process.env.LOCAL === 'true';
 
 const DB_URL = local
   ? 'mysql://root:root@localhost:3306/homeservice'
