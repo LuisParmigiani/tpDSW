@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { usuariosApi } from '../../services/usuariosApi';
 import { z } from 'zod';
+import ProfilePicture from '../ProfilePic/ProfilePicture';
 
 //Algunas validaciones no son necesarias pero las dejo para poder crear el objeto
 
@@ -26,6 +27,7 @@ export const usuarioSchema = z.object({
   direccion: z.string().min(1, 'La dirección es obligatoria'),
   nombreFantasia: z.string(),
   descripcion: z.string(),
+  foto: z.string().optional(),
 });
 
 export type Usuario = z.infer<typeof usuarioSchema>;
@@ -46,6 +48,7 @@ function RegisCard() {
     direccion: '',
     nombreFantasia: '',
     descripcion: '',
+    foto: '',
   });
 
   const [tipoUsuario, setearTipoUsuario] = useState('usuario');
@@ -143,6 +146,13 @@ function RegisCard() {
         className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-white shadow-inner outline-none mb-4 text-black font-inter "
         onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
       />
+      <ProfilePicture
+        src={form.foto || '/images/fotoUserId.png'}
+        onImageChange={(imageUrl) => setForm({ ...form, foto: imageUrl })}
+      />
+      <p className="text-center text-gray-600 text-sm mt-2 mb-4 font-inter">
+        Elija una foto para su cuenta, podrá cambiarla luego desde su perfil.
+      </p>
     </>
   );
 
@@ -169,6 +179,7 @@ function RegisCard() {
         direccion: '',
         nombreFantasia: '',
         descripcion: '',
+        foto: '',
       });
     } catch (error) {
       const err = error as { response?: { data?: { message?: string } } };
@@ -227,7 +238,7 @@ function RegisCard() {
         </div>
       )}
       <div className="flex flex-col min-h-screen items-center justify-center bg-white py-8 ">
-        <div className="flex flex-col md:flex-row w-full max-w-4xl mx-auto  bg-gray-100 rounded-4xl shadow-lg mt-8 overflow-hidden h-250 ">
+        <div className="flex flex-col md:flex-row w-full max-w-4xl mx-auto  bg-gray-100 rounded-4xl shadow-lg mt-8 overflow-hidden min-h-[700px] ">
           <div className="w-full md:w-1/2 flex flex-col justify-start items-center p-6 md:p-10 ">
             <p className="text-black font-inter text-3xl md:text-5xl mb-6 font-bold text-center ">
               Crear cuenta
