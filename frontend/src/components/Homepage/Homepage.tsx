@@ -2,6 +2,7 @@ import Navbar from '../Navbar/Navbar.tsx';
 import Carousel from '../Carousel/Carousel.tsx';
 import Comments from '../Comments/Comments.tsx';
 import Footer from '../Footer/Footer';
+import { mercadoPagoApi } from '../../services/mercadoPagoApi.ts';
 import { HomePageCard } from './HomePageCards.js';
 function Homepage() {
   const CommentOne = 1;
@@ -37,21 +38,15 @@ function Homepage() {
       <div className="flex flex-col w-full">
         <div className="absolute inset-0 w-full z-20">
           <Navbar />
-        </div>
-        {/* Botón de pago Mercado Pago integrado */}
-        <div className="flex justify-center mt-8">
           <button
-            className="bg-naranja-1 text-white px-6 py-3 rounded-lg font-bold shadow-lg hover:bg-orange-600 transition"
-            onClick={() => {
-              window.location.href =
-                import.meta.env.VITE_LOCAL === 'true'
-                  ? 'http://localhost:3000/api/mp/connect'
-                  : 'https://backend-patient-morning-1303.fly.dev/api/mp/connect';
-            }}
+            className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
+            onClick={() => mercadoPagoApi.connect(1)}
           >
-            Probar Mercado Pago OAuth
+            Conectar Mercado Pago
           </button>
         </div>
+        {/* Botón de pago Mercado Pago integrado */}
+        <div className="flex justify-center mt-8"></div>
         <div className="w-full">
           <Carousel
             fotos={[
