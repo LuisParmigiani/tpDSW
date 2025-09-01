@@ -13,8 +13,6 @@ export interface MenuItem {
 }
 
 interface FilterSideBarProps {
-  activeSection: string;
-  setActiveSection: (section: string) => void;
   menuItems?: MenuItem;
   tipoServicios: ServiciosFormProps['tipoServicios'];
   zonas: ServiciosFormProps['zonas'];
@@ -38,8 +36,8 @@ function FilterSideBar({
   return (
     <div
       className={`bg-white shadow-lg border-r border-gray-200 transition-all duration-300 ${
-        isCollapsed ? 'w-20' : 'w-64'
-      } flex flex-col`}
+        isCollapsed ? ' w-full lg:w-20' : 'w-full lg:w-64'
+      } flex flex-col lg:min-h-screen`}
     >
       <div className="p-4 border-b border-gray-200">
         {!isCollapsed ? (
@@ -47,9 +45,9 @@ function FilterSideBar({
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
               className={
-                'bg-white text-naranja-1 text-center  py-3 px-5 rounded-md hover:bg-naranja-1 text-xl font-semibold ' +
+                'bg-white text-naranja-1 text-center py-2 px-4 rounded-md hover:bg-naranja-1 text-xl font-semibold ' +
                 'border-naranja-1 border-2 hover:text-white hover:border-naranja-1 transition duration-300  flex flex-row ' +
-                'active:bg-white active:text-naranja-1 mx-auto'
+                'active:bg-white active:text-naranja-1 mx-auto mb-1'
               }
               style={{ outline: 'none' }}
             >
@@ -62,7 +60,7 @@ function FilterSideBar({
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
               className={
-                'bg-naranja-1 text-white text-center  py-3 px-5 rounded-md hover:bg-white text-xl font-semibold ' +
+                'bg-naranja-1 text-white text-center py-3 px-5 rounded-md hover:bg-white text-xl font-semibold ' +
                 'border-naranja-1 border-2 hover:text-naranja-1 hover:border-naranja-1 transition duration-300  flex flex-row ' +
                 'active:bg-white active:text-naranja-1 mx-auto'
               }
@@ -74,7 +72,7 @@ function FilterSideBar({
         )}
       </div>
 
-      <nav className="flex-1 p-4">
+      <nav className="flex-1 pt-10">
         {!isCollapsed && (
           <ServiciosForm
             tipoServicios={tipoServicios}

@@ -14,7 +14,7 @@ export const usuariosApi = {
     const params = new URLSearchParams(); // crea los parámetros para pasarlos en la consulta
     if (maxItems !== undefined) params.append('maxItems', maxItems);
     if (page !== undefined) params.append('page', page);
-    if (tarea === undefined || tarea === '') tarea = ' '; // Si tarea es undefined, asigna un string vacío para que la URL sea válida
+    if (tarea === undefined || tarea === '') tarea = ' ';
     const url = `/usuario/prestatarios/${tipoServicio}/${tarea}/${zona}/${orderBy}${
       params ? `?${params}` : ''
     }`;

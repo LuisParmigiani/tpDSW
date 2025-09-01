@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { Button } from './../Botones/FormButton';
 import { Form, FormControl, FormField, FormItem, FormMessage } from './Form';
 import ComboInput, { ComboInputRef } from './ComboInput';
+import { Label } from './../Label/Label.js';
 import {
   Select,
   SelectItem,
@@ -85,10 +86,10 @@ export function ServiciosForm({
       });
 
       form.reset({
-        servicio: filtrosForm.servicio || '',
+        servicio: filtrosForm.servicio || 'Todos',
         tarea: filtrosForm.tarea || '',
-        zona: filtrosForm.zona || '',
-        ordenarPor: filtrosForm.ordenarPor || '',
+        zona: filtrosForm.zona || 'Todas',
+        ordenarPor: filtrosForm.ordenarPor || 'calificacion',
       });
     }
   }, [filtrosForm, form, tipoServicios, zonas]);
@@ -116,18 +117,24 @@ export function ServiciosForm({
         onSubmit={form.handleSubmit(handleSubmit)}
         className={
           'hover:scale-105 transition mt-4 ease-in-out duration-400 bg-tinte-5 mx-auto my-2 flex ' +
-          'gap-2 py-1 shadow-2xl flex-col max-w-4/5 justify-items-center justify-center items-center rounded-md ' +
-          'px-2'
+          'gap-2 py-2 shadow-2xl flex-col max-w-1/3 justify-items-center justify-center items-center rounded-md ' +
+          'min-w-60 lg:max-w-60'
         }
       >
         <FormField
           control={form.control}
           name="servicio"
           render={({ field }) => (
-            <FormItem className="mb-4">
+            <FormItem className="mb-4 inline-block lg:mr-auto mx-auto">
+              <Label
+                htmlFor="servicio"
+                className="text-secondary font-medium mb-2 block"
+              >
+                Tipo de Servicio
+              </Label>
               <FormControl>
                 <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger className="!w-36 text-secondary text-base font-medium bg-white">
+                  <SelectTrigger className="!w-48 text-secondary text-base font-medium bg-white">
                     <SelectValue placeholder="Servicio" />
                   </SelectTrigger>
                   <SelectContent>
@@ -147,22 +154,37 @@ export function ServiciosForm({
             </FormItem>
           )}
         />
-        <ComboInput
-          ref={comboInputRef}
-          items={tareasTipo}
-          placeholder="Buscar por tarea..."
-          onSelect={handleTareaSelect}
-          className=" w-full mb-5 "
-        />
+
+        <div className="mb-4 inline-block lg:mr-auto mx-auto">
+          <Label
+            htmlFor="tarea"
+            className="text-secondary font-medium mb-2 block mr-auto"
+          >
+            Tarea Específica
+          </Label>
+          <ComboInput
+            ref={comboInputRef}
+            items={tareasTipo}
+            placeholder="Buscar tarea"
+            onSelect={handleTareaSelect}
+            className="!w-48"
+          />
+        </div>
 
         <FormField
           control={form.control}
           name="zona"
           render={({ field }) => (
-            <FormItem className="mb-4">
-              <FormControl>
+            <FormItem className="mb-4 inline-block lg:mr-auto mx-auto">
+              <Label
+                htmlFor="zona"
+                className="text-secondary font-medium mb-2 block"
+              >
+                Zona
+              </Label>
+              <FormControl className="">
                 <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger className="!w-36 text-secondary text-base font-medium bg-white">
+                  <SelectTrigger className="!w-48 text-secondary text-base font-medium bg-white">
                     <SelectValue placeholder="Zona" />
                   </SelectTrigger>
                   <SelectContent>
@@ -170,7 +192,7 @@ export function ServiciosForm({
                       <SelectItem
                         key={index}
                         value={zona.descripcionZona}
-                        className="text-secondary text-base font-medium bg-white hover:bg-gray-200"
+                        className="text-secondary text-base font-medium bg-white hover:bg-gray-20 "
                       >
                         {zona.descripcionZona}
                       </SelectItem>
@@ -183,15 +205,20 @@ export function ServiciosForm({
           )}
         />
 
-        {/* Ordenar Por Field */}
         <FormField
           control={form.control}
           name="ordenarPor"
           render={({ field }) => (
-            <FormItem className="mb-4">
+            <FormItem className="mb-4 inline-block lg:mr-auto mx-auto">
+              <Label
+                htmlFor="ordenarPor"
+                className="text-secondary font-medium mb-2 block"
+              >
+                Ordenar Por
+              </Label>
               <FormControl>
                 <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger className="!w-36 text-secondary text-base font-medium bg-white">
+                  <SelectTrigger className="!w-48 text-secondary text-base font-medium bg-white">
                     <SelectValue placeholder="Ordenar por" />
                   </SelectTrigger>
                   <SelectContent>
@@ -214,7 +241,6 @@ export function ServiciosForm({
             </FormItem>
           )}
         />
-
         <div className="mb-4">
           <Button
             type="submit"
@@ -224,7 +250,7 @@ export function ServiciosForm({
               'box-border cursor-pointer w-30'
             }
           >
-            Buscar
+            Filtrar
           </Button>
           <div className="mt-2  ">
             <Button
@@ -235,7 +261,12 @@ export function ServiciosForm({
                 'hover:bg-gray-300 hover:text-gray-800 w-30 transition duration-300 cursor-pointer '
               }
               onClick={() => {
-                form.reset();
+                form.reset({
+                  servicio: 'Todos',
+                  tarea: '',
+                  zona: 'Todas',
+                  ordenarPor: 'calificacion',
+                });
                 comboInputRef.current?.clearInput();
               }}
             >
