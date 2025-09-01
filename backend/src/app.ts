@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import express, { Request, Response, NextFunction } from 'express';
@@ -20,21 +21,22 @@ import { webhookRouter } from './mercadopago/mercadoPago.route.js';
 import cookieParser from 'cookie-parser';
 import authRoutes from './shared/middleware/auth.routes.js';
 
-//Tuve que recrear __dirname xq no estaba definido xq estamos usando ES Modules y no COmmonJS
+// Tuve que recrear __dirname xq no estaba definido xq estamos usando ES Modules y no COmmonJS
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Cargar .env solo en desarrollo local
-// Load environment variables from .env in development only
-if (process.env.NODE_ENV !== 'production') {
-  dotenv.config({ path: path.join(__dirname, '../../.env') });
+// Cargar .env solo si existe para distinguir modo local de producción
+const envPath = path.join(__dirname, '../.env');
+const isLocalEnv = fs.existsSync(envPath);
+if (isLocalEnv) {
+  dotenv.config({ path: envPath });
 }
 const app = express();
 // Como las variables de env son siempre string, tiene que comparar si es igual a 'true', entonces almacena el booleano de js
 
-console.log('env:', process.env.LOCAL);
-const local = process.env.LOCAL === 'true';
-console.log('local:', local);
+// Definir modo local según existencia de .env
+const local = isLocalEnv;
+console.log('Modo local (archivo .env encontrado):', local);
 // cors lo que hace es dar el permiso al un puerto para hacer las peticiones al back
 // CORS dinámico (permite lista separada por comas en FRONTEND_ORIGIN)
 const rawOrigins = local
@@ -73,32 +75,12 @@ app.use('/api/auth', authRoutes);
 app.use('/api/mercadopago', mercadoPago);
 app.use('/api/mercadopago/webhooks', webhookRouter);
 
-// app.use((req, res) => {
-//   console.log(req)
-//   return res.status(404).send({ message: 'Resource not found' });
-// }); comente esto pq me tiraba error
-
-// manejo de sincronización de esquema con seguridad para no bloquear en producción
 if (local) {
   console.log('LOCAL_MODE=true -> syncSchema habilitado');
-  try {
-    await syncSchema();
-  } catch (e) {
-    console.warn(
-      'syncSchema error, omitiendo:',
-      e instanceof Error ? e.message : e
-    );
-  }
+  await syncSchema();
 } else if (process.env.RUN_SYNC_SCHEMA === '1') {
   console.log('RUN_SYNC_SCHEMA=1 (override) -> ejecutando syncSchema una vez');
-  try {
-    await syncSchema();
-  } catch (e) {
-    console.warn(
-      'syncSchema error, omitiendo:',
-      e instanceof Error ? e.message : e
-    );
-  }
+  await syncSchema();
 } else {
   console.log('Producción -> syncSchema omitido');
 }
