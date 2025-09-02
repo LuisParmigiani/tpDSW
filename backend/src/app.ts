@@ -16,7 +16,6 @@ import { serviceTypeRouter } from './tipoServicio/tipoServ.route.js';
 import { horarioRouter } from './horario/horario.routes.js';
 import { CronManager } from './shared/cron/cronManager.js';
 import { PagoRouter } from './pago/pago.route.js';
-import mercadoPago from './mercadopago/mercadoPago.controller.js';
 import { webhookRouter } from './mercadopago/mercadoPago.route.js';
 import cookieParser from 'cookie-parser';
 import authRoutes from './shared/middleware/auth.routes.js';
@@ -73,7 +72,6 @@ app.use('/api/pago', PagoRouter);
 app.use('/api/auth', authRoutes);
 
 // MercadoPago routes - agrupadas
-app.use('/api/mercadopago', mercadoPago);
 // Rutas de MercadoPago (webhooks y OAuth)
 app.use('/api/mercadopago', webhookRouter);
 
