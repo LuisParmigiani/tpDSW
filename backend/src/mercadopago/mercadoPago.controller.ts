@@ -24,11 +24,13 @@ async function createPayment(req: AuthRequest, res: Response) {
     const id = req.user?.id; // cookie
 
     if (!id) {
+      console.log('❌ Usuario no autenticado');
       return res.status(400).json({ message: 'Usuario no autenticado' });
     }
 
     // Validación básica
     if (!title || !unit_price || !quantity) {
+      console.log('❌ Faltan datos requeridos: title, unit_price o quantity');
       return res.status(400).json({
         error: 'Faltan datos requeridos: title, unit_price o quantity',
       });
@@ -36,12 +38,14 @@ async function createPayment(req: AuthRequest, res: Response) {
 
     let prestatario;
     if (prestatario_id === undefined) {
+      console.log('❌ Se requiere el id del prestatario para el split payment');
       return res.status(400).json({
         error: 'Se requiere el id del prestatario para el split payment',
       });
     } else {
       prestatario = await getOauth(Number(prestatario_id));
       if (!prestatario) {
+        console.log('❌ Prestatario no encontrado');
         return res.status(404).json({
           error: 'Prestatario no encontrado',
         });
@@ -50,6 +54,7 @@ async function createPayment(req: AuthRequest, res: Response) {
 
     // VERIFICAR QUE TENGA TOKEN OAUTH
     if (!prestatario.mpAccessToken) {
+      console.log('❌ El prestatario no tiene token OAuth configurado');
       return res.status(400).json({
         error: 'El prestatario no tiene token OAuth configurado',
       });

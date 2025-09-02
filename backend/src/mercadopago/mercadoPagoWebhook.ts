@@ -141,6 +141,7 @@ async function procesarSplitPayment(paymentInfo: any) {
       );
     }
   } catch (error: any) {
+    console.log('🔔 Webhook en el catch del procesarSplitPayment:', error);
     console.error('❌ Error procesando split payment:', error);
     await guardarRegistroSplit(paymentInfo, null, 'failed', error.message);
   }
@@ -181,10 +182,12 @@ async function intentarPayout(
       return payoutResult;
     } else {
       const errorData = await payoutResponse.text();
+      console.log('❌ Error en payout:', payoutResponse.status, errorData);
       console.error('❌ Error en payout:', payoutResponse.status, errorData);
       throw new Error(`Payout failed: ${errorData}`);
     }
   } catch (error: any) {
+    console.log('❌ Error en payout alternativo:', error);
     console.error('❌ Error en payout alternativo:', error);
     throw error;
   }
@@ -228,6 +231,7 @@ async function guardarRegistroSplit(
     await emFork.persistAndFlush(splitRecord);
     */
   } catch (error: any) {
+    console.log('❌ Error guardando registro split:', error);
     console.error('❌ Error guardando registro split:', error);
   }
 }
@@ -321,6 +325,7 @@ async function actualizarPagoDesdeWebhook(paymentInfo: any) {
       paymentInfo.status
     );
   } catch (error) {
+    console.log('❌ Error actualizando pago en BD:', error);
     console.error('❌ Error actualizando pago en BD:', error);
     throw error;
   }
@@ -396,6 +401,7 @@ async function verificarEstadoPago(req: Request, res: Response) {
       },
     });
   } catch (error: any) {
+    console.log('🔔 Error verificando estado:', error);
     console.error('Error verificando estado:', error);
     res.status(500).json({ error: error.message });
   }
