@@ -45,6 +45,7 @@ type Usuario = {
   id: number;
   mail: string;
   nombreFantasia: string;
+  mpPublicKey: string;
 };
 
 type Props = {
