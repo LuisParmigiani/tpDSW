@@ -21,6 +21,7 @@ export const usuariosApi = {
     return api.get(url);
   },
   getById: (id: string) => api.get(`/usuario/${id}`),
+  getByIdOnlyInfo: (id: string) => api.get(`/usuario/onlyInfo/${id}`),
   getByCookie: () => api.get(`/usuario/cookie`, { withCredentials: true }),
   getCommentsByUserId: (
     userId: string,
@@ -46,4 +47,12 @@ export const usuariosApi = {
     api.post('/usuario/validar-codigo', data),
   cambiarPassword: (data: EntityData) =>
     api.post('/usuario/cambiar-password', data),
+  uploadProfileImage: (userId: string, imageFile: File) => {
+    const formData = new FormData();
+    formData.append('userId', userId);
+    formData.append('imageFile', imageFile);
+    return api.post(`/usuario/upload-profile-image/${userId}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
 };

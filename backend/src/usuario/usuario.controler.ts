@@ -1,14 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
 import { Usuario } from './usuario.entity.js';
+import path from 'path';
 import {
   getTurnosByServicioIdHelper,
   getTurnsPerDay,
 } from '../turno/turno.controler.js';
 import jwt from 'jsonwebtoken';
-
+import fs from 'fs/promises';
 import bcrypt from 'bcrypt';
 import { orm } from '../shared/db/orm.js';
 import nodemailer from 'nodemailer';
+import { processProfileImage } from '../utils/imageProcessor.js';
 const em = orm.em;
 const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
 
@@ -223,6 +225,15 @@ async function findPrestatariosByTipoServicioAndZona(
         totalPages,
       },
     });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+}
+async function findOneOnlyInfo(req: Request, res: Response) {
+  try {
+    const id = Number.parseInt(req.params.id);
+    const user = await em.findOneOrFail(Usuario, { id }, {});
+    res.status(200).json({ message: 'found one usuario', data: user });
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
@@ -502,11 +513,63 @@ async function getOauth(id: number) {
     throw new Error(error.message);
   }
 }
+async function uploadProfileImage(req: Request, res: Response) {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No se subió ninguna imagen' });
+    }
+    const userId = req.params.userId;
+    const user = await em.findOne(Usuario, { id: Number(userId) });
+    if (!user) {
+      await fs.unlink(req.file.path); // Elimina el archivo subido si el usuario no existe
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+    //Borra la foto anterior si existe
+    if (user.foto) {
+      const RutaFotoVieja = path.join(__dirname, '../../public', user.foto);
+      try {
+        await fs.unlink(RutaFotoVieja);
+      } catch (error) {
+        console.error('Error al eliminar la foto vieja:', error);
+      }
+    }
+    //procesa y optimiza la imagen
+    const urlOptimizada = await processProfileImage(
+      req.file.path,
+      Number(user.id)
+    );
+    //Limpia la imagen subida
+    await fs.unlink(req.file.path);
+    // Actualiza el usuario en la base
+    user.foto = urlOptimizada;
+    await em.flush();
+
+    res.json({
+      message: 'Foto de perfil actualizada correctamente',
+      url: urlOptimizada,
+      user: {
+        id: user.id,
+        foto: user.foto,
+      },
+    });
+  } catch (error) {
+    console.error('Error al subir la imagen de perfil:', error);
+    if (req.file) {
+      try {
+        await fs.unlink(req.file.path); //Intenta eliminar el archivo en caso de error
+      } catch (error) {
+        console.error('Error al eliminar la imagen de perfil:', error);
+      }
+    }
+    res.status(500).json({ error: 'Error al subir la imagen de perfil' });
+  }
+}
 export {
   sanitizeUsuarioInput,
   findAll,
   findPrestatariosByTipoServicioAndZona,
   findOne,
+  findOneOnlyInfo,
   add,
   update,
   loginUsuario,
@@ -518,4 +581,5 @@ export {
   cambiarPassword,
   putOauth,
   getOauth,
+  uploadProfileImage,
 };

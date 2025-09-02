@@ -1,12 +1,17 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { usuariosApi } from '../../services/usuariosApi';
+type Usuario = {
+  id: number;
+  mail: string;
+  nombreFantasia: string;
+};
 
 function Logincard() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
-
+  const [user, setUser] = useState<Usuario | null>(null);
   const [imag, setimag] = useState(
     'fa-solid fa-eye-slash absolute top-4 left-80 text-gray-500 text-4 cursor-pointer'
   );
@@ -33,9 +38,13 @@ function Logincard() {
 
   const envioFormulario = async () => {
     try {
-      await usuariosApi.login(form);
-      console.log('Login exitoso');
-      navigate('/dashboard');
+      const response = await usuariosApi.login(form);
+      setUser(response.data.data);
+      if (user?.nombreFantasia === '') {
+        navigate('/');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (error) {
       setOpen(true);
       const err = error as { response?: { status?: number } };
