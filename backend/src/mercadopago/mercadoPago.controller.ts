@@ -1,18 +1,31 @@
 import { MercadoPagoConfig, Preference } from 'mercadopago';
 import express, { Request, Response } from 'express';
+import { getOauth } from './../usuario/usuario.controler.js';
 
-const mercadoPago = express.Router();
+interface AuthRequest extends Request {
+  user?: {
+    id: string;
+    rol: string;
+  };
+}
 
-// Inicializamos cliente de Mercado Pago con token de sandbox
-const client = new MercadoPagoConfig({
-  accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN!, // asegurate que sea de prueba si estás en sandbox
-});
-
-const preference = new Preference(client);
-
-mercadoPago.post('/', async (req: Request, res: Response) => {
+async function createPayment(req: AuthRequest, res: Response) {
+  console.log('🔹 Creando pago:', req.body);
   try {
-    const { id, title, quantity, unit_price, secondaryEmail, turno } = req.body;
+    const {
+      title,
+      description,
+      currency,
+      quantity,
+      unit_price,
+      turno,
+      prestatario_id,
+    } = req.body;
+    const id = req.user?.id; // cookie
+
+    if (!id) {
+      return res.status(400).json({ message: 'Usuario no autenticado' });
+    }
 
     // Validación básica
     if (!title || !unit_price || !quantity) {
@@ -21,160 +34,135 @@ mercadoPago.post('/', async (req: Request, res: Response) => {
       });
     }
 
-    console.log('🔹 Creando preferencia con data:', req.body);
-    // TODO: Reemplaza 'ID_DEL_VENDEDOR_SECUNDARIO' por el user_id real del vendedor secundario (mail de prueba)
-    const result = await preference.create({
-      body: {
-        items: [
-          {
-            id: id || 'product-001',
-            title: title,
-            quantity: Number(quantity),
-            unit_price: Number(unit_price),
-            currency_id: 'ARS',
-          },
-        ],
-        back_urls: {
-          success: 'https://reformix.site/historial/success',
-          failure: 'https://reformix.site/historial/failure',
-          pending: 'https://reformix.site/historial/pending',
-        },
-        auto_return: 'approved',
-        notification_url:
-          'https://backend-patient-morning-1303.fly.dev/api/mercadopago/cambio',
-        external_reference: turno || undefined,
-        marketplace: 'Reformix',
-      } as any,
+    let prestatario;
+    if (prestatario_id === undefined) {
+      return res.status(400).json({
+        error: 'Se requiere el id del prestatario para el split payment',
+      });
+    } else {
+      prestatario = await getOauth(Number(prestatario_id));
+      if (!prestatario) {
+        return res.status(404).json({
+          error: 'Prestatario no encontrado',
+        });
+      }
+    }
+
+    // VERIFICAR QUE TENGA TOKEN OAUTH
+    if (!prestatario.mpAccessToken) {
+      return res.status(400).json({
+        error: 'El prestatario no tiene token OAuth configurado',
+      });
+    }
+
+    const cliente = await getOauth(Number(id));
+
+    console.log('🔹 Creando preferencia con split payment:', req.body);
+
+    // Calculamos los montos del split
+    const totalAmount = Number(unit_price) * Number(quantity);
+    const marketplaceFee = Math.round(totalAmount * 0.05); // 5% para ti (marketplace)
+    const vendorAmount = totalAmount - marketplaceFee; // 95% para el vendedor
+
+    console.log('🔹 💰 Split calculado:', {
+      total: totalAmount,
+      marketplaceFee: marketplaceFee,
+      vendorAmount: vendorAmount,
     });
 
-    console.log('✅ Preferencia creada:', result);
+    //  CREAR CLIENTE CON TOKEN DEL PRESTATARIO (VENDEDOR)
+    const mpAccessToken = prestatario.mpAccessToken;
+    if (!mpAccessToken) {
+      console.log(
+        '❌ MP_ACCESS_TOKEN no está definido en las variables de entorno: ',
+        process.env
+      );
+      return res.status(500).json({
+        error: 'MP_ACCESS_TOKEN no está definido en las variables de entorno',
+      });
+    }
+    const vendorClient = new MercadoPagoConfig({
+      accessToken: mpAccessToken,
+    });
 
+    const vendorPreference = new Preference(vendorClient);
+
+    // Configuración de la preferencia con split payment
+    const preferenceData = {
+      items: [
+        {
+          id: turno || 'product-001',
+          title: title,
+          quantity: Number(quantity),
+          unit_price: Number(unit_price),
+          currency_id: 'ARS',
+        },
+      ],
+      back_urls: {
+        success: 'https://reformix.site/historial/success',
+        failure: 'https://reformix.site/historial/failure',
+        pending: 'https://reformix.site/historial/pending',
+      },
+      auto_return: 'approved',
+      notification_url:
+        'https://backend-patient-morning-1303.fly.dev/api/mercadopago/cambio',
+      external_reference: turno || undefined,
+      marketplace: `MP-MKT-${process.env.MERCADOPAGO_COLLECTOR_ID}`,
+
+      // ⭐ CONFIGURACIÓN CORRECTA DEL SPLIT
+      marketplace_fee: marketplaceFee, // Tu 5% de comisión
+
+      // ⭐ INFORMACIÓN DEL COMPRADOR
+      payer: {
+        name: cliente.nombre,
+        email: cliente.mail,
+        identification: {
+          type: 'DNI', // o el tipo que uses
+          number: cliente.numeroDoc?.toString(),
+        },
+      },
+
+      metadata: {
+        cliente_id: id,
+        prestatario_id: prestatario_id,
+        turno_id: turno,
+        split_fee: marketplaceFee,
+        client_email: cliente.mail,
+        vendor_email: prestatario.mail,
+      },
+    };
+
+    // ⭐ CREAR CON EL CLIENTE DEL VENDEDOR
+    const result = await vendorPreference.create({
+      body: preferenceData,
+    });
+
+    console.log('🔹 ✅ Preferencia creada con split payment:', {
+      id: result.id,
+      marketplace_fee: marketplaceFee,
+      vendor_amount: vendorAmount,
+    });
+    console.log('🔹 Respuesta de MercadoPago:', result);
     res.json({
       preferenceId: result.id,
-      init_point: result.init_point, // URL para redirigir al checkout
-      sandbox_init_point: result.sandbox_init_point, // URL de sandbox (si corresponde)
+      init_point: result.init_point,
+      sandbox_init_point: result.sandbox_init_point,
+      split_info: {
+        total_amount: totalAmount,
+        marketplace_fee: marketplaceFee,
+        vendor_amount: vendorAmount,
+        marketplace_percentage: 5,
+        vendor_percentage: 95,
+      },
     });
   } catch (error: any) {
-    console.error('❌ Error al crear preferencia:', error);
+    console.log('🔹 entro al error', error);
+    console.error('❌ Error al crear preferencia con split:', error);
     res.status(500).json({
-      error: 'Error al crear preferencia',
+      error: 'Error al crear preferencia con split payment',
       details: error.message || error,
     });
   }
-});
+}
 
-export default mercadoPago;
-
-// ------------------------------------------------------------------------------------------------------
-const MP_PAYMENTS_URL = 'https://api.mercadopago.com/v1/payments'; // URL para crear pagos en MercadoPago
-// 4) Crear pago con split (usando tokens guardados)
-// router.post('/create-payment', async (req: Request, res: Response) => {
-//   try {
-//     const authHeader = req.headers.authorization; // Obtiene el header de autorización
-//     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-//       // Verifica si el token existe y es Bearer
-//       return res.status(401).json({ error: 'Token de autorización requerido' }); // Retorna error si no hay token
-//     }
-
-//     const token = authHeader.substring(7); // Extrae el token JWT
-//     const decoded = jwt.verify(
-//       token,
-//       process.env.JWT_SECRET || 'dev_secret'
-//     ) as any; // Verifica y decodifica el token JWT
-//     const vendedorId = decoded.id; // Obtiene el ID del vendedor del token
-
-//     const {
-//       transaction_amount,
-//       token: paymentToken,
-//       payment_method_id = 'visa',
-//       payer_email,
-//       description = 'Pago de servicio',
-//       installments = 1,
-//       commission_percentage = 0.05, // 5% de comisión por defecto
-//     } = req.body; // Extrae los datos del pago del body
-
-//     if (!transaction_amount || !paymentToken || !payer_email) {
-//       return res.status(400).json({
-//         error:
-//           'Faltan campos requeridos: transaction_amount, token, payer_email',
-//       }); // Retorna error si faltan campos requeridos
-//     }
-
-//     // Obtener tokens del vendedor
-//     const vendedor = await em.findOne(Usuario, { id: vendedorId }); // Busca el vendedor en la base de datos
-//     if (!vendedor || !vendedor.mpAccessToken) {
-//       return res
-//         .status(404)
-//         .json({ error: 'Usuario sin configuración de MercadoPago' }); // Retorna error si no tiene configuración de MercadoPago
-//     }
-
-//     // Verificar si el token ha expirado
-//     if (vendedor.mpTokenExpiration && vendedor.mpTokenExpiration < new Date()) {
-//       return res
-//         .status(401)
-//         .json({ error: 'Token de MercadoPago expirado. Renovar conexión.' }); // Retorna error si el token expiró
-//     }
-
-//     // Calcular comisión
-//     const applicationFee =
-//       Math.round(transaction_amount * commission_percentage * 100) / 100; // Calcula la comisión de la aplicación
-
-//     const payload = {
-//       transaction_amount: parseFloat(transaction_amount), // Monto total
-//       token: paymentToken, // Token de pago
-//       description, // Descripción del pago
-//       payment_method_id, // Método de pago
-//       installments: parseInt(installments), // Cantidad de cuotas
-//       payer: {
-//         email: payer_email, // Email del pagador
-//       },
-//       application_fee: applicationFee, // Comisión de la aplicación
-//       metadata: {
-//         vendedor_id: vendedorId, // ID del vendedor
-//         commission_percentage: commission_percentage, // Porcentaje de comisión
-//       },
-//     }; // Prepara el payload para MercadoPago
-
-//     const response = await axios.post(MP_PAYMENTS_URL, payload, {
-//       headers: {
-//         Authorization: `Bearer ${vendedor.mpAccessToken}`, // Token de acceso del vendedor
-//         'Content-Type': 'application/json', // Tipo de contenido
-//       },
-//     }); // Crea el pago en MercadoPago
-
-//     console.log('=== PAGO CREADO CON SPLIT ===');
-//     console.log('Monto total:', transaction_amount);
-//     console.log('Comisión aplicación:', applicationFee);
-//     console.log('Monto para vendedor:', transaction_amount - applicationFee);
-//     console.log('Respuesta MP:', response.data); // Muestra información del pago en consola
-
-//     // Aquí podrías guardar el pago en tu base de datos
-//     // const nuevoPago = new Pago({...});
-//     // await em.persistAndFlush(nuevoPago);
-
-//     res.json({
-//       success: true,
-//       payment: response.data,
-//       commission_info: {
-//         total_amount: transaction_amount,
-//         application_fee: applicationFee,
-//         vendor_amount: transaction_amount - applicationFee,
-//       },
-//     }); // Retorna la información del pago y la comisión
-//   } catch (err) {
-//     if (typeof err === 'object' && err !== null && 'response' in err) {
-//       const error = err as { response?: { data?: any }; message?: string };
-//       console.error(
-//         'Error creando pago:',
-//         error.response?.data || error.message
-//       ); // Muestra el error en consola
-//       res.status(500).json({
-//         error: 'Error creando pago',
-//         details: error.response?.data,
-//       }); // Retorna error si falla el proceso
-//     } else {
-//       console.error('Error creando pago:', (err as Error).message); // Muestra el error en consola
-//       res.status(500).json({ error: 'Error interno del servidor' }); // Retorna error genérico
-//     }
-//   }
-// });
+export default createPayment;

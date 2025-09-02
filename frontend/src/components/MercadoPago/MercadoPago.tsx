@@ -2,13 +2,15 @@ import { useState } from 'react';
 import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
 import { mercadoPagoApi } from '../../services/mercadoPagoApi';
 // Inicializa Mercado Pago con tu public key
-initMercadoPago('APP_USR-88fb13a3-185f-4cb7-a979-07c48e7fe2e4');
 
 type Props = {
   fechaHora: Date;
   montoFinal: number;
   servicio: Servicio;
   turno: number;
+  prestatarioEmail: string;
+  prestatarioId: number;
+  mpPublicKey: string;
 };
 type Servicio = {
   id: number;
@@ -31,6 +33,7 @@ type Usuario = {
 };
 
 const MercadoPago = (props: Props) => {
+  initMercadoPago(props.mpPublicKey);
   const [preferenceId, setPreferenceId] = useState('');
 
   const handlePago = async () => {
@@ -42,6 +45,8 @@ const MercadoPago = (props: Props) => {
         currency: 'ARS',
         unit_price: props.montoFinal,
         turno: props.turno,
+        prestatario_email: props.prestatarioEmail,
+        prestatario_id: props.prestatarioId,
       });
       setPreferenceId(response.data.preferenceId);
     } catch (error) {
