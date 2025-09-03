@@ -15,15 +15,7 @@
   "packageManager": "pnpm@10.6.5",
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
-<<<<<<< HEAD
-    "@types/cookie-parser": "^1.4.9",
-    "@types/express": "4.17.21",
-    "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.0.0",
-    "@types/node": "22.15.21",
-    "@types/node-cron": "^3.0.11",
-    "@types/nodemailer": "^7.0.1",
-=======
     "@types/body-parser": "^1.19.6",
     "@types/connect": "^3.4.38",
     "@types/cookie-parser": "^1.4.9",
@@ -38,7 +30,6 @@
     "@types/range-parser": "^1.2.7",
     "@types/send": "^0.17.5",
     "@types/serve-static": "^1.15.8",
->>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
     "nodemon": "^3.1.10",
     "tsc-watch": "6.0.4",
     "typescript": "5.1.3"
