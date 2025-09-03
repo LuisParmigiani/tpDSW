@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
+import { Wallet } from '@mercadopago/sdk-react';
 import { mercadoPagoApi } from '../../services/mercadoPagoApi';
 
 type Props = {
@@ -7,9 +7,6 @@ type Props = {
   montoFinal: number;
   servicio: Servicio;
   turno: number;
-  prestatarioEmail: string;
-  prestatarioId: number;
-  mpPublicKey: string;
 };
 
 type Servicio = {
@@ -33,7 +30,6 @@ type Usuario = {
 };
 
 const MercadoPago = (props: Props) => {
-  initMercadoPago(props.mpPublicKey);
   const [preferenceId, setPreferenceId] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -50,7 +46,6 @@ const MercadoPago = (props: Props) => {
         currency: 'ARS',
         unit_price: props.montoFinal,
         turno: props.turno,
-        prestatario_id: props.prestatarioId, // ✅ Corregido: usar prestatario_id
       });
 
       const response = await mercadoPagoApi.create({
@@ -60,7 +55,6 @@ const MercadoPago = (props: Props) => {
         currency: 'ARS',
         unit_price: props.montoFinal,
         turno: props.turno,
-        prestatario_id: props.prestatarioId, // ✅ Corregido: quitar prestatario_email
       });
 
       console.log('🔹 Respuesta del backend:', response.data);

@@ -1,8 +1,6 @@
-import { useState } from 'react';
-
 // Definición de tipos
 
-interface ProfilePictureProps {
+export interface ProfilePictureProps {
   src?: string;
   onImageChange: (file: File) => void;
   uploading: boolean;

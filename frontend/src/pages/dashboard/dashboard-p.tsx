@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import DashNav from '../../components/DashNav/DashNav';
 import type { MenuItem } from '../../components/DashNav/DashNav';
 import PerfilSection from '../../components/Dashboard/PerfilSection';

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { usuariosApi } from '../../services/usuariosApi';
 import { z } from 'zod';
-import ProfilePicture from '../ProfilePic/ProfilePicture';
 
 //Algunas validaciones no son necesarias pero las dejo para poder crear el objeto
 
