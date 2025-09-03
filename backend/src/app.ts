@@ -44,20 +44,42 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Definir modo local según existencia de .env
 const local = isLocalEnv;
-console.log('Modo local (archivo .env encontrado):', local);
+console.log('🔧 Configuración del entorno:');
+console.log('   Archivo .env encontrado:', isLocalEnv);
+console.log('   Modo local:', local);
+console.log('   process.env.LOCAL:', process.env.LOCAL);
+console.log('   process.env.NODE_ENV:', process.env.NODE_ENV);
 // cors lo que hace es dar el permiso al un puerto para hacer las peticiones al back
 // CORS dinámico (permite lista separada por comas en FRONTEND_ORIGIN)
 const rawOrigins = local
   ? 'http://localhost:5173'
   : process.env.FRONTEND_ORIGIN || 'https://reformix.site';
 const allowedOrigins = rawOrigins.split(',').map((o) => o.trim());
+
+console.log('🌐 Configuración CORS:', {
+  local,
+  rawOrigins,
+  allowedOrigins,
+});
+
 app.use(
   cors({
     origin: (origin, cb) => {
-      if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
-      return cb(new Error('Origen no permitido: ' + origin));
+      // Permitir requests sin origin (como desde Postman o aplicaciones móviles)
+      if (!origin) return cb(null, true);
+
+      // Verificar si el origin está en la lista de permitidos
+      if (allowedOrigins.includes(origin)) {
+        return cb(null, true);
+      }
+
+      console.error('❌ CORS: Origen no permitido:', origin);
+      console.error('   Orígenes permitidos:', allowedOrigins);
+      return cb(new Error('Origen no permitido por CORS: ' + origin));
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   })
 );
 
