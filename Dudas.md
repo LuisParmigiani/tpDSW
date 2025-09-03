@@ -1,3 +1,5 @@
+La sobrecarga de useStates y useEffects en un solo archivo esta mal?
+Si lo esta, uso objetos para mitigarlo?
 
 ### Comandos útiles de Fly.io
 
