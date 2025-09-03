@@ -45,7 +45,6 @@ type Usuario = {
   id: number;
   mail: string;
   nombreFantasia: string;
-  mpPublicKey: string;
 };
 
 type Props = {
@@ -277,7 +276,6 @@ function TurnHistory({ estado }: Props) {
             <ul className="flex flex-row flex-wrap items-center justify-center w-full m-auto ">
               {turns.map((turn) => (
                 <TurnCard
-                  key={turn.id}
                   navigate={navigate}
                   turn={turn}
                   openModal={openModal}
