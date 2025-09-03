@@ -255,60 +255,67 @@ function RegisCard() {
               <option value="prestatario">Prestatario</option>
             </select>
             <div className="w-full flex flex-col items-center">
-              {camposComunes}
-              {tipoUsuario === 'prestatario' && camposPrestatario}
-              <button
-                onClick={envioFormulario}
-                type="submit"
-                className={
-                  tipoUsuario === 'prestatario' &&
-                  ((form.nombreFantasia === '' && form.apellido === '') ||
-                    form.nombre === '' ||
-                    form.mail === '' ||
-                    form.descripcion === '' ||
-                    form.contrasena === '' ||
-                    form.tipoDoc === '' ||
-                    form.numeroDoc === '' ||
-                    form.telefono === '' ||
-                    form.direccion === '')
-                    ? 'w-full bg-gray-300 text-white px-5 py-2.5 rounded-b-2xl cursor-pointer focus:outline-none mb-5 mt-3'
-                    : tipoUsuario === 'usuario' &&
-                      (form.nombre === '' ||
-                        form.apellido === '' ||
+              <form
+                className="w-full flex flex-col items-center"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  envioFormulario();
+                }}
+              >
+                {camposComunes}
+                {tipoUsuario === 'prestatario' && camposPrestatario}
+                <button
+                  type="submit"
+                  className={
+                    tipoUsuario === 'prestatario' &&
+                    ((form.nombreFantasia === '' && form.apellido === '') ||
+                      form.nombre === '' ||
+                      form.mail === '' ||
+                      form.descripcion === '' ||
+                      form.contrasena === '' ||
+                      form.tipoDoc === '' ||
+                      form.numeroDoc === '' ||
+                      form.telefono === '' ||
+                      form.direccion === '')
+                      ? 'w-full bg-gray-300 text-white px-5 py-2.5 rounded-b-2xl cursor-pointer focus:outline-none mb-5 mt-3'
+                      : tipoUsuario === 'usuario' &&
+                        (form.nombre === '' ||
+                          form.apellido === '' ||
+                          form.mail === '' ||
+                          form.contrasena === '' ||
+                          form.tipoDoc === '' ||
+                          form.numeroDoc === '' ||
+                          form.telefono === '' ||
+                          form.direccion === '')
+                      ? 'w-full bg-gray-300 text-black-500 px-5 py-2.5 rounded-b-2xl cursor-pointer focus:outline-none mb-5 mt-3'
+                      : 'w-full bg-naranja-1 text-white px-5 py-2.5 rounded-b-2xl cursor-pointer hover:text-black focus:outline-none mb-5 mt-3 hover:shadow-lg'
+                  }
+                  disabled={
+                    (tipoUsuario === 'prestatario' &&
+                      (form.apellido === '' ||
+                        form.nombre === '' ||
+                        form.mail === '' ||
+                        form.descripcion === '' ||
+                        form.nombreFantasia === '' ||
+                        form.contrasena === '' ||
+                        form.tipoDoc === '' ||
+                        form.numeroDoc === '' ||
+                        form.telefono === '' ||
+                        form.direccion === '')) ||
+                    (tipoUsuario === 'usuario' &&
+                      (form.apellido === '' ||
+                        form.nombre === '' ||
                         form.mail === '' ||
                         form.contrasena === '' ||
                         form.tipoDoc === '' ||
                         form.numeroDoc === '' ||
                         form.telefono === '' ||
-                        form.direccion === '')
-                    ? 'w-full bg-gray-300 text-black-500 px-5 py-2.5 rounded-b-2xl cursor-pointer focus:outline-none mb-5 mt-3'
-                    : 'w-full bg-naranja-1 text-white px-5 py-2.5 rounded-b-2xl cursor-pointer hover:text-black focus:outline-none mb-5 mt-3 hover:shadow-lg'
-                }
-                disabled={
-                  (tipoUsuario === 'prestatario' &&
-                    (form.apellido === '' ||
-                      form.nombre === '' ||
-                      form.mail === '' ||
-                      form.descripcion === '' ||
-                      form.nombreFantasia === '' ||
-                      form.contrasena === '' ||
-                      form.tipoDoc === '' ||
-                      form.numeroDoc === '' ||
-                      form.telefono === '' ||
-                      form.direccion === '')) ||
-                  (tipoUsuario === 'usuario' &&
-                    (form.apellido === '' ||
-                      form.nombre === '' ||
-                      form.mail === '' ||
-                      form.contrasena === '' ||
-                      form.tipoDoc === '' ||
-                      form.numeroDoc === '' ||
-                      form.telefono === '' ||
-                      form.direccion === ''))
-                }
-              >
-                Crear cuenta
-              </button>
+                        form.direccion === ''))
+                  }
+                >
+                  Crear cuenta
+                </button>
+              </form>
             </div>
 
             <p className="text-black font-inter mb-0 text-center">
