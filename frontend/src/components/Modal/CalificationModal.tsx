@@ -34,7 +34,10 @@ type Props = {
   comentario: string;
   setComentario: (comment: string) => void;
   SaveRating: () => void;
+<<<<<<< HEAD
   flagged: boolean;
+=======
+>>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
 };
 
 function CalificationModal({
@@ -45,12 +48,16 @@ function CalificationModal({
   comentario,
   setComentario,
   SaveRating,
+<<<<<<< HEAD
   flagged,
 }: Props) {
   if (flagged) {
     comentario =
       'Tu comentario ha sido marcado como inapropiado y no se ha guardado.';
   }
+=======
+}: Props) {
+>>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-5 backdrop-blur-xs  bg-opacity-40">
       <div className="bg-white md:rounded-lg md:shadow-2xl md:p-10 text-black lg:w-6/12 md:w-9/12  lg:min-h-6/12 md:h-auto w-full px-10 h-full p-15">
@@ -92,10 +99,14 @@ function CalificationModal({
               Comentario:
             </label>
             <textarea
+<<<<<<< HEAD
               className={
                 'border border-naranja-1 rounded-md mx-2 p-2 w-full' +
                 (flagged ? ' border-red-500 text-red-800' : '')
               }
+=======
+              className="border border-naranja-1 rounded-md mx-2 p-2 w-full"
+>>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
               id="comentario"
               rows={4}
               value={comentario}

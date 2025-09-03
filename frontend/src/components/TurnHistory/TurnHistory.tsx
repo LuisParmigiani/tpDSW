@@ -72,7 +72,10 @@ function TurnHistory({ estado }: Props) {
   const cantItemsPerPage = '9'; // Cantidad de turnos por pagina
   const [currentPage, setCurrentPage] = useState(1); // Página actual
   const [totalPages, setTotalPages] = useState(1); // Total de páginas
+<<<<<<< HEAD
   const [flagged, setFlagged] = useState(false); //Bandera para saber si el comentario es inapropiado
+=======
+>>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
 
   // buscar todos los turnos del usuario con la informcaion del mismo.
   useEffect(() => {
@@ -135,7 +138,10 @@ function TurnHistory({ estado }: Props) {
       try {
         const res = await turnosApi.update(data.id.toString(), dataForUpdate);
         console.log('Respuesta de la API:', res);
+<<<<<<< HEAD
         setFlagged(res.data.flagged || false); // Actualizar el estado de flagged si viene en la respuesta
+=======
+>>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
 
         // Actualizar el turno en la lista local en lugar de recargar toda la página
         if (turns) {
@@ -153,7 +159,10 @@ function TurnHistory({ estado }: Props) {
         closeModal();
       } catch (error) {
         console.error('Error al guardar la calificación:', error);
+<<<<<<< HEAD
         setFlagged(true); // Si hay un error, asumir que el comentario fue inapropiado
+=======
+>>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
       }
     }
   };
@@ -225,7 +234,10 @@ function TurnHistory({ estado }: Props) {
           comentario={comentario}
           setComentario={setComentario}
           SaveRating={SaveRating}
+<<<<<<< HEAD
           flagged={flagged}
+=======
+>>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
         />
       )}
 
@@ -280,7 +292,10 @@ function TurnHistory({ estado }: Props) {
             <ul className="flex flex-row flex-wrap items-center justify-center w-full m-auto ">
               {turns.map((turn) => (
                 <TurnCard
+<<<<<<< HEAD
                   key={turn.id}
+=======
+>>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
                   navigate={navigate}
                   turn={turn}
                   openModal={openModal}

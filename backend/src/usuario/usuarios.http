@@ -2,15 +2,17 @@
 GET http://localhost:3000/api/usuario
 
 ### Obtener un usuario específico
+<<<<<<< HEAD
 GET http://localhost:3000/api/usuario/onlyInfo/77
 
+=======
+>>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
 GET http://localhost:3000/api/usuario/comments/47
 
 ### Obtengo los prestatarios por tipo de servicio y zona
 GET http://localhost:3000/api/usuario/prestatarios/Plomeria/ /Todas/Calificacion?maxItems=6&page=1
 
 ### Cargamos un usuario
-
 POST http://localhost:3000/api/usuario
 Content-Type: application/json
 
@@ -53,7 +55,11 @@ Content-Type: application/json
 DELETE http://localhost:3000/api/usuario/2
 
 
+<<<<<<< HEAD
 GET http://localhost:3000/api/usuario/comments/1
 
 ###Traer todos
 GET http://localhost:3000/api/usuario
+=======
+GET http://localhost:3000/api/usuario/comments/1
+>>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032

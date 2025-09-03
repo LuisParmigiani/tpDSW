@@ -517,7 +517,6 @@ async function getTurnosByPrestadorId(req: Request, res: Response) {
     servicio: { usuario: { id: prestadorId } },
     ...calificacionFilter,
   };
-
   // Agregar filtro de búsqueda por nombre y apellido del cliente si se proporciona
   if (searchQuery && searchQuery.trim() !== '') {
     const searchTerm = searchQuery.trim();
@@ -535,7 +534,6 @@ async function getTurnosByPrestadorId(req: Request, res: Response) {
     const totalCount = await em.count(Turno, where);
 
     let turnos;
-
     if (isMultipleStatesFilter) {
       // Para múltiples filtros, obtenemos TODOS los turnos primero
       const allTurnos = await em.find(Turno, where, {
@@ -547,7 +545,6 @@ async function getTurnosByPrestadorId(req: Request, res: Response) {
         ],
         // Sin limit ni offset - obtenemos todos
       });
-
       // Aplicar ordenamiento personalizado a TODOS los turnos
       allTurnos.sort((a, b) => {
         // Definir el orden de prioridad para los estados
@@ -589,7 +586,6 @@ async function getTurnosByPrestadorId(req: Request, res: Response) {
             return (b.id || 0) - (a.id || 0);
         }
       });
-
       // Aplicar paginación DESPUÉS del ordenamiento
       const startIndex = (currentPage - 1) * cantItemsPerPage;
       const endIndex = startIndex + cantItemsPerPage;

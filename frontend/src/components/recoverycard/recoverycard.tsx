@@ -121,7 +121,16 @@ function Recovery() {
             <p className="break-words whitespace-pre-line">{message}</p>
             {message ===
               'Ingrese el código de recuperación que se envió a su email' && (
+<<<<<<< HEAD
               <>
+=======
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  validarCodigo();
+                }}
+              >
+>>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
                 <input
                   className="w-full pt-3 pb-3 pr-5 pl-12 text-base border-none rounded-4xl bg-gray-100 shadow-inner outline-none mt-4 mb-4 text-black font-inter"
                   placeholder="Código de recuperación"
@@ -146,7 +155,10 @@ function Recovery() {
                   )}
                 </div>
                 <button
+<<<<<<< HEAD
                   onClick={validarCodigo}
+=======
+>>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
                   type="submit"
                   className={
                     codigo === ''
@@ -174,7 +186,11 @@ function Recovery() {
                 >
                   Reenviar código
                 </button>
+<<<<<<< HEAD
               </>
+=======
+              </form>
+>>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
             )}
             {(message === 'Ingresa un formato de email válido' ||
               message ===
@@ -203,7 +219,17 @@ function Recovery() {
             <p className="text-black fonttext-black font-inter text-1xl mb-4">
               Ingresa tu email
             </p>
+<<<<<<< HEAD
             <form className="w-full flex flex-col items-center">
+=======
+            <form
+              className="w-full flex flex-col items-center"
+              onSubmit={(e) => {
+                e.preventDefault();
+                envioFormulario();
+              }}
+            >
+>>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
               <div className="relative inline-block w-full max-w-xs">
                 <input
                   type="email"
@@ -215,6 +241,7 @@ function Recovery() {
                 />
                 <i className="fa-solid fa-envelope absolute top-6 left-4 -translate-y-1/2 text-gray-500 text-1xl pointer-events-none"></i>
               </div>
+<<<<<<< HEAD
             </form>
             <button
               className={
@@ -228,6 +255,20 @@ function Recovery() {
             >
               Recuperar contraseña
             </button>
+=======
+              <button
+                className={
+                  form.mail === '' || timerActivo
+                    ? 'w-full bg-gray-300 text-black-500 px-5 py-2.5 rounded-b-2xl cursor-pointer focus:outline-none mb-5 mt-3'
+                    : 'w-full bg-naranja-1 text-white px-5 py-2.5 rounded-b-2xl cursor-pointer hover:text-black focus:outline-none mb-5 mt-3 hover:shadow-lg'
+                }
+                type="submit"
+                disabled={form.mail === '' || timerActivo}
+              >
+                Recuperar contraseña
+              </button>
+            </form>
+>>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
             <div style={{ minHeight: 24 }}>
               {timerActivo && (
                 <p className="text-sm text-gray-500 mb-2">

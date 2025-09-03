@@ -1,7 +1,9 @@
 import { api } from './api';
 import type { EntityData } from './api';
 export const mercadoPagoApi = {
-  create: (data: EntityData) => api.post('/mercadopago', data),
+  // Ajuste: llamar al endpoint montado en /api/mercadopago
+  create: (data: EntityData) =>
+    api.post('/mercadopago/crear-pago', data, { withCredentials: true }),
 
   // OAuth endpoints
   connect: (userId: number) =>

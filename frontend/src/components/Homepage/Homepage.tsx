@@ -37,15 +37,6 @@ function Homepage() {
       <div className="flex flex-col w-full">
         <div className="absolute inset-0 w-full z-20">
           <Navbar />
-          <button
-            className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
-            onClick={() =>
-              (window.location.href =
-                'https://backend-patient-morning-1303.fly.dev/api/mercadopago/oauth/connect?userId=2')
-            }
-          >
-            Conectar Mercado Pago
-          </button>
         </div>
         {/* Botón de pago Mercado Pago integrado */}
         <div className="flex justify-center mt-8"></div>

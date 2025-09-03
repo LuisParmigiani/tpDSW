@@ -15,6 +15,7 @@ export const turnosApi = {
     const filterValue = selectedValueShow || 'all';
     const orderValue = selectedValueOrder || '';
 
+    
     let url = `/turno/byUser/${cantItemsPerPage}/${currentPage}/${filterValue}`;
     if (orderValue) {
       url += `/${orderValue}`;
@@ -48,11 +49,13 @@ export const turnosApi = {
       parts.push('none'); // placeholder que el backend reconocerá como vacío
     }
 
+    
     // Agregar searchQuery si hay
     if (searchQuery && searchQuery.trim() !== '') {
       parts.push(encodeURIComponent(searchQuery.trim()));
     }
 
+    
     const url = '/' + parts.join('/');
     console.log('URL construida:', url);
     return api.get(url);

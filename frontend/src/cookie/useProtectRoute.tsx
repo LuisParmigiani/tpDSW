@@ -20,6 +20,7 @@ export const useProtectRoute = (rolesPermitidos?: Rol[]) => {
 
     // Si se especificaron roles y el usuario no los tiene
     if (rolesPermitidos && !rolesPermitidos.includes(usuario.rol)) {
+<<<<<<< HEAD
       //si los roles permitidos incluye "prestador" y es cliente. Lo redirijo a la homepage
       if (rolesPermitidos.includes('prestador') && usuario.rol === 'cliente') {
         navigate('/'); // Redirigir al inicio
@@ -31,6 +32,10 @@ export const useProtectRoute = (rolesPermitidos?: Rol[]) => {
         //si el permitido es cliente y es prestador, lo redirijo a la dashboard
         navigate('/dashboard');
       }
+=======
+      navigate('/'); // Redirigir al inicio
+      return;
+>>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
     }
   }, [usuario, loading, rolesPermitidos, navigate]);
 

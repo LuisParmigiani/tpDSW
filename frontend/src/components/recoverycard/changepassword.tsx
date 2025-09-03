@@ -93,7 +93,17 @@ function ChangePassword() {
             <p className="text-black font-inter text-1xl mb-4">
               Ingrese su nueva contraseña
             </p>
+<<<<<<< HEAD
             <div className="w-full flex flex-col items-center">
+=======
+            <form
+              className="w-full flex flex-col items-center"
+              onSubmit={(e) => {
+                e.preventDefault();
+                cambiarpassword();
+              }}
+            >
+>>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
               <div className="relative inline-block w-full max-w-xs mb-4">
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -134,6 +144,7 @@ function ChangePassword() {
                   }
                 ></i>
               </div>
+<<<<<<< HEAD
             </div>
             <button
               className={
@@ -147,6 +158,20 @@ function ChangePassword() {
             >
               Confirmar cambio
             </button>
+=======
+              <button
+                className={
+                  password === '' || confirmPassword === ''
+                    ? 'w-full bg-gray-300 text-black-500 px-5 py-2.5 rounded-b-2xl cursor-pointer focus:outline-none mb-5 mt-3'
+                    : 'w-full bg-naranja-1 text-white px-5 py-2.5 rounded-b-2xl cursor-pointer hover:text-black focus:outline-none mb-5 mt-3 hover:shadow-lg'
+                }
+                disabled={password === '' || confirmPassword === ''}
+                type="submit"
+              >
+                Confirmar cambio
+              </button>
+            </form>
+>>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
           </div>
           <div className="hidden md:block w-full md:w-1/2 h-64 md:h-auto">
             <img

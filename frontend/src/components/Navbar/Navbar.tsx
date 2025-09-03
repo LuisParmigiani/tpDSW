@@ -209,22 +209,38 @@ function Navbar() {
                   </button>
                 </li>
                 {showOptions}
+<<<<<<< HEAD
                 <li className="flex justify-center items-center mt-4">
+=======
+                <li className="flex flex-row justify-center items-center mt-4">
+>>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
                   {usuario ? (
                     <Link
                       to={`/usuario/${usuario.nombre}`}
                       onClick={() => setShowNav(false)}
+<<<<<<< HEAD
                       className="bg-orange-500 text-white font-medium px-5 py-2  rounded-xl transition-all duration-300 hover:bg-gray-100 hover:border-orange-500 hover:border-1 hover:shadow-2xl hover:text-naranja-1 w-10/12 text-center"
                     >
                       <p>{usuario?.nombre}</p>
                       <img
+=======
+                      className="bg-orange-500 justify-center items-center text-white font-medium flex flex-row px-5 py-2 rounded-xl transition-all duration-300 hover:bg-gray-100 hover:border-orange-500 hover:border-1 hover:shadow-2xl hover:text-naranja-1 w-10/12 text-center"
+                    >
+                      <p className="mx-auto">{usuario?.nombre}</p>
+                      <img
+                        className="h-10 w-10 rounded-full ml-2"
+>>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
                         src={'/images/fotoUserId.png'}
                         alt="Foto de perfil"
                       />
                     </Link>
                   ) : (
                     <Link
+<<<<<<< HEAD
                       to="#"
+=======
+                      to="/login"
+>>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
                       onClick={() => setShowNav(false)}
                       className="bg-orange-500 text-white font-medium px-5 py-2  rounded-xl transition-all duration-300 hover:bg-gray-100 hover:border-orange-500 hover:border-1 hover:shadow-2xl hover:text-naranja-1 w-10/12 text-center"
                     >

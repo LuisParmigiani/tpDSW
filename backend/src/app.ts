@@ -16,17 +16,16 @@ import { serviceTypeRouter } from './tipoServicio/tipoServ.route.js';
 import { horarioRouter } from './horario/horario.routes.js';
 import { CronManager } from './shared/cron/cronManager.js';
 import { PagoRouter } from './pago/pago.route.js';
-import mercadoPago from './mercadopago/mercadoPago.controller.js';
 import { webhookRouter } from './mercadopago/mercadoPago.route.js';
 import cookieParser from 'cookie-parser';
 import authRoutes from './shared/middleware/auth.routes.js';
-import e from 'express';
 
 // Tuve que recrear __dirname xq no estaba definido xq estamos usando ES Modules y no COmmonJS
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Cargar .env solo si existe para distinguir modo local de producción
+// Buscar .env en la raíz del proyecto (subir dos niveles desde src)
 const envPath = path.join(__dirname, '../../.env');
 const isLocalEnv = fs.existsSync(envPath);
 if (isLocalEnv) {
@@ -81,7 +80,6 @@ app.use('/api/pago', PagoRouter);
 app.use('/api/auth', authRoutes);
 
 // MercadoPago routes - agrupadas
-app.use('/api/mercadopago', mercadoPago);
 // Rutas de MercadoPago (webhooks y OAuth)
 app.use('/api/mercadopago', webhookRouter);
 

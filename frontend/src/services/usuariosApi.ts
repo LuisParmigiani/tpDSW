@@ -47,6 +47,7 @@ export const usuariosApi = {
     api.post('/usuario/validar-codigo', data),
   cambiarPassword: (data: EntityData) =>
     api.post('/usuario/cambiar-password', data),
+<<<<<<< HEAD
   uploadProfileImage: (userId: string, imageFile: File) => {
     const formData = new FormData();
     formData.append('profileImage', imageFile);
@@ -55,4 +56,6 @@ export const usuariosApi = {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
   },
+=======
+>>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
 };

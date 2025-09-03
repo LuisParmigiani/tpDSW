@@ -1,6 +1,10 @@
 import Stars from '../stars/Stars';
 import MercadoPago from '../MercadoPago/MercadoPago.tsx';
+<<<<<<< HEAD
 
+=======
+const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY;
+>>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
 type Turno = {
   id: number;
   fechaHora: Date;
@@ -89,6 +93,12 @@ function TurnCard({ navigate, turn, openModal, cancelarTurno }: Props) {
                   montoFinal={turn.montoFinal}
                   servicio={turn.servicio}
                   turno={turn.id}
+<<<<<<< HEAD
+=======
+                  prestatarioEmail={turn.usuario.mail}
+                  prestatarioId={turn.servicio.usuario.id}
+                  mpPublicKey={mpPublicKey}
+>>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
                 />
                 <button
                   className="bg-naranja-1 text-white hover:text-naranja-1 hover:bg-white w-full rounded-2xl border-2 border-naranja-1"
