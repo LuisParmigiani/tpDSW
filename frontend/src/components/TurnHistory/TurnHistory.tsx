@@ -72,6 +72,7 @@ function TurnHistory({ estado }: Props) {
   const cantItemsPerPage = '9'; // Cantidad de turnos por pagina
   const [currentPage, setCurrentPage] = useState(1); // Página actual
   const [totalPages, setTotalPages] = useState(1); // Total de páginas
+  const [flagged, setFlagged] = useState(false); //Bandera para saber si el comentario es inapropiado
 
   // buscar todos los turnos del usuario con la informcaion del mismo.
   useEffect(() => {
@@ -134,6 +135,7 @@ function TurnHistory({ estado }: Props) {
       try {
         const res = await turnosApi.update(data.id.toString(), dataForUpdate);
         console.log('Respuesta de la API:', res);
+        setFlagged(res.data.flagged || false); // Actualizar el estado de flagged si viene en la respuesta
 
         // Actualizar el turno en la lista local en lugar de recargar toda la página
         if (turns) {
@@ -151,6 +153,7 @@ function TurnHistory({ estado }: Props) {
         closeModal();
       } catch (error) {
         console.error('Error al guardar la calificación:', error);
+        setFlagged(true); // Si hay un error, asumir que el comentario fue inapropiado
       }
     }
   };
@@ -222,6 +225,7 @@ function TurnHistory({ estado }: Props) {
           comentario={comentario}
           setComentario={setComentario}
           SaveRating={SaveRating}
+          flagged={flagged}
         />
       )}
 

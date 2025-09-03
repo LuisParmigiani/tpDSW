@@ -20,6 +20,7 @@ import mercadoPago from './mercadopago/mercadoPago.controller.js';
 import { webhookRouter } from './mercadopago/mercadoPago.route.js';
 import cookieParser from 'cookie-parser';
 import authRoutes from './shared/middleware/auth.routes.js';
+import e from 'express';
 
 // Tuve que recrear __dirname xq no estaba definido xq estamos usando ES Modules y no COmmonJS
 const __filename = fileURLToPath(import.meta.url);
@@ -32,6 +33,14 @@ if (isLocalEnv) {
   dotenv.config({ path: envPath });
 }
 const app = express();
+//Configuro el body parser para que tenga un límite más grande, sino las imagenes no podían llegar
+//hasta el middleware
+
+const staticPath = path.join(__dirname, '../public/uploads');
+
+app.use('/uploads', express.static(staticPath));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 // Como las variables de env son siempre string, tiene que comparar si es igual a 'true', entonces almacena el booleano de js
 
 // Definir modo local según existencia de .env

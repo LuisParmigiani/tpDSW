@@ -7,10 +7,15 @@ import {
 } from '../turno/turno.controler.js';
 import jwt from 'jsonwebtoken';
 import fs from 'fs/promises';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 import bcrypt from 'bcrypt';
 import { orm } from '../shared/db/orm.js';
 import nodemailer from 'nodemailer';
 import { processProfileImage } from '../utils/imageProcessor.js';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 const em = orm.em;
 const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
 
@@ -514,12 +519,21 @@ async function getOauth(id: number) {
   }
 }
 async function uploadProfileImage(req: Request, res: Response) {
+  //! Por razones de seguridad, MikroORM no deja usar la instancia global del em
+  //! En contextos de operaciones asincronas como subida de archivos, ya que puede causar
+  //! 'race conditions' y 'Corrupción de datos'
+  //*Es por eso que se utiliza un fork de la instancia
+  const emFork = em.fork();
   try {
+    console.log('Upload request received');
+    console.log('req.file:', req.file); // Debug log
+    console.log('req.params.userId:', req.params.userId); // Debug log
+    console.log('req.body:', req.body); // Debug log
     if (!req.file) {
       return res.status(400).json({ error: 'No se subió ninguna imagen' });
     }
     const userId = req.params.userId;
-    const user = await em.findOne(Usuario, { id: Number(userId) });
+    const user = await emFork.findOne(Usuario, { id: Number(userId) });
     if (!user) {
       await fs.unlink(req.file.path); // Elimina el archivo subido si el usuario no existe
       return res.status(404).json({ error: 'Usuario no encontrado' });
@@ -538,22 +552,34 @@ async function uploadProfileImage(req: Request, res: Response) {
       req.file.path,
       Number(user.id)
     );
+    console.log('✅ Image processed successfully');
+    console.log('🔗 Returned URL:', urlOptimizada);
     //Limpia la imagen subida
+    const baseUrl = process.env.BASE_URL || 'https://reformix.site';
+
+    const fullPath = path.join(__dirname, '../../public', urlOptimizada);
+    try {
+      await fs.access(fullPath);
+      console.log('✅ File exists at:', fullPath);
+    } catch (error) {
+      console.error('❌ File does NOT exist at:', fullPath);
+    }
+    const fullImageUrl = `${baseUrl}${urlOptimizada}`;
     await fs.unlink(req.file.path);
     // Actualiza el usuario en la base
-    user.foto = urlOptimizada;
-    await em.flush();
+    user.foto = fullImageUrl;
+    await emFork.flush();
 
     res.json({
       message: 'Foto de perfil actualizada correctamente',
-      url: urlOptimizada,
+      imageUrl: fullImageUrl,
       user: {
         id: user.id,
         foto: user.foto,
       },
     });
   } catch (error) {
-    console.error('Error al subir la imagen de perfil:', error);
+    console.error('Error al Hsubir la imagen de perfil:', error);
     if (req.file) {
       try {
         await fs.unlink(req.file.path); //Intenta eliminar el archivo en caso de error

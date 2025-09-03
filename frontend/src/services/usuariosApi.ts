@@ -49,8 +49,8 @@ export const usuariosApi = {
     api.post('/usuario/cambiar-password', data),
   uploadProfileImage: (userId: string, imageFile: File) => {
     const formData = new FormData();
-    formData.append('userId', userId);
-    formData.append('imageFile', imageFile);
+    formData.append('profileImage', imageFile);
+    //Con este nombre lo espera el middleware
     return api.post(`/usuario/upload-profile-image/${userId}`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });

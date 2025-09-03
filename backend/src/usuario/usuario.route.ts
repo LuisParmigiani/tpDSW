@@ -17,6 +17,7 @@ import {
   uploadProfileImage,
 } from './usuario.controler.js';
 import { verifyToken } from '../shared/middleware/auth.middleware.js';
+import { uploadProfile } from '../utils/uploadMiddleware.js';
 
 export const usuarioRouter = Router();
 
@@ -37,4 +38,8 @@ usuarioRouter.put('/:id', sanitizeUsuarioInput, update);
 usuarioRouter.patch('/:id', sanitizeUsuarioInput, update);
 usuarioRouter.delete('/:id', remove);
 usuarioRouter.post('/cambiar-password', cambiarPassword);
-usuarioRouter.post('/upload-profile-image/:id', uploadProfileImage);
+usuarioRouter.post(
+  '/upload-profile-image/:userId',
+  uploadProfile.single('profileImage'),
+  uploadProfileImage
+);

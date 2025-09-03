@@ -1,12 +1,18 @@
 import sharp from 'sharp';
 import path from 'path';
+import { fileURLToPath } from 'url'; //
+import { dirname } from 'path'; //
+
+// ✅ Recreate __dirname for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export async function processProfileImage(
   inputPath: string,
   userId: number
 ): Promise<string> {
   const outputDir = path.join(__dirname, '../../public/uploads/profiles');
-  const outputPath = path.join(outputDir, `profile_${userId}.jpg`);
+  const outputPath = path.join(outputDir, `profile_${userId}.webp`);
 
   await sharp(inputPath)
     .resize(300, 300, {
@@ -16,5 +22,5 @@ export async function processProfileImage(
     })
     .webp({ quality: 85 }) //cambia el formato a uno más eficiente
     .toFile(outputPath);
-  return `/uploads/profiles/user-${userId}.webp`; // Devuelve la ruta relativa para almacenar en la base de datos
+  return `/uploads/profiles/profile_${userId}.webp`; // Devuelve la ruta relativa para almacenar en la base de datos
 }

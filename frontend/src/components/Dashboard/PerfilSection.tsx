@@ -78,11 +78,21 @@ function PerfilSection() {
   const handleImageUpload = async (file: File) => {
     if (!file) return;
     setUploading(true);
-    const formData = new FormData();
-    formData.append('profileImage', file);
 
     try {
-      await usuariosApi.uploadProfileImage(usuario.id.toString(), formData);
+      console.log('Uploading image:', file.name, 'for user id:', usuario.id);
+      const res = await usuariosApi.uploadProfileImage(
+        usuario.id.toString(),
+        file
+      );
+      console.log('Upload response:', res);
+      if (res.data && res.data.imageUrl) {
+        //construyo la url correcta para que el front pueda acceder a donde esta guardada la foto
+        setProfileData((prev) =>
+          prev ? { ...prev, foto: res.data.imageUrl } : null
+        );
+        console.log(profileData?.foto);
+      }
     } catch (error) {
       console.error('Error uploading image:', error);
     } finally {
@@ -91,20 +101,16 @@ function PerfilSection() {
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setProfileData((prev) => ({ ...prev, [field]: value }));
+    setProfileData((prev) => (prev ? { ...prev, [field]: value } : null));
   };
-
-  const handleImageChange = (imageUrl: string) => {
-    setProfileData((prev) => ({ ...prev, profileImage: imageUrl }));
-  };
-
   if (dataFetched && profileData) {
     return (
       <DashboardSection>
         <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-sm border border-gray-200 p-8">
           <ProfilePicture
             src={profileData.foto}
-            onImageChange={handleImageChange}
+            onImageChange={handleImageUpload}
+            uploading={uploading}
           />
 
           <div className="space-y-6">
@@ -184,6 +190,14 @@ function PerfilSection() {
               className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors font-medium cursor-pointer"
               onClick={() => {
                 console.log('Datos a guardar:', profileData);
+                //Llamo a la api para guardar los cambios
+                try {
+                  usuariosApi.update(usuario.id.toString(), {
+                    ...profileData,
+                  });
+                } catch (error) {
+                  console.error('Error updating user:', error);
+                }
               }}
             >
               Guardar cambios

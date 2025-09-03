@@ -1,7 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { Turno } from './turno.entity.js';
 import { orm } from '../shared/db/orm.js';
-import { moderateContent, type ModerationResult } from '../shared/services/openai.service.js';
+import {
+  moderateContent,
+  type ModerationResult,
+} from '../shared/services/openai.service.js';
 
 interface AuthRequest extends Request {
   user?: {
@@ -119,21 +122,25 @@ async function update(req: Request, res: Response) {
 
       // Check if content was flagged (either by OpenAI or fallback)
       if (moderationResult.flagged) {
-        const moderationType = moderationResult.fallback ? 'fallback keyword detection' : 'OpenAI moderation';
+        const moderationType = moderationResult.fallback
+          ? 'fallback keyword detection'
+          : 'OpenAI moderation';
         return res.status(403).json({
-          message: `Comment blocked due to inappropriate content (${moderationType})`,
-          data: { 
-            flagged: true, 
+          message: `Comentario bloqueado por contenido inapropiado: (${moderationType})`,
+          data: {
+            flagged: true,
             categories: moderationResult.categories,
             moderationType,
-            foundKeywords: moderationResult.foundKeywords || []
+            foundKeywords: moderationResult.foundKeywords || [],
           },
         });
       }
 
       // Log if moderation service failed but content wasn't flagged
       if (moderationResult.error && !moderationResult.fallback) {
-        console.log('⚠️ OpenAI moderation service failed, but content passed fallback check');
+        console.log(
+          '⚠️ OpenAI moderation service failed, but content passed fallback check'
+        );
       }
     }
 
@@ -377,21 +384,26 @@ async function getTurnsPerDay(req: Request, res: Response) {
   }
 }
 
-
 async function getTurnosByPrestadorId(req: Request, res: Response) {
   const prestadorId = Number.parseInt(req.params.id);
   const cantItemsPerPage = Number(req.params.cantItemsPerPage) || 10;
   const currentPage = Number(req.params.currentPage) || 1;
   const selectedValueShow = req.params.selectedValueShow || '';
   // Tratar 'none' como placeholder vacío para selectedValueOrder
-  const selectedValueOrder = req.params.selectedValueOrder === 'none' ? '' : (req.params.selectedValueOrder || '');
+  const selectedValueOrder =
+    req.params.selectedValueOrder === 'none'
+      ? ''
+      : req.params.selectedValueOrder || '';
   const searchQuery = req.params.searchQuery || '';
 
   console.log('=== DEBUG ORDENAMIENTO ===');
   console.log('selectedValueOrder recibido:', selectedValueOrder);
   console.log('selectedValueShow recibido:', selectedValueShow);
   console.log('searchQuery recibido:', searchQuery);
-  console.log('isMultipleStatesFilter:', selectedValueShow.startsWith('multipleStates:'));
+  console.log(
+    'isMultipleStatesFilter:',
+    selectedValueShow.startsWith('multipleStates:')
+  );
 
   // Determinar el filtro de calificación según selectedValueShow
   let calificacionFilter: any = {};
@@ -448,19 +460,22 @@ async function getTurnosByPrestadorId(req: Request, res: Response) {
     default:
       // Manejar filtros múltiples: multipleStates:pendiente,confirmado,cancelado
       if (selectedValueShow.startsWith('multipleStates:')) {
-        const estados = selectedValueShow.replace('multipleStates:', '').split(',');
-        calificacionFilter = { 
-          estado: { $in: estados } 
+        const estados = selectedValueShow
+          .replace('multipleStates:', '')
+          .split(',');
+        calificacionFilter = {
+          estado: { $in: estados },
         };
       }
       break;
   }
-  
+
   // Variable para detectar si hay múltiples estados filtrados
-  const isMultipleStatesFilter = selectedValueShow.startsWith('multipleStates:');
-  
+  const isMultipleStatesFilter =
+    selectedValueShow.startsWith('multipleStates:');
+
   let selectedValueOrderShow;
-  
+
   // Si hay múltiples estados filtrados, usar ordenamiento personalizado por estado
   if (isMultipleStatesFilter) {
     // Para múltiples estados, haremos el ordenamiento en JavaScript después de la consulta
@@ -502,7 +517,7 @@ async function getTurnosByPrestadorId(req: Request, res: Response) {
     servicio: { usuario: { id: prestadorId } },
     ...calificacionFilter,
   };
-  
+
   // Agregar filtro de búsqueda por nombre y apellido del cliente si se proporciona
   if (searchQuery && searchQuery.trim() !== '') {
     const searchTerm = searchQuery.trim();
@@ -511,16 +526,16 @@ async function getTurnosByPrestadorId(req: Request, res: Response) {
       $or: [
         { nombre: { $like: `%${searchTerm}%` } },
         { apellido: { $like: `%${searchTerm}%` } },
-      ]
+      ],
     };
   }
-  
+
   try {
     // Total de turnos para el paginado
     const totalCount = await em.count(Turno, where);
 
     let turnos;
-    
+
     if (isMultipleStatesFilter) {
       // Para múltiples filtros, obtenemos TODOS los turnos primero
       const allTurnos = await em.find(Turno, where, {
@@ -532,31 +547,35 @@ async function getTurnosByPrestadorId(req: Request, res: Response) {
         ],
         // Sin limit ni offset - obtenemos todos
       });
-      
+
       // Aplicar ordenamiento personalizado a TODOS los turnos
       allTurnos.sort((a, b) => {
         // Definir el orden de prioridad para los estados
         const estadoOrder: { [key: string]: number } = {
-          'pendiente': 1,
-          'confirmado': 2,
-          'completado': 3,
-          'cancelado': 4
+          pendiente: 1,
+          confirmado: 2,
+          completado: 3,
+          cancelado: 4,
         };
-        
+
         const prioridadA = estadoOrder[a.estado] || 5;
         const prioridadB = estadoOrder[b.estado] || 5;
-        
+
         // Primero ordenar por prioridad de estado
         if (prioridadA !== prioridadB) {
           return prioridadA - prioridadB;
         }
-        
+
         // Si tienen el mismo estado, aplicar el ordenamiento seleccionado por el usuario
         switch (selectedValueOrder) {
           case 'fechaA':
-            return new Date(a.fechaHora).getTime() - new Date(b.fechaHora).getTime();
+            return (
+              new Date(a.fechaHora).getTime() - new Date(b.fechaHora).getTime()
+            );
           case 'fechaD':
-            return new Date(b.fechaHora).getTime() - new Date(a.fechaHora).getTime();
+            return (
+              new Date(b.fechaHora).getTime() - new Date(a.fechaHora).getTime()
+            );
           case 'montoA':
             return (a.montoFinal || 0) - (b.montoFinal || 0);
           case 'montoD':
@@ -570,12 +589,11 @@ async function getTurnosByPrestadorId(req: Request, res: Response) {
             return (b.id || 0) - (a.id || 0);
         }
       });
-      
+
       // Aplicar paginación DESPUÉS del ordenamiento
       const startIndex = (currentPage - 1) * cantItemsPerPage;
       const endIndex = startIndex + cantItemsPerPage;
       turnos = allTurnos.slice(startIndex, endIndex);
-      
     } else {
       // Para filtros únicos, usar la consulta normal con paginación en BD
       turnos = await em.find(Turno, where, {
@@ -590,16 +608,19 @@ async function getTurnosByPrestadorId(req: Request, res: Response) {
         orderBy: selectedValueOrderShow,
       });
     }
-    
+
     // Log para debuggear ordenamiento por monto
     if (selectedValueOrder.includes('monto')) {
-      console.log('Valores de montoFinal encontrados:', turnos.map(t => ({ 
-        id: t.id, 
-        montoFinal: t.montoFinal, 
-        estado: t.estado 
-      })));
+      console.log(
+        'Valores de montoFinal encontrados:',
+        turnos.map((t) => ({
+          id: t.id,
+          montoFinal: t.montoFinal,
+          estado: t.estado,
+        }))
+      );
     }
-    
+
     const hayPagoAprobado = turnos.some(
       (turno) =>
         turno.pagos &&

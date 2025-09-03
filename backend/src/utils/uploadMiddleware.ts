@@ -1,12 +1,17 @@
 import multer from 'multer';
 import path from 'path';
 import crypto from 'crypto';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     //guarda los archivos en el directorio que los queremos, y usa path join para garantizar que ande
     //en todas las plataformas
-    const uploadPath = path.join(__dirname, '../../public/uploads/profiles');
+    const uploadPath = path.join(__dirname, './../../public/uploads/profiles');
     cb(null, uploadPath);
   },
   filename: (req, file, cb) => {
