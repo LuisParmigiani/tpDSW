@@ -21,7 +21,7 @@ async function createPayment(req: AuthRequest, res: Response) {
       turno,
       prestatario_id,
     } = req.body;
-    const id = req.user?.id; // cookie
+    const id = req.user?.id;
 
     if (!id) {
       console.log('❌ Usuario no autenticado');
@@ -36,20 +36,19 @@ async function createPayment(req: AuthRequest, res: Response) {
       });
     }
 
-    let prestatario;
-    if (prestatario_id === undefined) {
+    if (!prestatario_id) {
       console.log('❌ Se requiere el id del prestatario para el split payment');
       return res.status(400).json({
         error: 'Se requiere el id del prestatario para el split payment',
       });
-    } else {
-      prestatario = await getOauth(Number(prestatario_id));
-      if (!prestatario) {
-        console.log('❌ Prestatario no encontrado');
-        return res.status(404).json({
-          error: 'Prestatario no encontrado',
-        });
-      }
+    }
+
+    const prestatario = await getOauth(Number(prestatario_id));
+    if (!prestatario) {
+      console.log('❌ Prestatario no encontrado');
+      return res.status(404).json({
+        error: 'Prestatario no encontrado',
+      });
     }
 
     // VERIFICAR QUE TENGA TOKEN OAUTH
@@ -62,11 +61,9 @@ async function createPayment(req: AuthRequest, res: Response) {
 
     const cliente = await getOauth(Number(id));
 
-    console.log('🔹 Creando preferencia con split payment:', req.body);
-
     // Calculamos los montos del split
     const totalAmount = Number(unit_price) * Number(quantity);
-    const marketplaceFee = Math.round(totalAmount * 0.05); // 5% para ti (marketplace)
+    const marketplaceFee = Math.round(totalAmount * 0.05); // 5% para ti
     const vendorAmount = totalAmount - marketplaceFee; // 95% para el vendedor
 
     console.log('🔹 💰 Split calculado:', {
@@ -75,24 +72,22 @@ async function createPayment(req: AuthRequest, res: Response) {
       vendorAmount: vendorAmount,
     });
 
-    //  CREAR CLIENTE CON TOKEN DEL PRESTATARIO (VENDEDOR)
-    const mpAccessToken = prestatario.mpAccessToken;
+    // ⭐ USAR TU TOKEN PARA CREAR LA PREFERENCIA
+    const mpAccessToken = process.env.MP_ACCESS_TOKEN;
     if (!mpAccessToken) {
-      console.log(
-        '❌ MP_ACCESS_TOKEN no está definido en las variables de entorno: ',
-        process.env
-      );
+      console.log('❌ MP_ACCESS_TOKEN no está definido');
       return res.status(500).json({
-        error: 'MP_ACCESS_TOKEN no está definido en las variables de entorno',
+        error: 'MP_ACCESS_TOKEN no está definido',
       });
     }
-    const vendorClient = new MercadoPagoConfig({
+
+    const marketplaceClient = new MercadoPagoConfig({
       accessToken: mpAccessToken,
     });
 
-    const vendorPreference = new Preference(vendorClient);
+    const marketplacePreference = new Preference(marketplaceClient);
 
-    // Configuración de la preferencia con split payment
+    // ⭐ CONFIGURACIÓN CORREGIDA PARA ARGENTINA - SIN application_fee
     const preferenceData = {
       items: [
         {
@@ -112,42 +107,66 @@ async function createPayment(req: AuthRequest, res: Response) {
       notification_url:
         'https://backend-patient-morning-1303.fly.dev/api/mercadopago/cambio',
       external_reference: turno || undefined,
-      marketplace: `MP-MKT-${process.env.MERCADOPAGO_COLLECTOR_ID}`,
-
-      // ⭐ CONFIGURACIÓN CORRECTA DEL SPLIT
-      marketplace_fee: marketplaceFee, // Tu 5% de comisión
 
       // ⭐ INFORMACIÓN DEL COMPRADOR
       payer: {
         name: cliente.nombre,
         email: cliente.mail,
         identification: {
-          type: 'DNI', // o el tipo que uses
+          type: 'DNI',
           number: cliente.numeroDoc?.toString(),
         },
       },
 
+      // ⭐ REMOVER application_fee - No funciona en Argentina
+      // application_fee: marketplaceFee, // ❌ ESTO CAUSA PROBLEMAS
+
+      // ⭐ METADATA COMPLETA para el webhook
       metadata: {
         cliente_id: id,
         prestatario_id: prestatario_id,
         turno_id: turno,
         split_fee: marketplaceFee,
+        vendor_amount: vendorAmount,
+        vendor_access_token: prestatario.mpAccessToken,
         client_email: cliente.mail,
         vendor_email: prestatario.mail,
+        marketplace_user_id: process.env.PLATFORM_USER_ID,
+        vendor_user_id: prestatario.mpUserId, // ASEGÚRATE DE TENER ESTE CAMPO
+        total_amount: totalAmount,
+        split_method: 'manual_transfer', // Indicar que será manual
       },
+
+      // ⭐ CONFIGURACIONES ADICIONALES PARA EVITAR ERRORES
+      payment_methods: {
+        excluded_payment_methods: [],
+        excluded_payment_types: [],
+        installments: 1, // Forzar 1 cuota para simplificar
+      },
+
+      // ⭐ CONFIGURACIÓN DE EXPERIENCIA MEJORADA
+      additional_info: `Compra de ${title} por ${cliente.nombre || ''} (${
+        cliente.mail || ''
+      })`,
     };
 
-    // ⭐ CREAR CON EL CLIENTE DEL VENDEDOR
-    const result = await vendorPreference.create({
+    console.log(
+      '🔹 Preferencia data:',
+      JSON.stringify(preferenceData, null, 2)
+    );
+
+    // ⭐ CREAR PREFERENCIA
+    const result = await marketplacePreference.create({
       body: preferenceData,
     });
 
-    console.log('🔹 ✅ Preferencia creada con split payment:', {
+    console.log('🔹 ✅ Preferencia creada exitosamente:', {
       id: result.id,
+      total_amount: totalAmount,
       marketplace_fee: marketplaceFee,
       vendor_amount: vendorAmount,
     });
-    console.log('🔹 Respuesta de MercadoPago:', result);
+
     res.json({
       preferenceId: result.id,
       init_point: result.init_point,
@@ -158,14 +177,19 @@ async function createPayment(req: AuthRequest, res: Response) {
         vendor_amount: vendorAmount,
         marketplace_percentage: 5,
         vendor_percentage: 95,
+        method: 'manual_transfer',
       },
     });
   } catch (error: any) {
-    console.log('🔹 entro al error', error);
-    console.error('❌ Error al crear preferencia con split:', error);
+    console.log('🔹 Error completo:', error);
+    console.error('❌ Error al crear preferencia:', error);
+
+    // ⭐ RESPUESTA DETALLADA DEL ERROR
     res.status(500).json({
       error: 'Error al crear preferencia con split payment',
       details: error.message || error,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+      raw_error: error,
     });
   }
 }

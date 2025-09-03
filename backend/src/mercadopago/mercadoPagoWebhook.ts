@@ -11,42 +11,57 @@ const client = new MercadoPagoConfig({
 
 const payment = new Payment(client);
 
-// Webhook para recibir notificaciones de MercadoPago
+// ⭐ WEBHOOK MEJORADO
 async function mercadoPagoWebhook(req: Request, res: Response) {
   console.log('🔔 Webhook recibido:', req.body);
+  console.log('🔔 Headers:', req.headers);
+
   try {
-    console.log('🔔 Webhook en el try ');
     const { type, data } = req.body;
 
     // Verificar que es una notificación de pago
     if (type === 'payment') {
       const paymentId = data.id;
-
       console.log(`📥 Procesando pago ID: ${paymentId}`);
 
-      // Obtener información completa del pago desde MercadoPago
+      // Obtener información completa del pago
       const paymentInfo = await payment.get({ id: paymentId });
-      console.log('💰 Información del pago:', paymentInfo);
-      console.log('📊 Metadata del pago:', paymentInfo.metadata);
-      // Actualizar el pago en nuestra base de datos
+      console.log(
+        '💰 Información completa del pago:',
+        JSON.stringify(paymentInfo, null, 2)
+      );
+
+      // Actualizar el pago en BD
       await actualizarPagoDesdeWebhook(paymentInfo);
 
+      // ⭐ SI EL PAGO FUE APROBADO, PROCESAR SPLIT
       if (paymentInfo.status === 'approved') {
-        console.log('✅ Pago aprobado, iniciando split payment...');
-        await procesarSplitPayment(paymentInfo);
+        console.log('✅ Pago aprobado, iniciando proceso de split...');
+
+        // Esperar un poco para asegurar que el dinero esté disponible
+        setTimeout(async () => {
+          try {
+            await procesarSplitManual(paymentInfo);
+          } catch (splitError) {
+            console.error('❌ Error en split diferido:', splitError);
+          }
+        }, 5000); // 5 segundos de delay
       }
+
       console.log(`✅ Pago ${paymentId} procesado exitosamente`);
     } else {
       console.log(`ℹ️ Tipo de notificación no manejada: ${type}`);
     }
 
-    // CRÍTICO: Responder 200 OK para confirmar recepción
+    // SIEMPRE responder 200 OK
     res.status(200).json({
       received: true,
       timestamp: new Date().toISOString(),
     });
   } catch (error: any) {
     console.error('❌ Error procesando webhook:', error);
+
+    // ⭐ IMPORTANTE: Aún así responder 200 para evitar reenvíos
     res.status(200).json({
       received: true,
       error: 'Processed with errors',
@@ -55,144 +70,198 @@ async function mercadoPagoWebhook(req: Request, res: Response) {
   }
 }
 
-// NUEVA FUNCIÓN: Procesar Split Payment
-async function procesarSplitPayment(paymentInfo: any) {
-  console.log('🔔 Webhook en el procesarSplitPayment:', paymentInfo);
+// ⭐ FUNCIÓN MEJORADA PARA SPLIT MANUAL
+async function procesarSplitManual(paymentInfo: any) {
+  console.log('🔄 Procesando split manual para pago:', paymentInfo.id);
+
   try {
     const metadata = paymentInfo.metadata;
 
-    // 📊 OBTENER INFORMACIÓN DEL SPLIT DESDE METADATA
-    const vendorAccessToken = metadata?.vendor_access_token; // 👤 TOKEN DEL VENDEDOR
-    const vendorAmount = metadata?.vendor_amount; // 👤 95% para el vendedor
-    const marketplaceFee = metadata?.split_fee; // 🏢 5% para ti
-    const vendorEmail = metadata?.vendor_email;
-    const turnoId = metadata?.turno_id;
+    if (!metadata) {
+      console.log('⚠️ No hay metadata en el pago');
+      return;
+    }
 
-    console.log('🔄 Datos para split payment:', {
+    const vendorAccessToken = metadata.vendor_access_token;
+    const vendorAmount = Number(metadata.vendor_amount);
+    const marketplaceFee = Number(metadata.split_fee);
+    const turnoId = metadata.turno_id;
+    const vendorUserId = metadata.vendor_user_id;
+
+    console.log('🔄 Datos para split:', {
+      payment_id: paymentInfo.id,
       total: paymentInfo.transaction_amount,
-      marketplace_fee: marketplaceFee, // 🏢 TU PARTE (ya la tienes automáticamente)
-      vendor_amount: vendorAmount, // 👤 PARTE DEL VENDEDOR
-      vendor_email: vendorEmail,
+      marketplace_fee: marketplaceFee,
+      vendor_amount: vendorAmount,
+      vendor_user_id: vendorUserId,
       has_vendor_token: !!vendorAccessToken,
     });
 
     if (!vendorAccessToken || !vendorAmount || vendorAmount <= 0) {
-      console.log(
-        '⚠️ No se puede procesar split: falta token del vendedor o monto inválido'
+      console.log('⚠️ Faltan datos para el split');
+      await guardarRegistroSplit(
+        paymentInfo,
+        null,
+        'failed',
+        'Datos incompletos'
       );
       return;
     }
 
-    try {
-      console.log('💸 Iniciando transferencia al vendedor...');
+    // ⭐ MÉTODO 1: Money Transfer (Preferido)
+    console.log('💸 Intentando Money Transfer...');
 
-      // Opción 1: Money Request (Transferencia directa)
-      const transferResponse = await fetch(
-        'https://api.mercadopago.com/money_requests',
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${vendorAccessToken}`, // 👤 TOKEN DEL VENDEDOR
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            amount: Number(vendorAmount), // 👤 95% del pago
-            currency: 'ARS',
-            email: vendorEmail, // 👤 EMAIL DEL VENDEDOR
-            concept: `Pago por servicio - Turno ${turnoId}`,
-            external_reference: `split_${paymentInfo.id}`,
-          }),
-        }
-      );
-
-      if (!transferResponse.ok) {
-        const errorData = await transferResponse.text();
-        console.error(
-          '❌ Error en transferencia:',
-          transferResponse.status,
-          errorData
-        );
-
-        // Intentar método alternativo: Payout
-        await intentarPayout(
-          vendorAccessToken,
-          vendorAmount,
-          vendorEmail,
-          paymentInfo.id,
-          turnoId
-        );
-      } else {
-        const transferResult = await transferResponse.json();
-        console.log('✅ Transferencia al vendedor exitosa:', transferResult);
-
-        // 📝 GUARDAR REGISTRO EN BASE DE DATOS
-        await guardarRegistroSplit(paymentInfo, transferResult, 'completed');
-      }
-    } catch (transferError: any) {
-      console.error('❌ Error en transferencia principal:', transferError);
-
-      // Intentar método de respaldo
-      await intentarPayout(
-        vendorAccessToken,
-        vendorAmount,
-        vendorEmail,
-        paymentInfo.id,
-        turnoId
-      );
-    }
-  } catch (error: any) {
-    console.log('🔔 Webhook en el catch del procesarSplitPayment:', error);
-    console.error('❌ Error procesando split payment:', error);
-    await guardarRegistroSplit(paymentInfo, null, 'failed', error.message);
-  }
-}
-
-// 💰 MÉTODO ALTERNATIVO: Payout (transferencia bancaria)
-async function intentarPayout(
-  vendorToken: string,
-  amount: number,
-  email: string,
-  paymentId: string,
-  turnoId: string
-) {
-  try {
-    console.log('💰 Intentando payout como método alternativo...');
-
-    const payoutResponse = await fetch('https://api.mercadopago.com/payouts', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${vendorToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        amount: Number(amount),
-        currency: 'ARS',
-        receiver: {
-          type: 'email',
-          value: email,
-        },
-        concept: `Split payment - Turno ${turnoId}`,
-        external_reference: `payout_${paymentId}`,
-      }),
+    const transferResult = await crearMoneyTransfer({
+      amount: vendorAmount,
+      receiverAccessToken: vendorAccessToken,
+      description: `Split pago ${paymentInfo.id} - Turno ${turnoId}`,
+      paymentId: paymentInfo.id,
     });
 
-    if (payoutResponse.ok) {
-      const payoutResult = await payoutResponse.json();
-      console.log('✅ Payout exitoso:', payoutResult);
-      return payoutResult;
-    } else {
-      const errorData = await payoutResponse.text();
-      console.log('❌ Error en payout:', payoutResponse.status, errorData);
-      console.error('❌ Error en payout:', payoutResponse.status, errorData);
-      throw new Error(`Payout failed: ${errorData}`);
+    if (transferResult.success) {
+      console.log('✅ Money Transfer exitoso:', transferResult.data);
+      await guardarRegistroSplit(paymentInfo, transferResult.data, 'completed');
+      return transferResult.data;
     }
+
+    // ⭐ MÉTODO 2: Si falla, intentar con API directa
+    console.log('💰 Money Transfer falló, intentando API directa...');
+
+    const directTransferResult = await crearTransferenciaDirecta({
+      amount: vendorAmount,
+      vendorUserId: vendorUserId,
+      paymentId: paymentInfo.id,
+      turnoId: turnoId,
+    });
+
+    if (directTransferResult.success) {
+      console.log(
+        '✅ Transferencia directa exitosa:',
+        directTransferResult.data
+      );
+      await guardarRegistroSplit(
+        paymentInfo,
+        directTransferResult.data,
+        'completed'
+      );
+      return directTransferResult.data;
+    }
+
+    throw new Error('Todos los métodos de transferencia fallaron');
   } catch (error: any) {
-    console.log('❌ Error en payout alternativo:', error);
-    console.error('❌ Error en payout alternativo:', error);
+    console.error('❌ Error en split manual:', error);
+    await guardarRegistroSplit(paymentInfo, null, 'failed', error.message);
     throw error;
   }
 }
 
+// ⭐ MÉTODO 1: Money Transfer usando SDK
+async function crearMoneyTransfer(params: {
+  amount: number;
+  receiverAccessToken: string;
+  description: string;
+  paymentId: string;
+}) {
+  try {
+    // Crear cliente con token del vendedor
+    const vendorClient = new MercadoPagoConfig({
+      accessToken: params.receiverAccessToken,
+    });
+
+    // Usar API de Money Transfer
+    const transferResponse = await fetch(
+      'https://api.mercadopago.com/v1/money_transfers',
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`, // TU token como marketplace
+          'Content-Type': 'application/json',
+          'X-Idempotency-Key': `split_${params.paymentId}_${Date.now()}`,
+        },
+        body: JSON.stringify({
+          amount: params.amount,
+          currency_id: 'ARS',
+          description: params.description,
+          receiver_id: params.receiverAccessToken, // Token del vendedor
+          external_reference: `split_${params.paymentId}`,
+        }),
+      }
+    );
+
+    if (transferResponse.ok) {
+      const data = await transferResponse.json();
+      return { success: true, data };
+    } else {
+      const errorText = await transferResponse.text();
+      console.error(
+        '❌ Error en Money Transfer:',
+        transferResponse.status,
+        errorText
+      );
+      return { success: false, error: errorText };
+    }
+  } catch (error: any) {
+    console.error('❌ Error creando Money Transfer:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+// ⭐ MÉTODO 2: Transferencia directa por User ID
+async function crearTransferenciaDirecta(params: {
+  amount: number;
+  vendorUserId: string;
+  paymentId: string;
+  turnoId: string;
+}) {
+  try {
+    console.log(
+      '🔄 Creando transferencia directa a user ID:',
+      params.vendorUserId
+    );
+
+    const transferResponse = await fetch(
+      'https://api.mercadopago.com/money_transfers',
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`,
+          'Content-Type': 'application/json',
+          'X-Idempotency-Key': `direct_${params.paymentId}_${Date.now()}`,
+        },
+        body: JSON.stringify({
+          amount: params.amount,
+          currency: 'ARS',
+          receiver_id: parseInt(params.vendorUserId), // ID numérico del usuario
+          description: `Split directo - Pago ${params.paymentId}`,
+          external_reference: `direct_split_${params.paymentId}`,
+          metadata: {
+            original_payment_id: params.paymentId,
+            turno_id: params.turnoId,
+            transfer_method: 'direct_user_id',
+          },
+        }),
+      }
+    );
+
+    if (transferResponse.ok) {
+      const data = await transferResponse.json();
+      return { success: true, data };
+    } else {
+      const errorText = await transferResponse.text();
+      console.error(
+        '❌ Error transferencia directa:',
+        transferResponse.status,
+        errorText
+      );
+      return { success: false, error: errorText };
+    }
+  } catch (error: any) {
+    console.error('❌ Error en transferencia directa:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+// ⭐ FUNCIÓN MEJORADA PARA GUARDAR REGISTROS
 async function guardarRegistroSplit(
   paymentInfo: any,
   transferResult: any,
@@ -200,54 +269,42 @@ async function guardarRegistroSplit(
   error?: string
 ) {
   try {
-    // Aquí deberías implementar el guardado en tu base de datos
-    console.log('📝 Guardando registro de split payment:', {
+    const splitRecord = {
       payment_id: paymentInfo.id,
       total_amount: paymentInfo.transaction_amount,
       marketplace_fee: paymentInfo.metadata?.split_fee,
       vendor_amount: paymentInfo.metadata?.vendor_amount,
       vendor_id: paymentInfo.metadata?.prestatario_id,
       turno_id: paymentInfo.metadata?.turno_id,
-      transfer_id: transferResult?.id,
+      transfer_id: transferResult?.id || null,
+      transfer_method: transferResult?.method || 'unknown',
       status: status,
-      error: error,
+      error_message: error,
+      raw_transfer_data: transferResult,
+      raw_payment_data: paymentInfo.metadata,
       created_at: new Date(),
-    });
+      updated_at: new Date(),
+    };
 
-    // Ejemplo de implementación con tu ORM:
-    /*
-    const emFork = em.fork();
-    const splitRecord = emFork.create(SplitPayment, {
-      payment_id: paymentInfo.id,
-      total_amount: paymentInfo.transaction_amount,
-      marketplace_fee: paymentInfo.metadata?.split_fee,
-      vendor_amount: paymentInfo.metadata?.vendor_amount,
-      vendor_id: paymentInfo.metadata?.prestatario_id,
-      turno_id: paymentInfo.metadata?.turno_id,
-      transfer_id: transferResult?.id,
-      status: status,
-      error: error,
-    });
-    await emFork.persistAndFlush(splitRecord);
-    */
+    console.log('📝 Guardando registro de split:', splitRecord);
+
+    // Aquí implementa el guardado en tu BD
+    // const emFork = em.fork();
+    // const splitEntity = emFork.create(SplitPaymentEntity, splitRecord);
+    // await emFork.persistAndFlush(splitEntity);
   } catch (error: any) {
-    console.log('❌ Error guardando registro split:', error);
     console.error('❌ Error guardando registro split:', error);
   }
 }
 
-// Función interna para actualizar pago desde webhook
+// ... resto de las funciones (actualizarPagoDesdeWebhook, etc.) ...
 async function actualizarPagoDesdeWebhook(paymentInfo: any) {
-  // Usar fork para transacciones para crear una nueva instancia de EntityManager
   const emFork = em.fork();
 
   try {
-    // Buscar el pago por ID de MercadoPago
     const pagoExistente = await emFork.findOne(
       Pago,
-      {
-        idMercadoPago: paymentInfo.id.toString(),
-      },
+      { idMercadoPago: paymentInfo.id.toString() },
       { populate: ['turno'] }
     );
 
@@ -257,9 +314,9 @@ async function actualizarPagoDesdeWebhook(paymentInfo: any) {
       const nuevoPago = emFork.create(Pago, {
         fechaHora: new Date(),
         idMercadoPago: paymentInfo.id.toString(),
-        idPreferencia: paymentInfo.id_preference,
+        idPreferencia: paymentInfo.preference_id,
         descripcionPago: paymentInfo.description,
-        monto: paymentInfo.transaction_details?.net_received_amount,
+        monto: paymentInfo.transaction_amount,
         estado: paymentInfo.status as EstadoPago,
         detalleEstado: paymentInfo.status_detail,
         cuotas: paymentInfo.installments,
@@ -279,117 +336,32 @@ async function actualizarPagoDesdeWebhook(paymentInfo: any) {
       return;
     }
 
-    // Guardar estado anterior para logging
+    // Actualizar pago existente
     const estadoAnterior = pagoExistente.estado;
-
-    // Actualizar campos del pago
     pagoExistente.estado = paymentInfo.status as EstadoPago;
     pagoExistente.detalleEstado = paymentInfo.status_detail;
     pagoExistente.fechaActualizacion = new Date();
+    pagoExistente.datosCompletos = paymentInfo;
 
-    // Campos opcionales si están disponibles
     if (paymentInfo.date_approved) {
       pagoExistente.fechaAprobacion = new Date(paymentInfo.date_approved);
     }
-
-    if (paymentInfo.payment_method_id) {
-      pagoExistente.metodoPago = paymentInfo.payment_method_id;
-    }
-
-    if (paymentInfo.payment_type_id) {
-      pagoExistente.tipoPago = paymentInfo.payment_type_id;
-    }
-
-    if (paymentInfo.payer?.email) {
-      pagoExistente.emailPagador = paymentInfo.payer.email;
-    }
-
-    if (paymentInfo.transaction_details?.net_received_amount) {
-      pagoExistente.montoNeto =
-        paymentInfo.transaction_details.net_received_amount;
-    }
-
-    // Guardar datos completos para debugging/auditoría
-    pagoExistente.datosCompletos = paymentInfo;
 
     await emFork.persistAndFlush(pagoExistente);
 
     console.log(
       `🔄 Pago ${pagoExistente.id} actualizado: ${estadoAnterior} → ${paymentInfo.status}`
     );
-
-    // Ejecutar acciones según el nuevo estado
-    await ejecutarAccionesPorEstado(
-      pagoExistente,
-      estadoAnterior,
-      paymentInfo.status
-    );
   } catch (error) {
-    console.log('❌ Error actualizando pago en BD:', error);
     console.error('❌ Error actualizando pago en BD:', error);
     throw error;
   }
 }
 
-// Función para ejecutar acciones específicas según cambio de estado
-async function ejecutarAccionesPorEstado(
-  pago: Pago,
-  estadoAnterior: EstadoPago,
-  nuevoEstado: EstadoPago
-) {
-  if (estadoAnterior === nuevoEstado) {
-    return;
-  }
-
-  try {
-    switch (nuevoEstado) {
-      case EstadoPago.APPROVED:
-        console.log(
-          `✅ Pago APROBADO - ID: ${pago.id}, Turno: ${pago.turno.id}`
-        );
-        // - Enviar email de confirmación
-
-        break;
-
-      case EstadoPago.REJECTED:
-        console.log(
-          `❌ Pago RECHAZADO - ID: ${pago.id}, Turno: ${pago.turno.id}`
-        );
-
-        // - Enviar email sugiriendo otro método de pago
-
-        break;
-
-      case EstadoPago.CANCELLED:
-        console.log(`🚫 Pago CANCELADO - ID: ${pago.id}`);
-
-        // - Notificar cancelación
-
-        break;
-
-      case EstadoPago.PENDING:
-        console.log(`⏳ Pago PENDIENTE - ID: ${pago.id}`);
-
-        // enviar email de recordatorio
-        break;
-
-      default:
-        console.log(`ℹ️ Estado no manejado: ${nuevoEstado} - Pago: ${pago.id}`);
-    }
-  } catch (error) {
-    console.error('❌ Error ejecutando acciones por estado:', error);
-  }
-}
-
-// Función auxiliar para verificar el estado de un pago manualmente
 async function verificarEstadoPago(req: Request, res: Response) {
   try {
     const { idMercadoPago } = req.params;
-
-    // Consultar directamente a MercadoPago
     const paymentInfo = await payment.get({ id: idMercadoPago });
-
-    // Actualizar en nuestra BD
     await actualizarPagoDesdeWebhook(paymentInfo);
 
     res.status(200).json({
@@ -398,10 +370,11 @@ async function verificarEstadoPago(req: Request, res: Response) {
         id: paymentInfo.id,
         status: paymentInfo.status,
         status_detail: paymentInfo.status_detail,
+        transaction_amount: paymentInfo.transaction_amount,
+        metadata: paymentInfo.metadata,
       },
     });
   } catch (error: any) {
-    console.log('🔔 Error verificando estado:', error);
     console.error('Error verificando estado:', error);
     res.status(500).json({ error: error.message });
   }

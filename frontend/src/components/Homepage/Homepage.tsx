@@ -35,10 +35,10 @@ function Homepage() {
   return (
     <>
       <div className="flex flex-col w-full">
-        <Navbar />
-
-        {/* Botón de pago Mercado Pago integrado */}
-        <div className="flex justify-center mt-8"></div>
+        <div className="absolute inset-0 w-full z-20">
+          <Navbar />
+          <div className="flex justify-center mt-8"></div>
+        </div>
         <div className="w-full">
           <Carousel
             fotos={[
