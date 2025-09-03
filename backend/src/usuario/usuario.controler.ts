@@ -1,15 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { Usuario } from './usuario.entity.js';
-<<<<<<< HEAD
 import path from 'path';
-=======
->>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
 import {
   getTurnosByServicioIdHelper,
   getTurnsPerDay,
 } from '../turno/turno.controler.js';
 import jwt from 'jsonwebtoken';
-<<<<<<< HEAD
 import fs from 'fs/promises';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -20,12 +16,6 @@ import { processProfileImage } from '../utils/imageProcessor.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-=======
-
-import bcrypt from 'bcrypt';
-import { orm } from '../shared/db/orm.js';
-import nodemailer from 'nodemailer';
->>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
 const em = orm.em;
 const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
 
@@ -244,7 +234,6 @@ async function findPrestatariosByTipoServicioAndZona(
     res.status(500).json({ message: error.message });
   }
 }
-<<<<<<< HEAD
 async function findOneOnlyInfo(req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id);
@@ -254,8 +243,6 @@ async function findOneOnlyInfo(req: Request, res: Response) {
     res.status(500).json({ message: error.message });
   }
 }
-=======
->>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
 
 async function findOne(req: Request, res: Response) {
   try {
@@ -409,25 +396,10 @@ async function loginUsuario(req: Request, res: Response) {
     if (usuarioSinContrasena) {
       const rol =
         usuarioSinContrasena.nombreFantasia === null ? 'cliente' : 'prestador';
-<<<<<<< HEAD
-=======
-
->>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
       const token = jwt.sign({ id: usuarioSinContrasena.id, rol }, JWT_SECRET, {
         expiresIn: '1d',
       });
 
-<<<<<<< HEAD
-      // 🔹 Guardamos el token en una cookie segura
-      const local = process.env.LOCAL === 'true';
-      res.cookie('token', token, {
-        httpOnly: true,
-        secure: !local,
-        sameSite: local ? 'lax' : 'none', // 'none' solo si secure=true
-        path: '/',
-      });
-    }
-=======
       // Detectamos si estás en local para no forzar HTTPS
       const local = process.env.LOCAL === 'true';
 
@@ -442,7 +414,6 @@ async function loginUsuario(req: Request, res: Response) {
       res.json({ message: 'Cookie seteada correctamente' });
     }
 
->>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
     return res
       .status(200)
       .json({ message: 'Login exitoso', data: usuarioSinContrasena });

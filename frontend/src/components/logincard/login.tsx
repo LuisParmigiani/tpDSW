@@ -1,24 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { usuariosApi } from '../../services/usuariosApi';
-<<<<<<< HEAD
-type Usuario = {
-  id: number;
-  mail: string;
-  nombreFantasia: string;
-};
-=======
->>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
 
 function Logincard() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
-<<<<<<< HEAD
-  const [user, setUser] = useState<Usuario | null>(null);
-=======
-
->>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
   const [imag, setimag] = useState(
     'fa-solid fa-eye-slash absolute top-4 left-80 text-gray-500 text-4 cursor-pointer'
   );
@@ -45,19 +32,9 @@ function Logincard() {
 
   const envioFormulario = async () => {
     try {
-<<<<<<< HEAD
-      const response = await usuariosApi.login(form);
-      setUser(response.data.data);
-      if (user?.nombreFantasia === '') {
-        navigate('/');
-      } else {
-        navigate('/dashboard');
-      }
-=======
       await usuariosApi.login(form);
       console.log('Login exitoso');
       navigate('/dashboard');
->>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
     } catch (error) {
       setOpen(true);
       const err = error as { response?: { status?: number } };
@@ -116,44 +93,6 @@ function Logincard() {
               ¡Bienvenido!
             </p>
             <div className="w-full flex flex-col items-center">
-<<<<<<< HEAD
-              <div className="relative inline-block w-full">
-                <input
-                  type="text"
-                  placeholder="Email"
-                  onChange={(e) => setForm({ ...form, mail: e.target.value })}
-                  className="w-full pt-3 pb-3 pr-5 pl-12 text-base border-none rounded-4xl bg-white shadow-inner outline-none mb-4 text-black font-inter "
-                />
-                <i className="fa-solid fa-envelope absolute top-4 left-6 text-gray-500 text-1xl pointer-events-none"></i>
-              </div>
-              <div className="relative inline-block w-full">
-                <input
-                  type={type_text}
-                  placeholder="Contraseña"
-                  onChange={(e) =>
-                    setForm({ ...form, contrasena: e.target.value })
-                  }
-                  className="w-full pt-3 pb-3 pr-5 pl-12 text-base border-none rounded-4xl bg-white shadow-inner outline-none mb-4 text-black font-inter"
-                />
-                <i
-                  className={imag + ' right-6'}
-                  onClick={handleClickCrossedEye}
-                ></i>
-                <i className="fa-solid fa-lock absolute top-4 left-6 text-gray-500 text-1xl pointer-events-none"></i>
-              </div>
-              <button
-                onClick={envioFormulario}
-                type="submit"
-                className={
-                  form.mail === '' || form.contrasena === ''
-                    ? 'w-full bg-gray-300 text-black-500 px-5 py-2.5 rounded-b-2xl cursor-pointer focus:outline-none mb-5 mt-3 '
-                    : 'w-full bg-naranja-1 text-white px-5 py-2.5 rounded-b-2xl cursor-pointer hover:text-black focus:outline-none mb-5 mt-3 hover:shadow-lg'
-                }
-                disabled={form.mail === '' || form.contrasena === ''}
-              >
-                Iniciar sesión
-              </button>
-=======
               <form
                 className="w-full flex flex-col items-center"
                 onSubmit={(e) => {
@@ -197,7 +136,6 @@ function Logincard() {
                   Iniciar sesión
                 </button>
               </form>
->>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
             </div>
 
             <p className="text-black font-inter mb-0 text-center">

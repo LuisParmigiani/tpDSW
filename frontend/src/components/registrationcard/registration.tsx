@@ -146,10 +146,12 @@ function RegisCard() {
         className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-white shadow-inner outline-none mb-4 text-black font-inter "
         onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
       />
-      <ProfilePicture
+      {/* <ProfilePicture
         src={form.foto || '/images/fotoUserId.png'}
-        onImageChange={(imageUrl) => setForm({ ...form, foto: imageUrl })}
-      />
+        onImageChange={handleImageUpload}
+        uploading={true}
+      /> */}
+      <div>Saque la foto después hay que ponerla bien</div>
       <p className="text-center text-gray-600 text-sm mt-2 mb-4 font-inter">
         Elija una foto para su cuenta, podrá cambiarla luego desde su perfil.
       </p>
@@ -255,28 +257,6 @@ function RegisCard() {
               <option value="prestatario">Prestatario</option>
             </select>
             <div className="w-full flex flex-col items-center">
-<<<<<<< HEAD
-              {camposComunes}
-              {tipoUsuario === 'prestatario' && camposPrestatario}
-              <button
-                onClick={envioFormulario}
-                type="submit"
-                className={
-                  tipoUsuario === 'prestatario' &&
-                  ((form.nombreFantasia === '' && form.apellido === '') ||
-                    form.nombre === '' ||
-                    form.mail === '' ||
-                    form.descripcion === '' ||
-                    form.contrasena === '' ||
-                    form.tipoDoc === '' ||
-                    form.numeroDoc === '' ||
-                    form.telefono === '' ||
-                    form.direccion === '')
-                    ? 'w-full bg-gray-300 text-white px-5 py-2.5 rounded-b-2xl cursor-pointer focus:outline-none mb-5 mt-3'
-                    : tipoUsuario === 'usuario' &&
-                      (form.nombre === '' ||
-                        form.apellido === '' ||
-=======
               <form
                 className="w-full flex flex-col items-center"
                 onSubmit={(e) => {
@@ -327,50 +307,17 @@ function RegisCard() {
                     (tipoUsuario === 'usuario' &&
                       (form.apellido === '' ||
                         form.nombre === '' ||
->>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
                         form.mail === '' ||
                         form.contrasena === '' ||
                         form.tipoDoc === '' ||
                         form.numeroDoc === '' ||
                         form.telefono === '' ||
-<<<<<<< HEAD
-                        form.direccion === '')
-                    ? 'w-full bg-gray-300 text-black-500 px-5 py-2.5 rounded-b-2xl cursor-pointer focus:outline-none mb-5 mt-3'
-                    : 'w-full bg-naranja-1 text-white px-5 py-2.5 rounded-b-2xl cursor-pointer hover:text-black focus:outline-none mb-5 mt-3 hover:shadow-lg'
-                }
-                disabled={
-                  (tipoUsuario === 'prestatario' &&
-                    (form.apellido === '' ||
-                      form.nombre === '' ||
-                      form.mail === '' ||
-                      form.descripcion === '' ||
-                      form.nombreFantasia === '' ||
-                      form.contrasena === '' ||
-                      form.tipoDoc === '' ||
-                      form.numeroDoc === '' ||
-                      form.telefono === '' ||
-                      form.direccion === '')) ||
-                  (tipoUsuario === 'usuario' &&
-                    (form.apellido === '' ||
-                      form.nombre === '' ||
-                      form.mail === '' ||
-                      form.contrasena === '' ||
-                      form.tipoDoc === '' ||
-                      form.numeroDoc === '' ||
-                      form.telefono === '' ||
-                      form.direccion === ''))
-                }
-              >
-                Crear cuenta
-              </button>
-=======
                         form.direccion === ''))
                   }
                 >
                   Crear cuenta
                 </button>
               </form>
->>>>>>> 0f77b45824cbbea0f0eaadf15887b04b27526032
             </div>
 
             <p className="text-black font-inter mb-0 text-center">
