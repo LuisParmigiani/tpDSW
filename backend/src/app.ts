@@ -54,7 +54,7 @@ console.log('   process.env.NODE_ENV:', process.env.NODE_ENV);
 const rawOrigins = local
   ? 'http://localhost:5173'
   : process.env.FRONTEND_ORIGIN || 'https://reformix.site';
-const allowedOrigins = rawOrigins.split(',').map((o) => o.trim());
+const allowedOrigins = rawOrigins.split(',').map((o: string) => o.trim());
 
 console.log('🌐 Configuración CORS:', {
   local,
