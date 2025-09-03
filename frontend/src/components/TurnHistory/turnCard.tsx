@@ -35,6 +35,7 @@ type Usuario = {
   id: number;
   mail: string;
   nombreFantasia: string;
+  mpPublicKey: string;
 };
 type Props = {
   navigate: (path: string) => void;
@@ -89,6 +90,9 @@ function TurnCard({ navigate, turn, openModal, cancelarTurno }: Props) {
                   montoFinal={turn.montoFinal}
                   servicio={turn.servicio}
                   turno={turn.id}
+                  prestatarioEmail={turn.usuario.mail}
+                  prestatarioId={turn.servicio.usuario.id}
+                  mpPublicKey={turn.servicio.usuario.mpPublicKey}
                 />
                 <button
                   className="bg-naranja-1 text-white hover:text-naranja-1 hover:bg-white w-full rounded-2xl border-2 border-naranja-1"

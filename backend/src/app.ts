@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import express, { Request, Response, NextFunction } from 'express';
@@ -15,23 +16,27 @@ import { serviceTypeRouter } from './tipoServicio/tipoServ.route.js';
 import { horarioRouter } from './horario/horario.routes.js';
 import { CronManager } from './shared/cron/cronManager.js';
 import { PagoRouter } from './pago/pago.route.js';
-import mercadoPago from './mercadopago/mercadoPago.controller.js';
-import mercadoPagoOauthRouter from './mercadopago/mercadoPagoOauth.js';
 import { webhookRouter } from './mercadopago/mercadoPago.route.js';
 import cookieParser from 'cookie-parser';
 import authRoutes from './shared/middleware/auth.routes.js';
 
-//Tuve que recrear __dirname xq no estaba definido xq estamos usando ES Modules y no COmmonJS
+// Tuve que recrear __dirname xq no estaba definido xq estamos usando ES Modules y no COmmonJS
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-dotenv.config({ path: path.join(__dirname, '../../.env') });
+// Cargar .env solo si existe para distinguir modo local de producción
+// Buscar .env en la raíz del proyecto (subir dos niveles desde src)
+const envPath = path.join(__dirname, '../../.env');
+const isLocalEnv = fs.existsSync(envPath);
+if (isLocalEnv) {
+  dotenv.config({ path: envPath });
+}
 const app = express();
 // Como las variables de env son siempre string, tiene que comparar si es igual a 'true', entonces almacena el booleano de js
 
-console.log('env:', process.env.LOCAL);
-const local = process.env.LOCAL === 'true';
-console.log('local:', local);
+// Definir modo local según existencia de .env
+const local = isLocalEnv;
+console.log('Modo local (archivo .env encontrado):', local);
 // cors lo que hace es dar el permiso al un puerto para hacer las peticiones al back
 // CORS dinámico (permite lista separada por comas en FRONTEND_ORIGIN)
 const rawOrigins = local
@@ -63,16 +68,12 @@ app.use('/api/servicio', servicioRouter);
 app.use('/api/turno', turnoRouter);
 app.use('/api/horario', horarioRouter);
 app.use('/api/zona', zonaRouter);
-app.use('/api/mercadoPago', mercadoPago);
-app.use('/api/mp', mercadoPagoOauthRouter);
 app.use('/api/pago', PagoRouter);
-app.use('/webhooks/mercadopago', webhookRouter);
 app.use('/api/auth', authRoutes);
 
-// app.use((req, res) => {
-//   console.log(req)
-//   return res.status(404).send({ message: 'Resource not found' });
-// }); comente esto pq me tiraba error
+// MercadoPago routes - agrupadas
+// Rutas de MercadoPago (webhooks y OAuth)
+app.use('/api/mercadopago', webhookRouter);
 
 if (local) {
   console.log('LOCAL_MODE=true -> syncSchema habilitado');
@@ -104,16 +105,10 @@ app.get('/health', async (req: Request, res: Response) => {
 });
 
 // Define el puerto en el que se ejecutará el servidor
-// console.log(local);
-// const port = local ? 3000 : Number(process.env.PORT) || 8080; // Fly asigna PORT
-// app.listen(port, () => {
-//   console.log(`Server running on port ${port}`);
-// });
-
-const PORT = Number(process.env.PORT) || 3000;
-
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+console.log(local);
+const port = local ? 3000 : Number(process.env.PORT) || 8080; // Fly asigna PORT
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
 
 /* app.listen(3000, () => {

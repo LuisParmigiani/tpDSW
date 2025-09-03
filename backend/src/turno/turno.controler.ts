@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Turno } from './turno.entity.js';
 import { orm } from '../shared/db/orm.js';
+import { moderateContent, type ModerationResult } from '../shared/services/openai.service.js';
 
 interface AuthRequest extends Request {
   user?: {
@@ -108,6 +109,35 @@ async function update(req: Request, res: Response) {
     if (!turn) {
       return res.status(404).json({ message: 'Turn not found' });
     }
+
+    // Check if there's a comment to moderate
+    if (sanitizedInput.comentario) {
+      console.log('🔍 Moderating comment:', sanitizedInput.comentario);
+      //Paso el comentario por la moderación de la API de OpenAI
+      const moderationResult = await moderateContent(sanitizedInput.comentario);
+      console.log('📊 Moderation result:', moderationResult);
+
+      // Check if content was flagged (either by OpenAI or fallback)
+      if (moderationResult.flagged) {
+        const moderationType = moderationResult.fallback ? 'fallback keyword detection' : 'OpenAI moderation';
+        return res.status(403).json({
+          message: `Comment blocked due to inappropriate content (${moderationType})`,
+          data: { 
+            flagged: true, 
+            categories: moderationResult.categories,
+            moderationType,
+            foundKeywords: moderationResult.foundKeywords || []
+          },
+        });
+      }
+
+      // Log if moderation service failed but content wasn't flagged
+      if (moderationResult.error && !moderationResult.fallback) {
+        console.log('⚠️ OpenAI moderation service failed, but content passed fallback check');
+      }
+    }
+
+    // Update the turn if moderation passed or no comment provided
     em.assign(turn, sanitizedInput);
     await em.persistAndFlush(turn);
     res.status(200).json({ message: 'Turn updated successfully', data: turn });
