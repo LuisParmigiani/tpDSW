@@ -1,6 +1,3 @@
-## Dudas a preguntar al profe:
-
----
 
 ### Comandos útiles de Fly.io
 
@@ -28,10 +25,5 @@
 - `fly restart`  
   Reinicia la app manualmente.
 
-- `fly deploy --app backend-patient-morning-1303`  
-  Despliega la aplicación específica.
-
-### Notas importantes:
-
-- Las credenciales sensibles (API keys, tokens, etc.) deben configurarse usando `fly secrets set` y nunca incluirse en archivos de código.
-- Para ver las variables secretas configuradas: `fly secrets list`
+- fly deploy --app backend-patient-morning-1303
+  --

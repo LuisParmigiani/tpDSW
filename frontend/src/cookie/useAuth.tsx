@@ -25,7 +25,7 @@ const useAuth = () => {
         setUsuario(null);
       }
     } catch (error) {
-      console.log('useAuth entre al catch', error);
+      console.log('❌ UseAuth: error en el catch', error);
       setUsuario(null);
     } finally {
       setLoading(false);

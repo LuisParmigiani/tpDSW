@@ -380,19 +380,25 @@ async function loginUsuario(req: Request, res: Response) {
     if (usuarioSinContrasena) {
       const rol =
         usuarioSinContrasena.nombreFantasia === null ? 'cliente' : 'prestador';
+
       const token = jwt.sign({ id: usuarioSinContrasena.id, rol }, JWT_SECRET, {
         expiresIn: '1d',
       });
 
-      // 🔹 Guardamos el token en una cookie segura
+      // Detectamos si estás en local para no forzar HTTPS
       const local = process.env.LOCAL === 'true';
+
       res.cookie('token', token, {
         httpOnly: true,
-        secure: !local,
-        sameSite: local ? 'lax' : 'none', // 'none' solo si secure=true
+        secure: !local, // ✅ en producción (HTTPS) => true, en local => false
+        sameSite: local ? 'lax' : 'none', // ✅ en local permite pruebas sin HTTPS
         path: '/',
+        maxAge: 24 * 60 * 60 * 1000, // 1 día
       });
+
+      res.json({ message: 'Cookie seteada correctamente' });
     }
+
     return res
       .status(200)
       .json({ message: 'Login exitoso', data: usuarioSinContrasena });
