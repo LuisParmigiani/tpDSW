@@ -269,7 +269,7 @@ async function findOneByCookie(req: AuthRequest, res: Response) {
   try {
     // Si el id viene por params, úsalo. Si no, usa el id del usuario autenticado.
     const id = req.user?.id;
-
+    console.log('ID from token:', id);
     if (!id) {
       return res.status(400).json({ message: 'Usuario no autenticado' });
     }
@@ -277,7 +277,10 @@ async function findOneByCookie(req: AuthRequest, res: Response) {
     const user = await em.findOneOrFail(Usuario, { id: Number(id) }, {});
     res.status(200).json({ message: 'found one usuario', data: user });
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      message: 'entro al catch de findOneByCookie',
+      error: error.message,
+    });
   }
 }
 

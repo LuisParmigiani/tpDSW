@@ -21,6 +21,20 @@ function Navbar() {
     setShowNav((prev) => !prev);
   };
 
+  useEffect(() => {
+    const getUsuario = async () => {
+      try {
+        console.log('Cargando usuario...');
+        const res = await usuariosApi.getByCookie();
+        console.log('Usuario cargado:', res.data.data);
+        setUsuario(res.data.data);
+      } catch (err) {
+        console.error('Error al cargar usuario:', err);
+      }
+    };
+    if (rol != '') getUsuario();
+  }, [rol]);
+  // juan.perez@email.com
   // Controlar el scroll del body cuando el menú está abierto
   useEffect(() => {
     if (showNav) {
@@ -28,13 +42,13 @@ function Navbar() {
     } else {
       document.body.style.overflow = 'unset';
     }
-
     // Cleanup al desmontar el componente
     return () => {
       document.body.style.overflow = 'unset';
     };
   }, [showNav]);
 
+  // opciones del menú según el rol
   const options: Option[] =
     rol === 'cliente'
       ? [
@@ -65,6 +79,7 @@ function Navbar() {
             url: '/about',
           },
         ];
+  // Mapeo de las opciones para renderizarlas
   const showOptions = options.map((option) => (
     <li
       key={option.nombre}
@@ -79,17 +94,6 @@ function Navbar() {
       </Link>
     </li>
   ));
-  useEffect(() => {
-    const getUsuario = async () => {
-      try {
-        const res = await usuariosApi.getByCookie();
-        setUsuario(res.data.data);
-      } catch (err) {
-        console.error('Error al cargar usuario:', err);
-      }
-    };
-    getUsuario();
-  }, []);
 
   // Renderizado del componente Navbar
   return (
