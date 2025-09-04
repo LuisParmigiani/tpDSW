@@ -1,6 +1,6 @@
 import { api } from './api';
 import type { EntityData } from './api';
-
+const token = localStorage.getItem('token');
 export const usuariosApi = {
   getAll: () => api.get('/usuario'),
   getPrestatariosByTipoServicioAndZona: (
@@ -22,7 +22,10 @@ export const usuariosApi = {
   },
   getById: (id: string) => api.get(`/usuario/${id}`),
   getByIdOnlyInfo: (id: string) => api.get(`/usuario/onlyInfo/${id}`),
-  getByCookie: () => api.get(`/usuario/cookie`, { withCredentials: true }),
+  getByCookie: () =>
+    api.get(`/usuario/cookie`, {
+      headers: { Authorization: `Bearer ${token}` },
+    }),
   getCommentsByUserId: (
     userId: string,
     maxItems?: string,

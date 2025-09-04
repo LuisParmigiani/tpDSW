@@ -1,6 +1,6 @@
 //axios es una librería que permite hacer peticiones HTTP
 import axios from 'axios';
-
+const token = localStorage.getItem('token');
 // El puerto del backend donde quiere hacer las peticiones
 // Como las variables de env son siempre string, tiene que comparar si es igual a 'true', entonces almacena el booleano de js
 const local = import.meta.env.VITE_LOCAL === 'true';
@@ -24,8 +24,8 @@ export const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
+    Authorization: `Bearer ${token}`,
   },
-  withCredentials: true,
 });
 
 // ====== INTERCEPTORES ======

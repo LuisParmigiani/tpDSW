@@ -32,8 +32,9 @@ function Logincard() {
 
   const envioFormulario = async () => {
     try {
-      await usuariosApi.login(form);
+      const { data } = await usuariosApi.login(form);
       console.log('Login exitoso');
+      localStorage.setItem('token', data.token);
       navigate('/dashboard');
     } catch (error) {
       setOpen(true);

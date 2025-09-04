@@ -1,9 +1,14 @@
 import { api } from './api';
 import type { EntityData } from './api';
+const token = localStorage.getItem('token');
 export const mercadoPagoApi = {
   // Ajuste: llamar al endpoint montado en /api/mercadopago
   create: (data: EntityData) =>
-    api.post('/mercadopago/crear-pago', data, { withCredentials: true }),
+    api.post('/mercadopago/crear-pago', data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }),
 
   // OAuth endpoints
   connect: (userId: number) =>

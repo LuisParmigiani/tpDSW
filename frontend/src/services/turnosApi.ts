@@ -1,6 +1,6 @@
 import { api } from './api';
 import type { EntityData } from './api';
-
+const token = localStorage.getItem('token');
 export const turnosApi = {
   getAll: () => api.get('/turno'),
   getById: (id: string) => api.get(`/turno/${id}`),
@@ -15,13 +15,12 @@ export const turnosApi = {
     const filterValue = selectedValueShow || 'all';
     const orderValue = selectedValueOrder || '';
 
-    
     let url = `/turno/byUser/${cantItemsPerPage}/${currentPage}/${filterValue}`;
     if (orderValue) {
       url += `/${orderValue}`;
     }
 
-    return api.get(url, { withCredentials: true });
+    return api.get(url, { headers: { Authorization: `Bearer ${token}` } });
   },
   getByPrestadorId: (
     id: string,
@@ -49,13 +48,11 @@ export const turnosApi = {
       parts.push('none'); // placeholder que el backend reconocerá como vacío
     }
 
-    
     // Agregar searchQuery si hay
     if (searchQuery && searchQuery.trim() !== '') {
       parts.push(encodeURIComponent(searchQuery.trim()));
     }
 
-    
     const url = '/' + parts.join('/');
     console.log('URL construida:', url);
     return api.get(url);

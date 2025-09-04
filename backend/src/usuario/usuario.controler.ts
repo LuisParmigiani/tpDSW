@@ -1,15 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { Usuario } from './usuario.entity.js';
 import path from 'path';
-import {
-  getTurnosByServicioIdHelper,
-  getTurnsPerDay,
-} from '../turno/turno.controler.js';
+import { getTurnosByServicioIdHelper } from '../turno/turno.controler.js';
 import jwt from 'jsonwebtoken';
 import fs from 'fs/promises';
 import fsSync from 'fs';
 import { fileURLToPath } from 'url';
-import { dirname } from 'path';
 import bcrypt from 'bcrypt';
 import { orm } from '../shared/db/orm.js';
 import nodemailer from 'nodemailer';
@@ -20,9 +16,6 @@ const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
 
 // Función para detectar si estamos en modo local
 const __dirname = path.dirname(__filename);
-// Define envPath to point to your .env file or environment config
-const envPath = path.join(__dirname, '../../.env');
-const isLocalMode = () => fsSync.existsSync(envPath);
 
 interface AuthRequest extends Request {
   user?: {
@@ -406,26 +399,9 @@ async function loginUsuario(req: Request, res: Response) {
       expiresIn: '1d',
     });
 
-    // Detectamos si estás en local para no forzar HTTPS
-    const local = isLocalMode();
-
-    console.log('🍪 Configuración de cookie:', {
-      local,
-      secure: !local,
-      sameSite: local ? 'lax' : 'none',
-    });
-
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: !local, // ✅ en producción (HTTPS) => true, en local => false
-      sameSite: local ? 'lax' : 'none', // ✅ en local permite pruebas sin HTTPS
-      path: '/',
-      maxAge: 24 * 60 * 60 * 1000, // 1 día
-    });
-
     return res
       .status(200)
-      .json({ message: 'Login exitoso', data: usuarioSinContrasena });
+      .json({ message: 'Login exitoso', token, data: usuarioSinContrasena });
   } catch (error: any) {
     console.error('Error en loginUsuario:', error);
     return res
