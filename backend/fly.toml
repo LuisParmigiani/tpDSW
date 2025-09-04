@@ -4,7 +4,7 @@
 # =============================================================
 
 app = 'backend-patient-morning-1303'
-primary_region = 'gru'
+primary_region = 'eze'
 
 [build]
   dockerfile = 'Dockerfile'
@@ -12,6 +12,10 @@ primary_region = 'gru'
 
 [env]
   NODE_ENV = 'production'
+
+[[mounts]]
+  source = "uploads"
+  destination = "/app/public/uploads"
 
 [[services]]
   protocol = 'tcp'

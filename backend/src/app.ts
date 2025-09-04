@@ -35,8 +35,23 @@ const app = express();
 //Configuro el body parser para que tenga un límite más grande, sino las imagenes no podían llegar
 //hasta el middleware
 
-const staticPath = path.join(__dirname, '../public/uploads');
+const isProduction = process.env.NODE_ENV === 'production';
 
+const staticPath = isProduction
+  ? '/app/public/uploads' // Fly.io volume mount point
+  : path.join(__dirname, '../../public/uploads'); // Local development
+
+console.log('📁 Static serving path:', staticPath);
+
+// Ensure directory exists (especially important for volumes)
+try {
+  await fs.promises.mkdir(path.join(staticPath, 'profiles'), {
+    recursive: true,
+  });
+  console.log('✅ Upload directories ready');
+} catch (error) {
+  console.error('❌ Error creating upload directories:', error);
+}
 app.use('/uploads', express.static(staticPath));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
