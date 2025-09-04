@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { usuariosApi } from '../../services/usuariosApi';
+import useAuth from '../../cookie/useAuth';
 
 function Logincard() {
+  const { verificarAuth } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
@@ -35,6 +37,7 @@ function Logincard() {
       const { data } = await usuariosApi.login(form);
       console.log('Login exitoso');
       localStorage.setItem('token', data.token);
+      await verificarAuth();
       navigate('/dashboard');
     } catch (error) {
       setOpen(true);

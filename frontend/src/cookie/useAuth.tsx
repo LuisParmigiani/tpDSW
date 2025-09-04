@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
 interface User {
   id: number;
-  rol: "cliente" | "prestador";
+  rol: 'cliente' | 'prestador';
 }
 
 const useAuth = () => {
@@ -11,12 +11,12 @@ const useAuth = () => {
 
   const verificarAuth = async () => {
     try {
-      const local = import.meta.env.VITE_LOCAL === "true";
+      const local = import.meta.env.VITE_LOCAL === 'true';
       const API_BASE_URL = local
-        ? "http://localhost:3000/api"
-        : "https://backend-patient-morning-1303.fly.dev/api";
+        ? 'http://localhost:3000/api'
+        : 'https://backend-patient-morning-1303.fly.dev/api';
 
-      const token = localStorage.getItem("token"); // 🔑 tomamos el token guardado
+      const token = localStorage.getItem('token'); // 🔑 tomamos el token guardado
       if (!token) {
         setUsuario(null);
         setLoading(false);
@@ -36,7 +36,7 @@ const useAuth = () => {
         setUsuario(null);
       }
     } catch (error) {
-      console.log("❌ UseAuth: error en el catch", error);
+      console.log('❌ UseAuth: error en el catch', error);
       setUsuario(null);
     } finally {
       setLoading(false);

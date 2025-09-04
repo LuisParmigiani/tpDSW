@@ -47,10 +47,6 @@ function Navbar() {
             url: '/historial',
           },
           {
-            nombre: 'Dashboard',
-            url: '/dashboard',
-          },
-          {
             nombre: 'Sobre nosotros',
             url: '/about',
           },

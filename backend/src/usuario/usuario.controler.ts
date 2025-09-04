@@ -420,6 +420,7 @@ const transporter = nodemailer.createTransport({
     pass: 'mkyg zmvc hjux pkqr',
   },
 });
+//
 
 async function recuperarContrasena(req: Request, res: Response) {
   try {
