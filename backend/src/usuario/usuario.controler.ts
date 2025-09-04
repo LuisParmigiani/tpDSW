@@ -549,7 +549,8 @@ async function uploadProfileImage(req: Request, res: Response) {
     console.log('✅ Image processed successfully');
     console.log('🔗 Returned URL:', urlOptimizada);
     //Limpia la imagen subida
-    const baseUrl = process.env.BASE_URL || 'https://reformix.site';
+    const baseUrl =
+      process.env.BASE_URL || 'https://backend-patient-morning-1303.fly.dev';
 
     const fullPath = path.join(__dirname, '../../public', urlOptimizada);
     try {
