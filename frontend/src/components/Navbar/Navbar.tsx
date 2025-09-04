@@ -88,8 +88,8 @@ function Navbar() {
         console.error('Error al cargar usuario:', err);
       }
     };
-    if (rol != '') getUsuario();
-  }, [rol]);
+    getUsuario();
+  }, []);
 
   // Renderizado del componente Navbar
   return (
