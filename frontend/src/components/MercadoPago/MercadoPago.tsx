@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
+//import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
 import { mercadoPagoApi } from '../../services/mercadoPagoApi';
 
 type Props = {
@@ -35,7 +35,7 @@ type Usuario = {
 };
 
 const MercadoPago = (props: Props) => {
-  initMercadoPago(props.mpPublicKey);
+  //initMercadoPago(props.mpPublicKey);
   const [preferenceId, setPreferenceId] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -135,7 +135,6 @@ const MercadoPago = (props: Props) => {
             </div>
 
             {/* ✅ Wallet de Mercado Pago */}
-            <Wallet initialization={{ preferenceId }} />
           </div>
         </div>
       )}
