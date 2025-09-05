@@ -2,7 +2,7 @@ import Stars from '../stars/Stars';
 import { useState, useEffect } from 'react';
 import { turnosApi } from '../../services/turnosApi';
 import { serviciosApi } from '../../services/serviciosApi';
-type Props = {
+export type Props = {
   id: number;
 };
 
@@ -13,6 +13,7 @@ export type Turno = {
   };
   servicio: {
     id: number;
+    usuario: number;
   };
   comentario?: string;
   calificacion?: number;
@@ -20,9 +21,17 @@ export type Turno = {
 type Servicio = {
   id: number;
   precio: number;
-  usuarios: {
+  usuario: {
     id: number;
     nombre: string;
+    nombreFantasia: string;
+  };
+  tarea?: {
+    id: number;
+    nombreTarea: string;
+    descripcionTarea?: string;
+    duracionTarea?: number;
+    tipoServicio?: number;
   };
 };
 
@@ -60,34 +69,38 @@ function Comments({ id }: Props) {
 
   const fotoUser = turno?.usuario?.fotoPerfil || '../images/fotoUserId.png';
   const nombreUser = turno?.usuario?.nombre || 'Nombre Usuario';
-  const comentarioText = turno?.comentario || 'Comentario no disponible';
+  const comentarioText = turno?.comentario || 'La persona no dejó comentario.';
   const calificacion = turno?.calificacion || 3;
+  
+  const nombreTarea = servicio?.tarea?.nombreTarea || 'Tarea no especificada';
 
-  const nombrePrestatario =
-    Array.isArray(servicio?.usuarios) && servicio.usuarios.length > 0
-      ? servicio.usuarios[0].nombre
-      : 'Nombre Prestatario'; // despues hay que cambiarlo porq ahora es una array de usuarios porq esta mal la base de datos
+  const nombrePrestatario = servicio?.usuario?.nombreFantasia || 'Nombre Prestatario';
   return (
     <div className="mx-auto mt-6 rounded-xl bg-white shadow-[0_0_30px_0_rgba(0,0,0,0.1)] p-3 h-auto pb-0 w-full">
-      <div className="flex items-center flex-row w-11/12 justify-between mb-2.5 ">
-        <div className="flex flex-row items-center max-w-[90%] max-h-[13%]">
+      <div className="flex items-center w-full mb-4">
+        <div className="flex flex-row items-center flex-1">
           <img
-            className="w-12 h-12 rounded-full mr-3 "
+            className="w-12 h-12 rounded-full mr-3"
             src={fotoUser}
             alt="foto de perfil de usuario"
           />
-          <h2 className="text-black">{nombreUser}</h2>
+          <div className="flex flex-col space-y-0">
+            <h2 className="text-black text-left leading-tight">{nombreUser}</h2>
+            <p className="text-gray-500 text-xs text-left leading-tight">{nombreTarea}</p>
+          </div>
         </div>
-        <div className="flex flex-row-reverse items-center max-w-24 max-h-16">
-          <Stars cant={calificacion} />
+        <div className="inline-flex items-center p-0 m-0">
+          <div style={{ margin: 0, padding: 0 }}>
+            <Stars cant={calificacion} className="!mx-0 !ml-0 !mr-0" />
+          </div>
         </div>
       </div>
 
-      <p className="text-black">{comentarioText}</p>
+      <p className="text-black text-left text-sm">{comentarioText}</p>
       <div className="w-full flex flex-row m-2/100">
         <p className="mt-3 pb-2 text-gray-500 text-xs">
           {' '}
-          Reseña al prestatario: {nombrePrestatario}
+          Reseña a {nombrePrestatario}
         </p>
       </div>
     </div>

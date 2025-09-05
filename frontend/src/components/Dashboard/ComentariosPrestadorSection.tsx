@@ -29,13 +29,18 @@ function ComentariosPrestadorSection() {
         'fechaCreacion_desc' // ordenar por fecha descendente
       );
       
-      console.log('Respuesta de la API:', response.data);
-      
       // Extraer los IDs de los turnos/comentarios
       const comentarios = response.data.data || [];
-      const ids = comentarios.map((comentario: Turno) => comentario.servicio.id).filter((id: number) => id);
       
-      console.log('IDs de comentarios encontrados:', ids);
+      // Filtrar solo comentarios de servicios del prestador ID 46
+      const comentariosFiltrados = comentarios.filter((comentario: Turno) => {
+        return comentario.servicio?.usuario === 46;
+      });
+      
+      console.log(`DEBUG - Total comentarios: ${comentarios.length}, Comentarios filtrados: ${comentariosFiltrados.length}`);
+      
+      // Usar el ID del turno, uso any porque turno no tiene id definido en el tipo y si lo cambio se rompe todo creo.
+      const ids = comentariosFiltrados.map((comentario: any) => comentario.id).filter((id: number) => id);
       
       setComentariosIds(ids);
       
@@ -89,9 +94,6 @@ function ComentariosPrestadorSection() {
           </div>
         ) : (
           <div className="space-y-4">
-            <p className="text-gray-600 mb-4">
-              Total de comentarios: {comentariosIds.length}
-            </p>
             {comentariosIds.map((id) => (
               <Comments key={id} id={id} />
             ))}
