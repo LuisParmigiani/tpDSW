@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import PerfilSection from '../../components/Dashboard/PerfilSection';
 import ClientesSection from '../../components/Dashboard/ClientesSection';
 import ServiciosSection from '../../components/Dashboard/ServiciosSection';
+import ComentariosPrestadorSection from '../../components/Dashboard/ComentariosPrestadorSection';
 import { useProtectRoute } from '../../cookie/useProtectRoute.tsx';
 
 function Dashboard() {
@@ -78,6 +79,21 @@ function Dashboard() {
         </svg>
       ),
     },
+    {
+      id: 'comentarios',
+      name: 'Comentarios',
+      icon: (
+        <svg
+          className="w-5 h-5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+      ),
+    },
   ];
 
   const renderActiveSection = () => {
@@ -88,6 +104,8 @@ function Dashboard() {
         return <ClientesSection />;
       case 'servicios':
         return <ServiciosSection />;
+      case 'comentarios':
+        return <ComentariosPrestadorSection />;
       default:
         return <PerfilSection />;
     }

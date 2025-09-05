@@ -45,9 +45,9 @@ function PerfilSection() {
       } else {
         throw new Error('Invalid response structure');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching prestador data:', error);
-      setError(error.message || 'Error loading profile data');
+      setError(error instanceof Error ? error.message : 'Error loading profile data');
       setDataFetched(false);
     }
   };

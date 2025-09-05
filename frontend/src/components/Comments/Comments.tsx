@@ -6,12 +6,12 @@ type Props = {
   id: number;
 };
 
-type Turno = {
+export type Turno = {
   usuario?: {
     nombre: string;
     fotoPerfil: string;
   };
-  servicio?: {
+  servicio: {
     id: number;
   };
   comentario?: string;

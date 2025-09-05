@@ -54,6 +54,15 @@ function DashNav({ activeSection, setActiveSection }: DashNavProps) {
           <path d="M14.9998 23.4373C14.2748 23.4373 13.5624 23.2748 12.9874 22.9623L8.98733 20.7373C7.78733 20.0748 6.8623 18.4873 6.8623 17.1123V12.8748C6.8623 11.5123 7.79983 9.92476 8.98733 9.24976L12.9874 7.02476C14.1374 6.38726 15.8623 6.38726 17.0123 7.02476L21.0123 9.24976C22.2123 9.91226 23.1374 11.4998 23.1374 12.8748V17.1123C23.1374 18.4748 22.1998 20.0623 21.0123 20.7373L17.0123 22.9623C16.4373 23.2873 15.7248 23.4373 14.9998 23.4373ZM14.9998 8.43726C14.5873 8.43726 14.1873 8.51226 13.8998 8.67476L9.89984 10.8998C9.28734 11.2373 8.7373 12.1873 8.7373 12.8748V17.1123C8.7373 17.8123 9.28734 18.7498 9.89984 19.0873L13.8998 21.3123C14.4748 21.6373 15.5248 21.6373 16.0998 21.3123L20.0998 19.0873C20.7123 18.7498 21.2624 17.7998 21.2624 17.1123V12.8748C21.2624 12.1748 20.7123 11.2373 20.0998 10.8998L16.0998 8.67476C15.8123 8.51226 15.4123 8.43726 14.9998 8.43726Z" fill="currentColor"/>
         </svg>
       )
+    },
+    {
+      id: 'comentarios',
+      name: 'Comentarios',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        </svg>
+      )
     }
   ];
 
@@ -154,10 +163,10 @@ function DashNav({ activeSection, setActiveSection }: DashNavProps) {
               <p className="text-sm font-medium text-gray-700 text-left">
                 {usuario?.nombre || usuario?.apellido 
                   ? `${usuario.nombre || ''} ${usuario.apellido || ''}`.trim()
-                  : usuario?.email || usuario?.mail || 'Luis Parmigiani'}
+                  : usuario?.mail }
               </p>
               <p className="text-xs text-gray-500 text-left">
-                {usuario?.email || usuario?.mail || 'luisperm@gmail.com'}
+                { usuario?.mail }
               </p>
             </div>
           )}
