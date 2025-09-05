@@ -18,13 +18,13 @@ function Homepage() {
     'Control de Plagas',
   ];
   const redirecciones: string[] = [
-    'Plomeria',
+    'Plomería',
     'Electricidad',
-    'Carpinteria',
+    'Carpintería',
     'Pintura',
-    'Construccion',
-    'Cerrajeria',
-    'Jardineria',
+    'Construcción',
+    'Cerrajería',
+    'Jardinería',
     'Limpieza Residencial',
     'Control de Plagas',
   ];

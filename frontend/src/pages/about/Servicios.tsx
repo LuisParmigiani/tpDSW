@@ -14,6 +14,7 @@ type Usuario = {
   nombre: string;
   apellido: string;
   nombreFantasia: string;
+  foto: string;
   tiposDeServicio: Array<{
     id: number;
     nombreTipo: string;
@@ -350,6 +351,7 @@ function FiltrosDeServicios() {
             nombre={user.nombreFantasia}
             rubros={nombresRubros}
             puntuacion={user.calificacion}
+            foto={user.foto}
             key={user.id} // Better to use user.id instead of index
           />
         );

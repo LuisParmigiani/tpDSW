@@ -185,6 +185,7 @@ async function upsertByUserAndTask(req: Request, res: Response) {
         precio,
         tarea: tareaId,
         usuario: usuarioId,
+        estado: 'inactivo',
       });
       await em.persistAndFlush(nuevoServicio);
       res.status(201).json({ 

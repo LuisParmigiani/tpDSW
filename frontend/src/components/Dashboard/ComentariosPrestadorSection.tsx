@@ -2,11 +2,11 @@ import DashboardSection from '../DashboardSection/DashboardSection';
 import { useState, useEffect } from 'react';
 import { usuariosApi } from '../../services/usuariosApi';
 import Comments from '../Comments/Comments';
-//import useAuth from '../../cookie/useAuth';
+import useAuth from '../../cookie/useAuth';
 import type { Turno } from '../../components/Comments/Comments';
 
 function ComentariosPrestadorSection() {
-  //const { usuario } = useAuth();
+  const { usuario } = useAuth();
   const [comentariosIds, setComentariosIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -17,11 +17,14 @@ function ComentariosPrestadorSection() {
       setLoading(true);
       setError(null);
       
-      // Por ahora usar el ID 46 como solicitaste
-      const prestadorId = '46'; // usuario?.id?.toString() ||;
+      const prestadorId = usuario?.id?.toString();
       
-      console.log('Cargando comentarios para prestador ID:', prestadorId);
-      
+      if (!prestadorId) {
+        console.error('No se pudo obtener prestadorId:', { usuario, prestadorId });
+        setError('No se pudo obtener el ID del usuario logueado.');
+        return;
+      }
+
       const response = await usuariosApi.getCommentsByUserId(
         prestadorId,
         '50', // máximo 50 comentarios
@@ -32,31 +35,40 @@ function ComentariosPrestadorSection() {
       // Extraer los IDs de los turnos/comentarios
       const comentarios = response.data.data || [];
       
-      // Filtrar solo comentarios de servicios del prestador ID 46
+      // Filtrar solo comentarios de servicios del prestador logueado
       const comentariosFiltrados = comentarios.filter((comentario: Turno) => {
-        return comentario.servicio?.usuario === 46;
+        return comentario.servicio?.usuario === usuario?.id;
       });
       
-      console.log(`DEBUG - Total comentarios: ${comentarios.length}, Comentarios filtrados: ${comentariosFiltrados.length}`);
       
       // Usar el ID del turno, uso any porque turno no tiene id definido en el tipo y si lo cambio se rompe todo creo.
       const ids = comentariosFiltrados.map((comentario: any) => comentario.id).filter((id: number) => id);
       
       setComentariosIds(ids);
       
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error al cargar comentarios:', err);
-      setError('Error al cargar los comentarios. Por favor, intenta nuevamente.');
-      setComentariosIds([]);
+      
+      // Si es un 404, significa que no hay comentarios, no es un error fatal
+      if (err?.response?.status === 404) {
+        console.log('Usuario no tiene comentarios (404)');
+        setComentariosIds([]); // Array vacío = "No tienes comentarios aún"
+        setError(null); // No mostrar error
+      } else {
+        setError('Error al cargar los comentarios. Por favor, intenta nuevamente.');
+        setComentariosIds([]);
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  // Cargar comentarios al montar el componente
+  // Cargar comentarios cuando el usuario esté disponible
   useEffect(() => {
-    cargarComentarios();
-  }, []);
+    if (usuario?.id) {
+      cargarComentarios();
+    }
+  }, [usuario?.id]);
 
   if (loading) {
     return (

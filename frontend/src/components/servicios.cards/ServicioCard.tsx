@@ -8,12 +8,14 @@ type Props = {
   nombre: string;
   rubros: string;
   puntuacion: number;
+  foto: string;
 };
 export default function ServicioCard({
   id,
   nombre,
   rubros,
   puntuacion,
+  foto,
 }: Props) {
   const handleClick = () => {
     navigate(`/borrower/${id}`);
@@ -27,7 +29,7 @@ export default function ServicioCard({
       key={id}
     >
       <img
-        src="./../../public/images/SantiagoMalet.png"
+        src={foto}
         alt="Foto de Perfil"
         className={'w-26 h-26 rounded-full mx-auto mt-2 mb-3'}
       />

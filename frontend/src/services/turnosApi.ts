@@ -1,6 +1,6 @@
 import { api } from './api';
 import type { EntityData } from './api';
-const token = localStorage.getItem('token');
+
 export const turnosApi = {
   getAll: () => api.get('/turno'),
   getById: (id: string) => api.get(`/turno/${id}`),
@@ -19,8 +19,10 @@ export const turnosApi = {
     if (orderValue) {
       url += `/${orderValue}`;
     }
-
-    return api.get(url, { headers: { Authorization: `Bearer ${token}` } });
+    const token = localStorage.getItem('token');
+    return api.get(url, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
   },
   getByPrestadorId: (
     id: string,
