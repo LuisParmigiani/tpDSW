@@ -6,9 +6,8 @@ import PaginationControls from '../../components/Pagination/PaginationControler'
 import { turnosApi } from '../../services/turnosApi';
 import TurnoDetailsModal from '../Modal/TurnoDetailsModal';
 import ConfirmationModal from '../Modal/ConfirmationModal';
+import useAuth from '../../cookie/useAuth';
 
-
-const PRESTADOR_ID_FIXED = '47';
 
 // Función auxiliar para capitalizar la primera letra
 const capitalizeFirstLetter = (string: string) => {
@@ -63,6 +62,7 @@ interface TurnoDisplay {
 }
 
 function ClientesSection() {
+	const { usuario } = useAuth(); // Obtener usuario logueado
 	const [selectedTurnoIds, setSelectedTurnoIds] = useState<number[]>([]); // Cambio: usar IDs en lugar de índices
 	const [showMenu, setShowMenu] = useState(false);
 	const [showBar, setShowBar] = useState(false);
@@ -89,6 +89,13 @@ function ClientesSection() {
 
 	const cargarTurnos = useCallback(async (page = 1, ordenamiento = sortBy, filtrosEstado = estadoFilters, isPageChange = false, searchTerm = '') => {
 		try {
+			// Validar que el usuario esté autenticado
+			if (!usuario || !usuario.id) {
+				setError('Error: Usuario no autenticado');
+				setLoading(false);
+				return;
+			}
+
 			if (isPageChange) {
 				setLoading(true); // Solo para cambios de página
 			} else {
@@ -131,7 +138,7 @@ function ClientesSection() {
 			// Si no hay filtros, no aplicar filtro específico (mostrar todos)
 			
 			const response = await turnosApi.getByPrestadorId(
-				PRESTADOR_ID_FIXED,
+				usuario.id.toString(),
 				itemsPerPage.toString(),
 				page.toString(),
 				backendFilterValue || 'all', // selectedValueShow - usar 'all' si está vacío
@@ -151,7 +158,7 @@ function ClientesSection() {
 		} finally {
 			setLoading(false);
 		}
-	}, [itemsPerPage, sortBy, estadoFilters]); // Remover searchQuery de las dependencias
+	}, [itemsPerPage, sortBy, estadoFilters, usuario]); // Agregar usuario a las dependencias
 
 	// Cargar turnos al montar el componente y cuando cambie la página
 	useEffect(() => {
