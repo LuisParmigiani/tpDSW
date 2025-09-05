@@ -1,5 +1,4 @@
 import StarRating from '../stars/RatingStars';
-import { useEffect } from 'react';
 
 type Turno = {
   id: number;
