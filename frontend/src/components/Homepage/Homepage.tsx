@@ -20,11 +20,11 @@ function Homepage() {
   const redirecciones: string[] = [
     'Plomería',
     'Electricidad',
-    'Carpinteria',
+    'Carpintería',
     'Pintura',
-    'Construccion',
-    'Cerrajeria',
-    'Jardineria',
+    'Construcción',
+    'Cerrajería',
+    'Jardinería',
     'Limpieza Residencial',
     'Control de Plagas',
   ];
