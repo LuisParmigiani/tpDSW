@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import { Servicio } from './servicio.entity.js';
 import { orm } from '../shared/db/orm.js';
 import { Turno } from '../turno/turno.entity.js';
+import { Tarea } from '../tarea/tarea.entity.js';
+import { Usuario } from '../usuario/usuario.entity.js';
 
 const em = orm.em;
 
@@ -124,6 +126,111 @@ async function getById(id: number) {
   }
 }
 
+// Obtener servicios por usuario
+async function getByUser(req: Request, res: Response) {
+  try {
+    const usuarioId = Number.parseInt(req.params.usuarioId);
+
+    if (!usuarioId) {
+      return res.status(400).json({ 
+        message: 'usuarioId es requerido' 
+      });
+    }
+
+    const servicios = await em.find(Servicio, {
+      usuario: usuarioId,
+    }, {
+      populate: ['tarea', 'tarea.tipoServicio', 'usuario']
+    });
+
+    res.status(200).json({ 
+      message: 'Servicios encontrados', 
+      data: servicios 
+    });
+  } catch (error: any) {
+    console.error('Error en getByUser:', error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
+// Crear o actualizar servicio por usuario y tarea
+async function upsertByUserAndTask(req: Request, res: Response) {
+  try {
+    const { tareaId, usuarioId, precio } = req.body;
+
+    if (!tareaId || !usuarioId || !precio || precio <= 0) {
+      return res.status(400).json({ 
+        message: 'tareaId, usuarioId y precio (>0) son requeridos' 
+      });
+    }
+
+    // Buscar si ya existe un servicio con esta combinación
+    const servicioExistente = await em.findOne(Servicio, {
+      tarea: tareaId,
+      usuario: usuarioId,
+    });
+
+    if (servicioExistente) {
+      // Actualizar precio del servicio existente
+      servicioExistente.precio = precio;
+      await em.persistAndFlush(servicioExistente);
+      res.status(200).json({ 
+        message: 'Servicio actualizado', 
+        data: servicioExistente,
+        action: 'updated'
+      });
+    } else {
+      // Crear nuevo servicio
+      const nuevoServicio = em.create(Servicio, {
+        precio,
+        tarea: tareaId,
+        usuario: usuarioId,
+      });
+      await em.persistAndFlush(nuevoServicio);
+      res.status(201).json({ 
+        message: 'Servicio creado', 
+        data: nuevoServicio,
+        action: 'created'
+      });
+    }
+  } catch (error: any) {
+    console.error('Error en upsertByUserAndTask:', error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
+// Eliminar servicio por usuario y tarea
+async function deleteByUserAndTask(req: Request, res: Response) {
+  try {
+    const { tareaId, usuarioId } = req.params;
+
+    if (!tareaId || !usuarioId) {
+      return res.status(400).json({ 
+        message: 'tareaId y usuarioId son requeridos' 
+      });
+    }
+
+    const servicio = await em.findOne(Servicio, {
+      tarea: Number(tareaId),
+      usuario: Number(usuarioId),
+    });
+
+    if (!servicio) {
+      return res.status(404).json({ 
+        message: 'Servicio no encontrado' 
+      });
+    }
+
+    await em.removeAndFlush(servicio);
+    res.status(200).json({ 
+      message: 'Servicio eliminado exitosamente' 
+    });
+  } catch (error: any) {
+    console.error('Error en deleteByUserAndTask:', error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
 export {
   sanitizeServicioInput,
   findall,
@@ -134,4 +241,7 @@ export {
   remove,
   getServicebyids,
   getServiceByServiceIds,
+  getByUser,
+  upsertByUserAndTask,
+  deleteByUserAndTask,
 };
