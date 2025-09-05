@@ -1,4 +1,5 @@
 import StarRating from '../stars/RatingStars';
+import { useEffect } from 'react';
 
 type Turno = {
   id: number;
@@ -47,10 +48,6 @@ function CalificationModal({
   SaveRating,
   flagged,
 }: Props) {
-  if (flagged) {
-    comentario =
-      'Tu comentario ha sido marcado como inapropiado y no se ha guardado.';
-  }
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-5 backdrop-blur-xs  bg-opacity-40">
       <div className="bg-white md:rounded-lg md:shadow-2xl md:p-10 text-black lg:w-6/12 md:w-9/12  lg:min-h-6/12 md:h-auto w-full px-10 h-full p-15">

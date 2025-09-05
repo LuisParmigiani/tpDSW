@@ -3,7 +3,10 @@ import Carousel from '../Carousel/Carousel.tsx';
 import Comments from '../Comments/Comments.tsx';
 import Footer from '../Footer/Footer';
 import { HomePageCard } from './HomePageCards.js';
+import { Alert, AlertTitle, AlertDescription } from '../Alerts/Alerts.js';
+import { useState, useEffect } from 'react';
 function Homepage() {
+  const [alertVisible, setAlertVisible] = useState(true);
   const CommentOne = 1;
   const CommentTwo = 2;
   const textos: string[] = [
@@ -35,7 +38,7 @@ function Homepage() {
   return (
     <>
       <div className="flex flex-col w-full">
-        <div className="absolute inset-0 w-full z-20">
+        <div className="sticky top-0 z-20 backdrop-blur">
           <Navbar />
         </div>
         {/* Botón de pago Mercado Pago integrado */}
@@ -53,6 +56,20 @@ function Homepage() {
       </div>
 
       <div className="flex flex-col items-center content-center align-center p-11 bg-white w-full m-0 h-96">
+        {alertVisible && (
+          <Alert
+            variant="success"
+            className=""
+            onClose={() => setAlertVisible(false)}
+            autoClose={true}
+            autoCloseDelay={5000}
+          >
+            <AlertTitle>¡Bienvenido a Reformix!</AlertTitle>
+            <AlertDescription className="mx-auto">
+              Aquí encontrarás los mejores servicios para solucionar tus
+            </AlertDescription>
+          </Alert>
+        )}
         <h2 className="text-5xl  font-bold text-[#333] m-0 mt-3">
           La solucion de tus <span className="text-naranja-1">problemas</span>
           , <br /> al alcance de un
