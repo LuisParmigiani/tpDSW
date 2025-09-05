@@ -19,7 +19,7 @@ import { PagoRouter } from './pago/pago.route.js';
 import { webhookRouter } from './mercadopago/mercadoPago.route.js';
 import cookieParser from 'cookie-parser';
 import authRoutes from './shared/middleware/auth.routes.js';
-
+import https from 'https';
 // Tuve que recrear __dirname xq no estaba definido xq estamos usando ES Modules y no COmmonJS
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -44,6 +44,92 @@ export const staticPath = !isProduction
 console.log('📁 Static serving path:', staticPath);
 console.log('📁 Directory exists:', fs.existsSync(staticPath));
 // Ensure directory exists (especially important for volumes)
+async function ensureDefaultAvatar() {
+  try {
+    const defaultAvatarPath = path.join(
+      staticPath,
+      'profiles',
+      'default-avatar.webp'
+    );
+
+    console.log('🔍 Checking for default avatar at:', defaultAvatarPath);
+
+    // Check if default avatar already exists
+    if (!fs.existsSync(defaultAvatarPath)) {
+      console.log('📁 Default avatar not found, creating...');
+
+      // Ensure profiles directory exists
+      await fs.promises.mkdir(path.join(staticPath, 'profiles'), {
+        recursive: true,
+      });
+
+      // Download and save default avatar
+      await downloadFile(
+        'https://png.pngtree.com/png-vector/20250825/ourlarge/pngtree-orange-circle-default-avatar-profile-icon-minimal-vector-style-on-white-png-image_17276338.webp',
+        defaultAvatarPath
+      );
+
+      console.log(
+        '✅ Default avatar created successfully at:',
+        defaultAvatarPath
+      );
+    } else {
+      console.log('✅ Default avatar already exists');
+    }
+
+    // Test if it's accessible
+    const isProduction = process.env.NODE_ENV === 'production';
+    const baseUrl = isProduction
+      ? process.env.BASE_URL || 'https://backend-patient-morning-1303.fly.dev'
+      : 'http://localhost:3000';
+
+    console.log(
+      '🔗 Default avatar will be accessible at:',
+      `${baseUrl}/uploads/profiles/default-avatar.webp`
+    );
+  } catch (error) {
+    console.error('❌ Error ensuring default avatar:', error);
+  }
+}
+
+function downloadFile(url: string, dest: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const file = fs.createWriteStream(dest);
+
+    https
+      .get(url, (response) => {
+        if (response.statusCode === 200) {
+          response.pipe(file);
+          file.on('finish', () => {
+            file.close();
+            console.log('📥 Default avatar downloaded successfully');
+            resolve();
+          });
+        } else {
+          reject(new Error(`Failed to download: ${response.statusCode}`));
+        }
+      })
+      .on('error', (err) => {
+        fs.unlink(dest, () => {}); // Delete the file on error
+        reject(err);
+      });
+  });
+}
+
+// Call this after creating upload directories but before starting the server
+// Replace your existing directory creation code with this:
+
+console.log('📁 Static serving path:', staticPath);
+console.log('📁 Directory exists:', fs.existsSync(staticPath));
+
+// Ensure directory exists and create default avatar
+try {
+  // ✅ Create default avatar
+  await ensureDefaultAvatar();
+} catch (error) {
+  console.error('❌ Error creating default avatar:', error);
+}
+
 try {
   await fs.promises.mkdir(path.join(staticPath, 'profiles'), {
     recursive: true,
