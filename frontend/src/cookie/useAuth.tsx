@@ -3,6 +3,12 @@ import { useState, useEffect } from 'react';
 interface User {
   id: number;
   rol: 'cliente' | 'prestador';
+  nombre?: string;
+  apellido?: string;
+  email?: string;
+  mail?: string; // Por si el backend usa 'mail' en lugar de 'email'
+  foto?: string;
+  urlFoto?: string; // Por si el backend usa este campo para la imagen
 }
 
 const useAuth = () => {
@@ -43,11 +49,16 @@ const useAuth = () => {
     }
   };
 
+  const logout = () => {
+    localStorage.removeItem('token');
+    setUsuario(null);
+  };
+
   useEffect(() => {
     verificarAuth();
   }, []);
 
-  return { usuario, loading, verificarAuth };
+  return { usuario, loading, verificarAuth, logout };
 };
 
 export default useAuth;

@@ -1,21 +1,12 @@
 import DashboardSection from '../DashboardSection/DashboardSection';
 import TipoServicioCard, { TipoServicioData } from '../DashboardTipoCard';
+import TareaRow, { type Tarea } from '../TareaRow/TareaRow';
 import { useState, useEffect, useCallback } from 'react';
 import { tiposServicioApi } from '../../services/tipoSericiosApi';
 import { tareasApi } from '../../services/tareasApi';
 import { serviciosApi } from '../../services/serviciosApi';
 import { Alert, AlertDescription } from '../Alerts/Alerts';
 import useAuth from '../../cookie/useAuth';
-
-// Tipos de datos
-type Tarea = {
-  id: number;
-  descripcion: string;
-  tipoServicioId: number;
-  seleccionada: boolean;
-  precio: number;
-  duracion?: number; // Duración en minutos
-};
 
 // Función para convertir datos del API al formato del componente
 const convertirTipoServicioADisplay = (tipoServicio: unknown): TipoServicioData => {
@@ -332,14 +323,6 @@ function ServiciosSection() {
   const todasSeleccionadas = tareasVisibles.length > 0 && tareasVisibles.every(tarea => tarea.seleccionada);
   const algunasSeleccionadas = tareasVisibles.some(tarea => tarea.seleccionada);
 
-  const formatearPrecio = (precio: number) => {
-    return new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'ARS',
-      minimumFractionDigits: 0
-    }).format(precio);
-  };
-
   // Función para guardar servicios
   const guardarServicios = async () => {
     if (!usuario) {
@@ -626,80 +609,12 @@ function ServiciosSection() {
                   {tareasVisibles.map((tarea) => {
                     const tipoServicio = tiposServicio.find(tipo => tipo.id === tarea.tipoServicioId);
                     return (
-                      <tr 
-                        key={tarea.id} 
-                        onClick={() => handleTareaChange(tarea.id, 'seleccionada', !tarea.seleccionada)}
-                        className={`cursor-pointer transition-all duration-200 ${
-                          tarea.seleccionada 
-                            ? 'bg-orange-50 hover:bg-orange-100' 
-                            : 'hover:bg-gray-50 hover:shadow-sm'
-                        }`}
-                      >
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center justify-start">
-                            <span className="relative flex items-center justify-center">
-                              <input
-                                type="checkbox"
-                                checked={tarea.seleccionada}
-                                onChange={(e) => {
-                                  e.stopPropagation(); // Evitar doble toggle
-                                  handleTareaChange(tarea.id, 'seleccionada', e.target.checked);
-                                }}
-                                className="peer h-5 w-5 rounded border border-gray-500 bg-white appearance-none cursor-pointer focus:ring-2 focus:ring-orange-500 checked:bg-orange-500 checked:border-orange-500"
-                              />
-                              <span className="absolute pointer-events-none inset-0 flex items-center justify-center">
-                                {tarea.seleccionada && (
-                                  <svg
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 20 20"
-                                    fill="none"
-                                    style={{ display: 'block' }}
-                                  >
-                                    <path
-                                      d="M5 10.5L9 14.5L15 7.5"
-                                      stroke="#fff"
-                                      strokeWidth="1.4"
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                    />
-                                  </svg>
-                                )}
-                              </span>
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-left">
-                          <div className="text-sm font-medium text-gray-900 text-left">{tarea.descripcion}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-left">
-                          <div className="text-sm font-medium text-gray-900 text-left">
-                            {tipoServicio?.nombre}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center space-x-2">
-                            <span className="text-sm text-gray-500">$</span>
-                            <input
-                              type="number"
-                              min="0"
-                              step="100"
-                              value={tarea.precio}
-                              onChange={(e) => {
-                                e.stopPropagation(); // Evitar toggle al escribir
-                                handleTareaChange(tarea.id, 'precio', parseInt(e.target.value) || 0);
-                              }}
-                              onClick={(e) => e.stopPropagation()} // Evitar toggle al hacer focus
-                              disabled={!tarea.seleccionada}
-                              className={`w-24 px-2 py-1 text-sm border rounded focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-colors duration-200 ${
-                                tarea.seleccionada 
-                                  ? 'border-gray-300 bg-white text-gray-900 hover:border-orange-300' 
-                                  : 'border-gray-200 bg-gray-50 text-gray-400'
-                              } [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
-                            />
-                          </div>
-                        </td>
-                      </tr>
+                      <TareaRow
+                        key={tarea.id}
+                        tarea={tarea}
+                        tipoServicio={tipoServicio}
+                        onTareaChange={handleTareaChange}
+                      />
                     );
                   })}
                 </tbody>
@@ -720,20 +635,6 @@ function ServiciosSection() {
             <p className="text-gray-500 mb-4">
               Selecciona al menos un tipo de servicio arriba para ver las tareas disponibles.
             </p>
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm text-yellow-800">
-                    <strong>Nota:</strong> Si haces clic en "Dar de Baja Todos los Servicios", se eliminarán todos tus servicios activos.
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
         ) : tareasVisibles.length === 0 && tipoServicioActivo !== null && (
           <div className="bg-blue-50 rounded-lg border-2 border-dashed border-blue-300 p-8 text-center">
@@ -746,35 +647,6 @@ function ServiciosSection() {
             <p className="text-gray-500">
               No se encontraron tareas para el tipo de servicio "{tiposServicio.find(tipo => tipo.id === tipoServicioActivo)?.nombre}".
             </p>
-          </div>
-        )}
-
-        {/* Resumen */}
-        {tareas.filter(t => t.seleccionada).length > 0 && (
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-orange-800">
-                  Tienes {tareas.filter(t => t.seleccionada).length} tareas seleccionadas en total
-                </h3>
-                <div className="text-sm text-orange-700 mt-1">
-                  Precio promedio: {formatearPrecio(
-                    tareas.filter(t => t.seleccionada).reduce((sum, t) => sum + t.precio, 0) / 
-                    tareas.filter(t => t.seleccionada).length || 0
-                  )}
-                </div>
-                {tareasVisibles.filter(t => t.seleccionada).length > 0 && (
-                  <div className="text-sm text-orange-700">
-                    En esta página: {tareasVisibles.filter(t => t.seleccionada).length} tareas seleccionadas
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
         )}
 

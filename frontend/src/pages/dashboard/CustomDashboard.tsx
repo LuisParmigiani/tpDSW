@@ -2,6 +2,7 @@ import { useState } from 'react';
 import DashNav from '../../components/DashNav/DashNav';
 import type { MenuItem } from '../../components/DashNav/DashNav';
 import DashboardSection from '../../components/DashboardSection/DashboardSection';
+import { Link } from 'react-router-dom';
 
 function CustomDashboard() {
   const [activeSection, setActiveSection] = useState('analytics');
@@ -179,11 +180,22 @@ function CustomDashboard() {
       />
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-semibold text-gray-800 capitalize">
+        <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4 h-16">
+          <div className="flex items-center justify-between h-full">
+            <h1 className="text-lg font-semibold text-gray-800 capitalize">
               {activeSection}
             </h1>
+            <Link 
+              to="/" 
+              className="flex items-center space-x-2 hover:bg-gray-50 hover:scale-105 transition-all duration-200 rounded-lg p-2 cursor-pointer group"
+            >
+              <img 
+                src="/images/logo.png" 
+                alt="Logo" 
+                className="w-8 h-8"
+              />
+              <h2 className="text-lg font-bold text-orange-500 group-hover:text-orange-600 transition-colors">Reformix</h2>
+            </Link>
           </div>
         </header>
 

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import useAuth from '../../cookie/useAuth';
 
 export interface MenuItem {
   id: string;
@@ -15,6 +16,13 @@ interface DashNavProps {
 
 function DashNav({ activeSection, setActiveSection }: DashNavProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const navigate = useNavigate();
+  const { usuario, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   const menuItems = [
     {
@@ -52,20 +60,10 @@ function DashNav({ activeSection, setActiveSection }: DashNavProps) {
   return (
     <div className={`bg-white shadow-lg border-r border-gray-200 transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'} flex flex-col`}>
       
-      <div className="p-4 border-b border-gray-200">
+      <div className="p-4 border-b border-gray-200 h-16 flex items-center">
         {!isCollapsed ? (
-          <div className="flex items-center justify-between">
-            <Link 
-              to="/" 
-              className="flex items-center space-x-2 hover:bg-gray-50 hover:scale-105 transition-all duration-200 rounded-lg p-2 cursor-pointer group"
-            >
-              <img 
-                src="/images/logo.png" 
-                alt="Logo" 
-                className="w-8 h-8"
-              />
-              <h1 className="text-lg font-bold text-orange-500 group-hover:text-orange-600 transition-colors">NombreEmpresa</h1>
-            </Link>
+          <div className="flex items-center justify-between w-full">
+            <h2 className="text-lg font-semibold text-gray-700 px-3">Dashboard</h2>
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
               className="p-1 rounded-md hover:bg-gray-100 transition-colors focus:outline-none focus:ring-0 border-0 outline-none cursor-pointer"
@@ -82,7 +80,7 @@ function DashNav({ activeSection, setActiveSection }: DashNavProps) {
             </button>
           </div>
         ) : (
-          <div className="flex justify-center">
+          <div className="flex justify-center h-full items-center">
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
               className="p-1 rounded-md hover:bg-gray-100 transition-colors focus:outline-none focus:ring-0 border-0 outline-none cursor-pointer"
@@ -128,17 +126,39 @@ function DashNav({ activeSection, setActiveSection }: DashNavProps) {
       </nav>
 
       
+      {/* Botón de Logout */}
+      <div className="p-4">
+        <button
+          onClick={handleLogout}
+          className={`w-full flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'} px-3 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-200 cursor-pointer`}
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          {!isCollapsed && (
+            <span>Cerrar Sesión</span>
+          )}
+        </button>
+      </div>
+
+      {/* Información del Usuario */}
       <div className="p-4 border-t border-gray-200">
         <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'}`}>
           <img 
-            src="/images/fotoUserId.png" 
+            src={usuario?.foto || usuario?.urlFoto || "/images/fotoUserId.png"} 
             alt="User" 
             className="w-8 h-8 rounded-full object-cover"
           />
           {!isCollapsed && (
             <div className="flex-1">
-              <p className="text-sm font-medium text-gray-700">Luis Parmigiani</p>
-              <p className="text-xs text-gray-500">luisperm@gmail.com</p>
+              <p className="text-sm font-medium text-gray-700 text-left">
+                {usuario?.nombre || usuario?.apellido 
+                  ? `${usuario.nombre || ''} ${usuario.apellido || ''}`.trim()
+                  : usuario?.email || usuario?.mail || 'Luis Parmigiani'}
+              </p>
+              <p className="text-xs text-gray-500 text-left">
+                {usuario?.email || usuario?.mail || 'luisperm@gmail.com'}
+              </p>
             </div>
           )}
         </div>
