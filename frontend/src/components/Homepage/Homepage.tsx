@@ -18,7 +18,7 @@ function Homepage() {
     'Control de Plagas',
   ];
   const redirecciones: string[] = [
-    'Plomeria',
+    'Plomería',
     'Electricidad',
     'Carpinteria',
     'Pintura',
