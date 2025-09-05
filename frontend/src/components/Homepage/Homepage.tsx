@@ -4,7 +4,7 @@ import Comments from '../Comments/Comments.tsx';
 import Footer from '../Footer/Footer';
 import { HomePageCard } from './HomePageCards.js';
 import { Alert, AlertTitle, AlertDescription } from '../Alerts/Alerts.js';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 function Homepage() {
   const [alertVisible, setAlertVisible] = useState(true);
   const CommentOne = 1;
@@ -38,7 +38,7 @@ function Homepage() {
   return (
     <>
       <div className="flex flex-col w-full">
-        <div className="sticky top-0 z-20 backdrop-blur">
+        <div className="sticky top-0 z-20 bg-white/80 backdrop-blur">
           <Navbar />
         </div>
         {/* Botón de pago Mercado Pago integrado */}
@@ -58,11 +58,10 @@ function Homepage() {
       <div className="flex flex-col items-center content-center align-center p-11 bg-white w-full m-0 h-96">
         {alertVisible && (
           <Alert
-            variant="success"
             className=""
             onClose={() => setAlertVisible(false)}
             autoClose={true}
-            autoCloseDelay={5000}
+            autoCloseDelay={10000}
           >
             <AlertTitle>¡Bienvenido a Reformix!</AlertTitle>
             <AlertDescription className="mx-auto">

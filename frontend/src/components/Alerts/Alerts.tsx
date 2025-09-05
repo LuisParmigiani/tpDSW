@@ -1,6 +1,6 @@
 import { cva, type VariantProps } from 'class-variance-authority';
 import { X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { cn } from './../../lib/utils.js';
 
 const alertVariants = cva(
@@ -9,7 +9,7 @@ const alertVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-card text-card-foreground',
+        default: 'bg-gray-200 text-gray-900 border-gray-400',
         danger:
           'text-destructive bg-red-200 text-red-900 border-red-400 [&>svg]:text-current *:data-[slot=alert-description]:text-destructive/90',
         info: 'bg-blue-200 text-blue-900 border-blue-400',
@@ -21,11 +21,11 @@ const alertVariants = cva(
 );
 
 function Alert({
-  className,
-  variant,
-  onClose,
-  autoClose,
-  autoCloseDelay = 5000,
+  className, //prop para aplicar los estilos que se deseen si las variantes no satisfacen
+  variant, // prop para definir la variante del alert, puede ser "default", "danger", "info" o "success"
+  onClose, //prop para manejar el cierre del alert. Lo que se pasa es el seter del useState booleano para controlar la visibilidad del alert
+  autoClose, //prop para controlar si el alert se cierra automáticamente true/false
+  autoCloseDelay = 5000, //prop para definir el tiempo de espera antes de cerrar el alert automáticamente. Por defecto es 5000ms.
   ...props
 }: React.ComponentProps<'div'> &
   VariantProps<typeof alertVariants> & {
@@ -35,20 +35,18 @@ function Alert({
   }) {
   const [isClosing, setIsClosing] = useState(false);
 
-  const handleClose = () => {
+  const DURACION_ANIMACION = 300;
+  const handleClose = useCallback(() => {
     setIsClosing(true);
-    setTimeout(() => onClose?.(), 300);
-  };
+    setTimeout(() => onClose?.(), DURACION_ANIMACION);
+  }, [onClose]);
 
   useEffect(() => {
     if (autoClose && onClose) {
-      const t = setTimeout(() => {
-        setIsClosing(true);
-        setTimeout(() => onClose?.(), 300);
-      }, autoCloseDelay);
+      const t = setTimeout(handleClose, autoCloseDelay);
       return () => clearTimeout(t);
     }
-  }, [autoClose, onClose, autoCloseDelay]);
+  }, [autoClose, handleClose, autoCloseDelay, onClose]);
 
   return (
     <div
@@ -56,10 +54,10 @@ function Alert({
       role="alert"
       className={cn(
         alertVariants({ variant }),
-        'pr-10 transition-all duration-300 ease-in-out transform-gpu',
+        'pr-10 transition-all duration-300 transform-gpu',
         isClosing
-          ? 'opacity-0 scale-95 -translate-y-2'
-          : 'opacity-100 scale-100 translate-y-0',
+          ? 'opacity-0 scale-95 -translate-y-3 ease-in' // Faster ease-in for exit
+          : 'opacity-100 scale-100 translate-y-0 ease-out',
         className
       )}
       {...props}

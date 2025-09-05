@@ -37,12 +37,12 @@ const app = express();
 
 const isProduction = process.env.NODE_ENV === 'production';
 
-const staticPath = isProduction
+const staticPath = !isProduction
   ? '/app/public/uploads' // Fly.io volume mount point
-  : path.join(__dirname, '../../public/uploads'); // Local development
+  : path.join(__dirname, '../public/uploads'); // Local development
 
 console.log('📁 Static serving path:', staticPath);
-
+console.log('📁 Directory exists:', fs.existsSync(staticPath));
 // Ensure directory exists (especially important for volumes)
 try {
   await fs.promises.mkdir(path.join(staticPath, 'profiles'), {

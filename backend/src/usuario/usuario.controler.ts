@@ -534,7 +534,12 @@ async function uploadProfileImage(req: Request, res: Response) {
     }
     //Borra la foto anterior si existe
     if (user.foto) {
-      const RutaFotoVieja = path.join(__dirname, '../../public', user.foto);
+      const relativePath = user.foto.includes('/uploads/')
+        ? user.foto.substring(user.foto.indexOf('/uploads/'))
+        : user.foto;
+
+      const RutaFotoVieja = path.join(__dirname, '../../public', relativePath);
+
       try {
         await fs.unlink(RutaFotoVieja);
       } catch (error) {
@@ -549,8 +554,10 @@ async function uploadProfileImage(req: Request, res: Response) {
     console.log('✅ Image processed successfully');
     console.log('🔗 Returned URL:', urlOptimizada);
     //Limpia la imagen subida
-    const baseUrl =
-      process.env.BASE_URL || 'https://backend-patient-morning-1303.fly.dev';
+    const isProduction = process.env.NODE_ENV === 'production';
+    const baseUrl = isProduction
+      ? process.env.BASE_URL || 'https://backend-patient-morning-1303.fly.dev'
+      : 'http://localhost:3000';
 
     const fullPath = path.join(__dirname, '../../public', urlOptimizada);
     try {

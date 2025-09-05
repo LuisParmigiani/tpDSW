@@ -3,6 +3,7 @@ import ProfilePicture from '../ProfilePic/ProfilePicture';
 import { useEffect, useState } from 'react';
 import { usuariosApi } from '../../services/usuariosApi.ts';
 import { useProtectRoute } from '../../cookie/useProtectRoute.tsx';
+import { Alert, AlertTitle, AlertDescription } from '../Alerts/Alerts.tsx';
 type PrestadorData = {
   id: number;
   mail: string;
@@ -18,6 +19,7 @@ function PerfilSection() {
   const [profileData, setProfileData] = useState<PrestadorData | null>(null);
   const [dataFetched, setDataFetched] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
 
   // Move useProtectRoute to top level
   const { usuario, loading: authLoading } = useProtectRoute(['prestador']);
@@ -78,20 +80,24 @@ function PerfilSection() {
   const handleImageUpload = async (file: File) => {
     if (!file) return;
     setUploading(true);
+    setUploadSuccess(false);
 
     try {
-      console.log('Uploading image:', file.name, 'for user id:', usuario.id);
       const res = await usuariosApi.uploadProfileImage(
         usuario.id.toString(),
         file
       );
       console.log('Upload response:', res);
       if (res.data && res.data.imageUrl) {
-        //construyo la url correcta para que el front pueda acceder a donde esta guardada la foto
+        //Le añdo un parametro para el cache busting, asi se refresca la imagen apenas la cambio
+        const cacheBustedUrl = `${res.data.imageUrl}?t=${Date.now()}`;
+
         setProfileData((prev) =>
-          prev ? { ...prev, foto: res.data.imageUrl } : null
+          prev ? { ...prev, foto: cacheBustedUrl } : null
         );
-        console.log(profileData?.foto);
+        setUploadSuccess(true);
+        setTimeout(() => setUploadSuccess(false), 3000); // Reset success state after 3 seconds
+        console.log('new pic with cache busting:', profileData?.foto);
       }
     } catch (error) {
       console.error('Error uploading image:', error);
@@ -106,6 +112,20 @@ function PerfilSection() {
   if (dataFetched && profileData) {
     return (
       <DashboardSection>
+        {uploadSuccess && (
+          <Alert
+            variant="success"
+            className="mb-4 max-w-xl mx-auto"
+            autoClose={true}
+            autoCloseDelay={5000}
+            onClose={() => setUploadSuccess(false)}
+          >
+            <AlertTitle>¡Éxito!</AlertTitle>
+            <AlertDescription className="mx-auto">
+              La imagen de perfil se ha actualizado correctamente.
+            </AlertDescription>
+          </Alert>
+        )}
         <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-sm border border-gray-200 p-8">
           <ProfilePicture
             src={profileData.foto}
