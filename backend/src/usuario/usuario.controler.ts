@@ -14,9 +14,7 @@ const __filename = fileURLToPath(import.meta.url);
 const em = orm.em;
 const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
 
-// Función para detectar si estamos en modo local
 const __dirname = path.dirname(__filename);
-
 interface AuthRequest extends Request {
   user?: {
     id: string;
@@ -116,12 +114,14 @@ async function findPrestatariosByTipoServicioAndZona(
 
     // Build the where clause conditionally
     const whereClause: any = {};
+    whereClause.servicios = { estado: 'activo' };
     whereClause.nombreFantasia = { $ne: null }; // De esta manera no traemos ningún usuario que no
     if (filtroTipoServicio) {
       whereClause.tiposDeServicio = { nombreTipo: filtroTipoServicio };
     }
     if (filtroTarea) {
       whereClause.servicios = {
+        estado: 'activo',
         tarea: { nombreTarea: filtroTarea },
       };
     }

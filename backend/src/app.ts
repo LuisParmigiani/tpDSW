@@ -37,7 +37,7 @@ const app = express();
 
 const isProduction = process.env.NODE_ENV === 'production';
 
-const staticPath = !isProduction
+export const staticPath = !isProduction
   ? '/app/public/uploads' // Fly.io volume mount point
   : path.join(__dirname, '../public/uploads'); // Local development
 
