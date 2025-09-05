@@ -31,7 +31,7 @@ ENV NODE_ENV=production
 # Copiar dist y node_modules desde build
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/node_modules ./node_modules
-COPY /public/uploads/profiles/default-avatar.png /app/public/uploads/profiles/default-avatar.png
+COPY public/uploads/profiles/default-avatar.png /app/public/uploads/profiles/default-avatar.png
 # Expone el puerto 8080 (Fly.io lo usará)
 EXPOSE 8080                           
 # Comando para iniciar la app
