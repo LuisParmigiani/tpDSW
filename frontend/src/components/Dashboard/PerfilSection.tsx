@@ -66,7 +66,10 @@ function PerfilSection() {
   const [dataFetched, setDataFetched] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [updateSuccess, setUpdateSuccess] = useState(false);
-  const [updateError, setUpdateError] = useState<string | null>(null);
+  const [updateError, setUpdateError] = useState<{
+    error: string;
+    message: string;
+  } | null>(null);
   // ✅ Track pending image for form submission
   const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
 
@@ -213,7 +216,7 @@ function PerfilSection() {
         ...data,
         foto: updatedImageUrl, // Use the uploaded image URL
       };
-
+      console.log('Updating user data with:', updateData);
       await usuariosApi.update(usuario.id.toString(), updateData);
 
       // ✅ Update local state with final data
@@ -240,7 +243,10 @@ function PerfilSection() {
       console.log('✅ Profile updated successfully');
     } catch (error: any) {
       console.error('Error updating profile:', error);
-      setUpdateError(error.message || 'Error al actualizar el perfil');
+      setUpdateError({
+        error: error.response.data.error || 'Error',
+        message: error.response.data.message || 'Error al actualizar el perfil',
+      });
     } finally {
       setUploading(false);
     }
@@ -272,8 +278,8 @@ function PerfilSection() {
             className="mb-4 max-w-xl mx-auto"
             onClose={() => setUpdateError(null)}
           >
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>{updateError}</AlertDescription>
+            <AlertTitle>{updateError.error}</AlertTitle>
+            <AlertDescription>{updateError.message}</AlertDescription>
           </Alert>
         )}
 

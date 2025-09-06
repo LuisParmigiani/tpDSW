@@ -305,11 +305,48 @@ async function add(req: Request, res: Response) {
 async function update(req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id);
-    const updateUser = await em.findOneOrFail(Usuario, { id });
-    em.assign(updateUser, req.body.sanitizeUsuarioInput);
+    const userToUpdate = await em.findOneOrFail(Usuario, { id });
+    //Verifica si el mail ya existe en otro usuario para devolver un error más claro. Sino solo tiraba error 500 por el catch
+    if (userToUpdate.mail !== req.body.sanitizeUsuarioInput.mail) {
+      const mailExists = await em.findOne(Usuario, {
+        mail: req.body.sanitizeUsuarioInput.mail,
+      });
+      if (mailExists) {
+        return res.status(409).json({
+          error: 'EMAIL_ALREADY_EXISTS',
+          message: 'El mail ya está registrado por otro usuario',
+        });
+      }
+    }
+    if (userToUpdate.numeroDoc !== req.body.sanitizeUsuarioInput.numeroDoc) {
+      const numDocExists = await em.findOne(Usuario, {
+        numeroDoc: req.body.sanitizeUsuarioInput.numeroDoc,
+      });
+      if (numDocExists) {
+        return res.status(409).json({
+          error: 'NUMDOC_ALREADY_EXISTS',
+          message: 'El número de documento ya está registrado por otro usuario',
+        });
+      }
+    }
+    if (userToUpdate.telefono !== req.body.sanitizeUsuarioInput.telefono) {
+      const telExists = await em.findOne(Usuario, {
+        telefono: req.body.sanitizeUsuarioInput.telefono,
+      });
+      if (telExists) {
+        return res.status(409).json({
+          error: 'PHONE_ALREADY_EXISTS',
+          message: 'El telefono ya está registrado por otro usuario',
+        });
+      }
+    }
+    em.assign(userToUpdate, req.body.sanitizeUsuarioInput);
     await em.flush();
-    res.status(200).json({ message: 'updated usuario', data: updateUser });
+    res.status(200).json({ message: 'updated usuario', data: userToUpdate });
   } catch (error: any) {
+    //Logica para devolver bien el mensaje de error
+    console.log('Hubo un error actualizando la info del user:', error);
+
     res.status(500).json({ message: error.message });
   }
 }

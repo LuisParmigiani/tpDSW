@@ -2,35 +2,22 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { usuariosApi } from '../../services/usuariosApi';
 import useAuth from '../../cookie/useAuth';
+import { cn } from '../../lib/utils.ts';
 
 function Logincard() {
   const { verificarAuth } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
-  const [imag, setimag] = useState(
-    'fa-solid fa-eye-slash absolute top-4 left-80 text-gray-500 text-4 cursor-pointer'
-  );
 
-  const [type_text, settypetext] = useState('password');
-
-  const handleClickCrossedEye = () => {
-    if (
-      imag ==
-      'fa-solid fa-eye-slash absolute top-4 left-80 text-gray-500 text-4 cursor-pointer'
-    ) {
-      setimag(
-        'fa-solid fa-eye absolute top-4 left-80 text-gray-500 text-4 cursor-pointer'
-      );
-      settypetext('text');
-    } else {
-      setimag(
-        'fa-solid fa-eye-slash absolute top-4 left-80 text-gray-500 text-4 cursor-pointer'
-      );
-      settypetext('password');
-    }
-  };
+  // ✅ Simplified state management
+  const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ mail: '', contrasena: '' });
+
+  // ✅ Simplified toggle function
+  const handleClickCrossedEye = () => {
+    setShowPassword(!showPassword);
+  };
 
   const envioFormulario = async () => {
     try {
@@ -104,36 +91,57 @@ function Logincard() {
                   envioFormulario();
                 }}
               >
+                {/* Email Input */}
                 <div className="relative inline-block w-full">
                   <input
                     type="text"
                     placeholder="Email"
                     onChange={(e) => setForm({ ...form, mail: e.target.value })}
-                    className="w-full pt-3 pb-3 pr-5 pl-12 text-base border-none rounded-4xl bg-white shadow-inner outline-none mb-4 text-black font-inter "
+                    className={cn(
+                      'w-full pt-3 pb-3 pr-5 pl-12 text-base border-none',
+                      'rounded-4xl bg-white shadow-inner outline-none mb-4',
+                      'text-black font-inter hover:shadow-lg hover:bg-orange-50 transition-all ease-in-out duration-300',
+                      'focus:ring-2 focus:ring-naranja-1 focus:border-transparent'
+                    )}
                   />
-                  <i className="fa-solid fa-envelope absolute top-4 left-6 text-gray-500 text-1xl pointer-events-none"></i>
+                  <i className="fa-solid fa-envelope absolute top-4 left-6 text-gray-500 text-lg pointer-events-none"></i>
                 </div>
+
+                {/* ✅ Updated Password Input */}
                 <div className="relative inline-block w-full">
                   <input
-                    type={type_text}
+                    type={showPassword ? 'text' : 'password'}
                     placeholder="Contraseña"
                     onChange={(e) =>
                       setForm({ ...form, contrasena: e.target.value })
                     }
-                    className="w-full pt-3 pb-3 pr-5 pl-12 text-base border-none rounded-4xl bg-white shadow-inner outline-none mb-4 text-black font-inter"
+                    className={cn(
+                      'w-full pt-3 pb-3 pr-12 pl-12 text-base border-none', // ✅ pr-12 for icon space
+                      'rounded-4xl bg-white shadow-inner outline-none mb-4',
+                      'text-black font-inter hover:shadow-lg hover:bg-orange-50 transition-all ease-in-out duration-300',
+                      'focus:ring-2 focus:ring-naranja-1 focus:border-transparent'
+                    )}
                   />
+                  {/* ✅ Eye icon - always positioned from the right */}
                   <i
-                    className={imag + ' right-6'}
+                    className={`${
+                      showPassword ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'
+                    } absolute top-4 right-4 text-gray-500 text-lg cursor-pointer hover:text-gray-700 transition-colors`}
                     onClick={handleClickCrossedEye}
                   ></i>
-                  <i className="fa-solid fa-lock absolute top-4 left-6 text-gray-500 text-1xl pointer-events-none"></i>
+                  {/* Lock icon - positioned from the left */}
+                  <i className="fa-solid fa-lock absolute top-4 left-6 text-gray-500 text-lg pointer-events-none"></i>
                 </div>
+
                 <button
                   type="submit"
                   className={
                     form.mail === '' || form.contrasena === ''
                       ? 'w-full bg-gray-300 text-black-500 px-5 py-2.5 rounded-b-2xl cursor-pointer focus:outline-none mb-5 mt-3 '
-                      : 'w-full bg-naranja-1 text-white px-5 py-2.5 rounded-b-2xl cursor-pointer hover:text-black focus:outline-none mb-5 mt-3 hover:shadow-lg'
+                      : cn(
+                          'w-full border-2 border-naranja-1 bg-naranja-1 text-white px-5 py-2.5 rounded-b-2xl cursor-pointer mb-5 mt-3 hover:shadow-lg',
+                          'hover:bg-white hover:text-naranja-1 hover:border-naranja-1 transition-all ease-in-out duration-300 focus:outline-none'
+                        )
                   }
                   disabled={form.mail === '' || form.contrasena === ''}
                 >
@@ -146,14 +154,14 @@ function Logincard() {
               ¿No tienes cuenta?{' '}
               <Link
                 to="/registration"
-                className="font-bold cursor-pointer hover:shadow-sm"
+                className="font-bold cursor-pointer hover:border-b-2 border-naranja-1 shadow-2xs "
               >
                 Regístrate
               </Link>
             </p>
             <Link
               to="/recovery"
-              className="text-black font-inter mb-0 font-bold cursor-pointer hover:shadow-sm mt-2"
+              className="text-black font-inter mb-0 font-bold cursor-pointer shadow-2xs mt-2 border-b-2 border-transparent hover:border-naranja-1  "
             >
               Olvidé mi contraseña
             </Link>
@@ -170,4 +178,5 @@ function Logincard() {
     </>
   );
 }
+
 export default Logincard;

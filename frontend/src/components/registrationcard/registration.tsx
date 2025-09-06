@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { usuariosApi } from '../../services/usuariosApi';
 import { z } from 'zod';
+import { cn } from '../../lib/utils.ts';
+import ProfilePicture from '../ProfilePic/ProfilePicture.tsx';
 
 //Algunas validaciones no son necesarias pero las dejo para poder crear el objeto
 
@@ -34,8 +36,16 @@ export type Usuario = z.infer<typeof usuarioSchema>;
 function RegisCard() {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
+  // ✅ Add uploading state for image
+  const [uploading, setUploading] = useState(false);
+  // ✅ Track pending image file for form submission
+  const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
 
-  // Estado iniciar para los campos del formulario
+  //Clases de tailwind para sacar los spinners del input type number en formato desktop
+  const sacarSpinners =
+    'md:[appearance:textfield] md:[&::-webkit-outer-spin-button]:appearance-none md:[&::-webkit-inner-spin-button]:appearance-none md:[&::-webkit-outer-spin-button]:m-0 md:[&::-webkit-inner-spin-button]:m-0';
+
+  // Estado inicial para los campos del formulario
   const [form, setForm] = useState<Usuario>({
     nombre: '',
     mail: '',
@@ -52,6 +62,22 @@ function RegisCard() {
 
   const [tipoUsuario, setearTipoUsuario] = useState('usuario');
 
+  // ✅ Handle image selection (following PerfilSection pattern)
+  const handleImageChange = async (file: File) => {
+    if (!file) return;
+
+    // Store the file for later upload
+    setPendingImageFile(file);
+
+    // Create a temporary URL for preview
+    const tempUrl = URL.createObjectURL(file);
+
+    // Update form state with temp URL
+    setForm((prev) => ({ ...prev, foto: tempUrl }));
+
+    console.log('📸 Image selected for registration');
+  };
+
   const camposComunes = (
     <>
       <input
@@ -59,7 +85,12 @@ function RegisCard() {
         name="nombre"
         value={form.nombre}
         placeholder="Nombre"
-        className="w-full pt-3 pb-3 pr-5 pl-12 text-base border-none rounded-3xl bg-white shadow-inner outline-none mb-4 text-black font-inter"
+        className={cn(
+          'w-full pt-3 pb-3 pr-20 pl-12 text-base border-none',
+          'rounded-4xl bg-white shadow-inner outline-none mb-4',
+          'text-black font-inter hover:shadow-lg hover:bg-orange-50 transition-all ease-in-out duration-300',
+          'focus:ring-2 focus:ring-naranja-1 focus:border-transparent'
+        )}
         onChange={(e) => setForm({ ...form, nombre: e.target.value })}
       />
       <input
@@ -67,7 +98,12 @@ function RegisCard() {
         name="apellido"
         value={form.apellido}
         placeholder="Apellido"
-        className="w-full pt-3 pb-3 pr-5 pl-12 text-base border-none rounded-3xl bg-white shadow-inner outline-none mb-4 text-black font-inter"
+        className={cn(
+          'w-full pt-3 pb-3 pr-5 pl-12 text-base border-none',
+          'rounded-4xl bg-white shadow-inner outline-none mb-4',
+          'text-black font-inter hover:shadow-lg hover:bg-orange-50 transition-all ease-in-out duration-300',
+          'focus:ring-2 focus:ring-naranja-1 focus:border-transparent'
+        )}
         onChange={(e) => setForm({ ...form, apellido: e.target.value })}
       />
       <input
@@ -75,13 +111,23 @@ function RegisCard() {
         name="mail"
         value={form.mail}
         placeholder="Email"
-        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-white shadow-inner outline-none mb-4 text-black font-inter"
+        className={cn(
+          'w-full pt-3 pb-3 pr-5 pl-12 text-base border-none',
+          'rounded-4xl bg-white shadow-inner outline-none mb-4',
+          'text-black font-inter hover:shadow-lg hover:bg-orange-50 transition-all ease-in-out duration-300',
+          'focus:ring-2 focus:ring-naranja-1 focus:border-transparent'
+        )}
         onChange={(e) => setForm({ ...form, mail: e.target.value })}
       />
       <select
         name="tipoDoc"
         value={form.tipoDoc}
-        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-white shadow-inner outline-none mb-4 text-black font-inter"
+        className={cn(
+          'w-full pt-3 pb-3 pr-20 pl-12 text-base border-none',
+          'rounded-4xl bg-white shadow-inner outline-none mb-4',
+          'text-black font-inter hover:shadow-lg hover:bg-orange-50 transition-all ease-in-out duration-300',
+          'focus:ring-2 focus:ring-naranja-1 focus:border-transparent'
+        )}
         onChange={(e) => setForm({ ...form, tipoDoc: e.target.value })}
       >
         <option value="">Seleccione tipo de documento</option>
@@ -93,7 +139,13 @@ function RegisCard() {
         name="numeroDoc"
         value={form.numeroDoc}
         placeholder="Número de documento"
-        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-white shadow-inner outline-none mb-4 text-black font-inter"
+        className={cn(
+          'w-full pt-3 pb-3 pr-20 pl-12 text-base border-none',
+          'rounded-4xl bg-white shadow-inner outline-none mb-4',
+          'text-black font-inter hover:shadow-lg hover:bg-orange-50 transition-all ease-in-out duration-300',
+          'focus:ring-2 focus:ring-naranja-1 focus:border-transparent',
+          sacarSpinners
+        )}
         onChange={(e) =>
           setForm({ ...form, numeroDoc: e.target.value.toString() })
         }
@@ -103,7 +155,12 @@ function RegisCard() {
         name="contrasena"
         value={form.contrasena}
         placeholder="Contraseña"
-        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-white shadow-inner outline-none mb-4 text-black font-inter"
+        className={cn(
+          'w-full pt-3 pb-3 pr-20 pl-12 text-base border-none',
+          'rounded-4xl bg-white shadow-inner outline-none mb-4',
+          'text-black font-inter hover:shadow-lg hover:bg-orange-50 transition-all ease-in-out duration-300',
+          'focus:ring-2 focus:ring-naranja-1 focus:border-transparent'
+        )}
         onChange={(e) => setForm({ ...form, contrasena: e.target.value })}
       />
       <input
@@ -111,7 +168,13 @@ function RegisCard() {
         name="telefono"
         value={form.telefono}
         placeholder="Teléfono"
-        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-white shadow-inner outline-none mb-4 text-black font-inter "
+        className={cn(
+          'w-full pt-3 pb-3 pr-20 pl-12 text-base border-none',
+          'rounded-4xl bg-white shadow-inner outline-none mb-4',
+          'text-black font-inter hover:shadow-lg hover:bg-orange-50 transition-all ease-in-out duration-300',
+          'focus:ring-2 focus:ring-naranja-1 focus:border-transparent',
+          sacarSpinners
+        )}
         onChange={(e) =>
           setForm({ ...form, telefono: e.target.value.toString() })
         }
@@ -121,7 +184,12 @@ function RegisCard() {
         name="direccion"
         value={form.direccion}
         placeholder="Dirección"
-        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-white shadow-inner outline-none mb-4 text-black font-inter "
+        className={cn(
+          'w-full pt-3 pb-3 pr-20 pl-12 text-base border-none',
+          'rounded-4xl bg-white shadow-inner outline-none mb-4',
+          'text-black font-inter hover:shadow-lg hover:bg-orange-50 transition-all ease-in-out duration-300',
+          'focus:ring-2 focus:ring-naranja-1 focus:border-transparent'
+        )}
         onChange={(e) => setForm({ ...form, direccion: e.target.value })}
       />
     </>
@@ -134,7 +202,12 @@ function RegisCard() {
         name="nombreFantasia"
         value={form.nombreFantasia}
         placeholder="Nombre de fantasía"
-        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-white shadow-inner outline-none mb-4 text-black font-inter "
+        className={cn(
+          'w-full pt-3 pb-3 pr-20 pl-12 text-base border-none',
+          'rounded-4xl bg-white shadow-inner outline-none mb-4',
+          'text-black font-inter hover:shadow-lg hover:bg-orange-50 transition-all ease-in-out duration-300',
+          'focus:ring-2 focus:ring-naranja-1 focus:border-transparent'
+        )}
         onChange={(e) => setForm({ ...form, nombreFantasia: e.target.value })}
       />
       <input
@@ -142,33 +215,60 @@ function RegisCard() {
         name="descripcion"
         value={form.descripcion}
         placeholder="Descripción"
-        className="w-full pt-3 pb-3 pr-20 pl-12 text-base border-none rounded-3xl bg-white shadow-inner outline-none mb-4 text-black font-inter "
+        className={cn(
+          'w-full pt-3 pb-3 pr-20 pl-12 text-base border-none',
+          'rounded-4xl bg-white shadow-inner outline-none mb-4',
+          'text-black font-inter hover:shadow-lg hover:bg-orange-50 transition-all ease-in-out duration-300',
+          'focus:ring-2 focus:ring-naranja-1 focus:border-transparent'
+        )}
         onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
       />
-      {/* <ProfilePicture
-        src={form.foto || '/images/fotoUserId.png'}
-        onImageChange={handleImageUpload}
-        uploading={true}
-      /> */}
-      <div>Saque la foto después hay que ponerla bien</div>
-      <p className="text-center text-gray-600 text-sm mt-2 mb-4 font-inter">
-        Elija una foto para su cuenta, podrá cambiarla luego desde su perfil.
-      </p>
     </>
   );
 
+  // ✅ Updated form submission with image upload (following PerfilSection pattern)
   const envioFormulario = async () => {
     setOpen(true);
+    setUploading(true);
+
     const resultado = usuarioSchema.safeParse(form);
     if (!resultado.success) {
       const errores = resultado.error.issues;
       setMessage(errores[0]?.message || 'Datos inválidos');
+      setUploading(false);
       return;
     }
 
     try {
-      await usuariosApi.create(form);
+      // ✅ First create user
+      const userResponse = await usuariosApi.create(form);
+      console.log('User created:', userResponse);
+
+      // ✅ Then upload image if there's a pending one (only for prestatarios)
+      if (
+        pendingImageFile &&
+        tipoUsuario === 'prestatario' &&
+        userResponse.data?.data?.id
+      ) {
+        console.log('📤 Uploading profile image for new user...');
+        try {
+          const imageResponse = await usuariosApi.uploadProfileImage(
+            userResponse.data.data.id.toString(),
+            pendingImageFile
+          );
+          console.log('✅ Profile image uploaded successfully:', imageResponse);
+        } catch (imageError) {
+          console.error(
+            '❌ Image upload failed (but user was created):',
+            imageError
+          );
+          // Don't fail the whole process if image upload fails
+        }
+      }
+
       setMessage('Usuario creado correctamente');
+
+      // ✅ Reset form and clear pending image
       setForm({
         nombre: '',
         mail: '',
@@ -182,6 +282,7 @@ function RegisCard() {
         descripcion: '',
         foto: '',
       });
+      setPendingImageFile(null);
     } catch (error) {
       const err = error as { response?: { data?: { message?: string } } };
       const msg = err?.response?.data?.message?.toLowerCase() || '';
@@ -195,6 +296,8 @@ function RegisCard() {
         setMessage('Error al crear usuario');
       }
       console.error('Error al crear usuario', error);
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -263,35 +366,33 @@ function RegisCard() {
                   envioFormulario();
                 }}
               >
+                {tipoUsuario === 'prestatario' && (
+                  <>
+                    <div className="flex justify-center mb-4">
+                      <ProfilePicture
+                        src={form.foto || '/images/fotoUserId.png'}
+                        onImageChange={handleImageChange}
+                        uploading={uploading}
+                      />
+                    </div>
+
+                    <p className="text-center text-gray-600 text-sm mt-2 mb-4 font-inter">
+                      Elija una foto para su cuenta, podrá cambiarla luego desde
+                      su perfil.
+                    </p>
+                    {pendingImageFile && (
+                      <p className="text-center text-naranja-1 text-sm mb-4 font-inter">
+                        📸 Imagen seleccionada - se subirá al crear la cuenta
+                      </p>
+                    )}
+                  </>
+                )}
                 {camposComunes}
                 {tipoUsuario === 'prestatario' && camposPrestatario}
                 <button
                   type="submit"
-                  className={
-                    tipoUsuario === 'prestatario' &&
-                    ((form.nombreFantasia === '' && form.apellido === '') ||
-                      form.nombre === '' ||
-                      form.mail === '' ||
-                      form.descripcion === '' ||
-                      form.contrasena === '' ||
-                      form.tipoDoc === '' ||
-                      form.numeroDoc === '' ||
-                      form.telefono === '' ||
-                      form.direccion === '')
-                      ? 'w-full bg-gray-300 text-white px-5 py-2.5 rounded-b-2xl cursor-pointer focus:outline-none mb-5 mt-3'
-                      : tipoUsuario === 'usuario' &&
-                        (form.nombre === '' ||
-                          form.apellido === '' ||
-                          form.mail === '' ||
-                          form.contrasena === '' ||
-                          form.tipoDoc === '' ||
-                          form.numeroDoc === '' ||
-                          form.telefono === '' ||
-                          form.direccion === '')
-                      ? 'w-full bg-gray-300 text-black-500 px-5 py-2.5 rounded-b-2xl cursor-pointer focus:outline-none mb-5 mt-3'
-                      : 'w-full bg-naranja-1 text-white px-5 py-2.5 rounded-b-2xl cursor-pointer hover:text-black focus:outline-none mb-5 mt-3 hover:shadow-lg'
-                  }
                   disabled={
+                    uploading || // ✅ Disable while uploading
                     (tipoUsuario === 'prestatario' &&
                       (form.apellido === '' ||
                         form.nombre === '' ||
@@ -313,8 +414,36 @@ function RegisCard() {
                         form.telefono === '' ||
                         form.direccion === ''))
                   }
+                  className={
+                    uploading || // ✅ Show loading state
+                    (tipoUsuario === 'prestatario' &&
+                      ((form.nombreFantasia === '' && form.apellido === '') ||
+                        form.nombre === '' ||
+                        form.mail === '' ||
+                        form.descripcion === '' ||
+                        form.contrasena === '' ||
+                        form.tipoDoc === '' ||
+                        form.numeroDoc === '' ||
+                        form.telefono === '' ||
+                        form.direccion === '')) ||
+                    (tipoUsuario === 'usuario' &&
+                      (form.nombre === '' ||
+                        form.apellido === '' ||
+                        form.mail === '' ||
+                        form.contrasena === '' ||
+                        form.tipoDoc === '' ||
+                        form.numeroDoc === '' ||
+                        form.telefono === '' ||
+                        form.direccion === ''))
+                      ? 'w-full bg-gray-300 text-white px-5 py-2.5 rounded-b-2xl cursor-not-allowed focus:outline-none mb-5 mt-3'
+                      : cn(
+                          'w-full border-2 border-naranja-1 bg-naranja-1 text-white px-5 py-2.5 rounded-b-2xl cursor-pointer mb-5 mt-3 hover:shadow-lg',
+                          'hover:bg-white hover:text-naranja-1 hover:border-naranja-1 transition-all ease-in-out duration-300 focus:outline-none'
+                        )
+                  }
                 >
-                  Crear cuenta
+                  {/* ✅ Show loading state */}
+                  {uploading ? 'Creando cuenta...' : 'Crear cuenta'}
                 </button>
               </form>
             </div>
@@ -323,7 +452,7 @@ function RegisCard() {
               ¿Ya tienes cuenta?{' '}
               <Link
                 to="/login"
-                className="font-bold cursor-pointer hover:shadow-sm"
+                className="font-bold cursor-pointer hover:border-b-2 border-naranja-1 shadow-2xs "
               >
                 Inicia sesión
               </Link>
@@ -341,4 +470,5 @@ function RegisCard() {
     </>
   );
 }
+
 export default RegisCard;
