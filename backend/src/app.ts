@@ -18,12 +18,8 @@ import { CronManager } from './shared/cron/cronManager.js';
 import { PagoRouter } from './pago/pago.route.js';
 import cookieParser from 'cookie-parser';
 import authRoutes from './shared/middleware/auth.routes.js';
-<<<<<<< HEAD
-import Stripe from 'stripe';
-import { stripeRouter } from './stripe/stripe.route.js';
-=======
 import https from 'https';
->>>>>>> 95ecac9af52d6226829222d1429665a3733bfc16
+import { stripeRouter } from './stripe/stripe.route.js';
 // Tuve que recrear __dirname xq no estaba definido xq estamos usando ES Modules y no COmmonJS
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,7 +37,6 @@ const app = express();
 
 const isProduction = process.env.NODE_ENV === 'production';
 
-<<<<<<< HEAD
 // Middleware especial para webhook de Stripe (debe ir ANTES de express.json())
 app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }));
 app.use(
@@ -49,7 +44,6 @@ app.use(
   express.raw({ type: 'application/json' })
 );
 
-=======
 export const staticPath = !isProduction
   ? '/app/public/uploads' // Fly.io volume mount point
   : path.join(__dirname, '../public/uploads'); // Local development
@@ -151,7 +145,6 @@ try {
 } catch (error) {
   console.error('❌ Error creating upload directories:', error);
 }
->>>>>>> 95ecac9af52d6226829222d1429665a3733bfc16
 app.use('/uploads', express.static(staticPath));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));

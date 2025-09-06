@@ -16,12 +16,9 @@
     "@radix-ui/react-select": "^2.2.5",
     "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-tooltip": "^1.2.8",
-<<<<<<< HEAD
     "@storybook/react": "^9.0.16",
     "@stripe/react-stripe-js": "^4.0.0",
     "@stripe/stripe-js": "^7.9.0",
-=======
->>>>>>> 95ecac9af52d6226829222d1429665a3733bfc16
     "@tailwindcss/vite": "^4.1.11",
     "axios": "^1.10.0",
     "class-variance-authority": "^0.7.1",
