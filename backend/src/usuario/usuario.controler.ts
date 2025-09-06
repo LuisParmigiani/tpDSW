@@ -14,9 +14,7 @@ const __filename = fileURLToPath(import.meta.url);
 const em = orm.em;
 const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
 
-// Función para detectar si estamos en modo local
 const __dirname = path.dirname(__filename);
-
 interface AuthRequest extends Request {
   user?: {
     id: string;
@@ -124,12 +122,14 @@ async function findPrestatariosByTipoServicioAndZona(
 
     // Build the where clause conditionally
     const whereClause: any = {};
+    whereClause.servicios = { estado: 'activo' };
     whereClause.nombreFantasia = { $ne: null }; // De esta manera no traemos ningún usuario que no
     if (filtroTipoServicio) {
       whereClause.tiposDeServicio = { nombreTipo: filtroTipoServicio };
     }
     if (filtroTarea) {
       whereClause.servicios = {
+        estado: 'activo',
         tarea: { nombreTarea: filtroTarea },
       };
     }
@@ -318,11 +318,48 @@ async function add(req: Request, res: Response) {
 async function update(req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id);
-    const updateUser = await em.findOneOrFail(Usuario, { id });
-    em.assign(updateUser, req.body.sanitizeUsuarioInput);
+    const userToUpdate = await em.findOneOrFail(Usuario, { id });
+    //Verifica si el mail ya existe en otro usuario para devolver un error más claro. Sino solo tiraba error 500 por el catch
+    if (userToUpdate.mail !== req.body.sanitizeUsuarioInput.mail) {
+      const mailExists = await em.findOne(Usuario, {
+        mail: req.body.sanitizeUsuarioInput.mail,
+      });
+      if (mailExists) {
+        return res.status(409).json({
+          error: 'EMAIL_ALREADY_EXISTS',
+          message: 'El mail ya está registrado por otro usuario',
+        });
+      }
+    }
+    if (userToUpdate.numeroDoc !== req.body.sanitizeUsuarioInput.numeroDoc) {
+      const numDocExists = await em.findOne(Usuario, {
+        numeroDoc: req.body.sanitizeUsuarioInput.numeroDoc,
+      });
+      if (numDocExists) {
+        return res.status(409).json({
+          error: 'NUMDOC_ALREADY_EXISTS',
+          message: 'El número de documento ya está registrado por otro usuario',
+        });
+      }
+    }
+    if (userToUpdate.telefono !== req.body.sanitizeUsuarioInput.telefono) {
+      const telExists = await em.findOne(Usuario, {
+        telefono: req.body.sanitizeUsuarioInput.telefono,
+      });
+      if (telExists) {
+        return res.status(409).json({
+          error: 'PHONE_ALREADY_EXISTS',
+          message: 'El telefono ya está registrado por otro usuario',
+        });
+      }
+    }
+    em.assign(userToUpdate, req.body.sanitizeUsuarioInput);
     await em.flush();
-    res.status(200).json({ message: 'updated usuario', data: updateUser });
+    res.status(200).json({ message: 'updated usuario', data: userToUpdate });
   } catch (error: any) {
+    //Logica para devolver bien el mensaje de error
+    console.log('Hubo un error actualizando la info del user:', error);
+
     res.status(500).json({ message: error.message });
   }
 }
@@ -559,7 +596,12 @@ async function uploadProfileImage(req: Request, res: Response) {
     }
     //Borra la foto anterior si existe
     if (user.foto) {
-      const RutaFotoVieja = path.join(__dirname, '../../public', user.foto);
+      const relativePath = user.foto.includes('/uploads/')
+        ? user.foto.substring(user.foto.indexOf('/uploads/'))
+        : user.foto;
+
+      const RutaFotoVieja = path.join(__dirname, '../../public', relativePath);
+
       try {
         await fs.unlink(RutaFotoVieja);
       } catch (error) {
@@ -574,7 +616,10 @@ async function uploadProfileImage(req: Request, res: Response) {
     console.log('✅ Image processed successfully');
     console.log('🔗 Returned URL:', urlOptimizada);
     //Limpia la imagen subida
-    const baseUrl = process.env.BASE_URL || 'https://reformix.site';
+    const isProduction = process.env.NODE_ENV === 'production';
+    const baseUrl = isProduction
+      ? process.env.BASE_URL || 'https://backend-patient-morning-1303.fly.dev'
+      : 'http://localhost:3000';
 
     const fullPath = path.join(__dirname, '../../public', urlOptimizada);
     try {

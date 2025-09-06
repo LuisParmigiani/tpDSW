@@ -18,13 +18,13 @@ function Homepage() {
     'Control de Plagas',
   ];
   const redirecciones: string[] = [
-    'Plomeria',
+    'Plomería',
     'Electricidad',
-    'Carpinteria',
+    'Carpintería',
     'Pintura',
-    'Construccion',
-    'Cerrajeria',
-    'Jardineria',
+    'Construcción',
+    'Cerrajería',
+    'Jardinería',
     'Limpieza Residencial',
     'Control de Plagas',
   ];
@@ -35,7 +35,7 @@ function Homepage() {
   return (
     <>
       <div className="flex flex-col w-full">
-        <div className="absolute inset-0 w-full z-20">
+        <div className="sticky top-0 z-20 bg-white/80 backdrop-blur">
           <Navbar />
         </div>
         {/* Botón de pago Mercado Pago integrado */}

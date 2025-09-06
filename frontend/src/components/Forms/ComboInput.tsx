@@ -165,7 +165,6 @@ const ComboInput = forwardRef<ComboInputRef, ComboInputProps>(
         e.preventDefault();
         handleItemClick(item);
       };
-    console.log('Items:', items);
     return (
       <div className="relative">
         {/* Input Field */}

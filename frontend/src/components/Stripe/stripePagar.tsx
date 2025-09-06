@@ -1,5 +1,11 @@
 import { useState } from 'react';
+<<<<<<< HEAD:frontend/src/components/Stripe/stripePagar.tsx
 import { stripeApi } from '../../services/stripeApi';
+=======
+//import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
+import { mercadoPagoApi } from '../../services/mercadoPagoApi';
+
+>>>>>>> 95ecac9af52d6226829222d1429665a3733bfc16:frontend/src/components/MercadoPago/MercadoPago.tsx
 type Props = {
   amount: number; // en centavos
   sellerStripeId: string;

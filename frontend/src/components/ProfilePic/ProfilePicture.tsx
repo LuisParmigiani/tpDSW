@@ -37,7 +37,7 @@ function ProfilePicture({
         )}
 
         <label
-          htmlFor="profile-image-input" // ✅ Connect to input with htmlFor
+          htmlFor="profile-image-input" //
           className={`absolute bottom-0 right-1/2 transform translate-x-1/2 translate-y-1/2 bg-orange-500 text-white rounded-full p-2 transition-colors ${
             uploading
               ? 'cursor-not-allowed opacity-50 bg-gray-400'
@@ -60,12 +60,12 @@ function ProfilePicture({
         </label>
 
         <input
-          id="profile-image-input" // ✅ Add matching id
+          id="profile-image-input" //
           type="file"
           accept="image/jpeg,image/png,image/webp"
           onChange={handleFileChange}
           className="hidden"
-          disabled={uploading} // ✅ Disable during upload
+          disabled={uploading} //
         />
       </div>
     </div>

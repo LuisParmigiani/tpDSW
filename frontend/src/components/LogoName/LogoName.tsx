@@ -12,7 +12,7 @@ function LogoName(){
                         <img src="/images/logo.png" alt="Logo" className=" " />
                     </div>
                     <b className="text-(--color-naranja-1) text-3xl font-semibold">
-                        NombreEmpresa
+                        Reformix
                     </b>
                     
                 </div>

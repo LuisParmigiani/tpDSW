@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import DashNav from '../../components/DashNav/DashNav';
 import type { MenuItem } from '../../components/DashNav/DashNav';
+import { Link } from 'react-router-dom';
 import PerfilSection from '../../components/Dashboard/PerfilSection';
 import ClientesSection from '../../components/Dashboard/ClientesSection';
 import ServiciosSection from '../../components/Dashboard/ServiciosSection';
+import ComentariosPrestadorSection from '../../components/Dashboard/ComentariosPrestadorSection';
 import { useProtectRoute } from '../../cookie/useProtectRoute.tsx';
 
 function Dashboard() {
@@ -77,6 +79,21 @@ function Dashboard() {
         </svg>
       ),
     },
+    {
+      id: 'comentarios',
+      name: 'Comentarios',
+      icon: (
+        <svg
+          className="w-5 h-5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+      ),
+    },
   ];
 
   const renderActiveSection = () => {
@@ -87,6 +104,8 @@ function Dashboard() {
         return <ClientesSection />;
       case 'servicios':
         return <ServiciosSection />;
+      case 'comentarios':
+        return <ComentariosPrestadorSection />;
       default:
         return <PerfilSection />;
     }
@@ -101,13 +120,24 @@ function Dashboard() {
       />
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-semibold text-gray-800 capitalize">
+        <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4 h-16">
+          <div className="flex items-center justify-between h-full">
+            <h1 className="text-lg font-semibold text-gray-800 capitalize">
               {activeSection === 'perfil'
                 ? 'Configuración de perfil'
                 : activeSection}
             </h1>
+            <Link 
+              to="/" 
+              className="flex items-center space-x-2 hover:bg-gray-50 hover:scale-105 transition-all duration-200 rounded-lg p-2 cursor-pointer group"
+            >
+              <img 
+                src="/images/logo.png" 
+                alt="Logo" 
+                className="w-8 h-8"
+              />
+              <h2 className="text-lg font-bold text-orange-500 group-hover:text-orange-600 transition-colors">Reformix</h2>
+            </Link>
           </div>
         </header>
 
