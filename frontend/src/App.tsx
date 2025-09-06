@@ -10,6 +10,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Servicios from './pages/about/Servicios';
 import Dashboard from './pages/dashboard/dashboard-p';
 import ChangePassword from './components/recoverycard/changepassword';
+import StripeCreate from './components/Stripe/stripe';
+
 function App() {
   // Creación de la API DSP hay que llevarla a login
 
@@ -39,6 +41,7 @@ function App() {
             path="/historial/pending"
             element={<TurnHistory estado="pending" />}
           />
+          <Route path="/stripe/crear-cuenta" element={<StripeCreate />} />
         </Routes>
       </Router>
     </>

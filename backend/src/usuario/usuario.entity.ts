@@ -42,21 +42,23 @@ export class Usuario extends BaseEntity {
   @Property({ nullable: true })
   foto?: string; // aca se pone la ruta de la foto
 
-  // Campos para MercadoPago OAuth
+  // Campos para stripe OAuth
   @Property({ nullable: true })
-  mpAccessToken?: string;
+  stripeAccountId?: string;
 
   @Property({ nullable: true })
-  mpRefreshToken?: string;
+  onboardingStatus?: string;
 
   @Property({ nullable: true })
-  mpUserId?: string;
+  chargesEnabled?: boolean;
 
   @Property({ nullable: true })
-  mpPublicKey?: string;
+  payoutsEnabled?: boolean;
 
   @Property({ nullable: true })
-  mpTokenExpiration?: Date;
+  createdAt?: Date;
+  @Property({ nullable: true })
+  updatedAt?: Date;
 
   // Relación con Servicio
   @OneToMany(() => Servicio, (servicio) => servicio.usuario, {
@@ -89,4 +91,7 @@ export class Usuario extends BaseEntity {
     owner: true,
   })
   zonas = new Collection<Zona>(this);
+
+  @Property({ nullable: false })
+  esatdo!: string;
 }

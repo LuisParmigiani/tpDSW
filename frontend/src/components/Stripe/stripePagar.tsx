@@ -1,23 +1,35 @@
 import { useState } from 'react';
-import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
-import { mercadoPagoApi } from '../../services/mercadoPagoApi';
-
+import { stripeApi } from '../../services/stripeApi';
 type Props = {
+  amount: number; // en centavos
+  sellerStripeId: string;
+  userID: number;
+  userMail: string;
+  turno: Turno;
+};
+
+type Turno = {
+  id: number;
   fechaHora: Date;
   montoFinal: number;
   servicio: Servicio;
-  turno: number;
-  prestatarioEmail: string;
-  prestatarioId: number;
-  mpPublicKey: string;
+  calificacion: number | null;
+  comentario: string | null;
+  estado: string;
+  usuario: Usuario;
+  pagos: Pago[];
+  hayPagoAprobado?: boolean; // Nuevo campo para indicar si tiene pagos aprobados
 };
 
+type Pago = {
+  id: number;
+  estado: string;
+};
 type Servicio = {
   id: number;
   tarea: Tarea;
   usuario: Usuario;
 };
-
 type Tarea = {
   nombreTarea: string;
   descripcionTarea: string;
@@ -27,61 +39,56 @@ type Tarea = {
     nombreTipo: string;
   };
 };
-
 type Usuario = {
   id: number;
   mail: string;
   nombreFantasia: string;
+  stripeAccountId?: string;
 };
 
-const MercadoPago = (props: Props) => {
-  initMercadoPago(props.mpPublicKey);
-  const [preferenceId, setPreferenceId] = useState('');
+function PagarTurno({
+  amount,
+  sellerStripeId,
+  userID,
+  userMail,
+  turno,
+}: Props) {
+  console.log('Datos para pago:', {
+    amount,
+    sellerStripeId,
+    userID,
+    userMail,
+    turnoId: turno.id,
+  });
   const [loading, setLoading] = useState(false);
+  const [preferenceId, setPreferenceId] = useState('');
   const [error, setError] = useState('');
-
-  const handlePago = async () => {
+  const handlePayment = async () => {
     setLoading(true);
-    setError('');
+
+    // Datos que enviamos al backend
+    const paymentData = {
+      amount: amount, // 50 USD en centavos
+      sellerStripeId: sellerStripeId, // ID de cuenta conectada del vendedor
+      turno: turno.id, // ID del turno que se está pagando
+      userMail: userMail,
+      userID: userID,
+    };
 
     try {
-      console.log('🔹 Creando preferencia con datos:', {
-        title: props.servicio.tarea.nombreTarea,
-        description: props.servicio.tarea.descripcionTarea,
-        quantity: 1,
-        currency: 'ARS',
-        unit_price: props.montoFinal,
-        turno: props.turno,
-        prestatario_id: props.prestatarioId, // ✅ Corregido: usar prestatario_id
-      });
+      // Llamada a tu backend para crear la Checkout Session
+      const res = await stripeApi.pay(paymentData);
 
-      const response = await mercadoPagoApi.create({
-        title: props.servicio.tarea.nombreTarea,
-        description: props.servicio.tarea.descripcionTarea,
-        quantity: 1,
-        currency: 'ARS',
-        unit_price: props.montoFinal,
-        turno: props.turno,
-        prestatario_id: props.prestatarioId, // ✅ Corregido: quitar prestatario_email
-      });
-
-      console.log('🔹 Respuesta del backend:', response.data);
-
-      if (response.data?.preferenceId) {
-        setPreferenceId(response.data.preferenceId);
-      } else {
-        throw new Error('No se recibió preferenceId del backend');
-      }
-    } catch (error: unknown) {
-      console.error('❌ Error al crear la preferencia de pago:', error);
-
-      let errorMessage = 'Error al crear la preferencia de pago';
-
-      if (error instanceof Error) {
-        errorMessage = error.message;
+      if (!res.data.url) {
+        console.error('Error creando Checkout Session', res.data);
+        setLoading(false);
+        return;
       }
 
-      setError(errorMessage);
+      // Redirige al usuario a Stripe Checkout
+      window.location.href = res.data.url;
+    } catch (err) {
+      console.error('Error al crear la sesión de pago:', err);
     } finally {
       setLoading(false);
     }
@@ -117,13 +124,13 @@ const MercadoPago = (props: Props) => {
               </svg>
             </button>
             <div className="items-start text-start">
-              <p>Tipo: {props.servicio.tarea.tipoServicio.nombreTipo}</p>
-              <p>Tarea: {props.servicio.tarea.nombreTarea}</p>
-              <p>Descripción: {props.servicio.tarea.descripcionTarea}</p>
-              <p>Duración: {props.servicio.tarea.duracionTarea} minutos</p>
+              <p>Tipo: {turno.servicio.tarea.tipoServicio.nombreTipo}</p>
+              <p>Tarea: {turno.servicio.tarea.nombreTarea}</p>
+              <p>Descripción: {turno.servicio.tarea.descripcionTarea}</p>
+              <p>Duración: {turno.servicio.tarea.duracionTarea} minutos</p>
               <p>
                 Dia-Hora:{' '}
-                {new Date(props.fechaHora).toLocaleString('es-AR', {
+                {new Date(turno.fechaHora).toLocaleString('es-AR', {
                   year: 'numeric',
                   month: '2-digit',
                   day: '2-digit',
@@ -131,11 +138,15 @@ const MercadoPago = (props: Props) => {
                   minute: '2-digit',
                 })}
               </p>
-              <p className="pb-10">Monto final: ${props.montoFinal}</p>
+              <p className="pb-10">Monto final: ${turno.montoFinal}</p>
+              <button
+                onClick={handlePayment}
+                disabled={loading}
+                className="bg-blue-500 text-white px-4 py-2 rounded w-full hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50"
+              >
+                {loading ? 'Procesando...' : 'Pagar a Turno'}
+              </button>
             </div>
-
-            {/* ✅ Wallet de Mercado Pago */}
-            <Wallet initialization={{ preferenceId }} />
           </div>
         </div>
       )}
@@ -143,7 +154,7 @@ const MercadoPago = (props: Props) => {
       <div className="w-full">
         <button
           className="bg-naranja-1 text-white hover:text-naranja-1 hover:bg-white w-full rounded-2xl border-2 border-naranja-1 disabled:opacity-50"
-          onClick={handlePago}
+          onClick={() => setPreferenceId('open')}
           disabled={loading}
         >
           {loading ? 'Creando pago...' : 'Realizar Pago'}
@@ -164,6 +175,6 @@ const MercadoPago = (props: Props) => {
       </div>
     </>
   );
-};
+}
 
-export default MercadoPago;
+export default PagarTurno;

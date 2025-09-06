@@ -45,6 +45,7 @@ type Usuario = {
   id: number;
   mail: string;
   nombreFantasia: string;
+  stripeAccountId?: string;
 };
 
 type Props = {

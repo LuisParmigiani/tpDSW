@@ -19,6 +19,8 @@
     "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-tooltip": "^1.2.8",
     "@storybook/react": "^9.0.16",
+    "@stripe/react-stripe-js": "^4.0.0",
+    "@stripe/stripe-js": "^7.9.0",
     "@tailwindcss/vite": "^4.1.11",
     "axios": "^1.10.0",
     "class-variance-authority": "^0.7.1",
@@ -29,6 +31,7 @@
     "react-helmet-async": "^2.0.5",
     "react-hook-form": "^7.62.0",
     "react-router-dom": "^7.6.3",
+    "stripe": "^18.5.0",
     "tailwindcss": "^4.1.11",
     "zod": "^4.0.14"
   },

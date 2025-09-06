@@ -1,6 +1,5 @@
 import Stars from '../stars/Stars';
-import MercadoPago from '../MercadoPago/MercadoPago.tsx';
-const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY;
+import PagarTurno from '../Stripe/stripePagar';
 type Turno = {
   id: number;
   fechaHora: Date;
@@ -35,6 +34,7 @@ type Usuario = {
   id: number;
   mail: string;
   nombreFantasia: string;
+  stripeAccountId?: string;
 };
 type Props = {
   navigate: (path: string) => void;
@@ -84,14 +84,12 @@ function TurnCard({ navigate, turn, openModal, cancelarTurno }: Props) {
           if (!turn.hayPagoAprobado && turn.estado === 'completado') {
             return (
               <>
-                <MercadoPago
-                  fechaHora={turn.fechaHora}
-                  montoFinal={turn.montoFinal}
-                  servicio={turn.servicio}
-                  turno={turn.id}
-                  prestatarioEmail={turn.usuario.mail}
-                  prestatarioId={turn.servicio.usuario.id}
-                  mpPublicKey={mpPublicKey}
+                <PagarTurno
+                  amount={turn.montoFinal}
+                  sellerStripeId={turn.servicio.usuario.stripeAccountId ?? ''}
+                  userID={turn.usuario.id}
+                  userMail={turn.usuario.mail}
+                  turno={turn}
                 />
                 <button
                   className="bg-naranja-1 text-white hover:text-naranja-1 hover:bg-white w-full rounded-2xl border-2 border-naranja-1"

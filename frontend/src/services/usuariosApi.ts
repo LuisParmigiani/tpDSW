@@ -23,7 +23,6 @@ export const usuariosApi = {
   getByIdOnlyInfo: (id: string) => api.get(`/usuario/onlyInfo/${id}`),
   getByCookie: () => {
     const token = localStorage.getItem('token');
-    console.log(token);
     return api.get(`/usuario/cookie`, {
       headers: { Authorization: `Bearer ${token}` },
     });

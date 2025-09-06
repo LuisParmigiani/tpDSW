@@ -11,7 +11,7 @@ function DevolucionPago({ estado, cerrar }: Props) {
     message = 'El pago del servicio se ha procesado correctamente.';
     modalstyle = 'bg-green-100 border-green-400 text-green-700';
     buttonstyle = 'bg-green-500 hover:bg-green-600';
-  } else if (estado === 'failure') {
+  } else if (estado === 'canceled') {
     message =
       'Ha ocurrido un error al procesar el pago intente de nuevo luego.';
     modalstyle = 'bg-red-100 border-red-400 text-red-700';

@@ -16,10 +16,10 @@ import { serviceTypeRouter } from './tipoServicio/tipoServ.route.js';
 import { horarioRouter } from './horario/horario.routes.js';
 import { CronManager } from './shared/cron/cronManager.js';
 import { PagoRouter } from './pago/pago.route.js';
-import { webhookRouter } from './mercadopago/mercadoPago.route.js';
 import cookieParser from 'cookie-parser';
 import authRoutes from './shared/middleware/auth.routes.js';
-
+import Stripe from 'stripe';
+import { stripeRouter } from './stripe/stripe.route.js';
 // Tuve que recrear __dirname xq no estaba definido xq estamos usando ES Modules y no COmmonJS
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -36,6 +36,13 @@ const app = express();
 //hasta el middleware
 
 const staticPath = path.join(__dirname, '../public/uploads');
+
+// Middleware especial para webhook de Stripe (debe ir ANTES de express.json())
+app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }));
+app.use(
+  '/api/stripe/webhook/split-payment',
+  express.raw({ type: 'application/json' })
+);
 
 app.use('/uploads', express.static(staticPath));
 app.use(express.json({ limit: '10mb' }));
@@ -84,6 +91,7 @@ app.use(
 );
 
 app.use(cookieParser());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -100,10 +108,7 @@ app.use('/api/horario', horarioRouter);
 app.use('/api/zona', zonaRouter);
 app.use('/api/pago', PagoRouter);
 app.use('/api/auth', authRoutes);
-
-// MercadoPago routes - agrupadas
-// Rutas de MercadoPago (webhooks y OAuth)
-app.use('/api/mercadopago', webhookRouter);
+app.use('/api/stripe', stripeRouter);
 
 if (local) {
   console.log('LOCAL_MODE=true -> syncSchema habilitado');
@@ -140,7 +145,3 @@ const port = local ? 3000 : Number(process.env.PORT) || 8080; // Fly asigna PORT
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
-
-/* app.listen(3000, () => {
-    console.log('Server runnning on http://localhost:3000');
-  }); */

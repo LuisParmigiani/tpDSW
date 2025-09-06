@@ -21,6 +21,7 @@ interface AuthRequest extends Request {
   user?: {
     id: string;
     rol: string;
+    email: string;
   };
 }
 
@@ -46,6 +47,13 @@ function sanitizeUsuarioInput(req: Request, res: Response, next: NextFunction) {
     orderBy: req.body.orderBy,
     maxItems: req.body.maxItems,
     page: req.body.page,
+    stripeAccountId: req.body.stripeAccountId,
+    onboardingStatus: req.body.onboardingStatus,
+    chargesEnabled: req.body.chargesEnabled,
+    payoutsEnabled: req.body.payoutsEnabled,
+    createdAt: req.body.createdAt,
+    updatedAt: req.body.updatedAt,
+    estado: req.body.estado,
   };
   Object.keys(req.body.sanitizeUsuarioInput).forEach((key) => {
     if (req.body.sanitizeUsuarioInput[key] === undefined) {
@@ -294,6 +302,11 @@ async function add(req: Request, res: Response) {
       );
       req.body.sanitizeUsuarioInput.contrasena = hashedPassword;
     }
+    if (req.body.sanitizeUsuarioInput.nombreFantasia) {
+      req.body.sanitizeUsuarioInput.estado = 'activo';
+    } else {
+      req.body.sanitizeUsuarioInput.estado = 'inactivo';
+    }
     const newUser = em.create(Usuario, req.body.sanitizeUsuarioInput);
     await em.flush();
     res.status(201).json({ message: 'created new usuario', data: newUser });
@@ -398,9 +411,13 @@ async function loginUsuario(req: Request, res: Response) {
     const rol =
       usuarioSinContrasena.nombreFantasia === null ? 'cliente' : 'prestador';
 
-    const token = jwt.sign({ id: usuarioSinContrasena.id, rol }, JWT_SECRET, {
-      expiresIn: '1d',
-    });
+    const token = jwt.sign(
+      { id: usuarioSinContrasena.id, rol, email: usuarioSinContrasena.mail },
+      JWT_SECRET,
+      {
+        expiresIn: '1d',
+      }
+    );
 
     return res
       .status(200)
@@ -482,24 +499,32 @@ async function cambiarPassword(req: Request, res: Response) {
 }
 
 async function putOauth(
-  id: number,
-  access_token: string,
-  refresh_token: string,
-  user_id: string,
-  public_key: string,
-  mpTokenExpiration: Date
+  mail: string,
+  estado: 'active' | 'pending' | 'rejected',
+  stripeAccountId?: string,
+  chargesEnabled?: boolean,
+  payoutsEnabled?: boolean,
+  createdAt?: Date,
+  updatedAt?: Date
 ) {
+  let guardar;
+  if (stripeAccountId) {
+    guardar = {
+      onboardingStatus: estado,
+      stripeAccountId,
+      chargesEnabled,
+      payoutsEnabled,
+      createdAt,
+      updatedAt,
+    };
+  } else {
+    guardar = { onboardingStatus: estado };
+  }
   try {
-    const updateUser = await em.findOneOrFail(Usuario, { id });
-    em.assign(updateUser, {
-      mpAccessToken: access_token, // Guarda el access token
-      mpRefreshToken: refresh_token, // Guarda el refresh token
-      mpUserId: user_id, // Guarda el user_id de MercadoPago
-      mpPublicKey: public_key, // Guarda la public key
-      mpTokenExpiration: mpTokenExpiration,
-    });
+    const updateUser = await em.findOneOrFail(Usuario, { mail });
+    em.assign(updateUser, guardar);
     await em.flush();
-    console.log('Tokens de MercadoPago actualizados');
+    console.log('Tokens de stripe actualizados');
   } catch (error: any) {
     console.error('Error en putOauth:', error);
   }

@@ -206,19 +206,19 @@ async function getTurnosByUserId(req: AuthRequest, res: Response) {
     case 'porPagar':
       calificacionFilter = {
         estado: 'completado',
-        pagos: { $none: { estado: { $in: ['approved', 'pending'] } } },
+        pagos: { $none: { estado: ['succeeded', 'processing'] } },
       };
       break;
     case 'pagado':
       calificacionFilter = {
         estado: 'completado',
-        pagos: { $some: { estado: { $eq: 'approved' } } },
+        pagos: { $some: { estado: { $eq: 'succeeded' } } },
       };
       break;
     case 'pagoPendiente':
       calificacionFilter = {
         estado: 'completado',
-        pagos: { $some: { estado: 'pending' } },
+        pagos: { $some: { estado: 'processing' } },
       };
       break;
   }
@@ -246,11 +246,8 @@ async function getTurnosByUserId(req: AuthRequest, res: Response) {
     ...calificacionFilter,
   };
   try {
-    // Total de turnos para ver el paginado
-    const totalCount = await em.count(Turno, where);
-
     // Buscar los turnos del usuario, populando toda la información necesaria en una sola consulta
-    const turnos = await em.find(Turno, where, {
+    const [turnos, totalCount] = await em.findAndCount(Turno, where, {
       populate: [
         'servicio.tarea.tipoServicio',
         'servicio.usuario',
@@ -275,10 +272,11 @@ async function getTurnosByUserId(req: AuthRequest, res: Response) {
         hayPagoAprobado: pagosArray.some(
           (pago: any) =>
             typeof pago.estado === 'string' &&
-            pago.estado.trim().toLowerCase() === 'approved'
+            pago.estado.trim().toLowerCase() === 'succeeded'
         ),
       };
     });
+    console.log('Turnos encontrados para el usuario:', turnosConPagoAprobado);
 
     res.status(200).json({
       message: 'found turns by user id',
@@ -291,7 +289,10 @@ async function getTurnosByUserId(req: AuthRequest, res: Response) {
       },
     });
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      message: 'Entro al catch:----------------------------------------',
+      error: error.message,
+    });
   }
 }
 
@@ -395,15 +396,6 @@ async function getTurnosByPrestadorId(req: Request, res: Response) {
       ? ''
       : req.params.selectedValueOrder || '';
   const searchQuery = req.params.searchQuery || '';
-
-  console.log('=== DEBUG ORDENAMIENTO ===');
-  console.log('selectedValueOrder recibido:', selectedValueOrder);
-  console.log('selectedValueShow recibido:', selectedValueShow);
-  console.log('searchQuery recibido:', searchQuery);
-  console.log(
-    'isMultipleStatesFilter:',
-    selectedValueShow.startsWith('multipleStates:')
-  );
 
   // Determinar el filtro de calificación según selectedValueShow
   let calificacionFilter: any = {};
