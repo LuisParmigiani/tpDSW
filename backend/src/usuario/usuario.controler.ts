@@ -295,6 +295,7 @@ async function findOneByCookie(req: AuthRequest, res: Response) {
 async function add(req: Request, res: Response) {
   try {
     // encripta password
+    console.log('Datos recibidos para crear usuario:', req.body.sanitizeUsuarioInput); // <-- Agregá esto
     if (req.body.sanitizeUsuarioInput.contrasena) {
       const hashedPassword = await bcrypt.hash(
         req.body.sanitizeUsuarioInput.contrasena,
@@ -303,9 +304,9 @@ async function add(req: Request, res: Response) {
       req.body.sanitizeUsuarioInput.contrasena = hashedPassword;
     }
     if (req.body.sanitizeUsuarioInput.nombreFantasia) {
-      req.body.sanitizeUsuarioInput.estado = 'activo';
-    } else {
       req.body.sanitizeUsuarioInput.estado = 'inactivo';
+    } else {
+      req.body.sanitizeUsuarioInput.estado = 'activo';
     }
     const newUser = em.create(Usuario, req.body.sanitizeUsuarioInput);
     await em.flush();
