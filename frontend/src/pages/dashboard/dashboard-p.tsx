@@ -119,10 +119,10 @@ function Dashboard() {
         menuItems={customMenuItems}
       />
 
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4 h-16">
+      <div className="flex-1 flex flex-col overflow-hidden md:ml-0 ml-16">
+        <header className="bg-white shadow-sm border-b border-gray-200 px-4 sm:px-6 py-4 h-16">
           <div className="flex items-center justify-between h-full">
-            <h1 className="text-lg font-semibold text-gray-800 capitalize">
+            <h1 className="text-base sm:text-lg font-semibold text-gray-800 capitalize ml-2 sm:ml-0">
               {activeSection === 'perfil'
                 ? 'Configuración de perfil'
                 : activeSection}
@@ -141,7 +141,7 @@ function Dashboard() {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
           {renderActiveSection()}
         </main>
       </div>

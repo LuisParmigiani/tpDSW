@@ -473,29 +473,29 @@ function ClientesSection() {
 
 	const estadosDisponibles = ['Pendiente', 'Confirmado', 'Cancelado', 'Completado'];
 
-	// Mostrar loading
+	// Mostrar loading - responsive
 	if (loading) {
 		return (
 			<DashboardSection>
-				<div className="flex items-center justify-center h-64">
+				<div className="flex items-center justify-center h-48 sm:h-64 px-4">
 					<div className="text-center">
-						<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto mb-4"></div>
-						<p className="text-gray-600">Cargando turnos...</p>
+						<div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-orange-500 mx-auto mb-4"></div>
+						<p className="text-gray-600 text-sm sm:text-base">Cargando turnos...</p>
 					</div>
 				</div>
 			</DashboardSection>
 		);
 	}
 
-	// Mostrar error
+	// Mostrar error - responsive
 	if (error) {
 		return (
 			<DashboardSection>
-				<div className="text-center py-8">
-					<div className="text-red-500 mb-4">{error}</div>
+				<div className="text-center py-6 sm:py-8 px-4">
+					<div className="text-red-500 mb-4 text-sm sm:text-base">{error}</div>
 					<button 
 						onClick={() => cargarTurnos(currentPage, sortBy, estadoFilters, false, activeSearchQuery)}  // Mantener búsqueda activa
-						className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600"
+						className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 text-sm sm:text-base"
 					>
 						Reintentar
 					</button>
@@ -506,21 +506,22 @@ function ClientesSection() {
 
 	return (
 		<DashboardSection>
-			<div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-				<h2 className="text-xl font-semibold text-gray-900">Turnos</h2>
-				<div className="flex gap-2">
+			{/* Header responsive */}
+			<div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-2 px-2 sm:px-0 relative">
+				<h2 className="text-lg sm:text-xl font-semibold text-gray-900">Turnos</h2>
+				<div className="flex flex-col sm:flex-row gap-2 sm:gap-2 relative">
 					<input
 						type="text"
 						placeholder="Buscar cliente..."
 						value={searchQuery}
 						onChange={(e) => setSearchQuery(e.target.value)}
 						onKeyDown={handleKeyDown}
-						className="border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+						className="w-full sm:w-auto border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
 					/>
 					<select 
 						value={sortBy}
 						onChange={handleSortChange}
-						className="border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+						className="w-full sm:w-auto border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
 					>
 						<option value="" className="text-gray-700 bg-white">
 							Ordenar por
@@ -540,10 +541,10 @@ function ClientesSection() {
 					</select>
 					
 					{/* Dropdown de filtrar por estado */}
-					<div className="relative" ref={dropdownRef}>
+					<div className="relative w-full sm:w-auto" ref={dropdownRef}>
 						<button
 							onClick={() => setShowEstadoDropdown(!showEstadoDropdown)}
-							className="border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 flex items-center gap-2"
+							className="w-full sm:w-auto border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 flex items-center justify-between sm:justify-center gap-2"
 						>
 							<span>
 								Filtrar por {estadoFilters.length > 0 && `(${estadoFilters.length})`}
@@ -559,7 +560,7 @@ function ClientesSection() {
 						</button>
 						
 						{showEstadoDropdown && (
-							<div className="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+							<div className="absolute top-full right-0 lg:left-0 mt-1 w-full sm:w-48 lg:w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-20">
 								<div className="p-3">
 									<div className="flex justify-between items-center mb-2">
 										<span className="text-sm font-medium text-gray-700">Estados</span>
@@ -589,23 +590,24 @@ function ClientesSection() {
 					</div>
 				</div>
 			</div>
-			<div className="overflow-x-auto bg-white rounded-lg shadow relative">
-				<table className="min-w-full text-sm table-fixed">
+			
+			{/* Tabla responsive */}
+			<div className="overflow-x-auto bg-white rounded-lg shadow relative mx-2 sm:mx-0">
+				<table className="min-w-full text-xs sm:text-sm table-fixed">
 					<thead>
 						<tr className="bg-gray-100 text-gray-700">
-							<th className="py-3 px-4 text-center">
+							<th className="py-2 sm:py-3 px-2 sm:px-4 text-center">
 								<span className="relative flex items-center justify-center">
 									<input
 										type="checkbox"
 										checked={allCurrentPageSelected}
 										onChange={handleSelectAll}
-										className="peer h-5 w-5 rounded border border-gray-500 bg-white appearance-none cursor-pointer focus:ring-2 focus:ring-orange-500 checked:bg-orange-500 checked:border-orange-500"
+										className="peer h-4 w-4 sm:h-5 sm:w-5 rounded border border-gray-500 bg-white appearance-none cursor-pointer focus:ring-2 focus:ring-orange-500 checked:bg-orange-500 checked:border-orange-500"
 									/>
 									<span className="absolute pointer-events-none inset-0 flex items-center justify-center">
 										{allCurrentPageSelected && (
 											<svg
-												width="20"
-												height="20"
+												className="w-4 h-4 sm:w-5 sm:h-5"
 												viewBox="0 0 20 20"
 												fill="none"
 												style={{ display: 'block' }}
@@ -622,12 +624,12 @@ function ClientesSection() {
 									</span>
 								</span>
 							</th>
-							<th className="py-3 px-4 text-left">Cliente</th>
-							<th className="py-3 px-4 text-left">Fecha</th>
-							<th className="py-3 px-4 text-left">Hora</th>
-							<th className="py-3 px-4 text-left min-w-[220px]">Tarea</th>
-							<th className="py-3 px-4 text-left">Monto</th>
-							<th className="py-3 px-4 text-left">Estado</th>
+							<th className="py-2 sm:py-3 px-2 sm:px-4 text-left text-xs sm:text-sm">Cliente</th>
+							<th className="py-2 sm:py-3 px-2 sm:px-4 text-left text-xs sm:text-sm hidden sm:table-cell">Fecha</th>
+							<th className="py-2 sm:py-3 px-2 sm:px-4 text-left text-xs sm:text-sm hidden sm:table-cell">Hora</th>
+							<th className="py-2 sm:py-3 px-2 sm:px-4 text-left text-xs sm:text-sm min-w-[150px] sm:min-w-[220px]">Tarea</th>
+							<th className="py-2 sm:py-3 px-2 sm:px-4 text-left text-xs sm:text-sm">Monto</th>
+							<th className="py-2 sm:py-3 px-2 sm:px-4 text-left text-xs sm:text-sm">Estado</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -643,8 +645,8 @@ function ClientesSection() {
 							))
 						) : (
 							<tr>
-								<td colSpan={7} className="py-4 text-center">
-									<p className="text-gray-400 opacity-60 mt-8">
+								<td colSpan={7} className="py-6 sm:py-8 text-center">
+									<p className="text-gray-400 opacity-60 text-sm sm:text-base px-4">
 										{activeSearchQuery 
 											? "No se encontraron turnos que coincidan con tu búsqueda."
 											: "No hay turnos disponibles."
@@ -655,7 +657,9 @@ function ClientesSection() {
 						)}
 					</tbody>
 				</table>
-				<div className={`mt-2 flex items-center justify-end ${currentTurnos.length > 0 ? 'min-h-[60px]' : 'min-h-[20px]'}`}>
+				
+				{/* Paginación responsive */}
+				<div className={`mt-2 flex items-center justify-center sm:justify-end px-2 sm:px-0 ${currentTurnos.length > 0 ? 'min-h-[60px]' : 'min-h-[20px]'}`}>
 					<PaginationControls
 						currentPage={currentPage}
 						totalPages={totalPages}
@@ -686,8 +690,9 @@ function ClientesSection() {
             }
           }
         `}</style>
+				{/* Mensaje de error responsive */}
 				{showErrorMessage && (
-					<div className={`fixed left-1/2 bottom-24 transform -translate-x-1/2 z-50 bg-red-100 border border-red-200 text-red-800 px-4 py-2 rounded-lg shadow-lg transition-all duration-200 ${
+					<div className={`fixed left-1/2 bottom-16 sm:bottom-24 transform -translate-x-1/2 z-50 bg-red-100 border border-red-200 text-red-800 px-3 sm:px-4 py-2 rounded-lg shadow-lg transition-all duration-200 text-sm sm:text-base mx-4 max-w-[90vw] sm:max-w-none ${
 						isErrorAnimating ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
 					}`}>
 						{errorMessage}
