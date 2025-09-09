@@ -3,7 +3,7 @@ import DashboardSection from '../DashboardSection/DashboardSection';
 import useAuth from '../../cookie/useAuth';
 import { Alert, AlertTitle, AlertDescription } from '../Alerts/Alerts';
 import StripeCreate from '../Stripe/stripe';
-import { CardPago } from '../CardPago';
+import CardPago from '../CardPago/CardPago';
 
 interface EstadisticasPagos {
   ingresosMes: number;
