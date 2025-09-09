@@ -303,9 +303,9 @@ async function add(req: Request, res: Response) {
       req.body.sanitizeUsuarioInput.contrasena = hashedPassword;
     }
     if (req.body.sanitizeUsuarioInput.nombreFantasia) {
-      req.body.sanitizeUsuarioInput.estado = 'activo';
-    } else {
       req.body.sanitizeUsuarioInput.estado = 'inactivo';
+    } else {
+      req.body.sanitizeUsuarioInput.estado = 'activo';
     }
     const newUser = em.create(Usuario, req.body.sanitizeUsuarioInput);
     await em.flush();
