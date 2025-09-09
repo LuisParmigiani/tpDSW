@@ -384,7 +384,7 @@ INSERT INTO `horario` (`dia_semana`, `hora_desde`, `hora_hasta`, `usuario_id`) V
 (5, '08:00:00', '20:00:00', 75), -- Viernes
 (6, '08:00:00', '18:00:00', 75), -- Sábado
 
-(6, '08:00:00', '18:00:00', 75); -- Sábado
+
 
 -- 4. INSERTAR TIPOS DE SERVICIO (40 tipos únicos)
 INSERT INTO `tipo_servicio` (`nombre_tipo`, `descripcion_tipo`) VALUES

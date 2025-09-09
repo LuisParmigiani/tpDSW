@@ -360,7 +360,7 @@ async function getTurnosByServicioIdHelper(params: {
 async function getTurnsPerDay(req: Request, res: Response) {
   const userId = req.params.id; // ID del usuario
   const date = req.params.date; // fecha seleccionada para hacer la búsqueda
-  console.log(date);
+
   try {
     const start = new Date(date + 'T00:00:00');
 

@@ -21,26 +21,20 @@ function App() {
         <Routes>
           <Route path="/" element={<Homepage />} />
           <Route path="/about" element={<About />} />
-          <Route path="/borrower/:id" element={<Borrower />} />
+          <Route
+            path="/prestatario/:id/:servicio?/:Tarea?/:horario?/:dia?/:open?"
+            element={<Borrower />}
+          />
           <Route path="/Servicios" element={<Servicios />} />
-          <Route path="/login" element={<Login />} />
+          <Route
+            path="/login/:id?/:servicio?/:Tarea?/:horario?/:dia?"
+            element={<Login />}
+          />
           <Route path="/recovery" element={<Recovery />} />
           <Route path="/registration" element={<Registration />} />
-          <Route path="/historial" element={<TurnHistory />} />
+          <Route path="/historial/:estado?" element={<TurnHistory />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/changepassword" element={<ChangePassword />} />
-          <Route
-            path="/historial/success"
-            element={<TurnHistory estado="success" />}
-          />
-          <Route
-            path="/historial/failure"
-            element={<TurnHistory estado="failure" />}
-          />
-          <Route
-            path="/historial/pending"
-            element={<TurnHistory estado="pending" />}
-          />
           <Route path="/stripe/crear-cuenta" element={<StripeCreate />} />
         </Routes>
       </Router>

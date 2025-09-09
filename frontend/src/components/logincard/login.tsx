@@ -1,10 +1,18 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { usuariosApi } from '../../services/usuariosApi';
+import { useParams } from 'react-router-dom';
 import useAuth from '../../cookie/useAuth';
 import { cn } from '../../lib/utils.ts';
 
 function Logincard() {
+  const { id, servicio, Tarea, horario, dia } = useParams<{
+    id?: string;
+    servicio?: string;
+    Tarea?: string;
+    horario?: string;
+    dia?: string;
+  }>();
   const { verificarAuth } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -22,10 +30,20 @@ function Logincard() {
   const envioFormulario = async () => {
     try {
       const { data } = await usuariosApi.login(form);
-      console.log('Login exitoso');
+
       localStorage.setItem('token', data.token);
       await verificarAuth();
-      navigate('/dashboard');
+      if (data.data.nombreFantasia) {
+        navigate('/dashboard');
+      } else {
+        if (id && servicio && Tarea && horario && dia) {
+          navigate(
+            `/prestatario/${id}/${servicio}/${Tarea}/${horario}/${dia}/true`
+          );
+        } else {
+          navigate('/');
+        }
+      }
     } catch (error) {
       setOpen(true);
       const err = error as { response?: { status?: number } };
