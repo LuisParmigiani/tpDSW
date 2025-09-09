@@ -6,8 +6,7 @@ import PaginationControls from '../../components/Pagination/PaginationControler'
 import { turnosApi } from '../../services/turnosApi';
 import TurnoDetailsModal from '../Modal/TurnoDetailsModal';
 import ConfirmationModal from '../Modal/ConfirmationModal';
-// TEMPORAL: comentar import de useAuth para usar ID fijo
-// import useAuth from '../../cookie/useAuth';
+import useAuth from '../../cookie/useAuth';
 
 
 // Función auxiliar para capitalizar la primera letra
@@ -63,8 +62,7 @@ interface TurnoDisplay {
 }
 
 function ClientesSection() {
-	// TEMPORAL: comentar useAuth para usar ID fijo
-	// const { usuario } = useAuth(); // Obtener usuario logueado
+	const { usuario } = useAuth(); // Obtener usuario logueado
 	const [selectedTurnoIds, setSelectedTurnoIds] = useState<number[]>([]); // Cambio: usar IDs en lugar de índices
 	const [showMenu, setShowMenu] = useState(false);
 	const [showBar, setShowBar] = useState(false);
@@ -94,21 +92,17 @@ function ClientesSection() {
 
 	const cargarTurnos = useCallback(async (page = 1, ordenamiento = sortBy, filtrosEstado = estadoFilters, isPageChange = false, searchTerm = '') => {
 		try {
-			// TEMPORAL: Usar ID fijo para pruebas - comentar detección de usuario
-			const temporalPrestadorId = "49"; // ID fijo para ver turnos de ejemplo
 			
-			// Validar que el usuario esté autenticado
-			// if (!usuario || !usuario.id) {
-			// 	setError('Error: Usuario no autenticado');
-			// 	setLoading(false);
-			// 	return;
-			// }
+			if (!usuario || !usuario.id) {
+				setError('Error: Usuario no autenticado');
+				setLoading(false);
+				return;
+			}
 
 			if (isPageChange) {
 				setLoading(true); // Solo para cambios de página
-			} else {
-				setLoading(true); // Para carga inicial o cambios de filtros/ordenamiento
-			}
+			} 
+			
 			setError(null);
 			
 			// Mapear las opciones del frontend a los valores que espera el backend
@@ -146,7 +140,7 @@ function ClientesSection() {
 			// Si no hay filtros, no aplicar filtro específico (mostrar todos)
 			
 			const response = await turnosApi.getByPrestadorId(
-				temporalPrestadorId, // TEMPORAL: usar ID fijo en lugar de usuario.id.toString(),
+				usuario.id.toString(),
 				itemsPerPage.toString(),
 				page.toString(),
 				backendFilterValue || 'all', // selectedValueShow - usar 'all' si está vacío
@@ -166,7 +160,7 @@ function ClientesSection() {
 		} finally {
 			setLoading(false);
 		}
-	}, [itemsPerPage, sortBy, estadoFilters]); // TEMPORAL: remover usuario de las dependencias
+	}, [itemsPerPage, sortBy, estadoFilters, usuario]);
 
 	// Cargar turnos al montar el componente y cuando cambie la página
 	useEffect(() => {
@@ -180,7 +174,7 @@ function ClientesSection() {
 	// Función para manejar la búsqueda al presionar Enter
 	const handleSearch = () => {
 		setCurrentPage(1); // Reset a página 1
-		setActiveSearchQuery(searchQuery); // Guardar la búsqueda activa (puede ser vacía para limpiar)
+		setActiveSearchQuery(searchQuery); 
 		cargarTurnos(1, sortBy, estadoFilters, false, searchQuery); // Cargar con búsqueda
 	};
 

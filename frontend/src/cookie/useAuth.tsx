@@ -23,6 +23,7 @@ const useAuth = () => {
         : 'https://backend-patient-morning-1303.fly.dev/api';
 
       const token = localStorage.getItem('token'); // 🔑 tomamos el token guardado
+      
       if (!token) {
         setUsuario(null);
         setLoading(false);
