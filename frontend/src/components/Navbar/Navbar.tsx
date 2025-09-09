@@ -116,7 +116,7 @@ function Navbar() {
                 <div className="flex items-center gap-2 bg-naranja-1 px-4 p-2 rounded-3xl">
                   <span className="text-sm font-medium">{usuario.nombre}</span>
                   <img
-                    src={'/images/fotoUserId.png'}
+                    src={usuario.foto}
                     alt="Foto de perfil"
                     className="w-7 h-7 rounded-full object-cover ml-2"
                   />

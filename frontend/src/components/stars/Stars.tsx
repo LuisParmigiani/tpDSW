@@ -11,8 +11,7 @@ function Stars({ cant, className }: Props) {
         stars.push(
           <svg
             key={i}
-            width="25px"
-            height="25px"
+            className="w-6 h-6"
             viewBox="0 -0.02 60.031 60.031"
             xmlns="http://www.w3.org/2000/svg"
           >
@@ -30,8 +29,7 @@ function Stars({ cant, className }: Props) {
         stars.push(
           <svg
             key={i}
-            width="25px"
-            height="25px"
+            className="w-6 h-6 "
             viewBox="0 -0.03 60.062 60.062"
             xmlns="http://www.w3.org/2000/svg"
           >
@@ -49,8 +47,7 @@ function Stars({ cant, className }: Props) {
       stars.push(
         <svg
           key={i}
-          width="25px"
-          height="25px"
+          className="w-6 h-6"
           viewBox="0 -0.02 60.031 60.031"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -69,7 +66,7 @@ function Stars({ cant, className }: Props) {
   return (
     <div
       className={
-        'flex flex-row items-center max-h-auto mx-14 ' +
+        'flex flex-row items-center justify-center max-h-auto mx-auto ' +
         (className ? className : '')
       }
     >

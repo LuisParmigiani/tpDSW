@@ -3,6 +3,30 @@ import CustomSelect from '../Select/CustomSelect';
 import { turnosApi } from '../../services/turnosApi';
 import { useRoleReturn } from '../../cookie/useProtectRoute.tsx';
 import { useNavigate } from 'react-router-dom';
+import { z } from 'zod';
+
+// Esquema simplificado que valida todo de una vez
+const turnFormSchema = z.object({
+  selectedService: z.string().min(1, 'Debe seleccionar un tipo de servicio'),
+  selectedTask: z.string().min(1, 'Debe seleccionar una tarea'),
+  dayForTurn: z
+    .string()
+    .min(1, 'Debe seleccionar una fecha')
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato de fecha inválido'),
+  horarioSelected: z
+    .string()
+    .min(1, 'Debe seleccionar un horario')
+    .regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Formato de horario inválido'),
+});
+
+// Schema para validar datos finales antes del envío
+const apiDataSchema = z.object({
+  servicio: z.number().positive(),
+  tarea: z.number().positive(),
+  fechaHora: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/),
+  estado: z.literal('pendiente'),
+  montoFinal: z.number().positive(),
+});
 
 // cuando apriero esc que se salga del menu
 type Usuario = {
@@ -54,6 +78,9 @@ type Props = {
   horario?: string;
   dia?: string;
   open?: string;
+  manejoAlertas: (
+    alert: { tipo: string; error: string; message: string } | null
+  ) => void;
 };
 
 function NewTurnModal({
@@ -64,55 +91,189 @@ function NewTurnModal({
   horario = '',
   dia = '',
   open,
+  manejoAlertas,
 }: Props) {
   const navigate = useNavigate();
-  //Ver si inicio seccion
+  // Verificar si el usuario ha iniciado sesión
   const rol = useRoleReturn();
-  //Variable de tipo opciones definida antes para los selects
+  // variables para manejar las devolvuciones del back
+
+  // Valida y sanitiza los parámetros iniciales recibidos por props/URL
+  // Devuelve un objeto con errores encontrados o null si todo está válido
+  const validateInitialParams = () => {
+    const errors: Record<string, string> = {};
+
+    // Validar servicio inicial
+    if (
+      servicio &&
+      !prestatario.tiposDeServicio.some((tipo) => tipo.nombreTipo === servicio)
+    ) {
+      errors.initialService = 'Servicio inicial no válido';
+    }
+
+    // Validar tarea inicial
+    if (
+      Tarea &&
+      !prestatario.servicios.some((serv) => serv.tarea.nombreTarea === Tarea)
+    ) {
+      errors.initialTask = 'Tarea inicial no válida';
+    }
+
+    // Validar horario inicial
+    if (horario && !/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(horario)) {
+      errors.initialHorario = 'Horario inicial no válido';
+    }
+
+    // Validar día inicial
+    if (
+      dia &&
+      (!/^\d{4}-\d{2}-\d{2}$/.test(dia) ||
+        new Date(dia) < new Date(new Date().toDateString()))
+    ) {
+      errors.initialDia = 'Fecha inicial no válida';
+    }
+
+    return Object.keys(errors).length === 0 ? null : errors;
+  };
+
+  // Validar parámetros iniciales una sola vez al cargar el componente
+  const initialValidationErrors = validateInitialParams();
+
+  // Variables de estado para las opciones de los selects
   const serviciosoptions: Option[] = [];
   const [tareasOptions, setTareasOptions] = useState<Option[]>([]);
-  const [horariosManana, setHorariosManana] = useState<number[]>([]); // Se Guardan todos los horarios posibles para esa fecha
-  const [horariosTarde, setHorariosTarde] = useState<number[]>([]); // Se Guardan todos los horarios posibles para esa fecha
+  // Estados para horarios disponibles divididos por mañana y tarde
+  const [horariosManana, setHorariosManana] = useState<number[]>([]);
+  const [horariosTarde, setHorariosTarde] = useState<number[]>([]);
 
-  const [dayForTurn, setDayForTurn] = useState(dia || ''); // se elige una fecha especifica
-  const [horarioSelected, setHorarioSelected] = useState(horario || ''); // Se guarda el horario seleccionado
-  const [selectedService, setSelectedService] = useState(servicio || ''); // se guarda el servicio seleccionado
-  const [page, setPage] = useState(1); // Pagina del modal
-  const [diasPage, setDiasPage] = useState(1); // pagina de los dias cambia de 6 en 6
+  // Estados principales del formulario (se inicializan vacíos si hay errores en parámetros iniciales)
+  const [dayForTurn, setDayForTurn] = useState(
+    initialValidationErrors ? '' : dia || ''
+  );
+  const [horarioSelected, setHorarioSelected] = useState(
+    initialValidationErrors ? '' : horario || ''
+  );
+  const [selectedService, setSelectedService] = useState(
+    initialValidationErrors ? '' : servicio || ''
+  );
+  // Estados para navegación del modal
+  const [page, setPage] = useState(1); // Página actual del modal (1: selección, 2: horarios)
+  const [diasPage, setDiasPage] = useState(1); // Página de navegación de días (6 días por página)
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(
-    open === 'true'
-  ); // Modal de confirmacion
-  const [selectedTask, setSelectedTask] = useState(Tarea || ''); // se guarda la tarea seleccionada
+    initialValidationErrors ? false : open === 'true'
+  );
+  const [selectedTask, setSelectedTask] = useState(
+    initialValidationErrors ? '' : Tarea || ''
+  );
 
-  // Efecto para desactivar el scroll de la página cuando el modal esté abierto
+  // Estados para manejar errores de validación
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
+  const [isValidating, setIsValidating] = useState(false);
+
+  // Función de validación simplificada usando Zod
+  // Valida el paso específico: 'service', 'datetime' o 'all' para todo el formulario
+  // Devuelve true si la validación es exitosa, false si hay errores
+  const validateForm = (step?: 'service' | 'datetime' | 'all') => {
+    const formData = {
+      selectedService,
+      selectedTask,
+      dayForTurn,
+      horarioSelected,
+    };
+
+    try {
+      if (step === 'service') {
+        // Solo validar servicio y tarea
+        z.object({
+          selectedService: turnFormSchema.shape.selectedService,
+          selectedTask: turnFormSchema.shape.selectedTask,
+        }).parse({ selectedService, selectedTask });
+      } else if (step === 'datetime') {
+        // Solo validar fecha y hora
+        z.object({
+          dayForTurn: turnFormSchema.shape.dayForTurn,
+          horarioSelected: turnFormSchema.shape.horarioSelected,
+        }).parse({ dayForTurn, horarioSelected });
+      } else {
+        // Validar todo
+        turnFormSchema.parse(formData);
+      }
+
+      setValidationErrors({});
+      return true;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errors: Record<string, string> = {};
+        error.issues.forEach((issue) => {
+          if (issue.path[0]) {
+            errors[issue.path[0] as string] = issue.message;
+          }
+        });
+        setValidationErrors(errors);
+      }
+      return false;
+    }
+  };
+
+  // Valida que los valores seleccionados pertenezcan realmente al prestatario
+  // Previene inyección de datos maliciosos a través de manipulación del DOM
+  // type: tipo de valor a validar ('service' | 'task')
+  // value: valor a validar
+  // Devuelve true si el valor es válido para el prestatario
+  const isValidValue = (type: string, value: string): boolean => {
+    switch (type) {
+      case 'service':
+        return (
+          value === '' ||
+          prestatario.tiposDeServicio.some((tipo) => tipo.nombreTipo === value)
+        );
+      case 'task':
+        return (
+          value === '' ||
+          prestatario.servicios.some(
+            (serv) =>
+              serv.tarea.nombreTarea === value &&
+              serv.tarea.tipoServicio.nombreTipo === selectedService
+          )
+        );
+      default:
+        return true;
+    }
+  };
+
+  // Efecto para desactivar el scroll del body cuando el modal está abierto
   useEffect(() => {
-    // Cuando el modal se abre, desactivamos el scroll de la página
+    // Desactivar scroll del body
     document.body.style.overflow = 'hidden';
 
-    // Cleanup function: cuando el modal se cierra, restauramos el scroll
+    // Cleanup: restaurar scroll cuando el componente se desmonte
     return () => {
       document.body.style.overflow = 'unset';
     };
-  }, []); // Se ejecuta al montar el componente (cuando el modal se abre)
+  }, []);
 
-  // Efecto para cerrar el modal al presionar la tecla Escape
+  // Efecto para manejar el cierre del modal con la tecla Escape
   useEffect(() => {
+    // Maneja el evento de teclado para cerrar el modal con Escape
+    // event: evento de teclado
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         setopen(false);
       }
     };
 
-    // Agregar el event listener
+    // Agregar listener de teclado
     document.addEventListener('keydown', handleKeyDown);
 
-    // Cleanup function: desactiva el event listener cuando el componente se desmonte
+    // Cleanup: remover listener cuando el componente se desmonte
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [setopen]); // Dependencia en setopen para asegurar que siempre tenga la referencia correcta
+  }, [setopen]);
 
-  // Variable de opciones de las tareas segun el servicio seleccionado.
+  // Efecto para generar las opciones de tareas según el servicio seleccionado
   useEffect(() => {
     const newTareasOptions: Option[] = [];
     prestatario.servicios.forEach((servicio) => {
@@ -126,9 +287,13 @@ function NewTurnModal({
     setTareasOptions(newTareasOptions);
   }, [selectedService, prestatario]);
 
-  // Efecto para obtener los horarios no disponibles (Los turnos que estan ese dia) según el día seleccionado
+  // Efecto principal para obtener y calcular horarios disponibles
   useEffect(() => {
-    // Función para generar los horarios disponibles
+    // Genera los horarios disponibles basándose en los horarios del prestatario y turnos ocupados
+    // horaDesde: hora de inicio del horario laboral (formato "HH:MM:SS")
+    // horaHasta: hora de fin del horario laboral (formato "HH:MM:SS")
+    // turnosOcupados: array de arrays con [inicio, fin] de turnos ya ocupados en minutos
+    // dayForTurn: fecha seleccionada en formato ISO
     const generateHorarios = (
       horaDesde: string,
       horaHasta: string,
@@ -143,7 +308,12 @@ function NewTurnModal({
       // Si el día seleccionado es hoy, usar la hora actual como mínimo
       if (dayForTurn === new Date().toISOString().split('T')[0]) {
         const ahora = new Date();
-        const horaActualEnMinutos = ahora.getHours() * 60 + ahora.getMinutes();
+        let horaActualEnMinutos =
+          (ahora.getHours() + 1) * 60 + ahora.getMinutes();
+        // Redondear para arriba al próximo múltiplo de 30 (00 o 30)
+        if (horaActualEnMinutos % 30 !== 0) {
+          horaActualEnMinutos += 30 - (horaActualEnMinutos % 30);
+        }
         horaAct = Math.max(horaAct, horaActualEnMinutos);
       }
       const horaHastaMin = hHasta * 60 + mHasta;
@@ -179,46 +349,60 @@ function NewTurnModal({
       setHorariosManana(nuevosHorariosManana);
       setHorariosTarde(nuevosHorariosTarde);
     };
-    // Función para obtener los turnos ocupados.
+    // Obtiene los turnos ocupados para el día seleccionado desde la API
+    // y genera los horarios disponibles considerando las ocupaciones
     const fetchHorarios = async () => {
-      if (dayForTurn) {
-        const response = await turnosApi.getTurnsPerDay(
-          prestatario.id.toString(),
-          dayForTurn
-        );
+      try {
+        if (dayForTurn) {
+          const response = await turnosApi.getTurnsPerDay(
+            prestatario.id.toString(),
+            dayForTurn
+          );
 
-        // Crear array de turnos ocupados
-        const turnosOcupados: number[][] = [];
-        response.data.data.forEach(
-          (turno: {
-            fechaHora: string;
-            servicio: { tarea: { duracionTarea: number } };
-          }) => {
-            const minutosInicio =
-              new Date(turno.fechaHora).getHours() * 60 +
-              new Date(turno.fechaHora).getMinutes();
+          // Crear array de rangos de tiempo ocupados [inicio, fin] en minutos
+          const turnosOcupados: number[][] = [];
+          response.data.data.forEach(
+            (turno: {
+              fechaHora: string;
+              servicio: { tarea: { duracionTarea: number } };
+            }) => {
+              const minutosInicio =
+                new Date(turno.fechaHora).getHours() * 60 +
+                new Date(turno.fechaHora).getMinutes();
 
-            turnosOcupados.push([
-              minutosInicio,
-              minutosInicio + Number(turno.servicio.tarea.duracionTarea),
-            ]);
-          }
-        );
+              turnosOcupados.push([
+                minutosInicio,
+                minutosInicio + Number(turno.servicio.tarea.duracionTarea),
+              ]);
+            }
+          );
 
-        // Ahora generar horarios con los turnos ocupados
-        for (const horario of prestatario.horarios) {
-          if (horario.diaSemana === new Date(dayForTurn).getDay()) {
-            generateHorarios(
-              horario.horaDesde,
-              horario.horaHasta,
-              turnosOcupados,
-              dayForTurn
-            );
-            break;
+          // Buscar el horario de trabajo del prestatario para el día seleccionado
+          for (const horario of prestatario.horarios) {
+            if (horario.diaSemana === new Date(dayForTurn).getDay()) {
+              generateHorarios(
+                horario.horaDesde,
+                horario.horaHasta,
+                turnosOcupados,
+                dayForTurn
+              );
+              break; // Solo necesitamos el primer horario que coincida
+            }
           }
         }
+      } catch (error: any) {
+        manejoAlertas({
+          tipo: 'error',
+          error: 'fetch_error',
+          message:
+            error.response?.data?.error ||
+            error.message ||
+            'Error al obtener los horarios',
+        });
+        console.error('Error fetching horarios:', error);
       }
     };
+    // Ejecutar la búsqueda de horarios
     fetchHorarios();
   }, [
     dayForTurn,
@@ -226,9 +410,12 @@ function NewTurnModal({
     prestatario.horarios,
     prestatario.servicios,
     selectedTask,
-  ]);
+    manejoAlertas,
+  ]); // Re-ejecutar cuando cambien estos valores
 
-  // Función para convertir minutos a formato Horas hh:mm
+  // Convierte minutos desde medianoche a formato de hora HH:MM
+  // minutos: número de minutos desde las 00:00
+  // Devuelve hora en formato "HH:MM"
   const minutosAHora = (minutos: number): string => {
     const horas = Math.floor(minutos / 60);
     const mins = minutos % 60;
@@ -237,7 +424,9 @@ function NewTurnModal({
       .padStart(2, '0')}`;
   };
 
-  // Función para mostrar los días de la semana con las fechas
+  // Genera los botones de días disponibles para selección
+  // Muestra 6 días a la vez con navegación por páginas
+  // Devuelve grid con botones de días
   const mostrarDias = () => {
     const primerDia = new Date();
     primerDia.setDate(primerDia.getDate() + (diasPage - 1) * 6);
@@ -260,7 +449,13 @@ function NewTurnModal({
       botonesDias.push(
         <>
           <button
-            onClick={() => setDayForTurn(fecha.toISOString().split('T')[0])}
+            onClick={() => {
+              const dateStr = fecha.toISOString().split('T')[0];
+              // Validar que la fecha no sea anterior a hoy antes de seleccionarla
+              if (new Date(dateStr) >= new Date(new Date().toDateString())) {
+                setDayForTurn(dateStr);
+              }
+            }}
             className={
               dayForTurn === fecha.toISOString().split('T')[0]
                 ? 'sm:block hidden  bg-naranja-1  rounded-md w-25 m-auto text-white py-2  border-2 border-naranja-1  items-center  text-center  justify-center transition-colors duration-300'
@@ -273,7 +468,13 @@ function NewTurnModal({
             {dias[diaIndex][0]}
           </button>
           <button
-            onClick={() => setDayForTurn(fecha.toISOString().split('T')[0])}
+            onClick={() => {
+              const dateStr = fecha.toISOString().split('T')[0];
+              // Validar que la fecha no sea anterior a hoy antes de seleccionarla (versión móvil)
+              if (new Date(dateStr) >= new Date(new Date().toDateString())) {
+                setDayForTurn(dateStr);
+              }
+            }}
             className={
               dayForTurn === fecha.toISOString().split('T')[0]
                 ? 'mt-4 sm:hidden bg-naranja-1 border-none rounded-md w-25 m-auto text-white  hover:bg-neutral-200 border-2 border-naranja-1 hover:text-naranja-1 transition-colors duration-300'
@@ -296,33 +497,84 @@ function NewTurnModal({
     );
   };
 
-  // Generar opciones de servicios
+  // Poblar las opciones de servicios disponibles del prestatario
   prestatario.tiposDeServicio.forEach((tipo) => {
     serviciosoptions.push({ value: tipo.nombreTipo, label: tipo.nombreTipo });
   });
 
-  // Guardar el turno (persistirlo)
+  // Función principal para guardar el turno
+  // Realiza validaciones completas y envía los datos a la API
+  // Maneja estados de carga y errores
   const guardarTurno = async () => {
+    setIsValidating(true);
     try {
+      // Validar formulario completo
+      if (!validateForm('all')) {
+        setIsValidating(false);
+        return;
+      }
+
       const services = prestatario.servicios.find(
         (s) => s.tarea.nombreTarea === selectedTask
       );
-      const precio = services?.precio || 100;
-      await turnosApi.createCookie({
-        servicio: services?.id,
-        tarea: services?.tarea.id,
+
+      if (!services) {
+        setValidationErrors({ general: 'Servicio no encontrado' });
+        setIsValidating(false);
+        return;
+      }
+
+      const precio = services.precio || 100;
+      const turnData = {
+        servicio: services.id,
+        tarea: services.tarea.id,
         fechaHora: `${dayForTurn}T${horarioSelected}:00`,
-        estado: 'pendiente',
+        estado: 'pendiente' as const,
         montoFinal: precio * 0.05 + precio,
-      });
+      };
+
+      // Validar datos para API
+      apiDataSchema.parse(turnData);
+      console.log(
+        '....................................................',
+        turnData
+      );
+      await turnosApi.createWithCookie(turnData);
+
+      // Limpiar formulario
       setSelectedService('');
       setSelectedTask('');
       setDayForTurn('');
       setHorarioSelected('');
+      setValidationErrors({});
       setopen(false);
       setConfirmationModalOpen(false);
+      manejoAlertas({
+        tipo: 'success',
+        error: 'success',
+        message: 'Turno guardado exitosamente',
+      });
+      setPage(1);
     } catch (error) {
-      console.error('Error al guardar el turno:', error);
+      manejoAlertas({
+        tipo: 'danger',
+        error: 'save_error',
+        message:
+          error.response?.data?.error ||
+          error.message ||
+          'Error al guardar el turno',
+      });
+      console.log('Error: --------------------------------------', error);
+
+      console.error(
+        'Error al guardar el turno: --------------------------------------',
+        error
+      );
+      setValidationErrors({
+        general: 'Error al guardar el turno. Por favor, intente nuevamente.',
+      });
+    } finally {
+      setIsValidating(false);
     }
   };
 
@@ -330,9 +582,10 @@ function NewTurnModal({
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-5 backdrop-blur-xs bg-opacity-40"
       onClick={() => {
-        setopen(false); // para cuando apretas afuera de la parte blanca se cierre
+        setopen(false); // Cerrar modal al hacer click fuera del contenido
       }}
     >
+      {/* Modal de confirmación de turno */}
       <div
         className={
           confirmationModalOpen
@@ -340,7 +593,7 @@ function NewTurnModal({
             : 'hidden'
         }
         onClick={(e) => {
-          e.stopPropagation(); // desactiva que cuando hagas click se salga en la parte blanca
+          e.stopPropagation(); // Prevenir cierre al hacer click dentro del modal
         }}
       >
         <div className="flex justify-end z-30 bg-transparent w-auto">
@@ -421,6 +674,8 @@ function NewTurnModal({
               className={
                 rol === ''
                   ? 'bg-gray-300 border-2 w-full border-gray-500 text-white rounded-md py-2 px-4 text-center relative group'
+                  : isValidating
+                  ? 'bg-gray-400 border-2 w-full border-gray-400 text-white rounded-md py-2 px-4 text-center cursor-not-allowed'
                   : 'bg-green-700 border-2 w-full border-green-700 text-white rounded-md py-2 px-4 hover:bg-white hover:text-green-700 text-center'
               }
               onClick={
@@ -431,17 +686,25 @@ function NewTurnModal({
                       )
                   : guardarTurno
               }
+              disabled={isValidating}
             >
-              Confirmar
+              {isValidating ? 'Guardando...' : 'Confirmar'}
               {rol === '' && (
                 <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none w-50">
                   Inicia sesión para poder sacar un turno
                 </span>
               )}
             </button>
+            {/* Mostrar errores de validación en el modal de confirmación */}
+            {validationErrors.general && (
+              <div className="mt-2 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-center">
+                {validationErrors.general}
+              </div>
+            )}
           </div>
         </div>
       </div>
+      {/* Modal principal para selección de turno */}
       <div
         className={
           confirmationModalOpen
@@ -449,7 +712,7 @@ function NewTurnModal({
             : 'bg-white md:rounded-lg md:shadow-2xl py-10 items-start text-black lg:w-6/12 md:w-180 flex flex-col lg:min-h-6/12  w-full h-screen md:max-h-[85vh]  md:h-auto overflow-y-auto gap-4'
         }
         onClick={(e) => {
-          e.stopPropagation(); // desactiva que cuando hagas click se salga en la parte blanca
+          e.stopPropagation(); // Prevenir cierre al hacer click dentro del modal
         }}
       >
         <div className="flex justify-end ml-auto z-30 bg-transparent w-auto">
@@ -482,28 +745,70 @@ function NewTurnModal({
         <h2 className="px-10">Contacto:</h2>
         <h2 className="px-10">- {prestatario.mail}</h2>
         <h2 className="px-10">- {prestatario.telefono}</h2>
+
+        {/* Alerta de errores en parámetros iniciales */}
+        {initialValidationErrors && (
+          <div className="mx-10 mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+            <p className="font-semibold">
+              Los parámetros iniciales contienen datos inválidos:
+            </p>
+            <ul className="list-disc list-inside mt-2">
+              {Object.values(initialValidationErrors).map((error, index) => (
+                <li key={index}>{error}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {/* Página 1: Selección de servicio y tarea */}
         {page === 1 && (
           <div className="px-10 w-full gap-4 ">
             <div className="w-full">
+              {/* Selector de tipo de servicio */}
               <CustomSelect
                 Name="Tipo Servicios"
                 options={serviciosoptions}
-                setOptions={setSelectedService}
+                setOptions={(value) => {
+                  if (isValidValue('service', value)) {
+                    setSelectedService(value);
+                    if (value !== selectedService) setSelectedTask(''); // Limpiar tarea al cambiar servicio
+                  }
+                }}
                 value={selectedService}
               />
+              {validationErrors.selectedService && (
+                <p className="text-red-500 text-sm mt-1 ml-2">
+                  {validationErrors.selectedService}
+                </p>
+              )}
             </div>
             <div className="w-full mt-5 ">
+              {/* Selector de tarea específica del servicio */}
               <CustomSelect
                 Name={
                   selectedService ? 'Tareas' : 'Seleccione un servicios antes'
                 }
                 options={tareasOptions}
-                setOptions={setSelectedTask}
+                setOptions={(value) => {
+                  if (isValidValue('task', value)) {
+                    setSelectedTask(value);
+                  }
+                }}
                 value={selectedTask}
               />
+              {validationErrors.selectedTask && (
+                <p className="text-red-500 text-sm mt-1 ml-2">
+                  {validationErrors.selectedTask}
+                </p>
+              )}
             </div>
+            {validationErrors.general && (
+              <div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                {validationErrors.general}
+              </div>
+            )}
           </div>
         )}
+        {/* Página 2: Selección de fecha y horario */}
         {page === 2 && (horariosManana || horariosTarde) && (
           <div className="w-full ">
             <h2 className="text-xl font-bold">Dias Disponibles:</h2>
@@ -617,8 +922,31 @@ function NewTurnModal({
                 )}
               </>
             )}
+            {/* Sección de errores de validación para la página 2 */}
+            {(validationErrors.dayForTurn ||
+              validationErrors.horarioSelected ||
+              validationErrors.general) && (
+              <div className="mt-4 px-7">
+                {validationErrors.dayForTurn && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {validationErrors.dayForTurn}
+                  </p>
+                )}
+                {validationErrors.horarioSelected && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {validationErrors.horarioSelected}
+                  </p>
+                )}
+                {validationErrors.general && (
+                  <div className="mt-2 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                    {validationErrors.general}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
+        {/* Botones de navegación del modal */}
         <div className="flex gap-6 justify-around mt-4 px-10">
           <button
             className={
@@ -641,7 +969,15 @@ function NewTurnModal({
                   ? 'bg-naranja-1 rounded-4xl text-white px-6 py-2 hover:bg-white border-2 border-naranja-1 hover:text-naranja-1 transition-colors duration-300 flex-1 max-w-32'
                   : 'bg-neutral-300 border-none rounded-4xl text-neutral-500 px-6 py-2 flex-1 max-w-32 cursor-not-allowed'
               }
-              onClick={selectedTask ? () => setPage(2) : undefined}
+              onClick={
+                selectedTask
+                  ? () => {
+                      if (validateForm('service')) {
+                        setPage(2);
+                      }
+                    }
+                  : undefined
+              }
               disabled={!selectedTask}
             >
               Siguiente
@@ -650,7 +986,9 @@ function NewTurnModal({
           {page === 2 && (
             <button
               onClick={() => {
-                setConfirmationModalOpen(true);
+                if (validateForm('datetime')) {
+                  setConfirmationModalOpen(true);
+                }
               }}
               className={
                 !horarioSelected || !dayForTurn

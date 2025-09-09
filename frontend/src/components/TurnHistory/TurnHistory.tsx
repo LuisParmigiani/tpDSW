@@ -9,6 +9,9 @@ import { useNavigate } from 'react-router-dom';
 import DevolucionPago from '../Modal/DevolucionPago.tsx';
 import { useProtectRoute } from '../../cookie/useProtectRoute.tsx';
 import TurnCard from './turnCard';
+import { Alert, AlertTitle, AlertDescription } from './../Alerts/Alerts';
+import { set } from 'zod';
+
 type Pago = {
   id: number;
   estado: string;
@@ -62,9 +65,6 @@ function TurnHistory({ estado }: Props) {
   // Modal para calificar
   const [isOpen, setIsOpen] = useState(false);
   const [data, setData] = useState<Turno | null>(null);
-  // Variables para la calificacion
-  const [startRating, setStartRating] = useState<number>(5);
-  const [comentario, setComentario] = useState<string>('');
   // orden de los turnos
   const [selectedValueOrder, setSelectedValueOrder] = useState('');
   // Filtros de los turnos
@@ -74,6 +74,16 @@ function TurnHistory({ estado }: Props) {
   const [currentPage, setCurrentPage] = useState(1); // Página actual
   const [totalPages, setTotalPages] = useState(1); // Total de páginas
   const [flagged, setFlagged] = useState(false); //Bandera para saber si el comentario es inapropiado
+
+  // alertas para la devolucion del back
+  const [updateError, setUpdateError] = useState<{
+    error: string;
+    message: string;
+  } | null>(null);
+  const [updateSuccess, setUpdateSuccess] = useState<{
+    success: string;
+    message: string;
+  } | null>(null);
 
   // buscar todos los turnos del usuario con la informcaion del mismo.
   useEffect(() => {
@@ -113,24 +123,19 @@ function TurnHistory({ estado }: Props) {
   //modal para calificar
   const openModal = (modalData: Turno) => {
     setData(modalData); // Guardar los datos del turno seleccionado
-    // Inicializar el formulario con valores por defecto
-    setComentario(modalData.comentario || '');
     setIsOpen(true);
   };
   // Cerrar modal
   const closeModal = () => {
     setIsOpen(false);
     setData(null);
-    // Resetear el formulario
-    setStartRating(5);
-    setComentario('');
   };
 
   // Guardar calificación
-  const SaveRating = async () => {
+  const SaveRating = async (rating: number, comentario: string) => {
     if (data) {
       const dataForUpdate = {
-        calificacion: startRating,
+        calificacion: rating,
         comentario: comentario,
       };
       try {
@@ -142,17 +147,23 @@ function TurnHistory({ estado }: Props) {
         if (turns) {
           const updatedTurns = turns.map((turn) =>
             turn.id === data.id
-              ? { ...turn, calificacion: startRating, comentario: comentario }
+              ? { ...turn, calificacion: rating, comentario: comentario }
               : turn
           );
           setTurns(updatedTurns);
         }
-
-        // Resetear el formulario y cerrar modal
-        setStartRating(5);
-        setComentario('');
+        setUpdateSuccess({
+          success: 'Calificación guardada',
+          message: 'Tu calificación ha sido guardada exitosamente.',
+        });
+        setUpdateError(null); // Limpiar cualquier error previo
+        // Cerrar modal
         closeModal();
-      } catch (error) {
+      } catch (error: any) {
+        setUpdateError({
+          error: 'Error al guardar la calificación',
+          message: error.message || ' error al guardar el comentario',
+        });
         console.error('Error al guardar la calificación:', error);
         setFlagged(true); // Si hay un error, asumir que el comentario fue inapropiado
       }
@@ -192,7 +203,16 @@ function TurnHistory({ estado }: Props) {
       });
       // Actualizar el estado local de los turnos
       setTurns(turns ? turns.filter((turno) => turno.id !== id) : null);
+      setUpdateSuccess({
+        success: 'Turno cancelado',
+        message: 'El turno ha sido cancelado exitosamente.',
+      });
+      setUpdateError(null); // Limpiar cualquier error previo
     } catch (error) {
+      setUpdateError({
+        error: 'Error al cancelar el turno',
+        message: 'Hubo un problema al cancelar el turno. Intenta nuevamente.',
+      });
       console.error('Error al cancelar el turno:', error);
     }
   };
@@ -211,6 +231,36 @@ function TurnHistory({ estado }: Props) {
   return (
     <>
       <Navbar />
+      {/* Alertas de exito o error */}
+      {updateError && (
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-xl flex justify-center">
+          <Alert
+            autoClose={true}
+            autoCloseDelay={3000}
+            variant="danger"
+            onClose={() => setUpdateError(null)}
+            className="w-full"
+          >
+            <AlertTitle>{updateError.error}</AlertTitle>
+            <AlertDescription>{updateError.message}</AlertDescription>
+          </Alert>
+        </div>
+      )}
+      {updateSuccess && (
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-xl flex justify-center">
+          <Alert
+            autoClose={true}
+            autoCloseDelay={3000}
+            variant="success"
+            onClose={() => setUpdateSuccess(null)}
+            className="w-full"
+          >
+            <AlertTitle>{updateSuccess.success}</AlertTitle>
+            <AlertDescription>{updateSuccess.message}</AlertDescription>
+          </Alert>
+        </div>
+      )}
+      {/* Modal de devolucion */}
       {estado && abrirDevolucion && (
         <DevolucionPago
           estado={estado}
@@ -221,10 +271,6 @@ function TurnHistory({ estado }: Props) {
         <CalificationModal
           data={data}
           closeModal={closeModal}
-          startRating={startRating}
-          setStartRating={setStartRating}
-          comentario={comentario}
-          setComentario={setComentario}
           SaveRating={SaveRating}
           flagged={flagged}
         />

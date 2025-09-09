@@ -1,6 +1,24 @@
 import StarRating from '../stars/RatingStars';
 import { Alert, AlertTitle, AlertDescription } from '../Alerts/Alerts.tsx';
 import { useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+
+// Esquema de validación con Zod
+const calificationSchema = z.object({
+  rating: z
+    .number()
+    .min(1, 'Debe seleccionar al menos 1 estrella')
+    .max(5, 'La calificación máxima es 5 estrellas'),
+  comentario: z
+    .string()
+    .min(20, 'El comentario debe tener al menos 20 caracteres')
+    .max(500, 'El comentario no puede exceder los 500 caracteres')
+    .trim(),
+});
+
+type CalificationFormData = z.infer<typeof calificationSchema>;
 
 type Turno = {
   id: number;
@@ -31,25 +49,31 @@ type Usuario = {
 type Props = {
   data: Turno;
   closeModal: () => void;
-  startRating: number;
-  setStartRating: (rating: number) => void;
-  comentario: string;
-  setComentario: (comment: string) => void;
-  SaveRating: () => void;
+  SaveRating: (rating: number, comentario: string) => void;
   flagged: boolean;
 };
 
-function CalificationModal({
-  data,
-  closeModal,
-  startRating,
-  setStartRating,
-  comentario,
-  setComentario,
-  SaveRating,
-  flagged,
-}: Props) {
+function CalificationModal({ data, closeModal, SaveRating, flagged }: Props) {
   const [alertVisible, setAlertVisible] = useState(flagged);
+  // alertas de errores del back
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isValid },
+    watch,
+  } = useForm<CalificationFormData>({
+    resolver: zodResolver(calificationSchema),
+    defaultValues: {
+      rating: 0,
+      comentario: ' ',
+    },
+    mode: 'onChange',
+  });
+
+  const onSubmit = (formData: CalificationFormData) => {
+    SaveRating(formData.rating, formData.comentario);
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-5 backdrop-blur-xs  bg-opacity-40">
@@ -93,10 +117,28 @@ function CalificationModal({
             })}{' '}
           </p>
         </div>
-        <form action="" className="flex flex-col items-center gap-4">
-          <div className="flex w-full items-center gap-6 ">
+        <form
+          id="calification-form"
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex flex-col items-center gap-4"
+        >
+          <div className="flex w-full items-center gap-6">
             <span className="whitespace-nowrap">Calificación:</span>
-            <StarRating initialRating={startRating} onChange={setStartRating} />
+            <Controller
+              name="rating"
+              control={control}
+              render={({ field }) => (
+                <StarRating
+                  initialRating={field.value}
+                  onChange={field.onChange}
+                />
+              )}
+            />
+            {errors.rating && (
+              <span className="text-red-500 text-sm ml-2">
+                {errors.rating.message}
+              </span>
+            )}
           </div>
           <div className="md:flex w-full items-center justify-between">
             <label
@@ -105,31 +147,62 @@ function CalificationModal({
             >
               Comentario:
             </label>
-            <textarea
-              className={
-                'border border-naranja-1 rounded-md mx-2 p-2 w-full' +
-                (flagged ? ' border-red-500 text-red-800' : '')
-              }
-              id="comentario"
-              rows={4}
-              value={comentario}
-              onChange={(e) => setComentario(e.target.value)}
-              placeholder="Escribe tu comentario aquí..."
-            />
+            <div className="flex flex-col w-full">
+              <Controller
+                name="comentario"
+                control={control}
+                render={({ field }) => (
+                  <textarea
+                    className={
+                      'border border-naranja-1 rounded-md mx-2 p-2 w-full' +
+                      (flagged || errors.comentario
+                        ? ' border-red-500 text-red-800'
+                        : '')
+                    }
+                    id="comentario"
+                    rows={4}
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Escribe tu comentario aquí (mínimo 20 caracteres, máximo 500)..."
+                  />
+                )}
+              />
+              {errors.comentario && (
+                <span className="text-red-500 text-sm mx-2 mt-1">
+                  {errors.comentario.message}
+                </span>
+              )}
+              <div className="text-right mx-2 mt-1">
+                <span
+                  className={`text-sm ${
+                    watch('comentario')?.length > 500
+                      ? 'text-red-500'
+                      : 'text-gray-500'
+                  }`}
+                >
+                  {watch('comentario')?.length || 0}/500
+                </span>
+              </div>
+            </div>
           </div>
         </form>
-        <button
-          className=" mt-4 px-4 py-2 hover:text-neutral-400  rounded-sm  border-1 border-neutral-400 bg-neutral-400 hover:bg-white text-white mr-14 "
-          onClick={closeModal}
-        >
-          Cerrar
-        </button>
-        <button
-          className=" mt-4 px-4 py-2 hover:text-amber-700  rounded-sm  border-1 border-naranja-1 bg-naranja-1 hover:bg-white text-white"
-          onClick={SaveRating}
-        >
-          Guardar
-        </button>
+        <div className="flex gap-4 mt-4">
+          <button
+            type="button"
+            className="px-4 py-2 hover:text-neutral-400 rounded-sm border-1 border-neutral-400 bg-neutral-400 hover:bg-white text-white"
+            onClick={closeModal}
+          >
+            Cerrar
+          </button>
+          <button
+            type="submit"
+            form="calification-form"
+            className="px-4 py-2 hover:text-amber-700 rounded-sm border-1 border-naranja-1 bg-naranja-1 hover:bg-white text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!isValid}
+          >
+            Guardar
+          </button>
+        </div>
       </div>
     </div>
   );
