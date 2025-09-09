@@ -241,11 +241,12 @@ function PerfilSection() {
       setTimeout(() => setUpdateSuccess(false), 3000);
 
       console.log('✅ Profile updated successfully');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error updating profile:', error);
+      const errorResponse = error as { response?: { data?: { error?: string; message?: string } } };
       setUpdateError({
-        error: error.response.data.error || 'Error',
-        message: error.response.data.message || 'Error al actualizar el perfil',
+        error: errorResponse.response?.data?.error || 'Error',
+        message: errorResponse.response?.data?.message || 'Error al actualizar el perfil',
       });
     } finally {
       setUploading(false);
@@ -255,11 +256,11 @@ function PerfilSection() {
   if (dataFetched && profileData) {
     return (
       <DashboardSection>
-        {/* Success Alert */}
+        {/* Success Alert - Mobile responsive */}
         {updateSuccess && (
           <Alert
             variant="success"
-            className="mb-4 max-w-xl mx-auto"
+            className="mb-4 mx-4 sm:max-w-xl sm:mx-auto"
             autoClose={true}
             autoCloseDelay={5000}
             onClose={() => setUpdateSuccess(false)}
@@ -271,11 +272,11 @@ function PerfilSection() {
           </Alert>
         )}
 
-        {/* Error Alert */}
+        {/* Error Alert - Mobile responsive */}
         {updateError && (
           <Alert
             variant="danger"
-            className="mb-4 max-w-xl mx-auto"
+            className="mb-4 mx-4 sm:max-w-xl sm:mx-auto"
             onClose={() => setUpdateError(null)}
           >
             <AlertTitle>{updateError.error}</AlertTitle>
@@ -283,11 +284,12 @@ function PerfilSection() {
           </Alert>
         )}
 
-        <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+        {/* Main container - Mobile responsive */}
+        <div className="mx-4 sm:max-w-2xl sm:mx-auto bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-8">
           {/* ✅ Form now includes everything */}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* ✅ Profile Picture inside form */}
-            <div className="flex justify-center mb-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
+            {/* ✅ Profile Picture inside form - Mobile responsive */}
+            <div className="flex justify-center mb-6 sm:mb-8">
               <ProfilePicture
                 src={profileData.foto}
                 onImageChange={handleImageChange}
@@ -303,7 +305,7 @@ function PerfilSection() {
               <input
                 type="email"
                 {...register('mail')}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-colors text-gray-900 outline-none ${
+                className={`w-full px-3 py-2 sm:px-4 sm:py-3 border rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-colors text-gray-900 outline-none text-sm sm:text-base ${
                   errors.mail ? 'border-red-500' : 'border-gray-300'
                 }`}
                 placeholder="tu@email.com"
@@ -315,8 +317,8 @@ function PerfilSection() {
               )}
             </div>
 
-            {/* Name and Last Name Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Name and Last Name Grid - Stack on mobile */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Nombre
@@ -324,7 +326,7 @@ function PerfilSection() {
                 <input
                   type="text"
                   {...register('nombre')}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-colors text-gray-900 outline-none ${
+                  className={`w-full px-3 py-2 sm:px-4 sm:py-3 border rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-colors text-gray-900 outline-none text-sm sm:text-base ${
                     errors.nombre ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="Tu nombre"
@@ -343,7 +345,7 @@ function PerfilSection() {
                 <input
                   type="text"
                   {...register('apellido')}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-colors text-gray-900 outline-none ${
+                  className={`w-full px-3 py-2 sm:px-4 sm:py-3 border rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-colors text-gray-900 outline-none text-sm sm:text-base ${
                     errors.apellido ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="Tu apellido"
@@ -364,7 +366,7 @@ function PerfilSection() {
               <input
                 type="text"
                 {...register('direccion')}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-colors text-gray-900 outline-none ${
+                className={`w-full px-3 py-2 sm:px-4 sm:py-3 border rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-colors text-gray-900 outline-none text-sm sm:text-base ${
                   errors.direccion ? 'border-red-500' : 'border-gray-300'
                 }`}
                 placeholder="Tu dirección completa"
@@ -384,7 +386,7 @@ function PerfilSection() {
               <input
                 type="tel"
                 {...register('telefono')}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-colors text-gray-900 outline-none ${
+                className={`w-full px-3 py-2 sm:px-4 sm:py-3 border rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-colors text-gray-900 outline-none text-sm sm:text-base ${
                   errors.telefono ? 'border-red-500' : 'border-gray-300'
                 }`}
                 placeholder="+54 11 1234-5678"
@@ -396,12 +398,12 @@ function PerfilSection() {
               )}
             </div>
 
-            {/* ✅ Submit Button - now active when image changes */}
-            <div className="mt-8 pt-6 border-t border-gray-200">
+            {/* Submit Button - Mobile responsive */}
+            <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200">
               <button
                 type="submit"
                 disabled={isSubmitting || (!isDirty && !pendingImageFile)}
-                className={`px-6 py-3 rounded-lg font-medium transition-colors ${
+                className={`w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors text-sm sm:text-base ${
                   isSubmitting || (!isDirty && !pendingImageFile)
                     ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
                     : 'bg-orange-500 text-white hover:bg-orange-600 cursor-pointer'
@@ -410,15 +412,15 @@ function PerfilSection() {
                 {isSubmitting ? 'Guardando...' : 'Guardar cambios'}
               </button>
 
-              {/* ✅ Updated helper text */}
+              {/* Updated helper text - Mobile responsive */}
               {!isDirty && !pendingImageFile && (
-                <p className="mt-2 text-sm text-gray-500">
+                <p className="mt-2 text-sm text-gray-500 text-center sm:text-left">
                   No hay cambios para guardar
                 </p>
               )}
 
               {pendingImageFile && (
-                <p className="mt-2 text-sm text-naranja-1">
+                <p className="mt-2 text-sm text-naranja-1 text-center sm:text-left">
                   📸 Imagen seleccionada - haz clic en "Guardar cambios" para
                   aplicar
                 </p>
