@@ -295,6 +295,7 @@ async function findOneByCookie(req: AuthRequest, res: Response) {
 async function add(req: Request, res: Response) {
   try {
     // encripta password
+    console.log('Datos recibidos para crear usuario:', req.body.sanitizeUsuarioInput); // <-- Agregá esto
     if (req.body.sanitizeUsuarioInput.contrasena) {
       const hashedPassword = await bcrypt.hash(
         req.body.sanitizeUsuarioInput.contrasena,
