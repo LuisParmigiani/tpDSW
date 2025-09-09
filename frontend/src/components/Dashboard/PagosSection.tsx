@@ -133,7 +133,7 @@ function PagosSection() {
 
         {!conectadoStripe ? (
           
-          <StripeCreate onConnect={() => setConectadoStripe(true)} />
+          <StripeCreate />
         ) : (
           
           <div className="space-y-6">
