@@ -664,7 +664,7 @@ function ClientesSection() {
 				</div>
 			</div>
 			
-			{/* Tabla responsive */}
+			
 			<div className="overflow-x-auto bg-white rounded-lg shadow relative mx-2 sm:mx-0">
 				<table className="min-w-full text-xs sm:text-sm table-fixed">
 					<thead>
@@ -680,10 +680,9 @@ function ClientesSection() {
 									<span className="absolute pointer-events-none inset-0 flex items-center justify-center">
 										{allCurrentPageSelected && (
 											<svg
-												className="w-4 h-4 sm:w-5 sm:h-5"
+												className="w-4 h-4 sm:w-5 sm:h-5 block"
 												viewBox="0 0 20 20"
 												fill="none"
-												style={{ display: 'block' }}
 											>
 												<path
 													d="M5 10.5L9 14.5L15 7.5"

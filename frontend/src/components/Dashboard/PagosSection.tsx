@@ -108,9 +108,9 @@ function PagosSection() {
     return (
       <DashboardSection>
         <div className="py-6 sm:py-8 px-4 flex flex-col items-center">
-          <Alert variant="danger" className="mb-4 max-w-md w-full" style={{textAlign: 'center'}}>
-            <AlertTitle style={{textAlign: 'left', width: '100%'}}>Error</AlertTitle>
-            <AlertDescription style={{textAlign: 'left', width: '100%'}}>{error}</AlertDescription>
+          <Alert variant="danger" className="mb-4 max-w-md w-full text-center">
+            <AlertTitle className="text-left w-full">Error</AlertTitle>
+            <AlertDescription className="text-left w-full">{error}</AlertDescription>
           </Alert>
           <button 
             onClick={() => window.location.reload()}
