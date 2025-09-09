@@ -7,7 +7,8 @@ import Stars from '../stars/Stars';
 import Footer from '../Footer/Footer';
 import PaginationControls from '../Pagination/PaginationControler';
 import NewTurnModal from '../Modal/NewTurnModal';
-
+import CustomSelect from './../Select/CustomSelect';
+import { Alert, AlertTitle, AlertDescription } from './../Alerts/Alerts';
 type Turno = {
   id: number;
   fechaHora: string;
@@ -61,6 +62,7 @@ function Borrower() {
   }>();
 
   const numericId = Number(id);
+
   // variable de prestatario para mostrar en la card de usuario y Buscar sus comentarios de cada servicio
   const [prestatario, setPrestatario] = useState<Usuario>();
   // Se guarda la informacion de los comentarios del prestatario, incluyendo el promedio de estrellas y la cantidad de comentarios
@@ -78,6 +80,21 @@ function Borrower() {
   const [totalComments, setTotalComments] = useState(0); // Total de comentarios
   // variables del modal
   const [isOpen, setIsOpen] = useState(open === 'true'); // Estado del modal
+  // variables para mostrar respuestas del back
+  const [updateBorrowerError, setUpdateBorrowerError] = useState<{
+    error: string;
+    message: string;
+  } | null>(null);
+  const [updateCommentsError, setUpdateCommentsError] = useState<{
+    error: string;
+    message: string;
+  } | null>(null);
+
+  const [alertNewTurn, setAlertNewTurn] = useState<{
+    tipo: string;
+    error: string;
+    message: string;
+  } | null>(null);
 
   // Se carga la informacion del prestatario
   useEffect(() => {
@@ -85,7 +102,14 @@ function Borrower() {
       try {
         const res = await usuariosApi.getById(id.toString());
         setPrestatario(res.data.data);
-      } catch (err) {
+      } catch (err: any) {
+        setUpdateBorrowerError({
+          error: 'Error al cargar usuario',
+          message:
+            err.response?.data?.error ||
+            err.message ||
+            'Error al cargar el perfil',
+        });
         console.error('Error al cargar usuario:', err);
       }
     };
@@ -112,7 +136,14 @@ function Borrower() {
         if (res.data.average) {
           setAverage(res.data.average); // Promedio de estrellas
         }
-      } catch (err) {
+      } catch (err: any) {
+        setUpdateCommentsError({
+          error: 'Error al cargar comentarios',
+          message:
+            err.response?.data?.error ||
+            err.message ||
+            'Error al cargar los comentarios',
+        });
         console.error('Error al cargar comentarios:', err);
       } finally {
         setLoading(false);
@@ -120,13 +151,6 @@ function Borrower() {
     };
     getComments(numericId);
   }, [numericId, currentPage, selectedValue]); // Cada que cambia el id de usuario, la página actual o el filtro de orden se vuelve a hacer la petición
-
-  // Cambia el orden de los comentarios segun el filtro seleccionado
-  const orderBy = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newValue = e.target.value;
-    setSelectedValue(newValue);
-    setCurrentPage(1); // Despues de cambiar el filtro vuelve a la primera página
-  };
 
   // Se muestra el promedio de puntuacion en la card de usuario
   let cantComments;
@@ -148,6 +172,58 @@ function Borrower() {
 
   return (
     <>
+      {/* Alerta de error de comentarios */}
+      {updateCommentsError && (
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-xl flex justify-center">
+          <Alert
+            autoClose={true}
+            autoCloseDelay={5000}
+            variant="danger"
+            onClose={() => setUpdateCommentsError(null)}
+            className="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 "
+          >
+            <AlertTitle>{updateCommentsError.error}</AlertTitle>
+            <AlertDescription>{updateCommentsError.message}</AlertDescription>
+          </Alert>
+        </div>
+      )}
+      {/* Alerta de error de prestatario */}
+      {updateBorrowerError && (
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-xl flex justify-center">
+          <Alert
+            autoClose={true}
+            autoCloseDelay={5000}
+            variant="danger"
+            onClose={() => setUpdateBorrowerError(null)}
+            className="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 w-11/12 "
+          >
+            <AlertTitle>{updateBorrowerError.error}</AlertTitle>
+            <AlertDescription>{updateBorrowerError.message}</AlertDescription>
+          </Alert>
+        </div>
+      )}
+      {/* Alerta de nuevo turno */}
+      {alertNewTurn && (
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-800 max-w-xl flex justify-center">
+          <Alert
+            autoClose={true}
+            autoCloseDelay={5000}
+            variant={
+              alertNewTurn.tipo === 'success' ||
+              alertNewTurn.tipo === 'danger' ||
+              alertNewTurn.tipo === 'default' ||
+              alertNewTurn.tipo === 'info'
+                ? alertNewTurn.tipo
+                : 'default'
+            }
+            onClose={() => setAlertNewTurn(null)}
+            className="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 w-11/12 text-center "
+          >
+            <AlertTitle>{alertNewTurn.error}</AlertTitle>
+            <AlertDescription>{alertNewTurn.message}</AlertDescription>
+          </Alert>
+        </div>
+      )}
       <Navbar />
       {isOpen && prestatario && (
         <NewTurnModal
@@ -158,13 +234,14 @@ function Borrower() {
           horario={horario}
           dia={dia}
           open={open}
+          manejoAlertas={setAlertNewTurn}
         />
       )}
       <div className="flex flex-col items-center   justify-center ">
         <div className="lg:flex items-center h-11/12  px-8 py-10 bg-tinte-5 shadow-2xl mt-20 mb-30  lg:w-220 lg:h-100 rounded-2xl ">
           <img
-            className="shadow-2xl rounded-xl object-cover m-auto h-52 w-52 lg:h-auto lg:w-85 lg:mx-5"
-            src={'../images/fotoUserId.png'}
+            className=" rounded-2xl object-cover m-auto h-52 w-52 lg:h-auto lg:w-85 lg:mx-5"
+            src={prestatario?.foto}
             alt="foto de perfil del prestatario"
           />
           <div className="flex flex-col items-start justify-between pt-5  text-black h-full lg:ml-17 lg:w-3/5 lg:h-3/4 text-md">
@@ -195,27 +272,18 @@ function Borrower() {
         <div className="w-9/12 justify-between">
           <h1 className="text-4xl font-bold mb-7 text-black">Comentarios</h1>
           <div className="flex justify-start mb-6 min-h-4/5 ">
-            <select
-              className="bg-naranja-2 py-2 px-5 rounded-3xl "
-              value={selectedValue}
-              onChange={orderBy}
-            >
-              <option className="bg-gray-400 border-0" value="">
-                Ordenar por
-              </option>
-              <option className="bg-gray-400 border-0" value="new">
-                Mas nuevo
-              </option>
-              <option className="bg-gray-400  border-0" value="old">
-                Mas viejo
-              </option>
-              <option className="bg-gray-400 border-0" value="best">
-                Mejor calificacion
-              </option>
-              <option className="bg-gray-400 border-0" value="worst">
-                Peor calificacion
-              </option>
-            </select>
+            <CustomSelect
+              Name="Ordenar por"
+              options={[
+                { value: '', label: 'Ordenar por' },
+                { value: 'new', label: 'Mas nuevo' },
+                { value: 'old', label: 'Mas viejo' },
+                { value: 'best', label: 'Mejor calificacion' },
+                { value: 'worst', label: 'Peor calificacion' },
+              ]}
+              setOptions={setSelectedValue}
+              setPage={setCurrentPage}
+            />
           </div>
           {loading ? (
             <p>Cargando comentarios...</p>

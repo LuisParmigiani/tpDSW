@@ -9,7 +9,7 @@ export type Props = {
 export type Turno = {
   usuario?: {
     nombre: string;
-    fotoPerfil: string;
+    foto: string;
   };
   servicio: {
     id: number;
@@ -67,14 +67,15 @@ function Comments({ id }: Props) {
     }
   }, [idService]);
 
-  const fotoUser = turno?.usuario?.fotoPerfil || '../images/fotoUserId.png';
+  const fotoUser = turno?.usuario?.foto;
   const nombreUser = turno?.usuario?.nombre || 'Nombre Usuario';
   const comentarioText = turno?.comentario || 'La persona no dejó comentario.';
   const calificacion = turno?.calificacion || 3;
-  
+
   const nombreTarea = servicio?.tarea?.nombreTarea || 'Tarea no especificada';
 
-  const nombrePrestatario = servicio?.usuario?.nombreFantasia || 'Nombre Prestatario';
+  const nombrePrestatario =
+    servicio?.usuario?.nombreFantasia || 'Nombre Prestatario';
   return (
     <div className="mx-auto mt-6 rounded-xl bg-white shadow-[0_0_30px_0_rgba(0,0,0,0.1)] p-3 h-auto pb-0 w-full">
       <div className="flex items-center w-full mb-4">
@@ -86,7 +87,9 @@ function Comments({ id }: Props) {
           />
           <div className="flex flex-col space-y-0">
             <h2 className="text-black text-left leading-tight">{nombreUser}</h2>
-            <p className="text-gray-500 text-xs text-left leading-tight">{nombreTarea}</p>
+            <p className="text-gray-500 text-xs text-left leading-tight">
+              {nombreTarea}
+            </p>
           </div>
         </div>
         <div className="inline-flex items-center p-0 m-0">

@@ -47,20 +47,20 @@ function TurnCard({ navigate, turn, openModal, cancelarTurno }: Props) {
   return (
     <li
       key={turn.id}
-      className="flex flex-row items-center w-98  m-6 rounded-xl shadow-md p-6 h-55  hover:shadow-xl transition-shadow"
+      className="flex flex-row items-center w-98  m-6 rounded-xl shadow-md p-6 h-60  hover:shadow-xl transition-shadow"
     >
       <div className="mr-6 flex-shrink-0">
         <img
-          className="h-20 w-20  object-cover border-2 border-gray-300"
+          className="h-16 w-16 sm:h-20 sm:w-20 object-cover border-2 border-gray-300 rounded-full mx-auto"
           src="/images/fotoUserId.png"
           alt="Foto de perfil de usuario"
         />
       </div>
-      <div className="flex flex-col mx-auto gap-1  ml-3 items-start w-full">
+      <div className="flex flex-col mx-auto gap-1  ml-3 items-start w-full ">
         <h2 className="text-lg font-bold text-gray-800 mb-1">
           {turn.servicio.usuario?.nombreFantasia}
         </h2>
-        <p className="text-sm text-gray-600 mb-1">
+        <p className="text-xs sm:text-sm text-gray-600 mb-1">
           Fecha:{' '}
           {new Date(turn.fechaHora).toLocaleDateString('es-AR', {
             year: 'numeric',
@@ -68,19 +68,18 @@ function TurnCard({ navigate, turn, openModal, cancelarTurno }: Props) {
             day: '2-digit',
           })}
         </p>
-        <p className="text-sm text-gray-600 mb-1">
+        <p className="text-xs sm:text-sm text-gray-600 mb-1">
           Servicio: {turn.servicio.tarea.nombreTarea}
         </p>
-        <p className="text-sm text-gray-700 font-medium">
+        <p className="text-xs sm:text-sm text-gray-700 font-medium mb-2">
           Monto: ${turn.montoFinal}
         </p>
         {/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */}
         {(() => {
-          // Mostrar botón "Calificar" si el turno es menor a 1 mes y no fue calificado y fue pagado.
+          // Verificar si ha pasado más de un mes desde la fecha del turno
           const unMesPasado =
-            Date.now() - new Date(turn.fechaHora).getTime() <
-            30 * 24 * 60 * 60 * 1000; // dias, horas, minutos, segundos, milisegundos
-
+            Date.now() - new Date(turn.fechaHora).getTime() >
+            31 * 24 * 60 * 60 * 1000;
           if (!turn.hayPagoAprobado && turn.estado === 'completado') {
             return (
               <>
@@ -95,7 +94,7 @@ function TurnCard({ navigate, turn, openModal, cancelarTurno }: Props) {
                   className="bg-naranja-1 text-white hover:text-naranja-1 hover:bg-white w-full rounded-2xl border-2 border-naranja-1"
                   onClick={() => {
                     // Navegar a la ruta con el ID dinámico
-                    navigate(`/borrower/${turn.servicio.usuario.id}`);
+                    navigate(`/prestatario/${turn.servicio.usuario.id}`);
                   }}
                 >
                   Volver a contratar
@@ -103,7 +102,7 @@ function TurnCard({ navigate, turn, openModal, cancelarTurno }: Props) {
               </>
             );
           } else if (
-            unMesPasado && // verifico si no paso mas de un mes
+            !unMesPasado && // verifico si NO ha pasado más de un mes
             turn.calificacion === null && // verifico que no tenga ya calificacion
             turn.estado === 'completado' // verifico que este completado
           ) {
@@ -119,7 +118,7 @@ function TurnCard({ navigate, turn, openModal, cancelarTurno }: Props) {
                   className="bg-naranja-1 text-white hover:text-naranja-1 hover:bg-white w-full rounded-2xl border-2 border-naranja-1"
                   onClick={() => {
                     // Navegar a la ruta con el ID dinámico
-                    navigate(`/borrower/${turn.servicio.usuario.id}`);
+                    navigate(`/prestatario/${turn.servicio.usuario.id}`);
                   }}
                 >
                   Volver a contratar
@@ -131,14 +130,12 @@ function TurnCard({ navigate, turn, openModal, cancelarTurno }: Props) {
             if (turn.calificacion !== null) {
               return (
                 <>
-                  <div className="justify-center flex">
-                    <Stars cant={turn.calificacion} />
-                  </div>
+                  <Stars cant={turn.calificacion} className="justify-center " />
                   <button
-                    className="bg-naranja-1 text-white hover:text-naranja-1 hover:bg-white w-full rounded-2xl border-2 border-naranja-1"
+                    className="bg-naranja-1 text-white hover:text-naranja-1 hover:bg-white w-full rounded-2xl border-2 border-naranja-1  "
                     onClick={() => {
                       // Navegar a la ruta con el ID dinámico
-                      navigate(`/borrower/${turn.servicio.usuario.id}`);
+                      navigate(`/prestatario/${turn.servicio.usuario.id}`);
                     }}
                   >
                     Volver a contratar
@@ -146,16 +143,18 @@ function TurnCard({ navigate, turn, openModal, cancelarTurno }: Props) {
                 </>
               );
             } else {
-              // Si el turno no paso por todos los otros if y entra aca se interpreta que ya paso un mes por lo que ya no puede calificar.
+              // Si el turno está completado pero ya pasó un mes, ya no puede calificar
               if (turn.estado === 'completado') {
                 return (
                   <>
-                    <p className="mt-2">Expiró el tiempo de calificación</p>
+                    <p className="mt-2 text-xs sm:text-sm text-center">
+                      Expiró el tiempo de calificación
+                    </p>
                     <button
                       className="bg-naranja-1 text-white hover:text-naranja-1 hover:bg-white w-full rounded-2xl border-2 border-naranja-1"
                       onClick={() => {
                         // Navegar a la ruta con el ID dinámico
-                        navigate(`/borrower/${turn.servicio.usuario.id}`);
+                        navigate(`/prestatario/${turn.servicio.usuario.id}`);
                       }}
                     >
                       Volver a contratar
@@ -167,7 +166,10 @@ function TurnCard({ navigate, turn, openModal, cancelarTurno }: Props) {
                 if (turn.estado !== 'cancelado') {
                   return (
                     <>
-                      <p> Estado: {turn.estado}</p>
+                      <p className="text-xs sm:text-sm text-center mb-2">
+                        {' '}
+                        Estado: {turn.estado}
+                      </p>
                       <button
                         onClick={() => cancelarTurno(turn.id)}
                         className="bg-naranja-1  text-white hover:text-naranja-1 hover:bg-white w-full rounded-2xl border-2 border-naranja-1"
@@ -177,7 +179,12 @@ function TurnCard({ navigate, turn, openModal, cancelarTurno }: Props) {
                     </>
                   );
                 }
-                return <p> Estado: {turn.estado}</p>;
+                return (
+                  <p className="text-xs sm:text-sm text-center">
+                    {' '}
+                    Estado: {turn.estado}
+                  </p>
+                );
               }
             }
           }

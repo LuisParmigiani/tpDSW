@@ -269,7 +269,10 @@ async function findOne(req: Request, res: Response) {
     );
     res.status(200).json({ message: 'found one usuario', data: user });
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      error: 'Error interno en el servidor',
+      message: error.message,
+    });
   }
 }
 
@@ -295,7 +298,10 @@ async function findOneByCookie(req: AuthRequest, res: Response) {
 async function add(req: Request, res: Response) {
   try {
     // encripta password
-    console.log('Datos recibidos para crear usuario:', req.body.sanitizeUsuarioInput); // <-- Agregá esto
+    console.log(
+      'Datos recibidos para crear usuario:',
+      req.body.sanitizeUsuarioInput
+    ); // <-- Agregá esto
     if (req.body.sanitizeUsuarioInput.contrasena) {
       const hashedPassword = await bcrypt.hash(
         req.body.sanitizeUsuarioInput.contrasena,
@@ -391,9 +397,11 @@ async function getCommentsByUserId(req: Request, res: Response) {
     );
 
     if (!userWithServices?.servicios?.length) {
-      return res
-        .status(404)
-        .json({ message: 'Usuario no encontrado o sin servicios' });
+      return res.status(404).json({
+        error:
+          'La peticion ha fallado ya que no se encontro el usuario o el usuario no posee servicios',
+        message: 'Usuario no encontrado o sin servicios',
+      });
     }
 
     // Obtener los IDs de cada servicio del usuario
@@ -421,7 +429,10 @@ async function getCommentsByUserId(req: Request, res: Response) {
       average: commentsData.average,
     });
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      message: 'Entro al catch de getCommentsByUserId',
+      error: 'Se ha producido un error al obtener los comentarios del usuario',
+    });
   }
 }
 
@@ -462,9 +473,10 @@ async function loginUsuario(req: Request, res: Response) {
       .json({ message: 'Login exitoso', token, data: usuarioSinContrasena });
   } catch (error: any) {
     console.error('Error en loginUsuario:', error);
-    return res
-      .status(500)
-      .json({ message: 'Error interno en login', error: error.message });
+    return res.status(500).json({
+      message: 'Error interno en login',
+      error: error.message,
+    });
   }
 }
 
