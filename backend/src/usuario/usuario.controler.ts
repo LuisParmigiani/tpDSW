@@ -1,21 +1,25 @@
 import { Request, Response, NextFunction } from 'express';
 import { Usuario } from './usuario.entity.js';
-import {
-  getTurnosByServicioIdHelper,
-  getTurnsPerDay,
-} from '../turno/turno.controler.js';
+import path from 'path';
+import { getTurnosByServicioIdHelper } from '../turno/turno.controler.js';
 import jwt from 'jsonwebtoken';
-
+import fs from 'fs/promises';
+import fsSync from 'fs';
+import { fileURLToPath } from 'url';
 import bcrypt from 'bcrypt';
 import { orm } from '../shared/db/orm.js';
 import nodemailer from 'nodemailer';
+import { processProfileImage } from '../utils/imageProcessor.js';
+const __filename = fileURLToPath(import.meta.url);
 const em = orm.em;
 const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
 
+const __dirname = path.dirname(__filename);
 interface AuthRequest extends Request {
   user?: {
     id: string;
     rol: string;
+    email: string;
   };
 }
 
@@ -33,7 +37,7 @@ function sanitizeUsuarioInput(req: Request, res: Response, next: NextFunction) {
     descripcion: req.body.descripcion,
     foto: req.body.foto,
     turnos: req.body.turnos,
-    tareas: req.body.tareas,
+    tarea: req.body.tarea,
     servicios: req.body.servicios,
     tiposDeServicio: req.body.tiposDeServicio,
     horarios: req.body.horarios,
@@ -41,6 +45,13 @@ function sanitizeUsuarioInput(req: Request, res: Response, next: NextFunction) {
     orderBy: req.body.orderBy,
     maxItems: req.body.maxItems,
     page: req.body.page,
+    stripeAccountId: req.body.stripeAccountId,
+    onboardingStatus: req.body.onboardingStatus,
+    chargesEnabled: req.body.chargesEnabled,
+    payoutsEnabled: req.body.payoutsEnabled,
+    createdAt: req.body.createdAt,
+    updatedAt: req.body.updatedAt,
+    estado: req.body.estado,
   };
   Object.keys(req.body.sanitizeUsuarioInput).forEach((key) => {
     if (req.body.sanitizeUsuarioInput[key] === undefined) {
@@ -68,7 +79,15 @@ async function findAll(req: Request, res: Response) {
     const users = await em.find(
       Usuario,
       {},
-      { populate: ['turnos', 'servicios', 'tiposDeServicio', 'horarios'] }
+      {
+        populate: [
+          'turnos',
+          'servicios',
+          'tiposDeServicio',
+          'horarios',
+          'servicios.tarea',
+        ],
+      }
     );
     res.status(200).json({ message: 'found all Usuarios', data: users });
   } catch (error: any) {
@@ -83,6 +102,7 @@ async function findPrestatariosByTipoServicioAndZona(
   try {
     const nombreTipoServicio = req.params.tipoServicio;
     const nombreZona = req.params.zona;
+    const tarea = req.params.tarea;
     const orderBy = req.params.orderBy as string;
     const maxItems = Number(req.query.maxItems) || 6;
     const page = Number(req.query.page) || 1;
@@ -91,6 +111,10 @@ async function findPrestatariosByTipoServicioAndZona(
     if (nombreTipoServicio !== 'Todos') {
       filtroTipoServicio = nombreTipoServicio;
     }
+    let filtroTarea = '';
+    if (tarea && tarea.trim() !== '' && tarea !== undefined) {
+      filtroTarea = tarea;
+    }
     let filtroZona = '';
     if (nombreZona !== 'Todas') {
       filtroZona = nombreZona;
@@ -98,9 +122,16 @@ async function findPrestatariosByTipoServicioAndZona(
 
     // Build the where clause conditionally
     const whereClause: any = {};
+    whereClause.servicios = { estado: 'activo' };
     whereClause.nombreFantasia = { $ne: null }; // De esta manera no traemos ningún usuario que no
     if (filtroTipoServicio) {
       whereClause.tiposDeServicio = { nombreTipo: filtroTipoServicio };
+    }
+    if (filtroTarea) {
+      whereClause.servicios = {
+        estado: 'activo',
+        tarea: { nombreTarea: filtroTarea },
+      };
     }
     if (filtroZona) {
       whereClause.zonas = { descripcion_zona: filtroZona };
@@ -108,7 +139,13 @@ async function findPrestatariosByTipoServicioAndZona(
     //! Por un tema de performance se tendría que calcular y guardar en algún lado la calificación, apra no tener que calcular todas las calificaciones
     //! y ordenar 30 objetos cada vez que se llama
     const [prestatarios, total] = await em.findAndCount(Usuario, whereClause, {
-      populate: ['tiposDeServicio', 'zonas', 'servicios', 'servicios.turnos'],
+      populate: [
+        'tiposDeServicio',
+        'zonas',
+        'servicios',
+        'servicios.turnos',
+        'servicios.tarea',
+      ],
       //Pasar order by después.
     });
 
@@ -124,6 +161,15 @@ async function findPrestatariosByTipoServicioAndZona(
       let countCalificaciones = 0;
 
       const servicios = prest.servicios.getItems();
+      const tareas: {
+        nombreTarea: string;
+      }[] = [];
+      //Armo una colección de tareas del prestatario, le saque los atributos que no me servían
+      servicios.forEach((s) => {
+        tareas.push({
+          nombreTarea: s.tarea.nombreTarea,
+        });
+      });
       for (const servicio of servicios) {
         if (servicio.turnos !== null && servicio.turnos !== undefined) {
           const turnos = servicio.turnos;
@@ -139,6 +185,13 @@ async function findPrestatariosByTipoServicioAndZona(
         }
       }
       // Build a plain object with all needed properties
+      /*       "tarea": {
+            "id": 11,
+            "nombreTarea": "Reparación de canillas",
+            "descripcionTarea": "Arreglo de grifería",
+            "duracionTarea": 60,
+            "tipoServicio": 2
+          }, */
       return {
         id: prest.id,
         nombre: prest.nombre,
@@ -147,6 +200,7 @@ async function findPrestatariosByTipoServicioAndZona(
         descripcion: prest.descripcion,
         foto: prest.foto,
         tiposDeServicio: prest.tiposDeServicio.getItems(),
+        tareas: tareas,
         calificacion:
           countCalificaciones > 0
             ? totalCalificaciones / countCalificaciones
@@ -186,6 +240,15 @@ async function findPrestatariosByTipoServicioAndZona(
     res.status(500).json({ message: error.message });
   }
 }
+async function findOneOnlyInfo(req: Request, res: Response) {
+  try {
+    const id = Number.parseInt(req.params.id);
+    const user = await em.findOneOrFail(Usuario, { id }, {});
+    res.status(200).json({ message: 'found one usuario', data: user });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+}
 
 async function findOne(req: Request, res: Response) {
   try {
@@ -214,7 +277,7 @@ async function findOneByCookie(req: AuthRequest, res: Response) {
   try {
     // Si el id viene por params, úsalo. Si no, usa el id del usuario autenticado.
     const id = req.user?.id;
-
+    console.log('ID from token:', id);
     if (!id) {
       return res.status(400).json({ message: 'Usuario no autenticado' });
     }
@@ -222,19 +285,28 @@ async function findOneByCookie(req: AuthRequest, res: Response) {
     const user = await em.findOneOrFail(Usuario, { id: Number(id) }, {});
     res.status(200).json({ message: 'found one usuario', data: user });
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      message: 'entro al catch de findOneByCookie',
+      error: error.message,
+    });
   }
 }
 
 async function add(req: Request, res: Response) {
   try {
     // encripta password
+    console.log('Datos recibidos para crear usuario:', req.body.sanitizeUsuarioInput); // <-- Agregá esto
     if (req.body.sanitizeUsuarioInput.contrasena) {
       const hashedPassword = await bcrypt.hash(
         req.body.sanitizeUsuarioInput.contrasena,
         10
       );
       req.body.sanitizeUsuarioInput.contrasena = hashedPassword;
+    }
+    if (req.body.sanitizeUsuarioInput.nombreFantasia) {
+      req.body.sanitizeUsuarioInput.estado = 'inactivo';
+    } else {
+      req.body.sanitizeUsuarioInput.estado = 'activo';
     }
     const newUser = em.create(Usuario, req.body.sanitizeUsuarioInput);
     await em.flush();
@@ -247,11 +319,48 @@ async function add(req: Request, res: Response) {
 async function update(req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id);
-    const updateUser = await em.findOneOrFail(Usuario, { id });
-    em.assign(updateUser, req.body.sanitizeUsuarioInput);
+    const userToUpdate = await em.findOneOrFail(Usuario, { id });
+    //Verifica si el mail ya existe en otro usuario para devolver un error más claro. Sino solo tiraba error 500 por el catch
+    if (userToUpdate.mail !== req.body.sanitizeUsuarioInput.mail) {
+      const mailExists = await em.findOne(Usuario, {
+        mail: req.body.sanitizeUsuarioInput.mail,
+      });
+      if (mailExists) {
+        return res.status(409).json({
+          error: 'EMAIL_ALREADY_EXISTS',
+          message: 'El mail ya está registrado por otro usuario',
+        });
+      }
+    }
+    if (userToUpdate.numeroDoc !== req.body.sanitizeUsuarioInput.numeroDoc) {
+      const numDocExists = await em.findOne(Usuario, {
+        numeroDoc: req.body.sanitizeUsuarioInput.numeroDoc,
+      });
+      if (numDocExists) {
+        return res.status(409).json({
+          error: 'NUMDOC_ALREADY_EXISTS',
+          message: 'El número de documento ya está registrado por otro usuario',
+        });
+      }
+    }
+    if (userToUpdate.telefono !== req.body.sanitizeUsuarioInput.telefono) {
+      const telExists = await em.findOne(Usuario, {
+        telefono: req.body.sanitizeUsuarioInput.telefono,
+      });
+      if (telExists) {
+        return res.status(409).json({
+          error: 'PHONE_ALREADY_EXISTS',
+          message: 'El telefono ya está registrado por otro usuario',
+        });
+      }
+    }
+    em.assign(userToUpdate, req.body.sanitizeUsuarioInput);
     await em.flush();
-    res.status(200).json({ message: 'updated usuario', data: updateUser });
+    res.status(200).json({ message: 'updated usuario', data: userToUpdate });
   } catch (error: any) {
+    //Logica para devolver bien el mensaje de error
+    console.log('Hubo un error actualizando la info del user:', error);
+
     res.status(500).json({ message: error.message });
   }
 }
@@ -336,25 +445,21 @@ async function loginUsuario(req: Request, res: Response) {
 
     // elimina contraseña antes de enviar el usuario, probarlo
     const { contrasena: _, ...usuarioSinContrasena } = usuario;
-    if (usuarioSinContrasena) {
-      const rol =
-        usuarioSinContrasena.nombreFantasia === null ? 'cliente' : 'prestador';
-      const token = jwt.sign({ id: usuarioSinContrasena.id, rol }, JWT_SECRET, {
-        expiresIn: '1d',
-      });
 
-      // 🔹 Guardamos el token en una cookie segura
-      const local = process.env.LOCAL === 'true';
-      res.cookie('token', token, {
-        httpOnly: true,
-        secure: !local,
-        sameSite: local ? 'lax' : 'none', // 'none' solo si secure=true
-        path: '/',
-      });
-    }
+    const rol =
+      usuarioSinContrasena.nombreFantasia === null ? 'cliente' : 'prestador';
+
+    const token = jwt.sign(
+      { id: usuarioSinContrasena.id, rol, email: usuarioSinContrasena.mail },
+      JWT_SECRET,
+      {
+        expiresIn: '1d',
+      }
+    );
+
     return res
       .status(200)
-      .json({ message: 'Login exitoso', data: usuarioSinContrasena });
+      .json({ message: 'Login exitoso', token, data: usuarioSinContrasena });
   } catch (error: any) {
     console.error('Error en loginUsuario:', error);
     return res
@@ -373,6 +478,7 @@ const transporter = nodemailer.createTransport({
     pass: 'mkyg zmvc hjux pkqr',
   },
 });
+//
 
 async function recuperarContrasena(req: Request, res: Response) {
   try {
@@ -430,11 +536,132 @@ async function cambiarPassword(req: Request, res: Response) {
   return res.status(200).json(); //se cambió la password
 }
 
+async function putOauth(
+  mail: string,
+  estado: 'active' | 'pending' | 'rejected',
+  stripeAccountId?: string,
+  chargesEnabled?: boolean,
+  payoutsEnabled?: boolean,
+  createdAt?: Date,
+  updatedAt?: Date
+) {
+  let guardar;
+  if (stripeAccountId) {
+    guardar = {
+      onboardingStatus: estado,
+      stripeAccountId,
+      chargesEnabled,
+      payoutsEnabled,
+      createdAt,
+      updatedAt,
+      estado: 'activo',
+    };
+  } else {
+    guardar = { onboardingStatus: estado };
+  }
+  try {
+    const updateUser = await em.findOneOrFail(Usuario, { mail });
+    em.assign(updateUser, guardar);
+    await em.flush();
+    console.log('Tokens de stripe actualizados');
+  } catch (error: any) {
+    console.error('Error en putOauth:', error);
+  }
+}
+async function getOauth(id: number) {
+  try {
+    const user = await em.findOneOrFail(Usuario, { id }, {});
+    return user;
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+}
+async function uploadProfileImage(req: Request, res: Response) {
+  //! Por razones de seguridad, MikroORM no deja usar la instancia global del em
+  //! En contextos de operaciones asincronas como subida de archivos, ya que puede causar
+  //! 'race conditions' y 'Corrupción de datos'
+  //*Es por eso que se utiliza un fork de la instancia
+  const emFork = em.fork();
+  try {
+    console.log('Upload request received');
+    console.log('req.file:', req.file); // Debug log
+    console.log('req.params.userId:', req.params.userId); // Debug log
+    console.log('req.body:', req.body); // Debug log
+    if (!req.file) {
+      return res.status(400).json({ error: 'No se subió ninguna imagen' });
+    }
+    const userId = req.params.userId;
+    const user = await emFork.findOne(Usuario, { id: Number(userId) });
+    if (!user) {
+      await fs.unlink(req.file.path); // Elimina el archivo subido si el usuario no existe
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+    //Borra la foto anterior si existe
+    if (user.foto) {
+      const relativePath = user.foto.includes('/uploads/')
+        ? user.foto.substring(user.foto.indexOf('/uploads/'))
+        : user.foto;
+
+      const RutaFotoVieja = path.join(__dirname, '../../public', relativePath);
+
+      try {
+        await fs.unlink(RutaFotoVieja);
+      } catch (error) {
+        console.error('Error al eliminar la foto vieja:', error);
+      }
+    }
+    //procesa y optimiza la imagen
+    const urlOptimizada = await processProfileImage(
+      req.file.path,
+      Number(user.id)
+    );
+    console.log('✅ Image processed successfully');
+    console.log('🔗 Returned URL:', urlOptimizada);
+    //Limpia la imagen subida
+    const isProduction = process.env.NODE_ENV === 'production';
+    const baseUrl = isProduction
+      ? process.env.BASE_URL || 'https://backend-patient-morning-1303.fly.dev'
+      : 'http://localhost:3000';
+
+    const fullPath = path.join(__dirname, '../../public', urlOptimizada);
+    try {
+      await fs.access(fullPath);
+      console.log('✅ File exists at:', fullPath);
+    } catch (error) {
+      console.error('❌ File does NOT exist at:', fullPath);
+    }
+    const fullImageUrl = `${baseUrl}${urlOptimizada}`;
+    await fs.unlink(req.file.path);
+    // Actualiza el usuario en la base
+    user.foto = fullImageUrl;
+    await emFork.flush();
+
+    res.json({
+      message: 'Foto de perfil actualizada correctamente',
+      imageUrl: fullImageUrl,
+      user: {
+        id: user.id,
+        foto: user.foto,
+      },
+    });
+  } catch (error) {
+    console.error('Error al Hsubir la imagen de perfil:', error);
+    if (req.file) {
+      try {
+        await fs.unlink(req.file.path); //Intenta eliminar el archivo en caso de error
+      } catch (error) {
+        console.error('Error al eliminar la imagen de perfil:', error);
+      }
+    }
+    res.status(500).json({ error: 'Error al subir la imagen de perfil' });
+  }
+}
 export {
   sanitizeUsuarioInput,
   findAll,
   findPrestatariosByTipoServicioAndZona,
   findOne,
+  findOneOnlyInfo,
   add,
   update,
   loginUsuario,
@@ -444,4 +671,7 @@ export {
   recuperarContrasena,
   validarCodigoRecuperacion,
   cambiarPassword,
+  putOauth,
+  getOauth,
+  uploadProfileImage,
 };

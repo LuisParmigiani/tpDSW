@@ -5,8 +5,8 @@ import ServicioCard from '../../components/servicios.cards/ServicioCard';
 import { tiposServicioApi } from '../../services/tipoSericiosApi';
 import { zonasApi } from '../../services/zonasApi';
 import { usuariosApi } from '../../services/usuariosApi';
-import { ServiciosForm } from '../../components/Forms/FormServicios';
 import PaginationControls from '../../components/Pagination/PaginationControler';
+import FilterSideBar from '../../components/Forms/FilterSideBar.tsx';
 
 // FIX 1: Complete Usuario type to match ServicioCard props
 type Usuario = {
@@ -14,33 +14,50 @@ type Usuario = {
   nombre: string;
   apellido: string;
   nombreFantasia: string;
+  foto: string;
   tiposDeServicio: Array<{
     id: number;
     nombreTipo: string;
     descripcionTipo: string;
   }>;
+  tareas: Array<{ nombreTarea: string }>;
   zonas: Array<{ id: number; descripcionZona: string }>;
   calificacion: number;
 
   // Add other properties your backend returns
 };
-type Filtros = {
+export type Filtros = {
   servicio: string;
+  tarea?: string;
   zona: string;
   ordenarPor: string;
 };
-
-type TipoServicio = {
+type TipoServicioResponse = {
+  id: number;
   nombreTipo: string;
   descripcionTipo: string;
+  tareas: Array<{
+    id: number;
+    nombreTarea: string;
+    descripcionTarea: string;
+    duracionTarea: number;
+    tipoServicio: number;
+  }>;
 };
-type Zona = {
+
+export type TipoServicio = {
+  nombreTipo: string;
+  descripcionTipo: string;
+  tareas: Array<{ id: number; nombreTarea: string }>;
+};
+export type Zona = {
   id: number;
   descripcionZona: string;
 };
 
 type FormValues = {
   servicio: string;
+  tarea?: string;
   zona: string;
   ordenarPor: string;
 };
@@ -48,11 +65,13 @@ function FiltrosDeServicios() {
   // Get URL parameters
   const [searchParams] = useSearchParams();
   const servicioParam = searchParams.get('tipoServicio') || '';
+  const tareaParam = searchParams.get('tarea') || '';
   const zonaParam = searchParams.get('zona') || '';
   const orderByParam = searchParams.get('orderBy') || '';
 
   const [filtrosForm, setFiltrosForm] = useState<Filtros>({
     servicio: '',
+    tarea: '',
     zona: '',
     ordenarPor: '',
   });
@@ -73,13 +92,26 @@ function FiltrosDeServicios() {
   useEffect(() => {
     const fetchServicios = async () => {
       try {
-        const response = await tiposServicioApi.getAll();
-        const servs = response.data.data;
-        servs.push({
+        const response = await tiposServicioApi.getAllWithTareas();
+        const tipoServs = response.data.data;
+        const todasLasTareas: Array<{ id: number; nombreTarea: string }> = [];
+        tipoServs.forEach((element: TipoServicioResponse) => {
+          element.tareas.forEach(
+            (tarea: { id: number; nombreTarea: string }) => {
+              const tareaResponse = {
+                id: tarea.id,
+                nombreTarea: tarea.nombreTarea,
+              };
+              todasLasTareas.push(tareaResponse);
+            }
+          );
+        });
+        tipoServs.push({
           nombreTipo: 'Todos',
           descripcionTipo: 'Todos los servicios',
+          tareas: todasLasTareas,
         });
-        setTipoServicios(servs); // Use the modified array
+        setTipoServicios(tipoServs); // Use the modified array
       } catch (error) {
         console.error('Error fetching servicios:', error);
         return [];
@@ -102,11 +134,13 @@ function FiltrosDeServicios() {
     //!Todo esto se hace apenas carga la página, ya que el useEffect está vacío
     fetchServicios();
     fetchZonas();
-    // Hago que es muestren todos de manera default:
+  }, []);
 
-    if (servicioParam && zonaParam && orderByParam) {
+  useEffect(() => {
+    if (servicioParam || tareaParam || zonaParam || orderByParam) {
       setFiltrosForm({
         servicio: servicioParam,
+        tarea: tareaParam,
         zona: zonaParam,
         ordenarPor: orderByParam,
       });
@@ -119,13 +153,14 @@ function FiltrosDeServicios() {
       }));
     }
     setSubmit(true); // Trigger the search after fetching
-  }, [orderByParam, servicioParam, zonaParam]);
+  }, [orderByParam, servicioParam, tareaParam, zonaParam]);
 
   useEffect(() => {
     if (!submit) return;
 
     const fetchUsuarios = async (
       servicio: string,
+      tarea: string | undefined,
       zona: string,
       ordenarPor: string,
       cantPrestPorPagina: string,
@@ -138,12 +173,10 @@ function FiltrosDeServicios() {
 
       try {
         setIsLoading(true);
-        console.log(
-          `Fetching usuarios for servicio: ${servicio}, zona: ${zona} and ordered by: ${ordenarPor}`
-        );
         console.log(cantPrestPorPagina, currentPage);
         const response = await usuariosApi.getPrestatariosByTipoServicioAndZona(
           servicio,
+          tarea || '',
           zona,
           ordenarPor,
           cantPrestPorPagina,
@@ -151,13 +184,37 @@ function FiltrosDeServicios() {
         );
         setUsuarios(response.data.data);
         setTotalPages(response.data.pagination.totalPages);
+        //Paso los parametros de la consulta por url para que no se borre el form
+      } catch (err: any) {
+        console.error('Full error object:', err); // Add this to see the actual structure
 
-        console.log('Usuarios fetched:', response.data.data);
-        console.log(response.data.pagination);
-      } catch (err: unknown) {
-        console.error('Error: ', err);
-        setError('Error al cargar los prestadores de servicios');
-        setUsuarios([]);
+        // Handle different error structures
+        let errorMessage = '';
+
+        if (err?.response?.data?.message) {
+          // Axios error structure
+          errorMessage = err.response.data.message;
+        } else if (err?.data?.message) {
+          // Your current expected structure
+          errorMessage = err.data.message;
+        } else if (err?.message) {
+          // Standard Error object
+          errorMessage = err.message;
+        } else {
+          // Fallback
+          errorMessage = 'Unknown error occurred';
+        }
+
+        if (
+          errorMessage ===
+          'No prestatarios found for the given tipoServicio and zona'
+        ) {
+          console.log('No prestatarios found for the filters');
+          setUsuarios([]);
+        } else {
+          console.error('Error: ', err);
+          setError('Error al cargar los prestadores de servicios');
+        }
       } finally {
         setIsLoading(false);
       }
@@ -165,6 +222,7 @@ function FiltrosDeServicios() {
 
     fetchUsuarios(
       filtrosForm.servicio,
+      filtrosForm.tarea,
       filtrosForm.zona,
       filtrosForm.ordenarPor,
       cantPrestPorPagina,
@@ -173,6 +231,7 @@ function FiltrosDeServicios() {
   }, [
     submit,
     filtrosForm.servicio,
+    filtrosForm.tarea,
     filtrosForm.zona,
     filtrosForm.ordenarPor,
     currentPage,
@@ -180,7 +239,6 @@ function FiltrosDeServicios() {
 
   // FIX 6: Fixed form submission logic
   const handleFormSubmit = (values: FormValues) => {
-    console.log('handling form submit with values:', values);
     setFiltrosForm(values);
     setSubmit(true);
     setError(null); // Clear previous errors when submitting
@@ -293,29 +351,62 @@ function FiltrosDeServicios() {
             nombre={user.nombreFantasia}
             rubros={nombresRubros}
             puntuacion={user.calificacion}
+            foto={user.foto}
             key={user.id} // Better to use user.id instead of index
           />
         );
       });
-
-      return (
-        <>
-          <div className="flex flex-wrap flex-col xl:flex-row gap-5 mx-8 mt-8 align-middle justify-items-center">
-            {cards}
-          </div>
-          <div className="flex justify-center mt-8">
-            <PaginationControls
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
-          </div>
-        </>
-      );
+      //cambio la cantidad de columnas dependiendo de la cantidad de cartas
+      if (cards.length === 1) {
+        return (
+          <>
+            <div className="grid grid-cols-1 gap-6 mx-8 mt-8 justify-items-center">
+              {cards}
+            </div>
+            <div className="flex justify-center mt-8">
+              <PaginationControls
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            </div>
+          </>
+        );
+      } else if (cards.length === 2) {
+        return (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mx-8 mt-8 justify-items-center">
+              {cards}
+            </div>
+            <div className="flex justify-center mt-8">
+              <PaginationControls
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            </div>
+          </>
+        );
+      } else {
+        return (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mx-8 mt-8 justify-items-center">
+              {cards}
+            </div>
+            <div className="flex justify-center mt-8">
+              <PaginationControls
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            </div>
+          </>
+        );
+      }
     }
 
     // Show empty state only if we've submitted the form (to avoid showing it initially)
-    if (submit) {
+    if (submit && usuarios.length === 0) {
       return <EmptyState />;
     }
 
@@ -331,13 +422,23 @@ function FiltrosDeServicios() {
 
   return (
     <>
-      <ServiciosForm
-        tipoServicios={tipoServicios}
-        zonas={zonas}
-        onSubmit={handleFormSubmit}
-        filtrosForm={filtrosForm}
-      />
-      {renderContent()}
+      <div className="flex flex-col lg:flex-row bg-gray-100 min-h-screen">
+        <FilterSideBar
+          tipoServicios={tipoServicios}
+          zonas={zonas}
+          filtrosForm={filtrosForm}
+          onSubmit={handleFormSubmit}
+        />
+        <div className="flex-1 flex flex-col">
+          <header className="bg-white border-b sticky top-0 z-10 border-gray-200 h-21">
+            <h1 className="text-2xl mt-auto font-semibold text-gray-800 capitalize mx-auto pt-6">
+              Resultados
+            </h1>
+          </header>
+
+          <main className="p-6 flex-1">{renderContent()}</main>
+        </div>
+      </div>
     </>
   );
 }

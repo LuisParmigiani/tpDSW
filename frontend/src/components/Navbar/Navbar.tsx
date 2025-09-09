@@ -21,6 +21,20 @@ function Navbar() {
     setShowNav((prev) => !prev);
   };
 
+  useEffect(() => {
+    const getUsuario = async () => {
+      try {
+        console.log('Cargando usuario...');
+        const res = await usuariosApi.getByCookie();
+        console.log('Usuario cargado:', res.data.data);
+        setUsuario(res.data.data);
+      } catch (err) {
+        console.error('Error al cargar usuario:', err);
+      }
+    };
+    if (rol != '') getUsuario();
+  }, [rol]);
+  // juan.perez@email.com
   // Controlar el scroll del body cuando el menú está abierto
   useEffect(() => {
     if (showNav) {
@@ -28,13 +42,13 @@ function Navbar() {
     } else {
       document.body.style.overflow = 'unset';
     }
-
     // Cleanup al desmontar el componente
     return () => {
       document.body.style.overflow = 'unset';
     };
   }, [showNav]);
 
+  // opciones del menú según el rol
   const options: Option[] =
     rol === 'cliente'
       ? [
@@ -45,10 +59,6 @@ function Navbar() {
           {
             nombre: 'Historia de turnos',
             url: '/historial',
-          },
-          {
-            nombre: 'Dashboard',
-            url: '/dashboard',
           },
           {
             nombre: 'Sobre nosotros',
@@ -69,6 +79,7 @@ function Navbar() {
             url: '/about',
           },
         ];
+  // Mapeo de las opciones para renderizarlas
   const showOptions = options.map((option) => (
     <li
       key={option.nombre}
@@ -83,17 +94,6 @@ function Navbar() {
       </Link>
     </li>
   ));
-  useEffect(() => {
-    const getUsuario = async () => {
-      try {
-        const res = await usuariosApi.getByCookie();
-        setUsuario(res.data.data);
-      } catch (err) {
-        console.error('Error al cargar usuario:', err);
-      }
-    };
-    if (rol != '') getUsuario();
-  }, [rol]);
 
   // Renderizado del componente Navbar
   return (
@@ -209,22 +209,23 @@ function Navbar() {
                   </button>
                 </li>
                 {showOptions}
-                <li className="flex justify-center items-center mt-4">
+                <li className="flex flex-row justify-center items-center mt-4">
                   {usuario ? (
                     <Link
                       to={`/usuario/${usuario.nombre}`}
                       onClick={() => setShowNav(false)}
-                      className="bg-orange-500 text-white font-medium px-5 py-2  rounded-xl transition-all duration-300 hover:bg-gray-100 hover:border-orange-500 hover:border-1 hover:shadow-2xl hover:text-naranja-1 w-10/12 text-center"
+                      className="bg-orange-500 justify-center items-center text-white font-medium flex flex-row px-5 py-2 rounded-xl transition-all duration-300 hover:bg-gray-100 hover:border-orange-500 hover:border-1 hover:shadow-2xl hover:text-naranja-1 w-10/12 text-center"
                     >
-                      <p>{usuario?.nombre}</p>
+                      <p className="mx-auto">{usuario?.nombre}</p>
                       <img
+                        className="h-10 w-10 rounded-full ml-2"
                         src={'/images/fotoUserId.png'}
                         alt="Foto de perfil"
                       />
                     </Link>
                   ) : (
                     <Link
-                      to="#"
+                      to="/login"
                       onClick={() => setShowNav(false)}
                       className="bg-orange-500 text-white font-medium px-5 py-2  rounded-xl transition-all duration-300 hover:bg-gray-100 hover:border-orange-500 hover:border-1 hover:shadow-2xl hover:text-naranja-1 w-10/12 text-center"
                     >

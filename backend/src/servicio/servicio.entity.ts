@@ -17,6 +17,9 @@ export class Servicio {
   id!: number;
 
   @Property({ nullable: false })
+  estado!: 'activo' | 'inactivo';
+
+  @Property({ nullable: false })
   precio!: number;
 
   @ManyToOne(() => Tarea, { nullable: false })

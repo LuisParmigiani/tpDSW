@@ -2,66 +2,50 @@ import { Entity, ManyToOne, Property, Rel, Enum } from '@mikro-orm/core';
 import { BaseEntity } from '../shared/db/baseEntity.entity.js';
 import { Turno } from '../turno/turno.entity.js';
 
-// Enum para estados de MercadoPago
-export enum EstadoPago {
-  PENDING = 'pending', // Pendiente
-  APPROVED = 'approved', // Aprobado
-  AUTHORIZED = 'authorized', // Autorizado
-  IN_PROCESS = 'in_process', // En proceso
-  IN_MEDIATION = 'in_mediation', // En mediación
-  REJECTED = 'rejected', // Rechazado
-  CANCELLED = 'cancelled', // Cancelado
-  REFUNDED = 'refunded', // Reembolsado
-  CHARGED_BACK = 'charged_back', // Contracargo
-}
-
 @Entity()
 export class Pago extends BaseEntity {
-  @Property({ nullable: false })
-  fechaHora!: Date;
+  @Property({ unique: true })
+  paymentIntentId!: string; // ID del PaymentIntent en Stripe
 
-  @Property({ nullable: false, unique: true })
-  idMercadoPago!: string;
+  @Property()
+  amount!: number; // Monto total en centavos
 
-  @Property({ nullable: true }) // Puede ser null inicialmente
-  idPreferencia?: string; // ID de la preferencia de MP
+  @Property({ length: 3 })
+  currency!: string; // Moneda ISO (ej: 'usd', 'ars')
 
-  @Property({ nullable: false })
-  descripcionPago!: string;
+  @Property()
+  estado!:
+    | 'requires_payment_method'
+    | 'requires_confirmation'
+    | 'requires_action'
+    | 'processing'
+    | 'succeeded'
+    | 'requires_capture'
+    | 'canceled';
 
-  @Property({ nullable: false, type: 'decimal', precision: 10, scale: 2 })
-  monto!: number;
+  @Property()
+  sellerStripeId!: string; // ID de la cuenta conectada del vendedor
 
-  @Enum(() => EstadoPago)
-  estado!: EstadoPago;
-
-  @Property({ nullable: true }) // Detalle específico del estado
-  detalleEstado?: string; // status_detail de MP
-
-  @Property({ nullable: false, default: 1 })
-  cuotas!: number;
-
-  @Property({ nullable: false, onUpdate: () => new Date() })
-  fechaActualizacion!: Date;
-
-  // Campos adicionales útiles de MercadoPago
-  @Property({ nullable: true })
-  metodoPago?: string; // visa, mastercard, etc.
+  @Property()
+  amountReceived!: number; // Lo que recibe el vendedor después de el cobro
 
   @Property({ nullable: true })
-  tipoPago?: string; // credit_card, debit_card, etc.
+  applicationFeeAmount?: number; // Lo que cobra la plataforma
 
   @Property({ nullable: true })
-  emailPagador?: string;
+  transferId?: string; // ID de la transferencia a la cuenta del vendedor
 
   @Property({ nullable: true })
-  montoNeto?: number; // Monto que recibes después de comisiones
-
-  @Property({ nullable: true })
-  fechaAprobacion?: Date; // Cuándo fue aprobado
+  buyerEmail?: string; // Email del comprador
 
   @Property({ type: 'json', nullable: true })
-  datosCompletos?: any; // Para guardar toda la respuesta de MP
+  metadata?: Record<string, any>; // Datos extra como productId, orderId
+
+  @Property()
+  createdAt: Date = new Date();
+
+  @Property({ onUpdate: () => new Date() })
+  updatedAt: Date = new Date();
 
   @ManyToOne(() => Turno, { nullable: false })
   turno!: Rel<Turno>;

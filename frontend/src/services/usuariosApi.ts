@@ -1,10 +1,10 @@
 import { api } from './api';
 import type { EntityData } from './api';
-
 export const usuariosApi = {
   getAll: () => api.get('/usuario'),
   getPrestatariosByTipoServicioAndZona: (
     tipoServicio: string,
+    tarea: string,
     zona: string,
     orderBy: string,
     maxItems?: string,
@@ -13,13 +13,20 @@ export const usuariosApi = {
     const params = new URLSearchParams(); // crea los parámetros para pasarlos en la consulta
     if (maxItems !== undefined) params.append('maxItems', maxItems);
     if (page !== undefined) params.append('page', page);
-    const url = `/usuario/prestatarios/${tipoServicio}/${zona}/${orderBy}${
+    if (tarea === undefined || tarea === '') tarea = ' ';
+    const url = `/usuario/prestatarios/${tipoServicio}/${tarea}/${zona}/${orderBy}${
       params ? `?${params}` : ''
     }`;
     return api.get(url);
   },
   getById: (id: string) => api.get(`/usuario/${id}`),
-  getByCookie: () => api.get(`/usuario/cookie`, { withCredentials: true }),
+  getByIdOnlyInfo: (id: string) => api.get(`/usuario/onlyInfo/${id}`),
+  getByCookie: () => {
+    const token = localStorage.getItem('token');
+    return api.get(`/usuario/cookie`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  },
   getCommentsByUserId: (
     userId: string,
     maxItems?: string,
@@ -44,4 +51,12 @@ export const usuariosApi = {
     api.post('/usuario/validar-codigo', data),
   cambiarPassword: (data: EntityData) =>
     api.post('/usuario/cambiar-password', data),
+  uploadProfileImage: (userId: string, imageFile: File) => {
+    const formData = new FormData();
+    formData.append('profileImage', imageFile);
+    //Con este nombre lo espera el middleware
+    return api.post(`/usuario/upload-profile-image/${userId}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
 };

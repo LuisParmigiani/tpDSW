@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import CustomSelect from '../Select/CustomSelect';
 import { turnosApi } from '../../services/turnosApi';
 import { useRoleReturn } from '../../cookie/useProtectRoute.tsx';
+import { useNavigate } from 'react-router-dom';
 
 // cuando apriero esc que se salga del menu
 type Usuario = {
@@ -13,7 +14,8 @@ type Usuario = {
   telefono: string;
   tiposDeServicio: TipoDeServicio[];
   horarios: {
-    dia: string;
+    id: number;
+    diaSemana: number;
     horaDesde: string;
     horaHasta: string;
   }[];
@@ -46,9 +48,24 @@ type Option = {
 type Props = {
   prestatario: Usuario;
   setopen: (open: boolean) => void;
+
+  servicio?: string;
+  Tarea?: string;
+  horario?: string;
+  dia?: string;
+  open?: string;
 };
 
-function NewTurnModal({ prestatario, setopen }: Props) {
+function NewTurnModal({
+  prestatario,
+  setopen,
+  servicio = '',
+  Tarea = '',
+  horario = '',
+  dia = '',
+  open,
+}: Props) {
+  const navigate = useNavigate();
   //Ver si inicio seccion
   const rol = useRoleReturn();
   //Variable de tipo opciones definida antes para los selects
@@ -57,13 +74,15 @@ function NewTurnModal({ prestatario, setopen }: Props) {
   const [horariosManana, setHorariosManana] = useState<number[]>([]); // Se Guardan todos los horarios posibles para esa fecha
   const [horariosTarde, setHorariosTarde] = useState<number[]>([]); // Se Guardan todos los horarios posibles para esa fecha
 
-  const [dayForTurn, setDayForTurn] = useState(''); // se elige una fecha especifica
-  const [horarioSelected, setHorarioSelected] = useState(''); // Se guarda el horario seleccionado
-  const [selectedService, setSelectedService] = useState(''); // se guarda el servicio seleccionado
+  const [dayForTurn, setDayForTurn] = useState(dia || ''); // se elige una fecha especifica
+  const [horarioSelected, setHorarioSelected] = useState(horario || ''); // Se guarda el horario seleccionado
+  const [selectedService, setSelectedService] = useState(servicio || ''); // se guarda el servicio seleccionado
   const [page, setPage] = useState(1); // Pagina del modal
   const [diasPage, setDiasPage] = useState(1); // pagina de los dias cambia de 6 en 6
-  const [confirmationModalOpen, setConfirmationModalOpen] = useState(false); // Modal de confirmacion
-  const [selectedTask, setSelectedTask] = useState(''); // se guarda la tarea seleccionada
+  const [confirmationModalOpen, setConfirmationModalOpen] = useState(
+    open === 'true'
+  ); // Modal de confirmacion
+  const [selectedTask, setSelectedTask] = useState(Tarea || ''); // se guarda la tarea seleccionada
 
   // Efecto para desactivar el scroll de la página cuando el modal esté abierto
   useEffect(() => {
@@ -113,12 +132,20 @@ function NewTurnModal({ prestatario, setopen }: Props) {
     const generateHorarios = (
       horaDesde: string,
       horaHasta: string,
-      turnosOcupados: number[][] = []
+      turnosOcupados: number[][] = [],
+      dayForTurn: string
     ) => {
       // Convierte "08:00:00" a minutos totales
       const [hDesde, mDesde] = horaDesde.split(':').map(Number);
       const [hHasta, mHasta] = horaHasta.split(':').map(Number);
-      let horaAct = hDesde * 60 + mDesde;
+      let horaAct = hDesde * 60 + mDesde; // Hora actual en minutos
+
+      // Si el día seleccionado es hoy, usar la hora actual como mínimo
+      if (dayForTurn === new Date().toISOString().split('T')[0]) {
+        const ahora = new Date();
+        const horaActualEnMinutos = ahora.getHours() * 60 + ahora.getMinutes();
+        horaAct = Math.max(horaAct, horaActualEnMinutos);
+      }
       const horaHastaMin = hHasta * 60 + mHasta;
       const taskDuration =
         prestatario.servicios.find(
@@ -152,6 +179,7 @@ function NewTurnModal({ prestatario, setopen }: Props) {
       setHorariosManana(nuevosHorariosManana);
       setHorariosTarde(nuevosHorariosTarde);
     };
+    // Función para obtener los turnos ocupados.
     const fetchHorarios = async () => {
       if (dayForTurn) {
         const response = await turnosApi.getTurnsPerDay(
@@ -178,13 +206,17 @@ function NewTurnModal({ prestatario, setopen }: Props) {
         );
 
         // Ahora generar horarios con los turnos ocupados
-        generateHorarios(
-          prestatario.horarios?.[new Date(dayForTurn).getDay()]?.horaDesde ??
-            '',
-          prestatario.horarios?.[new Date(dayForTurn).getDay()]?.horaHasta ??
-            '',
-          turnosOcupados
-        );
+        for (const horario of prestatario.horarios) {
+          if (horario.diaSemana === new Date(dayForTurn).getDay()) {
+            generateHorarios(
+              horario.horaDesde,
+              horario.horaHasta,
+              turnosOcupados,
+              dayForTurn
+            );
+            break;
+          }
+        }
       }
     };
     fetchHorarios();
@@ -391,8 +423,14 @@ function NewTurnModal({ prestatario, setopen }: Props) {
                   ? 'bg-gray-300 border-2 w-full border-gray-500 text-white rounded-md py-2 px-4 text-center relative group'
                   : 'bg-green-700 border-2 w-full border-green-700 text-white rounded-md py-2 px-4 hover:bg-white hover:text-green-700 text-center'
               }
-              onClick={guardarTurno}
-              disabled={rol === ''}
+              onClick={
+                rol === ''
+                  ? () =>
+                      navigate(
+                        `/login/${prestatario.id.toString()}/${selectedService}/${selectedTask}/${horarioSelected}/${dayForTurn}`
+                      )
+                  : guardarTurno
+              }
             >
               Confirmar
               {rol === '' && (
@@ -516,40 +554,69 @@ function NewTurnModal({ prestatario, setopen }: Props) {
               </button>
             </div>
             <h2 className="text-xl font-bold">Horarios Disponibles:</h2>
-            <h2>Mañana:</h2>
-            <div className="grid grid-cols-4 gap-2 mt-5 px-7">
-              {horariosManana.map((horario) => (
-                <button
-                  key={`manana-${horario}`}
-                  className={
-                    minutosAHora(horario) === horarioSelected
-                      ? 'bg-naranja-1 border-none rounded-md text-white px-6 py-2 hover:bg-neutral-200 border-2 border-naranja-1 hover:text-naranja-1 transition-colors duration-300'
-                      : 'bg-neutral-200 rounded-md py-2 hover:bg-neutral-400'
-                  }
-                  onClick={() => setHorarioSelected(minutosAHora(horario))}
-                >
-                  {' '}
-                  {minutosAHora(horario)}
-                </button>
-              ))}
-            </div>
-            <h2>Tarde:</h2>
-            <div className="grid grid-cols-4 gap-2 mt-5 px-7">
-              {horariosTarde.map((horario) => (
-                <button
-                  key={`tarde-${horario}`}
-                  className={
-                    minutosAHora(horario) === horarioSelected
-                      ? 'bg-naranja-1 border-none rounded-md text-white px-6 py-2 hover:bg-neutral-200 border-2 border-naranja-1 hover:text-naranja-1 transition-colors duration-300'
-                      : 'bg-neutral-200 rounded-md py-2 hover:bg-neutral-400'
-                  }
-                  onClick={() => setHorarioSelected(minutosAHora(horario))}
-                >
-                  {' '}
-                  {minutosAHora(horario)}
-                </button>
-              ))}
-            </div>
+            {horariosManana.length === 0 && horariosTarde.length === 0 ? (
+              <p className="text-red-500 text-xl my-6">
+                No hay horarios disponibles para la fecha seleccionada.
+              </p>
+            ) : (
+              <>
+                <h2>Mañana:</h2>
+                {horariosManana.length === 0 ? (
+                  <p className="text-red-500 text-xl m-6">
+                    No hay horarios disponibles en la mañana para la fecha
+                    seleccionada.
+                  </p>
+                ) : (
+                  <div className="grid grid-cols-4 gap-2 mt-5 px-7">
+                    {horariosManana.map((horario) => (
+                      <button
+                        key={`manana-${horario}`}
+                        className={
+                          minutosAHora(horario) === horarioSelected
+                            ? 'bg-naranja-1 border-none rounded-md text-white px-6 py-2 hover:bg-neutral-200 border-2 border-naranja-1 hover:text-naranja-1 transition-colors duration-300'
+                            : 'bg-neutral-200 rounded-md py-2 hover:bg-neutral-400'
+                        }
+                        onClick={() =>
+                          setHorarioSelected(minutosAHora(horario))
+                        }
+                      >
+                        {' '}
+                        {minutosAHora(horario)}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <h2 className="mt-6">Tarde:</h2>
+
+                {horariosTarde.length === 0 ? (
+                  <p className="text-red-500 text-xl m-7">
+                    No hay horarios disponibles en la tarde para la fecha
+                    seleccionada.
+                  </p>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-4 gap-2 mt-5 px-7">
+                      {horariosTarde.map((horario) => (
+                        <button
+                          key={`tarde-${horario}`}
+                          className={
+                            minutosAHora(horario) === horarioSelected
+                              ? 'bg-naranja-1 border-none rounded-md text-white px-6 py-2 hover:bg-neutral-200 border-2 border-naranja-1 hover:text-naranja-1 transition-colors duration-300'
+                              : 'bg-neutral-200 rounded-md py-2 hover:bg-neutral-400'
+                          }
+                          onClick={() =>
+                            setHorarioSelected(minutosAHora(horario))
+                          }
+                        >
+                          {' '}
+                          {minutosAHora(horario)}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </>
+            )}
           </div>
         )}
         <div className="flex gap-6 justify-around mt-4 px-10">

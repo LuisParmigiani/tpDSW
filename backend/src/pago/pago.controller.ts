@@ -1,26 +1,25 @@
 import { Request, Response, NextFunction } from 'express';
-import { Pago, EstadoPago } from './pago.entity.js';
+import { Pago } from './pago.entity.js';
 import { orm } from '../shared/db/orm.js';
 
 const em = orm.em;
 
 function sanitizePagoInput(req: Request, res: Response, next: NextFunction) {
   req.body.sanitizePagoInput = {
-    fechaHora: req.body.fechaHora,
-    idMercadoPago: req.body.idMercadoPago,
-    idPreferencia: req.body.idPreferencia,
-    descripcionPago: req.body.descripcionPago,
-    monto: req.body.monto,
-    estado: req.body.estado,
-    detalleEstado: req.body.detalleEstado,
-    cuotas: req.body.cuotas,
-    fechaActualizacion: req.body.fechaActualizacion,
-    metodoPago: req.body.metodoPago,
-    tipoPago: req.body.tipoPago,
-    emailPagador: req.body.emailPagador,
-    montoNeto: req.body.montoNeto,
-    fechaAprobacion: req.body.fechaAprobacion,
-    datosCompletos: req.body.datosCompletos,
+    paymentIntentId: req.body.paymentIntentId,
+    amount: req.body.amount,
+    currency: req.body.currency,
+    status: req.body.status,
+    sellerStripeId: req.body.sellerStripeId,
+    amountReceived: req.body.amountReceived,
+    applicationFeeAmount: req.body.applicationFeeAmount,
+    transferId: req.body.transferId,
+    buyerEmail: req.body.buyerEmail,
+    metadata: req.body.metadata,
+    paymentMethodType: req.body.paymentMethodType,
+    description: req.body.description,
+    createdAt: req.body.createdAt,
+    updatedAt: req.body.updatedAt,
     turno: req.body.turno,
   };
   Object.keys(req.body.sanitizePagoInput).forEach((key) => {
@@ -33,16 +32,16 @@ function sanitizePagoInput(req: Request, res: Response, next: NextFunction) {
 
 async function findall(req: Request, res: Response) {
   try {
-    const { estado, limit = 50, offset = 0 } = req.query;
+    const { status, limit = 50, offset = 0 } = req.query;
     const whereConditions: any = {};
-    if (estado) {
-      whereConditions.estado = estado;
+    if (status) {
+      whereConditions.status = status;
     }
     const [pagos, total] = await em.findAndCount(Pago, whereConditions, {
       populate: ['turno'],
       limit: Number(limit),
       offset: Number(offset),
-      orderBy: { fechaHora: 'DESC' },
+      orderBy: { createdAt: 'DESC' },
     });
     res.status(200).json({
       message: 'Pagos encontrados:',
@@ -58,36 +57,36 @@ async function findall(req: Request, res: Response) {
     res.status(500).json({ error: 'Internal server error' });
   }
 }
-// Buscar por ID de MercadoPago
-async function findByMercadoPagoId(req: Request, res: Response) {
+// Buscar por Payment Intent ID de Stripe
+async function findByPaymentIntentId(req: Request, res: Response) {
   try {
-    const { idMercadoPago } = req.params;
+    const { paymentIntentId } = req.params;
     const pago = await em.findOne(
       Pago,
-      { idMercadoPago },
+      { paymentIntentId },
       { populate: ['turno'] }
     );
     if (!pago) {
       return res.status(404).json({
         message: 'Pago no encontrado',
-        idMercadoPago,
+        paymentIntentId,
       });
     }
     res.status(200).json({
       message: 'Pago encontrado:',
       data: {
         id: pago.id,
-        idMercadoPago: pago.idMercadoPago,
+        paymentIntentId: pago.paymentIntentId,
         estado: pago.estado,
-        detalleEstado: pago.detalleEstado,
-        monto: pago.monto,
-        descripcion: pago.descripcionPago,
-        cuotas: pago.cuotas,
-        fechaHora: pago.fechaHora,
-        fechaActualizacion: pago.fechaActualizacion,
-        fechaAprobacion: pago.fechaAprobacion,
-        metodoPago: pago.metodoPago,
-        tipoPago: pago.tipoPago,
+        amount: pago.amount,
+        currency: pago.currency,
+        sellerStripeId: pago.sellerStripeId,
+        amountReceived: pago.amountReceived,
+        applicationFeeAmount: pago.applicationFeeAmount,
+        transferId: pago.transferId,
+        buyerEmail: pago.buyerEmail,
+        createdAt: pago.createdAt,
+        updatedAt: pago.updatedAt,
         turno: {
           id: pago.turno.id,
           // Agregar campos del turno que necesites
@@ -120,6 +119,36 @@ async function findByTurno(req: Request, res: Response) {
   }
 }
 
+// Buscar pagos por vendedor (cuenta de Stripe)
+async function findBySeller(req: Request, res: Response) {
+  try {
+    const { sellerStripeId } = req.params;
+    const { limit = 50, offset = 0 } = req.query;
+    const [pagos, total] = await em.findAndCount(
+      Pago,
+      { sellerStripeId },
+      {
+        populate: ['turno'],
+        limit: Number(limit),
+        offset: Number(offset),
+        orderBy: { createdAt: 'DESC' },
+      }
+    );
+    res.status(200).json({
+      message: 'Pagos encontrados para el vendedor:',
+      data: pagos,
+      pagination: {
+        total,
+        limit: Number(limit),
+        offset: Number(offset),
+        pages: Math.ceil(total / Number(limit)),
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
 async function findone(req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id);
@@ -133,31 +162,92 @@ async function findone(req: Request, res: Response) {
   }
 }
 
+async function updatePagoSplit(
+  paymentIntentId: string,
+  status: string,
+  paymentIntent?: any
+) {
+  try {
+    // Buscar si ya existe un pago con este Payment Intent ID
+    const pagoExistente = await em.findOne(Pago, { paymentIntentId });
+
+    if (pagoExistente) {
+      // Actualizar pago existente
+      pagoExistente.estado = status as any;
+      pagoExistente.updatedAt = new Date();
+
+      // Si tenemos datos del paymentIntent de Stripe, actualizar campos adicionales
+      if (paymentIntent) {
+        pagoExistente.buyerEmail =
+          paymentIntent.receipt_email || pagoExistente.buyerEmail;
+        pagoExistente.amountReceived =
+          paymentIntent.amount_received || pagoExistente.amountReceived;
+        pagoExistente.metadata =
+          paymentIntent.metadata || pagoExistente.metadata;
+      }
+
+      await em.persistAndFlush(pagoExistente);
+      return pagoExistente;
+    } else {
+      // Si no existe y tenemos datos completos, crear nuevo pago
+      if (!paymentIntent) {
+        throw new Error(
+          'No se puede crear un pago sin datos del Payment Intent'
+        );
+      }
+      const amountReceived =
+        paymentIntent.amount - paymentIntent.application_fee_amount;
+      const nuevoPago = em.create(Pago, {
+        paymentIntentId,
+        amount: paymentIntent.amount,
+        currency: paymentIntent.currency,
+        estado: status as any,
+        sellerStripeId: paymentIntent.transfer_data.destination,
+        amountReceived: amountReceived,
+        applicationFeeAmount: paymentIntent.application_fee_amount,
+        buyerEmail: paymentIntent.metadata.userMail,
+        metadata: paymentIntent.metadata,
+        transferId: paymentIntent.transfer,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        // Nota: turno debe ser asignado externamente o extraído de metadata
+        turno: Number(paymentIntent.metadata.turnoId),
+      });
+
+      await em.persistAndFlush(nuevoPago);
+      return nuevoPago;
+    }
+  } catch (error) {
+    console.error('Error actualizando/creando pago:', error);
+    throw new Error('Error actualizando/creando pago');
+  }
+}
+
 async function add(req: Request, res: Response) {
   try {
     const sanitizedInput = req.body.sanitizePagoInput;
     // Validaciones básicas
-    if (!sanitizedInput.idMercadoPago) {
-      return res.status(400).json({ error: 'ID de MercadoPago es requerido' });
+    if (!sanitizedInput.paymentIntentId) {
+      return res.status(400).json({ error: 'Payment Intent ID es requerido' });
     }
     if (!sanitizedInput.turno) {
       return res.status(400).json({ error: 'Turno es requerido' });
     }
-    // Verificar si ya existe un pago con este ID de MercadoPago
+    // Verificar si ya existe un pago con este Payment Intent ID
     const pagoExistente = await em.findOne(Pago, {
-      idMercadoPago: sanitizedInput.idMercadoPago,
+      paymentIntentId: sanitizedInput.paymentIntentId,
     });
     if (pagoExistente) {
       return res.status(409).json({
-        error: 'Ya existe un pago con este ID de MercadoPago',
+        error: 'Ya existe un pago con este Payment Intent ID',
         pagoExistente: pagoExistente.id,
       });
     }
     // Establecer valores por defecto
-    sanitizedInput.fechaHora = sanitizedInput.fechaHora || new Date();
-    sanitizedInput.fechaActualizacion = new Date();
-    sanitizedInput.estado = sanitizedInput.estado || EstadoPago.PENDING;
-    sanitizedInput.cuotas = sanitizedInput.cuotas || 1;
+    sanitizedInput.createdAt = sanitizedInput.createdAt || new Date();
+    sanitizedInput.updatedAt = new Date();
+    sanitizedInput.status = sanitizedInput.status || 'pending';
+    sanitizedInput.currency = sanitizedInput.currency || 'usd';
     const newPago = em.create(Pago, sanitizedInput);
     await em.persistAndFlush(newPago);
     res.status(201).json({ message: 'Pago creado:', data: newPago });
@@ -172,7 +262,7 @@ async function update(req: Request, res: Response) {
     const id = Number.parseInt(req.params.id);
     const pago = await em.findOneOrFail(Pago, { id });
     // Actualizar fecha de actualización automáticamente
-    req.body.sanitizePagoInput.fechaActualizacion = new Date();
+    req.body.sanitizePagoInput.updatedAt = new Date();
     em.assign(pago, req.body.sanitizePagoInput);
     await em.persistAndFlush(pago);
     res.status(200).json({ message: 'Pago actualizado:', data: pago });
@@ -195,8 +285,10 @@ async function remove(req: Request, res: Response) {
 export {
   findall,
   findone,
-  findByMercadoPagoId,
+  findByPaymentIntentId,
   findByTurno,
+  findBySeller,
+  updatePagoSplit,
   add,
   update,
   remove,

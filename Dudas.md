@@ -1,6 +1,5 @@
-## Dudas a preguntar al profe:
-
----
+La sobrecarga de useStates y useEffects en un solo archivo esta mal?
+Si lo esta, uso objetos para mitigarlo?
 
 ### Comandos útiles de Fly.io
 
@@ -29,5 +28,4 @@
   Reinicia la app manualmente.
 
 - fly deploy --app backend-patient-morning-1303
-
---
+  --

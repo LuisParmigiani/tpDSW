@@ -14,13 +14,15 @@ export const turnosApi = {
     // Usar 'all' como valor por defecto para selectedValueShow si está vacío
     const filterValue = selectedValueShow || 'all';
     const orderValue = selectedValueOrder || '';
-    
+
     let url = `/turno/byUser/${cantItemsPerPage}/${currentPage}/${filterValue}`;
     if (orderValue) {
       url += `/${orderValue}`;
     }
-
-    return api.get(url, { withCredentials: true });
+    const token = localStorage.getItem('token');
+    return api.get(url, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
   },
   getByPrestadorId: (
     id: string,
@@ -37,9 +39,9 @@ export const turnosApi = {
       id,
       cantItemsPerPage,
       currentPage,
-      selectedValueShow || 'all'
+      selectedValueShow || 'all',
     ];
-    
+
     // Agregar selectedValueOrder solo si hay valor o si necesitamos searchQuery
     if (selectedValueOrder && selectedValueOrder !== '') {
       parts.push(selectedValueOrder);
@@ -47,12 +49,12 @@ export const turnosApi = {
       // Si hay searchQuery pero no selectedValueOrder, usar placeholder
       parts.push('none'); // placeholder que el backend reconocerá como vacío
     }
-    
+
     // Agregar searchQuery si hay
     if (searchQuery && searchQuery.trim() !== '') {
       parts.push(encodeURIComponent(searchQuery.trim()));
     }
-    
+
     const url = '/' + parts.join('/');
     console.log('URL construida:', url);
     return api.get(url);

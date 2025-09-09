@@ -42,6 +42,24 @@ export class Usuario extends BaseEntity {
   @Property({ nullable: true })
   foto?: string; // aca se pone la ruta de la foto
 
+  // Campos para stripe OAuth
+  @Property({ nullable: true })
+  stripeAccountId?: string;
+
+  @Property({ nullable: true })
+  onboardingStatus?: string;
+
+  @Property({ nullable: true })
+  chargesEnabled?: boolean;
+
+  @Property({ nullable: true })
+  payoutsEnabled?: boolean;
+
+  @Property({ nullable: true })
+  createdAt?: Date;
+  @Property({ nullable: true })
+  updatedAt?: Date;
+
   // Relación con Servicio
   @OneToMany(() => Servicio, (servicio) => servicio.usuario, {
     cascade: [Cascade.ALL],
@@ -73,4 +91,7 @@ export class Usuario extends BaseEntity {
     owner: true,
   })
   zonas = new Collection<Zona>(this);
+
+  @Property({ nullable: false })
+  estado!: string;
 }

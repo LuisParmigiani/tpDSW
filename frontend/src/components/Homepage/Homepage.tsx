@@ -18,13 +18,13 @@ function Homepage() {
     'Control de Plagas',
   ];
   const redirecciones: string[] = [
-    'Plomeria',
+    'Plomería',
     'Electricidad',
-    'Carpinteria',
+    'Carpintería',
     'Pintura',
-    'Construccion',
-    'Cerrajeria',
-    'Jardineria',
+    'Construcción',
+    'Cerrajería',
+    'Jardinería',
     'Limpieza Residencial',
     'Control de Plagas',
   ];
@@ -35,7 +35,7 @@ function Homepage() {
   return (
     <>
       <div className="flex flex-col w-full">
-        <div className="absolute inset-0 w-full z-20">
+        <div className="sticky top-0 z-20 bg-white/80 backdrop-blur ">
           <Navbar />
         </div>
 
@@ -65,7 +65,7 @@ function Homepage() {
       </div>
 
       <div className="bg-[#4d4d4d] flex flex-col pb-5">
-        <div className="mt-9 flex flex-row justify-around w-full gap-5 flex-wrap ">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mx-8 mt-8 justify-items-center">
           {cards}
         </div>
       </div>

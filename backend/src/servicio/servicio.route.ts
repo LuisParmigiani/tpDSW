@@ -6,6 +6,9 @@ import {
   add,
   update,
   remove,
+  getByUser,
+  upsertByUserAndTask,
+  deleteByUserAndTask,
 } from './servicio.controler.js';
 
 export const servicioRouter = Router();
@@ -16,3 +19,8 @@ servicioRouter.post('/', sanitizeServicioInput, add);
 servicioRouter.put('/:id', sanitizeServicioInput, update);
 servicioRouter.patch('/:id', sanitizeServicioInput, update);
 servicioRouter.delete('/:id', remove);
+
+// Nuevas rutas específicas
+servicioRouter.get('/user/:usuarioId', getByUser);
+servicioRouter.post('/upsert', upsertByUserAndTask);
+servicioRouter.delete('/user/:usuarioId/task/:tareaId', deleteByUserAndTask);

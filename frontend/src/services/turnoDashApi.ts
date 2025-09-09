@@ -6,7 +6,7 @@ const local = import.meta.env.VITE_LOCAL === 'true';
 const API_BASE_URL = local
   ? 'http://localhost:3000/api'
   : 'https://backend-patient-morning-1303.fly.dev/api';
-
+const token = localStorage.getItem('token');
 // ====== INTERFACES Y TIPOS ======
 
 /**
@@ -74,8 +74,8 @@ export const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
+    Authorization: `Bearer ${token}`,
   },
-  withCredentials: true,
 });
 
 // ====== INTERCEPTORES ======
@@ -112,15 +112,19 @@ export const getTurnosByPrestador = async (
 ): Promise<TurnosResponse> => {
   try {
     let url = `/turnos/byUser/${prestadorId}`;
-    
+
     // Agregar parámetros opcionales
-    const params = [cantItemsPerPage, currentPage, selectedValueShow, selectedValueOrder]
-      .filter(param => param !== undefined);
-    
+    const params = [
+      cantItemsPerPage,
+      currentPage,
+      selectedValueShow,
+      selectedValueOrder,
+    ].filter((param) => param !== undefined);
+
     if (params.length > 0) {
       url += `/${params.join('/')}`;
     }
-    
+
     const response = await api.get(url);
     return response.data;
   } catch (error) {
@@ -155,9 +159,7 @@ export const updateTurnosEstado = async (
   try {
     // Realizar actualizaciones en paralelo
     await Promise.all(
-      turnoIds.map(id => 
-        api.patch(`/turnos/${id}`, { estado: nuevoEstado })
-      )
+      turnoIds.map((id) => api.patch(`/turnos/${id}`, { estado: nuevoEstado }))
     );
   } catch (error) {
     console.error('Error al actualizar estado de turnos:', error);
@@ -175,7 +177,9 @@ export const getTurnosPorDia = async (
   fecha: string
 ): Promise<Turno[]> => {
   try {
-    const response = await api.get(`/turnos/turnosPorDia/${prestadorId}/${fecha}`);
+    const response = await api.get(
+      `/turnos/turnosPorDia/${prestadorId}/${fecha}`
+    );
     return response.data.data;
   } catch (error) {
     console.error('Error al obtener turnos por día:', error);

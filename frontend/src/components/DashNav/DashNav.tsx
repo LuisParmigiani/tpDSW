@@ -1,5 +1,7 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import useAuth from '../../cookie/useAuth';
+import LogoutButton from '../LogoutButton/LogoutButton.tsx';
 
 export interface MenuItem {
   id: string;
@@ -11,10 +13,44 @@ interface DashNavProps {
   activeSection: string;
   setActiveSection: (section: string) => void;
   menuItems?: MenuItem[];
+  showMobileNav?: boolean;
+  setShowMobileNav?: (show: boolean) => void;
 }
 
-function DashNav({ activeSection, setActiveSection }: DashNavProps) {
+function DashNav({ activeSection, setActiveSection, showMobileNav, setShowMobileNav }: DashNavProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const navigate = useNavigate();
+  const { usuario, logout } = useAuth();
+
+  // Hook para detectar cambios en el tamaño de pantalla
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768; // md breakpoint
+      setIsMobile(mobile);
+      
+      // Auto-colapsar en mobile, expandir en desktop
+      if (mobile) {
+        setIsCollapsed(true);
+      } else {
+        setIsCollapsed(false);
+      }
+    };
+
+    // Configurar el estado inicial
+    handleResize();
+
+    // Agregar listener
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   const menuItems = [
     {
@@ -46,104 +82,222 @@ function DashNav({ activeSection, setActiveSection }: DashNavProps) {
           <path d="M14.9998 23.4373C14.2748 23.4373 13.5624 23.2748 12.9874 22.9623L8.98733 20.7373C7.78733 20.0748 6.8623 18.4873 6.8623 17.1123V12.8748C6.8623 11.5123 7.79983 9.92476 8.98733 9.24976L12.9874 7.02476C14.1374 6.38726 15.8623 6.38726 17.0123 7.02476L21.0123 9.24976C22.2123 9.91226 23.1374 11.4998 23.1374 12.8748V17.1123C23.1374 18.4748 22.1998 20.0623 21.0123 20.7373L17.0123 22.9623C16.4373 23.2873 15.7248 23.4373 14.9998 23.4373ZM14.9998 8.43726C14.5873 8.43726 14.1873 8.51226 13.8998 8.67476L9.89984 10.8998C9.28734 11.2373 8.7373 12.1873 8.7373 12.8748V17.1123C8.7373 17.8123 9.28734 18.7498 9.89984 19.0873L13.8998 21.3123C14.4748 21.6373 15.5248 21.6373 16.0998 21.3123L20.0998 19.0873C20.7123 18.7498 21.2624 17.7998 21.2624 17.1123V12.8748C21.2624 12.1748 20.7123 11.2373 20.0998 10.8998L16.0998 8.67476C15.8123 8.51226 15.4123 8.43726 14.9998 8.43726Z" fill="currentColor"/>
         </svg>
       )
+    },
+    {
+      id: 'comentarios',
+      name: 'Comentarios',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        </svg>
+      )
     }
   ];
 
   return (
-    <div className={`bg-white shadow-lg border-r border-gray-200 transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'} flex flex-col`}>
+    <>
+      {/* Overlay oscuro para móvil cuando se despliega */}
+      {isMobile && (
+        <div 
+          className={`fixed inset-0 z-40 transition-opacity duration-300 ease-in-out ${
+            showMobileNav ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          }`}
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.8)' }}
+          onClick={() => setShowMobileNav?.(false)}
+        />
+      )}
       
-      <div className="p-4 border-b border-gray-200">
-        {!isCollapsed ? (
-          <div className="flex items-center justify-between">
-            <Link 
-              to="/" 
-              className="flex items-center space-x-2 hover:bg-gray-50 hover:scale-105 transition-all duration-200 rounded-lg p-2 cursor-pointer group"
-            >
-              <img 
-                src="/images/logo.png" 
-                alt="Logo" 
-                className="w-8 h-8"
-              />
-              <h1 className="text-lg font-bold text-orange-500 group-hover:text-orange-600 transition-colors">NombreEmpresa</h1>
-            </Link>
-            <button
-              onClick={() => setIsCollapsed(!isCollapsed)}
-              className="p-1 rounded-md hover:bg-gray-100 transition-colors focus:outline-none focus:ring-0 border-0 outline-none cursor-pointer"
-              style={{ outline: 'none', border: 'none' }}
-            >
-              <svg 
-                className={`w-5 h-5 text-gray-600 transition-transform ${isCollapsed ? 'rotate-180' : ''}`} 
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-          </div>
-        ) : (
-          <div className="flex justify-center">
-            <button
-              onClick={() => setIsCollapsed(!isCollapsed)}
-              className="p-1 rounded-md hover:bg-gray-100 transition-colors focus:outline-none focus:ring-0 border-0 outline-none cursor-pointer"
-              style={{ outline: 'none', border: 'none' }}
-            >
-              <svg 
-                className={`w-4 h-4 text-gray-600 transition-transform ${isCollapsed ? 'rotate-180' : ''}`} 
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-          </div>
-        )}
-      </div>
-
-      
-      <nav className="flex-1 p-4">
-        <ul className="space-y-2">
-          {menuItems.map((item) => (
-            <li key={item.id}>
+      {/* Sidebar principal - siempre visible */}
+      <div className={`bg-white shadow-lg border-r border-gray-200 transition-all duration-300 flex flex-col ${
+        isMobile 
+          ? 'w-16 fixed inset-y-0 left-0 z-30' // En móvil: siempre colapsado
+          : `${isCollapsed ? 'w-16' : 'w-64'} relative` // En desktop: normal
+      }`}>
+        
+        <div className="p-4 border-b border-gray-200 h-16 flex items-center">
+        {!(isMobile || isCollapsed) ? (
+          <div className="flex items-center justify-between w-full">
+            <h2 className="text-lg font-semibold text-gray-700 px-3">Dashboard</h2>
+            {/* Solo mostrar botón de colapsar en desktop */}
+            {!isMobile && (
               <button
-                onClick={() => setActiveSection(item.id)}
-                className={`w-full flex items-center ${isCollapsed ? 'justify-center px-2' : 'space-x-3 px-3'} py-2 rounded-lg ${isCollapsed ? 'text-center' : 'text-left'} transition-colors focus:outline-none focus:ring-0 border-0 outline-none cursor-pointer group ${
-                  activeSection === item.id
-                    ? 'bg-orange-500 text-white'
-                    : 'text-gray-700 hover:bg-gray-50 hover:text-orange-600'
-                }`}
+                onClick={() => setIsCollapsed(!isCollapsed)}
+                className="p-1 rounded-md hover:bg-gray-100 transition-colors focus:outline-none focus:ring-0 border-0 outline-none cursor-pointer"
                 style={{ outline: 'none', border: 'none' }}
               >
-                <span className={`transition-colors ${activeSection === item.id ? 'text-white' : 'text-gray-500 group-hover:text-orange-600'}`}>
-                  {item.icon}
-                </span>
-                {!isCollapsed && (
-                  <span className="font-medium">{item.name}</span>
-                )}
+                <svg 
+                  className={`w-5 h-5 text-gray-600 transition-transform ${isCollapsed ? 'rotate-180' : ''}`} 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
               </button>
-            </li>
-          ))}
-        </ul>
-      </nav>
+            )}
+          </div>
+        ) : (
+          <div className="flex justify-center h-full items-center">
+            {/* Botón hamburguesa para móvil */}
+            {isMobile && (
+              <button
+                onClick={() => setShowMobileNav?.(true)}
+                className="p-1 rounded-md hover:bg-gray-100 transition-colors focus:outline-none focus:ring-0 border-0 outline-none cursor-pointer"
+                style={{ outline: 'none', border: 'none' }}
+              >
+                <svg 
+                  className="w-5 h-5 text-gray-600" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+            )}
+            {/* Solo mostrar botón de expandir en desktop */}
+            {!isMobile && (
+              <button
+                onClick={() => setIsCollapsed(!isCollapsed)}
+                className="p-1 rounded-md hover:bg-gray-100 transition-colors focus:outline-none focus:ring-0 border-0 outline-none cursor-pointer"
+                style={{ outline: 'none', border: 'none' }}
+              >
+                <svg 
+                  className={`w-4 h-4 text-gray-600 transition-transform ${isCollapsed ? 'rotate-180' : ''}`} 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+            )}
+          </div>
+        )}
+      </div>    <nav className="flex-1 p-4">
+      <ul className="space-y-2">
+        {menuItems.map((item) => (
+          <li key={item.id}>
+            <button
+              onClick={() => {
+                setActiveSection(item.id);
+                if (isMobile && setShowMobileNav) {
+                  setShowMobileNav(false);
+                }
+              }}
+              className={`w-full flex items-center ${isCollapsed ? 'justify-center px-2' : 'space-x-3 px-3'} py-2 rounded-lg ${isCollapsed ? 'text-center' : 'text-left'} transition-colors focus:outline-none focus:ring-0 border-0 outline-none cursor-pointer group ${
+                activeSection === item.id
+                  ? 'bg-orange-500 text-white'
+                  : 'text-gray-700 hover:bg-gray-50 hover:text-orange-600'
+              }`}
+              style={{ outline: 'none', border: 'none' }}
+            >
+              <span className={`transition-colors ${activeSection === item.id ? 'text-white' : 'text-gray-500 group-hover:text-orange-600'}`}>
+                {item.icon}
+              </span>
+              {!isCollapsed && (
+                <span className="font-medium">{item.name}</span>
+              )}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </nav>
 
-      
-      <div className="p-4 border-t border-gray-200">
-        <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'}`}>
-          <img 
-            src="/images/fotoUserId.png" 
-            alt="User" 
-            className="w-8 h-8 rounded-full object-cover"
-          />
-          {!isCollapsed && (
-            <div className="flex-1">
-              <p className="text-sm font-medium text-gray-700">Luis Parmigiani</p>
-              <p className="text-xs text-gray-500">luisperm@gmail.com</p>
-            </div>
-          )}
+    {/* Botón de Logout */}
+        <div className="p-4">
+          <LogoutButton onLogout={handleLogout} isCollapsed={isMobile || isCollapsed} />
+        </div>
+
+        {/* Información del Usuario */}
+        <div className="p-4 border-t border-gray-200">
+          <div className={`flex items-center ${(isMobile || isCollapsed) ? 'justify-center' : 'space-x-3'}`}>
+            <img 
+              src={usuario?.foto || usuario?.urlFoto || "/images/fotoUserId.png"} 
+              alt="User" 
+              className="w-8 h-8 rounded-full object-cover"
+            />
+            {!(isMobile || isCollapsed) && (
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-700 text-left">
+                  {usuario?.nombre || usuario?.apellido 
+                    ? `${usuario.nombre || ''} ${usuario.apellido || ''}`.trim()
+                    : usuario?.mail }
+                </p>
+                <p className="text-xs text-gray-500 text-left">
+                  { usuario?.mail }
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Sidebar expandida para móvil (overlay) */}
+      {isMobile && (
+        <div className={`bg-white shadow-lg border-r border-gray-200 w-64 flex flex-col fixed inset-y-0 left-0 z-50 transform transition-all duration-300 ease-out ${
+          showMobileNav ? 'translate-x-0' : '-translate-x-full'
+        }`}>
+          <div className="p-4 border-b border-gray-200 h-16 flex items-center">
+            <div className="flex items-center justify-between w-full">
+              <h2 className="text-lg font-semibold text-gray-700 px-3">Dashboard</h2>
+            </div>
+          </div>
+
+          <nav className="flex-1 p-4">
+            <ul className="space-y-2">
+              {menuItems.map((item) => (
+                <li key={item.id}>
+                  <button
+                    onClick={() => {
+                      setActiveSection(item.id);
+                      if (isMobile && setShowMobileNav) {
+                        setShowMobileNav(false);
+                      }
+                    }}
+                    className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors focus:outline-none focus:ring-0 border-0 outline-none cursor-pointer group ${
+                      activeSection === item.id
+                        ? 'bg-orange-500 text-white'
+                        : 'text-gray-700 hover:bg-gray-50 hover:text-orange-600'
+                    }`}
+                    style={{ outline: 'none', border: 'none' }}
+                  >
+                    <span className={`transition-colors ${activeSection === item.id ? 'text-white' : 'text-gray-500 group-hover:text-orange-600'}`}>
+                      {item.icon}
+                    </span>
+                    <span className="font-medium">{item.name}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          <div className="p-4">
+            <LogoutButton onLogout={handleLogout} isCollapsed={false} />
+          </div>
+
+          <div className="p-4 border-t border-gray-200">
+            <div className="flex items-center space-x-3">
+              <img 
+                src={usuario?.foto || usuario?.urlFoto || "/images/fotoUserId.png"} 
+                alt="User" 
+                className="w-8 h-8 rounded-full object-cover"
+              />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-700 text-left">
+                  {usuario?.nombre || usuario?.apellido 
+                    ? `${usuario.nombre || ''} ${usuario.apellido || ''}`.trim()
+                    : usuario?.mail }
+                </p>
+                <p className="text-xs text-gray-500 text-left">
+                  { usuario?.mail }
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
