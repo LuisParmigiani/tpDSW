@@ -1,11 +1,22 @@
 
-import { stripeApi } from '../../services/stripeApi';
+// TODO: Uncomment when ready to integrate with backend
+// import { stripeApi } from '../../services/stripeApi';
 
-function StripeCreate() {
+interface StripeCreateProps {
+  onConnect?: () => void;
+}
+
+function StripeCreate({ onConnect }: StripeCreateProps) {
   const handleClick = async () => {
-    const res = await stripeApi.create();
-    const data = res.data;
-    window.location.href = data.url;
+    // TODO: Uncomment when ready to integrate with backend
+    // const res = await stripeApi.create();
+    // const data = res.data;
+    // window.location.href = data.url;
+    
+    // For now, just simulate successful connection
+    if (onConnect) {
+      onConnect();
+    }
   };
 
   return (
