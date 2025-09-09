@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { usuariosApi } from '../../services/usuariosApi';
 import { z } from 'zod';
 import { cn } from '../../lib/utils.ts';
@@ -34,6 +34,7 @@ export const usuarioSchema = z.object({
 export type Usuario = z.infer<typeof usuarioSchema>;
 
 function RegisCard() {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
   // ✅ Add uploading state for image
@@ -333,7 +334,11 @@ function RegisCard() {
             </div>
             <p>{message}</p>
             <button
-              onClick={() => setOpen(false)}
+              onClick={
+                message === 'Usuario creado correctamente'
+                  ? () => navigate('/login')
+                  : () => setOpen(false)
+              }
               className="mt-2 px-4 py-2 bg-naranja-1 text-white rounded hover:bg-naranja-2"
             >
               Cerrar

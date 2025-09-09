@@ -24,7 +24,8 @@ type Usuario = {
   telefono: string;
   tiposDeServicio: TipoDeServicio[];
   horarios: {
-    dia: string;
+    id: number;
+    diaSemana: number;
     horaDesde: string;
     horaHasta: string;
   }[];
@@ -50,7 +51,15 @@ type Tarea = {
 };
 
 function Borrower() {
-  const { id } = useParams<{ id: string }>();
+  const { id, servicio, Tarea, horario, dia, open } = useParams<{
+    id: string;
+    servicio?: string;
+    Tarea?: string;
+    horario?: string;
+    dia?: string;
+    open?: string;
+  }>();
+
   const numericId = Number(id);
   // variable de prestatario para mostrar en la card de usuario y Buscar sus comentarios de cada servicio
   const [prestatario, setPrestatario] = useState<Usuario>();
@@ -68,7 +77,7 @@ function Borrower() {
   const [totalPages, setTotalPages] = useState(1); // Total de páginas
   const [totalComments, setTotalComments] = useState(0); // Total de comentarios
   // variables del modal
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(open === 'true'); // Estado del modal
 
   // Se carga la informacion del prestatario
   useEffect(() => {
@@ -141,7 +150,15 @@ function Borrower() {
     <>
       <Navbar />
       {isOpen && prestatario && (
-        <NewTurnModal prestatario={prestatario} setopen={setIsOpen} />
+        <NewTurnModal
+          prestatario={prestatario}
+          setopen={setIsOpen}
+          servicio={servicio}
+          Tarea={Tarea}
+          horario={horario}
+          dia={dia}
+          open={open}
+        />
       )}
       <div className="flex flex-col items-center   justify-center ">
         <div className="lg:flex items-center h-11/12  px-8 py-10 bg-tinte-5 shadow-2xl mt-20 mb-30  lg:w-220 lg:h-100 rounded-2xl ">

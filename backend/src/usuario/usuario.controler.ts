@@ -554,6 +554,7 @@ async function putOauth(
       payoutsEnabled,
       createdAt,
       updatedAt,
+      estado: 'activo',
     };
   } else {
     guardar = { onboardingStatus: estado };

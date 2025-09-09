@@ -18,7 +18,7 @@ export default function ServicioCard({
   foto,
 }: Props) {
   const handleClick = () => {
-    navigate(`/borrower/${id}`);
+    navigate(`/prestatario/${id}`);
   };
   const navigate = useNavigate();
   return (
