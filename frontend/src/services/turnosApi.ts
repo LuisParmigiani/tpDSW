@@ -60,7 +60,12 @@ export const turnosApi = {
     return api.get(url);
   },
   create: (data: EntityData) => api.post('/turno', data),
-  createCookie: (data: EntityData) => api.post('/turno/cookie', data),
+  createWithCookie: (data: EntityData) => {
+    const token = localStorage.getItem('token');
+    return api.post('/turno/cookie', data, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  },
   update: (id: string, data: EntityData) => api.put(`/turno/${id}`, data),
   patch: (id: string, data: EntityData) => api.patch(`/turno/${id}`, data),
   delete: (id: string) => api.delete(`/turno/${id}`),

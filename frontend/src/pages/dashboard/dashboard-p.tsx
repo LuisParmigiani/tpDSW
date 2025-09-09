@@ -6,6 +6,7 @@ import PerfilSection from '../../components/Dashboard/PerfilSection';
 import ClientesSection from '../../components/Dashboard/ClientesSection';
 import ServiciosSection from '../../components/Dashboard/ServiciosSection';
 import ComentariosPrestadorSection from '../../components/Dashboard/ComentariosPrestadorSection';
+import PagosSection from '../../components/Dashboard/PagosSection';
 import { useProtectRoute } from '../../cookie/useProtectRoute.tsx';
 
 function Dashboard() {
@@ -112,6 +113,21 @@ function Dashboard() {
         </svg>
       ),
     },
+    {
+      id: 'pagos',
+      name: 'Pagos',
+      icon: (
+        <svg
+          className="w-5 h-5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+        </svg>
+      ),
+    },
   ];
 
   const renderActiveSection = () => {
@@ -124,6 +140,8 @@ function Dashboard() {
         return <ServiciosSection />;
       case 'comentarios':
         return <ComentariosPrestadorSection />;
+      case 'pagos':
+        return <PagosSection />;
       default:
         return <PerfilSection />;
     }
@@ -146,6 +164,8 @@ function Dashboard() {
               <h1 className="text-base sm:text-lg font-semibold text-gray-800 capitalize">
                 {activeSection === 'perfil'
                   ? 'Configuración de perfil'
+                  : activeSection === 'pagos'
+                  ? 'Pagos e Ingresos'
                   : activeSection}
               </h1>
             </div>
