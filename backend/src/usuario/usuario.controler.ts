@@ -295,7 +295,10 @@ async function findOneByCookie(req: AuthRequest, res: Response) {
 async function add(req: Request, res: Response) {
   try {
     // encripta password
-    console.log('Datos recibidos para crear usuario:', req.body.sanitizeUsuarioInput); // <-- Agregá esto
+    console.log(
+      'Datos recibidos para crear usuario:',
+      req.body.sanitizeUsuarioInput
+    ); // <-- Agregá esto
     if (req.body.sanitizeUsuarioInput.contrasena) {
       const hashedPassword = await bcrypt.hash(
         req.body.sanitizeUsuarioInput.contrasena,
@@ -430,17 +433,17 @@ async function loginUsuario(req: Request, res: Response) {
     const mail = req.query.mail as string;
     const contrasena = req.query.contrasena as string;
     if (!mail || !contrasena) {
-      return res.status(400).json();
+      return res.status(400).json({ message: 'Faltan mail o contraseña' });
     }
 
     const usuario = await em.findOne(Usuario, { mail });
     if (!usuario) {
-      return res.status(401).json();
+      return res.status(401).json({ message: 'El usuario no existe' });
     }
 
     const passwordMatch = await bcrypt.compare(contrasena, usuario.contrasena);
     if (!passwordMatch) {
-      return res.status(401).json();
+      return res.status(401).json({ message: 'La contraseña es incorrecta' });
     }
 
     // elimina contraseña antes de enviar el usuario, probarlo
@@ -464,7 +467,7 @@ async function loginUsuario(req: Request, res: Response) {
     console.error('Error en loginUsuario:', error);
     return res
       .status(500)
-      .json({ message: 'Error interno en login', error: error.message });
+      .json({ error: 'Error interno en login', details: error.message });
   }
 }
 
@@ -478,7 +481,6 @@ const transporter = nodemailer.createTransport({
     pass: 'mkyg zmvc hjux pkqr',
   },
 });
-//
 
 async function recuperarContrasena(req: Request, res: Response) {
   try {
@@ -486,7 +488,7 @@ async function recuperarContrasena(req: Request, res: Response) {
 
     const usuario = await em.findOne(Usuario, { mail });
     if (!usuario) {
-      return res.status(404).json();
+      return res.status(404).json({ message: 'El usuario no existe' });
     }
 
     //Generar codigo de 6 digitos
@@ -502,9 +504,9 @@ async function recuperarContrasena(req: Request, res: Response) {
       subject: 'Recuperación de contraseña',
       text: `Tu código de recuperación es: ${codigo} y expirará en 5 minutos`,
     });
-    return res.status(200).json(); //Manda mail de recuperación
+    return res.status(200).json({ message: 'Mail de recuperación enviado' }); //Manda mail de recuperación
   } catch (error) {
-    return res.status(500).json();
+    return res.status(500).json({ error: 'Error a la hora de enviar mail' });
   }
 }
 
@@ -516,8 +518,10 @@ async function validarCodigoRecuperacion(req: Request, res: Response) {
   const { mail, codigo } = req.body;
   const registro = codigosRecuperacion[mail];
   if (registro.expiracion < new Date() || registro.codigo !== codigo)
-    return res.status(400).json(); //codigo incorrecto
-  return res.status(200).json(); //codigo valido
+    return res
+      .status(400)
+      .json({ message: 'Código de recuperación incorrecto' });
+  return res.status(200).json({ message: 'Código de recuperación correcto' });
 }
 
 async function cambiarPassword(req: Request, res: Response) {
@@ -533,7 +537,7 @@ async function cambiarPassword(req: Request, res: Response) {
   // Elimina el código usado
   delete codigosRecuperacion[mail];
 
-  return res.status(200).json(); //se cambió la password
+  return res.status(200).json({ message: 'Contraseña cambiada correctamente' });
 }
 
 async function putOauth(

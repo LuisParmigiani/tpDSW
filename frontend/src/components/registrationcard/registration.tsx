@@ -246,11 +246,7 @@ function RegisCard() {
       console.log('User created:', userResponse);
 
       // ✅ Then upload image if there's a pending one (only for prestatarios)
-      if (
-        pendingImageFile &&
-        tipoUsuario === 'prestatario' &&
-        userResponse.data?.data?.id
-      ) {
+      if (pendingImageFile && userResponse.data?.data?.id) {
         console.log('📤 Uploading profile image for new user...');
         try {
           const imageResponse = await usuariosApi.uploadProfileImage(
@@ -371,27 +367,26 @@ function RegisCard() {
                   envioFormulario();
                 }}
               >
-                {tipoUsuario === 'prestatario' && (
-                  <>
-                    <div className="flex justify-center mb-4">
-                      <ProfilePicture
-                        src={form.foto || '/images/fotoUserId.png'}
-                        onImageChange={handleImageChange}
-                        uploading={uploading}
-                      />
-                    </div>
+                <>
+                  <div className="flex justify-center mb-4">
+                    <ProfilePicture
+                      src={form.foto || '/images/fotoUserId.png'}
+                      onImageChange={handleImageChange}
+                      uploading={uploading}
+                    />
+                  </div>
 
-                    <p className="text-center text-gray-600 text-sm mt-2 mb-4 font-inter">
-                      Elija una foto para su cuenta, podrá cambiarla luego desde
-                      su perfil.
+                  <p className="text-center text-gray-600 text-sm mt-2 mb-4 font-inter">
+                    Elija una foto para su cuenta, podrá cambiarla luego desde
+                    su perfil.
+                  </p>
+                  {pendingImageFile && (
+                    <p className="text-center text-naranja-1 text-sm mb-4 font-inter">
+                      📸 Imagen seleccionada - se subirá al crear la cuenta
                     </p>
-                    {pendingImageFile && (
-                      <p className="text-center text-naranja-1 text-sm mb-4 font-inter">
-                        📸 Imagen seleccionada - se subirá al crear la cuenta
-                      </p>
-                    )}
-                  </>
-                )}
+                  )}
+                </>
+
                 {camposComunes}
                 {tipoUsuario === 'prestatario' && camposPrestatario}
                 <button
