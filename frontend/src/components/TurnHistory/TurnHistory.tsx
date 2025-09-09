@@ -10,7 +10,6 @@ import DevolucionPago from '../Modal/DevolucionPago.tsx';
 import { useProtectRoute } from '../../cookie/useProtectRoute.tsx';
 import TurnCard from './turnCard';
 import { Alert, AlertTitle, AlertDescription } from './../Alerts/Alerts';
-import { set } from 'zod';
 
 type Pago = {
   id: number;

@@ -555,7 +555,7 @@ function NewTurnModal({
         message: 'Turno guardado exitosamente',
       });
       setPage(1);
-    } catch (error) {
+    } catch (error: any) {
       manejoAlertas({
         tipo: 'danger',
         error: 'save_error',
