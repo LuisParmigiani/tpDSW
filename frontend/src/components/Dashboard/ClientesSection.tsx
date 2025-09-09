@@ -6,7 +6,8 @@ import PaginationControls from '../../components/Pagination/PaginationControler'
 import { turnosApi } from '../../services/turnosApi';
 import TurnoDetailsModal from '../Modal/TurnoDetailsModal';
 import ConfirmationModal from '../Modal/ConfirmationModal';
-import useAuth from '../../cookie/useAuth';
+// TEMPORAL: comentar import de useAuth para usar ID fijo
+// import useAuth from '../../cookie/useAuth';
 
 
 // Función auxiliar para capitalizar la primera letra
@@ -62,7 +63,8 @@ interface TurnoDisplay {
 }
 
 function ClientesSection() {
-	const { usuario } = useAuth(); // Obtener usuario logueado
+	// TEMPORAL: comentar useAuth para usar ID fijo
+	// const { usuario } = useAuth(); // Obtener usuario logueado
 	const [selectedTurnoIds, setSelectedTurnoIds] = useState<number[]>([]); // Cambio: usar IDs en lugar de índices
 	const [showMenu, setShowMenu] = useState(false);
 	const [showBar, setShowBar] = useState(false);
@@ -79,22 +81,28 @@ function ClientesSection() {
 	const [searchQuery, setSearchQuery] = useState<string>('');
 	const [activeSearchQuery, setActiveSearchQuery] = useState<string>(''); // La búsqueda actualmente aplicada
 	const [showEstadoDropdown, setShowEstadoDropdown] = useState(false);
+	const [showSortDropdown, setShowSortDropdown] = useState(false);
 	const [showDetailsModal, setShowDetailsModal] = useState(false);
 	const [selectedTurnoDetails, setSelectedTurnoDetails] = useState<TurnoDisplay | null>(null);
+	const [isMobileLayout, setIsMobileLayout] = useState(false);
 	const [showErrorMessage, setShowErrorMessage] = useState(false);
 	const [isErrorAnimating, setIsErrorAnimating] = useState(false);
 	const [errorMessage, setErrorMessage] = useState('');
 	const dropdownRef = useRef<HTMLDivElement>(null);
+	const sortDropdownRef = useRef<HTMLDivElement>(null);
 	const itemsPerPage = 6;
 
 	const cargarTurnos = useCallback(async (page = 1, ordenamiento = sortBy, filtrosEstado = estadoFilters, isPageChange = false, searchTerm = '') => {
 		try {
+			// TEMPORAL: Usar ID fijo para pruebas - comentar detección de usuario
+			const temporalPrestadorId = "49"; // ID fijo para ver turnos de ejemplo
+			
 			// Validar que el usuario esté autenticado
-			if (!usuario || !usuario.id) {
-				setError('Error: Usuario no autenticado');
-				setLoading(false);
-				return;
-			}
+			// if (!usuario || !usuario.id) {
+			// 	setError('Error: Usuario no autenticado');
+			// 	setLoading(false);
+			// 	return;
+			// }
 
 			if (isPageChange) {
 				setLoading(true); // Solo para cambios de página
@@ -107,19 +115,19 @@ function ClientesSection() {
 			let backendOrderValue = '';
 			switch (ordenamiento) {
 				case 'fecha':
-					backendOrderValue = 'fechaD'; // Fecha descendente (más reciente primero)
+					backendOrderValue = 'fechaD'; 
 					break;
 				case 'fechaAsc':
-					backendOrderValue = 'fechaA'; // Fecha ascendente (más antigua primero)
+					backendOrderValue = 'fechaA'; 
 					break;
 				case 'monto':
-					backendOrderValue = 'montoD'; // Monto descendente (mayor primero)
+					backendOrderValue = 'montoD'; 
 					break;
 				case 'montoMenor':
-					backendOrderValue = 'montoA'; // Monto ascendente (menor primero)
+					backendOrderValue = 'montoA'; 
 					break;
 				default:
-					backendOrderValue = ''; // Sin ordenamiento específico
+					backendOrderValue = ''; 
 			}
 			
 			// Determinar filtro de estado para el backend
@@ -138,7 +146,7 @@ function ClientesSection() {
 			// Si no hay filtros, no aplicar filtro específico (mostrar todos)
 			
 			const response = await turnosApi.getByPrestadorId(
-				usuario.id.toString(),
+				temporalPrestadorId, // TEMPORAL: usar ID fijo en lugar de usuario.id.toString(),
 				itemsPerPage.toString(),
 				page.toString(),
 				backendFilterValue || 'all', // selectedValueShow - usar 'all' si está vacío
@@ -158,7 +166,7 @@ function ClientesSection() {
 		} finally {
 			setLoading(false);
 		}
-	}, [itemsPerPage, sortBy, estadoFilters, usuario]); // Agregar usuario a las dependencias
+	}, [itemsPerPage, sortBy, estadoFilters]); // TEMPORAL: remover usuario de las dependencias
 
 	// Cargar turnos al montar el componente y cuando cambie la página
 	useEffect(() => {
@@ -442,9 +450,41 @@ function ClientesSection() {
 		}
 	}, [pendingAction, calculateSelectedCounts]);
 
-	// Función para manejar el cambio de ordenamiento
-	const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-		const newSortBy = event.target.value;
+	// Detectar tamaño de pantalla para layout móvil (mismo breakpoint que DashNav)
+	useEffect(() => {
+		const checkScreenSize = () => {
+			setIsMobileLayout(window.innerWidth < 768);
+		};
+
+		checkScreenSize();
+		window.addEventListener('resize', checkScreenSize);
+
+		return () => {
+			window.removeEventListener('resize', checkScreenSize);
+		};
+	}, []);
+
+	// Cerrar dropdowns cuando se hace clic fuera
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			// Cerrar dropdown de estado
+			if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+				setShowEstadoDropdown(false);
+			}
+			// Cerrar dropdown de ordenar
+			if (sortDropdownRef.current && !sortDropdownRef.current.contains(event.target as Node)) {
+				setShowSortDropdown(false);
+			}
+		};
+
+		document.addEventListener('mousedown', handleClickOutside);
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside);
+		};
+	}, []);
+
+	// Función para manejar el cambio de ordenamiento (ahora para botones)
+	const handleSortSelect = (newSortBy: string) => {
 		setSortBy(newSortBy);
 		
 		// Recargar los datos con el nuevo ordenamiento desde la primera página
@@ -507,44 +547,83 @@ function ClientesSection() {
 	return (
 		<DashboardSection>
 			{/* Header responsive */}
-			<div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-2 px-2 sm:px-0 relative">
+			<div className={`mb-4 sm:mb-6 flex ${isMobileLayout ? 'flex-col' : 'flex-col sm:flex-row'} ${isMobileLayout ? '' : 'sm:items-center sm:justify-between'} gap-3 sm:gap-2 px-2 sm:px-0 relative`}>
 				<h2 className="text-lg sm:text-xl font-semibold text-gray-900">Turnos</h2>
-				<div className="flex flex-col sm:flex-row gap-2 sm:gap-2 relative">
+				<div className={`flex ${isMobileLayout ? 'flex-col' : 'flex-col sm:flex-row'} gap-2 sm:gap-2 relative`}>
 					<input
 						type="text"
 						placeholder="Buscar cliente..."
 						value={searchQuery}
 						onChange={(e) => setSearchQuery(e.target.value)}
 						onKeyDown={handleKeyDown}
-						className="w-full sm:w-auto border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+						className={`${isMobileLayout ? 'w-full' : 'w-full sm:w-auto'} border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500`}
 					/>
-					<select 
-						value={sortBy}
-						onChange={handleSortChange}
-						className="w-full sm:w-auto border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-					>
-						<option value="" className="text-gray-700 bg-white">
-							Ordenar por
-						</option>
-						<option value="fecha" className="text-gray-700 bg-white">
-							Fecha (más reciente)
-						</option>
-						<option value="fechaAsc" className="text-gray-700 bg-white">
-							Fecha (más antigua)
-						</option>
-						<option value="monto" className="text-gray-700 bg-white">
-							Monto (mayor)
-						</option>
-						<option value="montoMenor" className="text-gray-700 bg-white">
-							Monto (menor)
-						</option>
-					</select>
+					{/* Dropdown de ordenar - personalizado para coincidir con "Filtrar por" */}
+					<div ref={sortDropdownRef} className={`relative ${isMobileLayout ? 'w-full' : 'w-full sm:w-auto'}`}>
+						<button
+							onClick={() => setShowSortDropdown(!showSortDropdown)}
+							className={`${isMobileLayout ? 'w-full' : 'w-full sm:w-auto'} border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 flex items-center ${isMobileLayout ? 'justify-between' : 'justify-between sm:justify-center'} gap-2`}
+						>
+							<span>
+								{sortBy === '' ? 'Ordenar por' : 
+								 sortBy === 'fecha' ? 'Fecha (más reciente)' :
+								 sortBy === 'fechaAsc' ? 'Fecha (más antigua)' :
+								 sortBy === 'monto' ? 'Monto (mayor)' :
+								 sortBy === 'montoMenor' ? 'Monto (menor)' : 'Ordenar por'}
+							</span>
+							<svg 
+								className={`w-4 h-4 transition-transform ${showSortDropdown ? 'rotate-180' : ''}`} 
+								fill="none" 
+								stroke="currentColor" 
+								viewBox="0 0 24 24"
+							>
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+							</svg>
+						</button>
+						
+						{showSortDropdown && (
+							<div className={`absolute top-full right-0 mt-1 ${isMobileLayout ? 'w-full' : 'w-full sm:w-48'} bg-white border border-gray-300 rounded-lg shadow-lg z-20`}>
+								<div className="p-1">
+									<button
+										onClick={() => { handleSortSelect(''); setShowSortDropdown(false); }}
+										className={`w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 ${sortBy === '' ? 'bg-orange-50 text-orange-700' : 'text-gray-700'}`}
+									>
+										Ordenar por
+									</button>
+									<button
+										onClick={() => { handleSortSelect('fecha'); setShowSortDropdown(false); }}
+										className={`w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 ${sortBy === 'fecha' ? 'bg-orange-50 text-orange-700' : 'text-gray-700'}`}
+									>
+										Fecha (más reciente)
+									</button>
+									<button
+										onClick={() => { handleSortSelect('fechaAsc'); setShowSortDropdown(false); }}
+										className={`w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 ${sortBy === 'fechaAsc' ? 'bg-orange-50 text-orange-700' : 'text-gray-700'}`}
+									>
+										Fecha (más antigua)
+									</button>
+									<button
+										onClick={() => { handleSortSelect('monto'); setShowSortDropdown(false); }}
+										className={`w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 ${sortBy === 'monto' ? 'bg-orange-50 text-orange-700' : 'text-gray-700'}`}
+									>
+										Monto (mayor)
+									</button>
+									<button
+										onClick={() => { handleSortSelect('montoMenor'); setShowSortDropdown(false); }}
+										className={`w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 ${sortBy === 'montoMenor' ? 'bg-orange-50 text-orange-700' : 'text-gray-700'}`}
+									>
+										Monto (menor)
+									</button>
+								</div>
+							</div>
+						)}
+					</div>
 					
 					{/* Dropdown de filtrar por estado */}
-					<div className="relative w-full sm:w-auto" ref={dropdownRef}>
+					<div className={`relative ${isMobileLayout ? 'w-full' : 'w-full sm:w-auto'}`} ref={dropdownRef}>
 						<button
 							onClick={() => setShowEstadoDropdown(!showEstadoDropdown)}
-							className="w-full sm:w-auto border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 flex items-center justify-between sm:justify-center gap-2"
+							className={`${isMobileLayout ? 'w-full' : 'w-full sm:w-auto'} border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 flex items-center ${isMobileLayout ? 'justify-between' : 'justify-between sm:justify-center'} gap-2`}
 						>
 							<span>
 								Filtrar por {estadoFilters.length > 0 && `(${estadoFilters.length})`}
@@ -560,7 +639,7 @@ function ClientesSection() {
 						</button>
 						
 						{showEstadoDropdown && (
-							<div className="absolute top-full right-0 lg:left-0 mt-1 w-full sm:w-48 lg:w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-20">
+							<div className={`absolute top-full right-0 mt-1 ${isMobileLayout ? 'w-full' : 'w-full sm:w-48'} bg-white border border-gray-300 rounded-lg shadow-lg z-20`}>
 								<div className="p-3">
 									<div className="flex justify-between items-center mb-2">
 										<span className="text-sm font-medium text-gray-700">Estados</span>
