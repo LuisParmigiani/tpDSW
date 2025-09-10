@@ -4,44 +4,29 @@ import {
 } from '@asteasolutions/zod-to-openapi';
 import fs from 'fs/promises';
 import path from 'path';
-
-// Import all your individual registries
+//* SE importan los registros de los endpoints
 import { usuarioRegistry } from './usuario/usuario.registry.js';
-//import { servicioRegistry } from './servicio/servicio.registry.js'; // example
-//import { reservaRegistry } from './reserva/reserva.registry.js'; // example
-// ... import other registries
 
 async function generateOpenApiDocument() {
-  // Create main registry
   const registry = new OpenAPIRegistry();
 
-  // Register security schemes
+  //* Se registran los sistemas de seguridad que se van a usar
   registry.registerComponent('securitySchemes', 'bearerAuth', {
     type: 'http',
     scheme: 'bearer',
     bearerFormat: 'JWT',
   });
 
-  // Get definitions from all registries and register them in the main registry
-  const allRegistries = [
-    usuarioRegistry,
-    // servicioRegistry,
-    // reservaRegistry,
-    // ... other registries
+  //* Coleccion final donde van a ir los registros de cada api para que se combinen en uno solo y se documenten
+  const allDefinitions = [
+    ...registry.definitions, // Esquemas de seguridad
+    ...usuarioRegistry.definitions, // Esquemas y definiciones del usuario
+    // ,...servicioRegistry.definitions, // Esquemas y definiciones del servicio
+    // ...reservaRegistry.definitions,
   ];
 
-  // Combine all definitions from individual registries
-  allRegistries.forEach((individualRegistry) => {
-    // Get all definitions from the individual registry
-    const definitions = individualRegistry.definitions;
-
-    // Add each definition to the main registry's definitions array
-    definitions.forEach((definition) => {
-      registry.definitions.push(definition);
-    });
-  });
-
-  const generator = new OpenApiGeneratorV3(usuarioRegistry.definitions);
+  //Generador con todas las definiciones
+  const generator = new OpenApiGeneratorV3(allDefinitions);
 
   const document = generator.generateDocument({
     openapi: '3.0.0',
@@ -77,11 +62,12 @@ async function generateOpenApiDocument() {
       },
       {
         name: 'Reservas',
-        description: 'Operaciones para el manejo re Reservas',
+        description: 'Operaciones para el manejo de Reservas',
       },
       {
         name: 'Autenticación',
-        description: 'Operaciones relacionadas autenticación y autorización',
+        description:
+          'Operaciones relacionadas con la autenticación y autorización de usuarios',
       },
     ],
   });
@@ -110,7 +96,7 @@ async function generateOpenApiDocument() {
   return document;
 }
 
-// Run if called directly
+// Permite ejecutar la generación del documento si se corre este archivo directamente con Node.js
 if (import.meta.url === `file://${process.argv[1]}`) {
   generateOpenApiDocument();
 }

@@ -11,7 +11,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:3000",
+      "url": "http://localhost:3000/api",
       "description": "Development server"
     },
     {
@@ -35,10 +35,21 @@
     },
     {
       "name": "Reservas",
-      "description": "Operaciones para el manejo re Reservas"
+      "description": "Operaciones para el manejo de Reservas"
+    },
+    {
+      "name": "Autenticación",
+      "description": "Operaciones relacionadas con la autenticación y autorización de usuarios"
     }
   ],
   "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
     "schemas": {
       "CreateUsuario": {
         "type": "object",
@@ -68,7 +79,11 @@
           },
           "tipoDoc": {
             "type": "string",
-            "enum": ["DNI", "CUIT", "CUIL"],
+            "enum": [
+              "DNI",
+              "CUIT",
+              "CUIL"
+            ],
             "description": "Tipo de documento",
             "example": "DNI"
           },
@@ -108,7 +123,10 @@
           },
           "estado": {
             "type": "string",
-            "enum": ["activo", "inactivo"],
+            "enum": [
+              "activo",
+              "inactivo"
+            ],
             "default": "activo",
             "description": "Estado del usuario",
             "example": "activo"
@@ -153,7 +171,10 @@
             "example": "Password123"
           }
         },
-        "required": ["mail", "contrasena"]
+        "required": [
+          "mail",
+          "contrasena"
+        ]
       },
       "UsuarioResponse": {
         "type": "object",
@@ -248,12 +269,17 @@
                   "example": "Email inválido"
                 }
               },
-              "required": ["field", "message"]
+              "required": [
+                "field",
+                "message"
+              ]
             },
             "description": "Detalles de errores de validación"
           }
         },
-        "required": ["message"]
+        "required": [
+          "message"
+        ]
       },
       "TipoServicioInfo": {
         "type": "object",
@@ -274,7 +300,11 @@
             "example": "Servicios de plomería profesional"
           }
         },
-        "required": ["id", "nombreTipo", "descripcionTipo"]
+        "required": [
+          "id",
+          "nombreTipo",
+          "descripcionTipo"
+        ]
       },
       "TareaInfo": {
         "type": "object",
@@ -285,7 +315,9 @@
             "example": "Reparación de canillas"
           }
         },
-        "required": ["nombreTarea"]
+        "required": [
+          "nombreTarea"
+        ]
       },
       "PrestatarioWithRating": {
         "type": "object",
@@ -375,7 +407,11 @@
             "example": 5
           }
         },
-        "required": ["page", "maxItems", "totalPages"],
+        "required": [
+          "page",
+          "maxItems",
+          "totalPages"
+        ],
         "description": "Información de paginación"
       },
       "FindPrestatarioByTipoServicioAndZona": {
@@ -397,7 +433,11 @@
             "$ref": "#/components/schemas/PaginationInfo"
           }
         },
-        "required": ["message", "data", "pagination"]
+        "required": [
+          "message",
+          "data",
+          "pagination"
+        ]
       },
       "Turno": {
         "type": "object",
@@ -509,7 +549,12 @@
             "$ref": "#/components/schemas/Tarea"
           }
         },
-        "required": ["id", "precio", "estado", "tarea"]
+        "required": [
+          "id",
+          "precio",
+          "estado",
+          "tarea"
+        ]
       },
       "TipoServicio": {
         "type": "object",
@@ -530,7 +575,11 @@
             "example": "Servicios de plomería profesional"
           }
         },
-        "required": ["id", "nombreTipo", "descripcionTipo"]
+        "required": [
+          "id",
+          "nombreTipo",
+          "descripcionTipo"
+        ]
       },
       "Horario": {
         "type": "object",
@@ -556,7 +605,12 @@
             "example": "17:00"
           }
         },
-        "required": ["id", "diaSemana", "horaInicio", "horaFin"]
+        "required": [
+          "id",
+          "diaSemana",
+          "horaInicio",
+          "horaFin"
+        ]
       },
       "UsuarioCompleteResponse": {
         "type": "object",
@@ -688,7 +742,10 @@
             "description": "Lista completa de usuarios con todas sus relaciones"
           }
         },
-        "required": ["message", "data"]
+        "required": [
+          "message",
+          "data"
+        ]
       },
       "NotFoundResponse": {
         "type": "object",
@@ -699,7 +756,9 @@
             "example": "No prestatarios found for the given tipoServicio and zona"
           }
         },
-        "required": ["message"]
+        "required": [
+          "message"
+        ]
       },
       "RecuperarContrasena": {
         "type": "object",
@@ -711,7 +770,9 @@
             "example": "juan.perez@gmail.com"
           }
         },
-        "required": ["mail"]
+        "required": [
+          "mail"
+        ]
       },
       "ValidarCodigo": {
         "type": "object",
@@ -728,7 +789,10 @@
             "example": "123456"
           }
         },
-        "required": ["mail", "codigo"]
+        "required": [
+          "mail",
+          "codigo"
+        ]
       },
       "CambiarPassword": {
         "type": "object",
@@ -751,7 +815,11 @@
             "example": "NuevaPassword123"
           }
         },
-        "required": ["mail", "codigo", "nuevaContrasena"]
+        "required": [
+          "mail",
+          "codigo",
+          "nuevaContrasena"
+        ]
       },
       "IdParam": {
         "type": "object",
@@ -763,7 +831,9 @@
             "example": "1"
           }
         },
-        "required": ["id"]
+        "required": [
+          "id"
+        ]
       },
       "UserIdParam": {
         "type": "object",
@@ -775,7 +845,9 @@
             "example": "1"
           }
         },
-        "required": ["userId"]
+        "required": [
+          "userId"
+        ]
       },
       "PaginationQuery": {
         "type": "object",
@@ -811,7 +883,9 @@
             "description": "Archivo de imagen para el perfil del usuario"
           }
         },
-        "required": ["profileImage"]
+        "required": [
+          "profileImage"
+        ]
       },
       "SuccessMessage": {
         "type": "object",
@@ -822,7 +896,9 @@
             "example": "Operación completada exitosamente"
           }
         },
-        "required": ["message"]
+        "required": [
+          "message"
+        ]
       },
       "LoginResponse": {
         "type": "object",
@@ -840,7 +916,11 @@
             "$ref": "#/components/schemas/UsuarioResponse"
           }
         },
-        "required": ["message", "token", "data"]
+        "required": [
+          "message",
+          "token",
+          "data"
+        ]
       },
       "ImageUploadResponse": {
         "type": "object",
@@ -867,10 +947,17 @@
                 "format": "uri"
               }
             },
-            "required": ["id", "foto"]
+            "required": [
+              "id",
+              "foto"
+            ]
           }
         },
-        "required": ["message", "imageUrl", "user"]
+        "required": [
+          "message",
+          "imageUrl",
+          "user"
+        ]
       },
       "CommentsResponse": {
         "type": "object",
@@ -912,7 +999,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["id", "nombre", "apellido"]
+                  "required": [
+                    "id",
+                    "nombre",
+                    "apellido"
+                  ]
                 }
               },
               "required": [
@@ -940,7 +1031,12 @@
                 "type": "number"
               }
             },
-            "required": ["page", "maxItems", "totalComments", "totalPages"]
+            "required": [
+              "page",
+              "maxItems",
+              "totalComments",
+              "totalPages"
+            ]
           },
           "average": {
             "type": "number",
@@ -948,7 +1044,12 @@
             "example": 4.2
           }
         },
-        "required": ["message", "data", "pagination", "average"]
+        "required": [
+          "message",
+          "data",
+          "pagination",
+          "average"
+        ]
       },
       "ConflictResponse": {
         "type": "object",
@@ -964,7 +1065,10 @@
             "example": "El mail ya está registrado por otro usuario"
           }
         },
-        "required": ["error", "message"]
+        "required": [
+          "error",
+          "message"
+        ]
       },
       "FindAllUsuariosResponse": {
         "type": "object",
@@ -982,7 +1086,10 @@
             "description": "Lista completa de usuarios con todas sus relaciones"
           }
         },
-        "required": ["message", "data"]
+        "required": [
+          "message",
+          "data"
+        ]
       },
       "FindPrestatariosResponse": {
         "type": "object",
@@ -1003,7 +1110,11 @@
             "$ref": "#/components/schemas/PaginationInfo"
           }
         },
-        "required": ["message", "data", "pagination"]
+        "required": [
+          "message",
+          "data",
+          "pagination"
+        ]
       }
     },
     "parameters": {}
@@ -1013,7 +1124,9 @@
       "post": {
         "description": "Crear un nuevo usuario",
         "summary": "Crear usuario",
-        "tags": ["Usuarios"],
+        "tags": [
+          "Usuarios"
+        ],
         "requestBody": {
           "description": "Datos del usuario a crear",
           "content": {
@@ -1040,7 +1153,10 @@
                       "$ref": "#/components/schemas/UsuarioResponse"
                     }
                   },
-                  "required": ["message", "data"]
+                  "required": [
+                    "message",
+                    "data"
+                  ]
                 }
               }
             }
@@ -1070,7 +1186,9 @@
       "get": {
         "description": "Obtener todos los usuarios",
         "summary": "Listar usuarios completos",
-        "tags": ["Usuarios"],
+        "tags": [
+          "Usuarios"
+        ],
         "responses": {
           "200": {
             "description": "Lista de usuarios con turnos, servicios, tipos de servicio, horarios y tareas",
@@ -1090,7 +1208,10 @@
                       }
                     }
                   },
-                  "required": ["message", "data"]
+                  "required": [
+                    "message",
+                    "data"
+                  ]
                 }
               }
             }
@@ -1112,7 +1233,9 @@
       "post": {
         "description": "Recuperar contraseña de usuario",
         "summary": "Recuperar contraseña",
-        "tags": ["Autenticación"],
+        "tags": [
+          "Autenticación"
+        ],
         "requestBody": {
           "description": "Correo electrónico para recuperación de contraseña",
           "content": {
@@ -1127,7 +1250,9 @@
                     "example": "juan.perez@gmail.com"
                   }
                 },
-                "required": ["mail"]
+                "required": [
+                  "mail"
+                ]
               }
             }
           }
@@ -1146,7 +1271,9 @@
                       "example": "Operación completada exitosamente"
                     }
                   },
-                  "required": ["message"]
+                  "required": [
+                    "message"
+                  ]
                 }
               }
             }
@@ -1178,7 +1305,9 @@
       "post": {
         "description": "Validar código de recuperación de contraseña",
         "summary": "Validar código de recuperación",
-        "tags": ["Autenticación"],
+        "tags": [
+          "Autenticación"
+        ],
         "requestBody": {
           "description": "Código de recuperación y correo electrónico",
           "content": {
@@ -1198,7 +1327,10 @@
                     "example": "123456"
                   }
                 },
-                "required": ["mail", "codigo"]
+                "required": [
+                  "mail",
+                  "codigo"
+                ]
               }
             }
           }
@@ -1217,7 +1349,9 @@
                       "example": "Operación completada exitosamente"
                     }
                   },
-                  "required": ["message"]
+                  "required": [
+                    "message"
+                  ]
                 }
               }
             }
@@ -1249,7 +1383,9 @@
       "post": {
         "description": "Cambiar contraseña usando código de recuperación",
         "summary": "Cambiar contraseña",
-        "tags": ["Autenticación"],
+        "tags": [
+          "Autenticación"
+        ],
         "requestBody": {
           "description": "Datos para cambiar la contraseña",
           "content": {
@@ -1275,7 +1411,11 @@
                     "example": "NuevaPassword123"
                   }
                 },
-                "required": ["mail", "codigo", "nuevaContrasena"]
+                "required": [
+                  "mail",
+                  "codigo",
+                  "nuevaContrasena"
+                ]
               }
             }
           }
@@ -1294,7 +1434,9 @@
                       "example": "Operación completada exitosamente"
                     }
                   },
-                  "required": ["message"]
+                  "required": [
+                    "message"
+                  ]
                 }
               }
             }
@@ -1326,7 +1468,9 @@
       "post": {
         "description": "Subir imagen de perfil para un usuario",
         "summary": "Subir imagen de perfil",
-        "tags": ["Usuarios"],
+        "tags": [
+          "Usuarios"
+        ],
         "parameters": [
           {
             "schema": {
@@ -1354,7 +1498,9 @@
                     "description": "Archivo de imagen para el perfil del usuario"
                   }
                 },
-                "required": ["profileImage"]
+                "required": [
+                  "profileImage"
+                ]
               }
             }
           }
@@ -1389,10 +1535,17 @@
                           "format": "uri"
                         }
                       },
-                      "required": ["id", "foto"]
+                      "required": [
+                        "id",
+                        "foto"
+                      ]
                     }
                   },
-                  "required": ["message", "imageUrl", "user"]
+                  "required": [
+                    "message",
+                    "imageUrl",
+                    "user"
+                  ]
                 }
               }
             }
@@ -1424,7 +1577,9 @@
       "get": {
         "description": "Iniciar sesión de usuario",
         "summary": "Login de usuario",
-        "tags": ["Autenticación"],
+        "tags": [
+          "Autenticación"
+        ],
         "parameters": [
           {
             "schema": {
@@ -1467,7 +1622,7 @@
                       "type": "string",
                       "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                     },
-                    "user": {
+                    "data": {
                       "type": "object",
                       "properties": {
                         "id": {
@@ -1491,10 +1646,19 @@
                           "example": "Pérez"
                         }
                       },
-                      "required": ["id", "mail", "nombre", "apellido"]
+                      "required": [
+                        "id",
+                        "mail",
+                        "nombre",
+                        "apellido"
+                      ]
                     }
                   },
-                  "required": ["message", "token", "user"]
+                  "required": [
+                    "message",
+                    "token",
+                    "data"
+                  ]
                 }
               }
             }
@@ -1536,7 +1700,9 @@
       "get": {
         "description": "Obtener un usuario por ID pero con todas sus relaciones",
         "summary": "Trae un usuario y toda su información",
-        "tags": ["Usuarios"],
+        "tags": [
+          "Usuarios"
+        ],
         "parameters": [
           {
             "schema": {
@@ -1567,7 +1733,10 @@
                       "$ref": "#/components/schemas/FindAllUsuariosResponse"
                     }
                   },
-                  "required": ["message", "data"]
+                  "required": [
+                    "message",
+                    "data"
+                  ]
                 }
               }
             }
@@ -1597,7 +1766,9 @@
       "put": {
         "description": "Actualizar información de un usuario",
         "summary": "Actualizar usuario",
-        "tags": ["Usuarios"],
+        "tags": [
+          "Usuarios"
+        ],
         "parameters": [
           {
             "schema": {
@@ -1644,7 +1815,11 @@
                   },
                   "tipoDoc": {
                     "type": "string",
-                    "enum": ["DNI", "CUIT", "CUIL"],
+                    "enum": [
+                      "DNI",
+                      "CUIT",
+                      "CUIL"
+                    ],
                     "description": "Tipo de documento",
                     "example": "DNI"
                   },
@@ -1684,7 +1859,10 @@
                   },
                   "estado": {
                     "type": "string",
-                    "enum": ["activo", "inactivo"],
+                    "enum": [
+                      "activo",
+                      "inactivo"
+                    ],
                     "default": "activo",
                     "description": "Estado del usuario",
                     "example": "activo"
@@ -1722,7 +1900,10 @@
                       "$ref": "#/components/schemas/UsuarioResponse"
                     }
                   },
-                  "required": ["message", "data"]
+                  "required": [
+                    "message",
+                    "data"
+                  ]
                 }
               }
             }
@@ -1753,7 +1934,10 @@
                       "example": "El mail ya está registrado por otro usuario"
                     }
                   },
-                  "required": ["error", "message"]
+                  "required": [
+                    "error",
+                    "message"
+                  ]
                 }
               }
             }
@@ -1773,7 +1957,9 @@
       "delete": {
         "description": "Eliminar un usuario",
         "summary": "Eliminar usuario",
-        "tags": ["Usuarios"],
+        "tags": [
+          "Usuarios"
+        ],
         "parameters": [
           {
             "schema": {
@@ -1804,7 +1990,10 @@
                       "$ref": "#/components/schemas/UsuarioResponse"
                     }
                   },
-                  "required": ["message", "data"]
+                  "required": [
+                    "message",
+                    "data"
+                  ]
                 }
               }
             }
@@ -1836,7 +2025,9 @@
       "get": {
         "description": "Obtener un usuario por ID sin relaciones",
         "summary": "Obtener usuario básico",
-        "tags": ["Usuarios"],
+        "tags": [
+          "Usuarios"
+        ],
         "parameters": [
           {
             "schema": {
@@ -1867,7 +2058,10 @@
                       "$ref": "#/components/schemas/UsuarioResponse"
                     }
                   },
-                  "required": ["message", "data"]
+                  "required": [
+                    "message",
+                    "data"
+                  ]
                 }
               }
             }
@@ -1899,7 +2093,9 @@
       "get": {
         "description": "Obtener el usuario autenticado mediante el token JWT",
         "summary": "Obtener usuario por token",
-        "tags": ["Usuarios"],
+        "tags": [
+          "Usuarios"
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -1922,7 +2118,10 @@
                       "$ref": "#/components/schemas/UsuarioResponse"
                     }
                   },
-                  "required": ["message", "data"]
+                  "required": [
+                    "message",
+                    "data"
+                  ]
                 }
               }
             }
@@ -1974,7 +2173,9 @@
       "get": {
         "description": "Obtener comentarios de un usuario específico",
         "summary": "Obtener comentarios por ID de usuario",
-        "tags": ["Usuarios"],
+        "tags": [
+          "Usuarios"
+        ],
         "parameters": [
           {
             "schema": {
@@ -2071,7 +2272,11 @@
                                 "type": "string"
                               }
                             },
-                            "required": ["id", "nombre", "apellido"]
+                            "required": [
+                              "id",
+                              "nombre",
+                              "apellido"
+                            ]
                           }
                         },
                         "required": [
@@ -2111,7 +2316,12 @@
                       "example": 4.2
                     }
                   },
-                  "required": ["message", "data", "pagination", "average"]
+                  "required": [
+                    "message",
+                    "data",
+                    "pagination",
+                    "average"
+                  ]
                 }
               }
             }
@@ -2141,7 +2351,9 @@
     },
     "/api/usuario/prestatarios/{tipoServicio}/{tarea}/{zona}/{orderBy}": {
       "get": {
-        "tags": ["Usuarios"],
+        "tags": [
+          "Usuarios"
+        ],
         "summary": "Buscar prestatarios por tipo de servicio, zona y tarea",
         "description": "Busca prestatarios filtrados por tipo de servicio, zona y tarea específica con paginación",
         "parameters": [
@@ -2181,7 +2393,10 @@
           {
             "schema": {
               "type": "string",
-              "enum": ["nombre", "calificacion"],
+              "enum": [
+                "nombre",
+                "calificacion"
+              ],
               "description": "Campo por el cual ordenar los resultados",
               "example": "calificacion"
             },

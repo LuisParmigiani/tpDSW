@@ -7,7 +7,7 @@ info:
     name: API Support
     email: support@homeservice.com
 servers:
-  - url: http://localhost:3000
+  - url: http://localhost:3000/api
     description: Development server
   - url: https://backend-patient-morning-1303.fly.dev/api
     description: Production server
@@ -19,8 +19,15 @@ tags:
   - name: Servicios
     description: Operaciones para el manejo de Servicios
   - name: Reservas
-    description: Operaciones para el manejo re Reservas
+    description: Operaciones para el manejo de Reservas
+  - name: Autenticación
+    description: Operaciones relacionadas con la autenticación y autorización de usuarios
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     CreateUsuario:
       type: object
@@ -1176,7 +1183,7 @@ paths:
                   token:
                     type: string
                     example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-                  user:
+                  data:
                     type: object
                     properties:
                       id:
@@ -1203,7 +1210,7 @@ paths:
                 required:
                   - message
                   - token
-                  - user
+                  - data
         "400":
           description: Faltan datos de login
           content:
