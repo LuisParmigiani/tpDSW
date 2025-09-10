@@ -59,8 +59,8 @@ async function createAccount(req: AuthRequest, res: Response) {
     // 2️⃣ Generar enlace de onboarding
     const accountLink = await stripe.accountLinks.create({
       account: account.id,
-      refresh_url: `${process.env.FRONTEND_URL}historial/refresh`,
-      return_url: `${process.env.FRONTEND_URL}historial/success`,
+      refresh_url: `${process.env.FRONTEND_URL}dashboard/refresh`,
+      return_url: `${process.env.FRONTEND_URL}dashboard/success`,
       type: 'account_onboarding',
     });
     console.log(`Enlace de onboarding: ${accountLink.url}`);

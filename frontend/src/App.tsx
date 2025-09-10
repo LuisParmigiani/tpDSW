@@ -33,7 +33,7 @@ function App() {
           <Route path="/recovery" element={<Recovery />} />
           <Route path="/registration" element={<Registration />} />
           <Route path="/historial/:estado?" element={<TurnHistory />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard/:estado?" element={<Dashboard />} />
           <Route path="/changepassword" element={<ChangePassword />} />
           <Route path="/stripe/crear-cuenta" element={<StripeCreate />} />
         </Routes>

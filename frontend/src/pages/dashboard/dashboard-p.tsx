@@ -1,15 +1,25 @@
 import { useState, useEffect } from 'react';
 import DashNav from '../../components/DashNav/DashNav';
 import type { MenuItem } from '../../components/DashNav/DashNav';
-import { Link } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import PerfilSection from '../../components/Dashboard/PerfilSection';
 import ClientesSection from '../../components/Dashboard/ClientesSection';
 import ServiciosSection from '../../components/Dashboard/ServiciosSection';
 import ComentariosPrestadorSection from '../../components/Dashboard/ComentariosPrestadorSection';
 import PagosSection from '../../components/Dashboard/PagosSection';
 import { useProtectRoute } from '../../cookie/useProtectRoute.tsx';
+import DevolucionPago from '../../components/Modal/DevolucionPago.tsx';
 
 function Dashboard() {
+  const lugar = 'dashboard';
+  const { estado } = useParams<{ estado?: string }>();
+  const navigate = useNavigate();
+
+  // Función para cerrar el modal
+  const cerrarModal = () => {
+    navigate('/dashboard');
+  };
+
   const [activeSection, setActiveSection] = useState('perfil');
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -20,7 +30,7 @@ function Dashboard() {
     const handleResize = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
-      
+
       // Cerrar menú móvil si se cambia a desktop
       if (!mobile && showMobileNav) {
         setShowMobileNav(false);
@@ -109,7 +119,7 @@ function Dashboard() {
           stroke="currentColor"
           strokeWidth={2}
         >
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
         </svg>
       ),
     },
@@ -124,7 +134,7 @@ function Dashboard() {
           stroke="currentColor"
           strokeWidth={2}
         >
-          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
         </svg>
       ),
     },
@@ -156,8 +166,14 @@ function Dashboard() {
         showMobileNav={showMobileNav}
         setShowMobileNav={setShowMobileNav}
       />
-
-      <div className={`flex-1 flex flex-col overflow-hidden transition-all duration-300 ${isMobile ? 'ml-16' : 'ml-0'}`}>
+      {estado && (
+        <DevolucionPago estado={estado} cerrar={cerrarModal} lugar={lugar} />
+      )}
+      <div
+        className={`flex-1 flex flex-col overflow-hidden transition-all duration-300 ${
+          isMobile ? 'ml-16' : 'ml-0'
+        }`}
+      >
         <header className="bg-white shadow-sm border-b border-gray-200 px-4 sm:px-6 py-4 h-16">
           <div className="flex items-center justify-between h-full">
             <div className="flex items-center gap-3">
@@ -169,16 +185,14 @@ function Dashboard() {
                   : activeSection}
               </h1>
             </div>
-            <Link 
-              to="/" 
+            <Link
+              to="/"
               className="flex items-center space-x-2 hover:bg-gray-50 hover:scale-105 transition-all duration-200 rounded-lg p-2 cursor-pointer group"
             >
-              <img 
-                src="/images/logo.png" 
-                alt="Logo" 
-                className="w-8 h-8"
-              />
-              <h2 className="text-lg font-bold text-orange-500 group-hover:text-orange-600 transition-colors">Reformix</h2>
+              <img src="/images/logo.png" alt="Logo" className="w-8 h-8" />
+              <h2 className="text-lg font-bold text-orange-500 group-hover:text-orange-600 transition-colors">
+                Reformix
+              </h2>
             </Link>
           </div>
         </header>
