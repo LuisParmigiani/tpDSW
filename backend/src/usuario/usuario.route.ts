@@ -4,7 +4,7 @@ import {
   validateParams,
   validateQuery,
   authenticateToken,
-} from './usuario.middleware.js';
+} from '../utils/apiMiddleware.js';
 import {
   createUsuarioValidation,
   updateUsuarioValidation,
