@@ -245,373 +245,6 @@
           "descripcion"
         ]
       },
-      "ErrorResponse": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensaje de error",
-            "example": "Validation failed"
-          },
-          "errors": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "field": {
-                  "type": "string",
-                  "description": "Campo que falló",
-                  "example": "email"
-                },
-                "message": {
-                  "type": "string",
-                  "description": "Mensaje de error",
-                  "example": "Email inválido"
-                }
-              },
-              "required": [
-                "field",
-                "message"
-              ]
-            },
-            "description": "Detalles de errores de validación"
-          }
-        },
-        "required": [
-          "message"
-        ]
-      },
-      "TipoServicioInfo": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number",
-            "description": "ID del tipo de servicio",
-            "example": 1
-          },
-          "nombreTipo": {
-            "type": "string",
-            "description": "Nombre del tipo de servicio",
-            "example": "Plomería"
-          },
-          "descripcionTipo": {
-            "type": "string",
-            "description": "Descripción del tipo de servicio",
-            "example": "Servicios de plomería profesional"
-          }
-        },
-        "required": [
-          "id",
-          "nombreTipo",
-          "descripcionTipo"
-        ]
-      },
-      "TareaInfo": {
-        "type": "object",
-        "properties": {
-          "nombreTarea": {
-            "type": "string",
-            "description": "Nombre de la tarea",
-            "example": "Reparación de canillas"
-          }
-        },
-        "required": [
-          "nombreTarea"
-        ]
-      },
-      "PrestatarioWithRating": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number",
-            "description": "ID único del prestatario",
-            "example": 1
-          },
-          "nombre": {
-            "type": "string",
-            "description": "Nombre del prestatario",
-            "example": "Juan"
-          },
-          "apellido": {
-            "type": "string",
-            "description": "Apellido del prestatario",
-            "example": "Pérez"
-          },
-          "nombreFantasia": {
-            "type": "string",
-            "description": "Nombre de fantasía del prestatario",
-            "example": "Plomería Pérez"
-          },
-          "descripcion": {
-            "type": "string",
-            "nullable": true,
-            "description": "Descripción del prestatario",
-            "example": "Plomero con más de 10 años de experiencia"
-          },
-          "foto": {
-            "type": "string",
-            "nullable": true,
-            "description": "URL de la foto de perfil",
-            "example": "http://localhost:3000/uploads/profiles/optimized_1.webp"
-          },
-          "tiposDeServicio": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TipoServicioInfo"
-            },
-            "description": "Tipos de servicio que ofrece el prestatario"
-          },
-          "tareas": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TareaInfo"
-            },
-            "description": "Tareas específicas que puede realizar"
-          },
-          "calificacion": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 5,
-            "description": "Calificación promedio del prestatario (0-5)",
-            "example": 4.5
-          }
-        },
-        "required": [
-          "id",
-          "nombre",
-          "apellido",
-          "nombreFantasia",
-          "descripcion",
-          "foto",
-          "tiposDeServicio",
-          "tareas",
-          "calificacion"
-        ]
-      },
-      "PaginationInfo": {
-        "type": "object",
-        "properties": {
-          "page": {
-            "type": "number",
-            "description": "Página actual",
-            "example": 1
-          },
-          "maxItems": {
-            "type": "number",
-            "description": "Elementos por página",
-            "example": 6
-          },
-          "totalPages": {
-            "type": "number",
-            "description": "Total de páginas disponibles",
-            "example": 5
-          }
-        },
-        "required": [
-          "page",
-          "maxItems",
-          "totalPages"
-        ],
-        "description": "Información de paginación"
-      },
-      "FindPrestatarioByTipoServicioAndZona": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensaje de respuesta",
-            "example": "found prestatarios"
-          },
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PrestatarioWithRating"
-            },
-            "description": "Lista de prestatarios encontrados"
-          },
-          "pagination": {
-            "$ref": "#/components/schemas/PaginationInfo"
-          }
-        },
-        "required": [
-          "message",
-          "data",
-          "pagination"
-        ]
-      },
-      "Turno": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number",
-            "description": "ID del turno",
-            "example": 1
-          },
-          "fechaTurno": {
-            "type": "string",
-            "description": "Fecha del turno",
-            "example": "2024-03-15"
-          },
-          "horaTurno": {
-            "type": "string",
-            "description": "Hora del turno",
-            "example": "14:30"
-          },
-          "estado": {
-            "type": "string",
-            "description": "Estado del turno",
-            "example": "confirmado"
-          },
-          "calificacion": {
-            "type": "number",
-            "nullable": true,
-            "description": "Calificación del turno (1-5)",
-            "example": 4.5
-          },
-          "comentario": {
-            "type": "string",
-            "nullable": true,
-            "description": "Comentario del cliente",
-            "example": "Excelente servicio"
-          }
-        },
-        "required": [
-          "id",
-          "fechaTurno",
-          "horaTurno",
-          "estado",
-          "calificacion",
-          "comentario"
-        ]
-      },
-      "Tarea": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number",
-            "description": "ID de la tarea",
-            "example": 1
-          },
-          "nombreTarea": {
-            "type": "string",
-            "description": "Nombre de la tarea",
-            "example": "Reparación de canillas"
-          },
-          "descripcionTarea": {
-            "type": "string",
-            "description": "Descripción de la tarea",
-            "example": "Arreglo de grifería"
-          },
-          "duracionTarea": {
-            "type": "number",
-            "description": "Duración de la tarea en minutos",
-            "example": 60
-          },
-          "tipoServicio": {
-            "type": "number",
-            "description": "ID del tipo de servicio",
-            "example": 2
-          }
-        },
-        "required": [
-          "id",
-          "nombreTarea",
-          "descripcionTarea",
-          "duracionTarea",
-          "tipoServicio"
-        ],
-        "description": "Tarea asociada al servicio"
-      },
-      "Servicio": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number",
-            "description": "ID del servicio",
-            "example": 1
-          },
-          "descripcionServicio": {
-            "type": "string",
-            "description": "Descripción del servicio",
-            "example": "Servicio de plomería profesional"
-          },
-          "precio": {
-            "type": "number",
-            "description": "Precio del servicio",
-            "example": 2500
-          },
-          "estado": {
-            "type": "string",
-            "description": "Estado del servicio",
-            "example": "activo"
-          },
-          "tarea": {
-            "$ref": "#/components/schemas/Tarea"
-          }
-        },
-        "required": [
-          "id",
-          "precio",
-          "estado",
-          "tarea"
-        ]
-      },
-      "TipoServicio": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number",
-            "description": "ID del tipo de servicio",
-            "example": 1
-          },
-          "nombreTipo": {
-            "type": "string",
-            "description": "Nombre del tipo de servicio",
-            "example": "Plomería"
-          },
-          "descripcionTipo": {
-            "type": "string",
-            "description": "Descripción del tipo de servicio",
-            "example": "Servicios de plomería profesional"
-          }
-        },
-        "required": [
-          "id",
-          "nombreTipo",
-          "descripcionTipo"
-        ]
-      },
-      "Horario": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number",
-            "description": "ID del horario",
-            "example": 1
-          },
-          "diaSemana": {
-            "type": "string",
-            "description": "Día de la semana",
-            "example": "Lunes"
-          },
-          "horaInicio": {
-            "type": "string",
-            "description": "Hora de inicio",
-            "example": "09:00"
-          },
-          "horaFin": {
-            "type": "string",
-            "description": "Hora de fin",
-            "example": "17:00"
-          }
-        },
-        "required": [
-          "id",
-          "diaSemana",
-          "horaInicio",
-          "horaFin"
-        ]
-      },
       "UsuarioCompleteResponse": {
         "type": "object",
         "properties": {
@@ -681,28 +314,186 @@
           "turnos": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Turno"
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "number",
+                  "description": "ID del turno",
+                  "example": 1
+                },
+                "fechaTurno": {
+                  "type": "string",
+                  "description": "Fecha del turno",
+                  "example": "2024-03-15"
+                },
+                "horaTurno": {
+                  "type": "string",
+                  "description": "Hora del turno",
+                  "example": "14:30"
+                },
+                "estado": {
+                  "type": "string",
+                  "description": "Estado del turno",
+                  "example": "confirmado"
+                },
+                "calificacion": {
+                  "type": "number",
+                  "nullable": true,
+                  "description": "Calificación del turno (1-5)",
+                  "example": 4.5
+                },
+                "comentario": {
+                  "type": "string",
+                  "nullable": true,
+                  "description": "Comentario del cliente",
+                  "example": "Excelente servicio"
+                }
+              },
+              "required": [
+                "id",
+                "fechaTurno",
+                "horaTurno",
+                "estado",
+                "calificacion",
+                "comentario"
+              ]
             },
             "description": "Turnos asociados al usuario"
           },
           "servicios": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Servicio"
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "number",
+                  "description": "ID del servicio",
+                  "example": 1
+                },
+                "descripcionServicio": {
+                  "type": "string",
+                  "description": "Descripción del servicio",
+                  "example": "Servicio de plomería profesional"
+                },
+                "precio": {
+                  "type": "number",
+                  "description": "Precio del servicio",
+                  "example": 2500
+                },
+                "estado": {
+                  "type": "string",
+                  "description": "Estado del servicio",
+                  "example": "activo"
+                },
+                "tarea": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "number",
+                      "description": "ID de la tarea",
+                      "example": 1
+                    },
+                    "nombreTarea": {
+                      "type": "string",
+                      "description": "Nombre de la tarea",
+                      "example": "Reparación de canillas"
+                    },
+                    "descripcionTarea": {
+                      "type": "string",
+                      "description": "Descripción de la tarea",
+                      "example": "Arreglo de grifería"
+                    },
+                    "duracionTarea": {
+                      "type": "number",
+                      "description": "Duración de la tarea en minutos",
+                      "example": 60
+                    },
+                    "tipoServicio": {
+                      "type": "number",
+                      "description": "ID del tipo de servicio",
+                      "example": 2
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "nombreTarea",
+                    "descripcionTarea",
+                    "duracionTarea",
+                    "tipoServicio"
+                  ],
+                  "description": "Tarea asociada al servicio"
+                }
+              },
+              "required": [
+                "id",
+                "precio",
+                "estado",
+                "tarea"
+              ]
             },
             "description": "Servicios ofrecidos por el usuario"
           },
           "tiposDeServicio": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/TipoServicio"
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "number",
+                  "description": "ID del tipo de servicio",
+                  "example": 1
+                },
+                "nombreTipo": {
+                  "type": "string",
+                  "description": "Nombre del tipo de servicio",
+                  "example": "Plomería"
+                },
+                "descripcionTipo": {
+                  "type": "string",
+                  "description": "Descripción del tipo de servicio",
+                  "example": "Servicios de plomería profesional"
+                }
+              },
+              "required": [
+                "id",
+                "nombreTipo",
+                "descripcionTipo"
+              ]
             },
             "description": "Tipos de servicio que ofrece el usuario"
           },
           "horarios": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Horario"
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "number",
+                  "description": "ID del horario",
+                  "example": 1
+                },
+                "diaSemana": {
+                  "type": "string",
+                  "description": "Día de la semana",
+                  "example": "Lunes"
+                },
+                "horaInicio": {
+                  "type": "string",
+                  "description": "Hora de inicio",
+                  "example": "09:00"
+                },
+                "horaFin": {
+                  "type": "string",
+                  "description": "Hora de fin",
+                  "example": "17:00"
+                }
+              },
+              "required": [
+                "id",
+                "diaSemana",
+                "horaInicio",
+                "horaFin"
+              ]
             },
             "description": "Horarios de disponibilidad del usuario"
           }
@@ -726,6 +517,188 @@
           "horarios"
         ]
       },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensaje de error",
+            "example": "Validation failed"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {
+                  "type": "string",
+                  "description": "Campo que falló",
+                  "example": "email"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Mensaje de error",
+                  "example": "Email inválido"
+                }
+              },
+              "required": [
+                "field",
+                "message"
+              ]
+            },
+            "description": "Detalles de errores de validación"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "FindPrestatarioByTipoServicioAndZona": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensaje de respuesta",
+            "example": "found prestatarios"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "number",
+                  "description": "ID único del prestatario",
+                  "example": 1
+                },
+                "nombre": {
+                  "type": "string",
+                  "description": "Nombre del prestatario",
+                  "example": "Juan"
+                },
+                "apellido": {
+                  "type": "string",
+                  "description": "Apellido del prestatario",
+                  "example": "Pérez"
+                },
+                "nombreFantasia": {
+                  "type": "string",
+                  "description": "Nombre de fantasía del prestatario",
+                  "example": "Plomería Pérez"
+                },
+                "descripcion": {
+                  "type": "string",
+                  "nullable": true,
+                  "description": "Descripción del prestatario",
+                  "example": "Plomero con más de 10 años de experiencia"
+                },
+                "foto": {
+                  "type": "string",
+                  "nullable": true,
+                  "description": "URL de la foto de perfil",
+                  "example": "http://localhost:3000/uploads/profiles/optimized_1.webp"
+                },
+                "tiposDeServicio": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "number",
+                        "description": "ID del tipo de servicio",
+                        "example": 1
+                      },
+                      "nombreTipo": {
+                        "type": "string",
+                        "description": "Nombre del tipo de servicio",
+                        "example": "Plomería"
+                      },
+                      "descripcionTipo": {
+                        "type": "string",
+                        "description": "Descripción del tipo de servicio",
+                        "example": "Servicios de plomería profesional"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "nombreTipo",
+                      "descripcionTipo"
+                    ]
+                  },
+                  "description": "Tipos de servicio que ofrece el prestatario"
+                },
+                "tareas": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "nombreTarea": {
+                        "type": "string",
+                        "description": "Nombre de la tarea",
+                        "example": "Reparación de canillas"
+                      }
+                    },
+                    "required": [
+                      "nombreTarea"
+                    ]
+                  },
+                  "description": "Tareas específicas que puede realizar"
+                },
+                "calificacion": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 5,
+                  "description": "Calificación promedio del prestatario (0-5)",
+                  "example": 4.5
+                }
+              },
+              "required": [
+                "id",
+                "nombre",
+                "apellido",
+                "nombreFantasia",
+                "descripcion",
+                "foto",
+                "tiposDeServicio",
+                "tareas",
+                "calificacion"
+              ]
+            },
+            "description": "Lista de prestatarios encontrados"
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "page": {
+                "type": "number",
+                "description": "Página actual",
+                "example": 1
+              },
+              "maxItems": {
+                "type": "number",
+                "description": "Elementos por página",
+                "example": 6
+              },
+              "totalPages": {
+                "type": "number",
+                "description": "Total de páginas disponibles",
+                "example": 5
+              }
+            },
+            "required": [
+              "page",
+              "maxItems",
+              "totalPages"
+            ],
+            "description": "Información de paginación"
+          }
+        },
+        "required": [
+          "message",
+          "data",
+          "pagination"
+        ]
+      },
       "FindAllUsuarios": {
         "type": "object",
         "properties": {
@@ -737,7 +710,276 @@
           "data": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/UsuarioCompleteResponse"
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "number",
+                  "description": "ID único del usuario",
+                  "example": 1
+                },
+                "mail": {
+                  "type": "string",
+                  "description": "Email del usuario",
+                  "example": "usuario@example.com"
+                },
+                "nombre": {
+                  "type": "string",
+                  "description": "Nombre del usuario",
+                  "example": "Juan"
+                },
+                "apellido": {
+                  "type": "string",
+                  "description": "Apellido del usuario",
+                  "example": "Pérez"
+                },
+                "tipoDoc": {
+                  "type": "string",
+                  "description": "Tipo de documento",
+                  "example": "DNI"
+                },
+                "numeroDoc": {
+                  "type": "string",
+                  "description": "Número de documento",
+                  "example": "12345678"
+                },
+                "telefono": {
+                  "type": "string",
+                  "description": "Teléfono",
+                  "example": "+54 11 1234-5678"
+                },
+                "direccion": {
+                  "type": "string",
+                  "description": "Dirección",
+                  "example": "Av. Corrientes 1234"
+                },
+                "nombreFantasia": {
+                  "type": "string",
+                  "nullable": true,
+                  "description": "Nombre de fantasía",
+                  "example": "Plomería Pérez"
+                },
+                "descripcion": {
+                  "type": "string",
+                  "nullable": true,
+                  "description": "Descripción",
+                  "example": "Plomero con experiencia"
+                },
+                "foto": {
+                  "type": "string",
+                  "nullable": true,
+                  "description": "URL de la foto de perfil",
+                  "example": "http://localhost:3000/uploads/profiles/optimized_1.webp"
+                },
+                "estado": {
+                  "type": "string",
+                  "description": "Estado del usuario",
+                  "example": "activo"
+                },
+                "turnos": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "number",
+                        "description": "ID del turno",
+                        "example": 1
+                      },
+                      "fechaTurno": {
+                        "type": "string",
+                        "description": "Fecha del turno",
+                        "example": "2024-03-15"
+                      },
+                      "horaTurno": {
+                        "type": "string",
+                        "description": "Hora del turno",
+                        "example": "14:30"
+                      },
+                      "estado": {
+                        "type": "string",
+                        "description": "Estado del turno",
+                        "example": "confirmado"
+                      },
+                      "calificacion": {
+                        "type": "number",
+                        "nullable": true,
+                        "description": "Calificación del turno (1-5)",
+                        "example": 4.5
+                      },
+                      "comentario": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Comentario del cliente",
+                        "example": "Excelente servicio"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "fechaTurno",
+                      "horaTurno",
+                      "estado",
+                      "calificacion",
+                      "comentario"
+                    ]
+                  },
+                  "description": "Turnos asociados al usuario"
+                },
+                "servicios": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "number",
+                        "description": "ID del servicio",
+                        "example": 1
+                      },
+                      "descripcionServicio": {
+                        "type": "string",
+                        "description": "Descripción del servicio",
+                        "example": "Servicio de plomería profesional"
+                      },
+                      "precio": {
+                        "type": "number",
+                        "description": "Precio del servicio",
+                        "example": 2500
+                      },
+                      "estado": {
+                        "type": "string",
+                        "description": "Estado del servicio",
+                        "example": "activo"
+                      },
+                      "tarea": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "number",
+                            "description": "ID de la tarea",
+                            "example": 1
+                          },
+                          "nombreTarea": {
+                            "type": "string",
+                            "description": "Nombre de la tarea",
+                            "example": "Reparación de canillas"
+                          },
+                          "descripcionTarea": {
+                            "type": "string",
+                            "description": "Descripción de la tarea",
+                            "example": "Arreglo de grifería"
+                          },
+                          "duracionTarea": {
+                            "type": "number",
+                            "description": "Duración de la tarea en minutos",
+                            "example": 60
+                          },
+                          "tipoServicio": {
+                            "type": "number",
+                            "description": "ID del tipo de servicio",
+                            "example": 2
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "nombreTarea",
+                          "descripcionTarea",
+                          "duracionTarea",
+                          "tipoServicio"
+                        ],
+                        "description": "Tarea asociada al servicio"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "precio",
+                      "estado",
+                      "tarea"
+                    ]
+                  },
+                  "description": "Servicios ofrecidos por el usuario"
+                },
+                "tiposDeServicio": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "number",
+                        "description": "ID del tipo de servicio",
+                        "example": 1
+                      },
+                      "nombreTipo": {
+                        "type": "string",
+                        "description": "Nombre del tipo de servicio",
+                        "example": "Plomería"
+                      },
+                      "descripcionTipo": {
+                        "type": "string",
+                        "description": "Descripción del tipo de servicio",
+                        "example": "Servicios de plomería profesional"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "nombreTipo",
+                      "descripcionTipo"
+                    ]
+                  },
+                  "description": "Tipos de servicio que ofrece el usuario"
+                },
+                "horarios": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "number",
+                        "description": "ID del horario",
+                        "example": 1
+                      },
+                      "diaSemana": {
+                        "type": "string",
+                        "description": "Día de la semana",
+                        "example": "Lunes"
+                      },
+                      "horaInicio": {
+                        "type": "string",
+                        "description": "Hora de inicio",
+                        "example": "09:00"
+                      },
+                      "horaFin": {
+                        "type": "string",
+                        "description": "Hora de fin",
+                        "example": "17:00"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "diaSemana",
+                      "horaInicio",
+                      "horaFin"
+                    ]
+                  },
+                  "description": "Horarios de disponibilidad del usuario"
+                }
+              },
+              "required": [
+                "id",
+                "mail",
+                "nombre",
+                "apellido",
+                "tipoDoc",
+                "numeroDoc",
+                "telefono",
+                "direccion",
+                "nombreFantasia",
+                "descripcion",
+                "foto",
+                "estado",
+                "turnos",
+                "servicios",
+                "tiposDeServicio",
+                "horarios"
+              ]
             },
             "description": "Lista completa de usuarios con todas sus relaciones"
           }
@@ -821,6 +1063,19 @@
           "nuevaContrasena"
         ]
       },
+      "SuccessMessage": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensaje de éxito",
+            "example": "Operación completada exitosamente"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
       "IdParam": {
         "type": "object",
         "properties": {
@@ -879,48 +1134,10 @@
         "properties": {
           "profileImage": {
             "type": "string",
-            "format": "binary",
-            "description": "Archivo de imagen para el perfil del usuario"
+            "description": "Archivo de imagen para el perfil del usuario",
+            "format": "binary"
           }
-        },
-        "required": [
-          "profileImage"
-        ]
-      },
-      "SuccessMessage": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensaje de éxito",
-            "example": "Operación completada exitosamente"
-          }
-        },
-        "required": [
-          "message"
-        ]
-      },
-      "LoginResponse": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "example": "Login exitoso"
-          },
-          "token": {
-            "type": "string",
-            "description": "JWT token para autenticación",
-            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-          },
-          "data": {
-            "$ref": "#/components/schemas/UsuarioResponse"
-          }
-        },
-        "required": [
-          "message",
-          "token",
-          "data"
-        ]
+        }
       },
       "ImageUploadResponse": {
         "type": "object",
@@ -983,8 +1200,7 @@
                   "maximum": 5
                 },
                 "fechaCreacion": {
-                  "type": "string",
-                  "format": "date-time"
+                  "type": "string"
                 },
                 "cliente": {
                   "type": "object",
@@ -1050,71 +1266,6 @@
           "pagination",
           "average"
         ]
-      },
-      "ConflictResponse": {
-        "type": "object",
-        "properties": {
-          "error": {
-            "type": "string",
-            "description": "Código del error de conflicto",
-            "example": "EMAIL_ALREADY_EXISTS"
-          },
-          "message": {
-            "type": "string",
-            "description": "Descripción del error",
-            "example": "El mail ya está registrado por otro usuario"
-          }
-        },
-        "required": [
-          "error",
-          "message"
-        ]
-      },
-      "FindAllUsuariosResponse": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensaje de respuesta",
-            "example": "found all Usuarios"
-          },
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/UsuarioCompleteResponse"
-            },
-            "description": "Lista completa de usuarios con todas sus relaciones"
-          }
-        },
-        "required": [
-          "message",
-          "data"
-        ]
-      },
-      "FindPrestatariosResponse": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensaje de respuesta",
-            "example": "found prestatarios"
-          },
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PrestatarioWithRating"
-            },
-            "description": "Lista de prestatarios encontrados"
-          },
-          "pagination": {
-            "$ref": "#/components/schemas/PaginationInfo"
-          }
-        },
-        "required": [
-          "message",
-          "data",
-          "pagination"
-        ]
       }
     },
     "parameters": {}
@@ -1132,7 +1283,108 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateUsuario"
+                "type": "object",
+                "properties": {
+                  "nombre": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 50,
+                    "pattern": "^[a-zA-ZÀ-ÿ\\s]+$",
+                    "description": "Nombre del usuario",
+                    "example": "Juan"
+                  },
+                  "apellido": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 50,
+                    "pattern": "^[a-zA-ZÀ-ÿ\\s]+$",
+                    "description": "Apellido del usuario",
+                    "example": "Pérez"
+                  },
+                  "mail": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "format": "email",
+                    "description": "Correo electrónico del usuario",
+                    "example": "juan.perez@gmail.com"
+                  },
+                  "tipoDoc": {
+                    "type": "string",
+                    "enum": [
+                      "DNI",
+                      "CUIT",
+                      "CUIL"
+                    ],
+                    "description": "Tipo de documento",
+                    "example": "DNI"
+                  },
+                  "numeroDoc": {
+                    "type": "string",
+                    "minLength": 7,
+                    "maxLength": 13,
+                    "pattern": "^[0-9\\-]+$",
+                    "description": "Número de documento",
+                    "example": "12345678"
+                  },
+                  "telefono": {
+                    "type": "string",
+                    "pattern": "^[+]?[0-9\\s\\-()]{8,20}$",
+                    "description": "Número de teléfono",
+                    "example": "+54 11 1234-5678"
+                  },
+                  "direccion": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 200,
+                    "description": "Dirección del usuario",
+                    "example": "Av. Corrientes 1234"
+                  },
+                  "contrasena": {
+                    "type": "string",
+                    "minLength": 6,
+                    "description": "Contraseña del usuario",
+                    "example": "Password123"
+                  },
+                  "foto": {
+                    "type": "string",
+                    "maxLength": 200,
+                    "format": "uri",
+                    "description": "URL de la foto de perfil del usuario",
+                    "example": "http://example.com/foto.jpg"
+                  },
+                  "estado": {
+                    "type": "string",
+                    "enum": [
+                      "activo",
+                      "inactivo"
+                    ],
+                    "default": "activo",
+                    "description": "Estado del usuario",
+                    "example": "activo"
+                  },
+                  "nombreFantasia": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 30,
+                    "description": "Nombre de fantasía del prestatario",
+                    "example": "Servicios SRL"
+                  },
+                  "descripcion": {
+                    "type": "string",
+                    "description": "Descripción del prestatario",
+                    "example": "Ofrecemos servicios de plomería y electricidad."
+                  }
+                },
+                "required": [
+                  "nombre",
+                  "apellido",
+                  "mail",
+                  "tipoDoc",
+                  "numeroDoc",
+                  "telefono",
+                  "direccion",
+                  "contrasena"
+                ]
               }
             }
           }
@@ -1150,7 +1402,73 @@
                       "example": "Usuario creado exitosamente"
                     },
                     "data": {
-                      "$ref": "#/components/schemas/UsuarioResponse"
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "number",
+                          "description": "ID único del usuario",
+                          "example": 1
+                        },
+                        "mail": {
+                          "type": "string",
+                          "description": "Email del usuario",
+                          "example": "usuario@example.com"
+                        },
+                        "nombre": {
+                          "type": "string",
+                          "description": "Nombre del usuario",
+                          "example": "Juan"
+                        },
+                        "apellido": {
+                          "type": "string",
+                          "description": "Apellido del usuario",
+                          "example": "Pérez"
+                        },
+                        "tipoDoc": {
+                          "type": "string",
+                          "description": "Tipo de documento",
+                          "example": "DNI"
+                        },
+                        "numeroDoc": {
+                          "type": "string",
+                          "description": "Número de documento",
+                          "example": "12345678"
+                        },
+                        "telefono": {
+                          "type": "string",
+                          "description": "Teléfono",
+                          "example": "+54 11 1234-5678"
+                        },
+                        "direccion": {
+                          "type": "string",
+                          "description": "Dirección",
+                          "example": "Av. Corrientes 1234"
+                        },
+                        "nombreFantasia": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Nombre de fantasía",
+                          "example": "Plomería Pérez"
+                        },
+                        "descripcion": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Descripción",
+                          "example": "Plomero con experiencia"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "mail",
+                        "nombre",
+                        "apellido",
+                        "tipoDoc",
+                        "numeroDoc",
+                        "telefono",
+                        "direccion",
+                        "nombreFantasia",
+                        "descripcion"
+                      ]
                     }
                   },
                   "required": [
@@ -1166,7 +1484,40 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "email"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Email inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
                 }
               }
             }
@@ -1176,7 +1527,40 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "email"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Email inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
                 }
               }
             }
@@ -1204,7 +1588,276 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/FindAllUsuariosResponse"
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "number",
+                            "description": "ID único del usuario",
+                            "example": 1
+                          },
+                          "mail": {
+                            "type": "string",
+                            "description": "Email del usuario",
+                            "example": "usuario@example.com"
+                          },
+                          "nombre": {
+                            "type": "string",
+                            "description": "Nombre del usuario",
+                            "example": "Juan"
+                          },
+                          "apellido": {
+                            "type": "string",
+                            "description": "Apellido del usuario",
+                            "example": "Pérez"
+                          },
+                          "tipoDoc": {
+                            "type": "string",
+                            "description": "Tipo de documento",
+                            "example": "DNI"
+                          },
+                          "numeroDoc": {
+                            "type": "string",
+                            "description": "Número de documento",
+                            "example": "12345678"
+                          },
+                          "telefono": {
+                            "type": "string",
+                            "description": "Teléfono",
+                            "example": "+54 11 1234-5678"
+                          },
+                          "direccion": {
+                            "type": "string",
+                            "description": "Dirección",
+                            "example": "Av. Corrientes 1234"
+                          },
+                          "nombreFantasia": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Nombre de fantasía",
+                            "example": "Plomería Pérez"
+                          },
+                          "descripcion": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Descripción",
+                            "example": "Plomero con experiencia"
+                          },
+                          "foto": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "URL de la foto de perfil",
+                            "example": "http://localhost:3000/uploads/profiles/optimized_1.webp"
+                          },
+                          "estado": {
+                            "type": "string",
+                            "description": "Estado del usuario",
+                            "example": "activo"
+                          },
+                          "turnos": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number",
+                                  "description": "ID del turno",
+                                  "example": 1
+                                },
+                                "fechaTurno": {
+                                  "type": "string",
+                                  "description": "Fecha del turno",
+                                  "example": "2024-03-15"
+                                },
+                                "horaTurno": {
+                                  "type": "string",
+                                  "description": "Hora del turno",
+                                  "example": "14:30"
+                                },
+                                "estado": {
+                                  "type": "string",
+                                  "description": "Estado del turno",
+                                  "example": "confirmado"
+                                },
+                                "calificacion": {
+                                  "type": "number",
+                                  "nullable": true,
+                                  "description": "Calificación del turno (1-5)",
+                                  "example": 4.5
+                                },
+                                "comentario": {
+                                  "type": "string",
+                                  "nullable": true,
+                                  "description": "Comentario del cliente",
+                                  "example": "Excelente servicio"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "fechaTurno",
+                                "horaTurno",
+                                "estado",
+                                "calificacion",
+                                "comentario"
+                              ]
+                            },
+                            "description": "Turnos asociados al usuario"
+                          },
+                          "servicios": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number",
+                                  "description": "ID del servicio",
+                                  "example": 1
+                                },
+                                "descripcionServicio": {
+                                  "type": "string",
+                                  "description": "Descripción del servicio",
+                                  "example": "Servicio de plomería profesional"
+                                },
+                                "precio": {
+                                  "type": "number",
+                                  "description": "Precio del servicio",
+                                  "example": 2500
+                                },
+                                "estado": {
+                                  "type": "string",
+                                  "description": "Estado del servicio",
+                                  "example": "activo"
+                                },
+                                "tarea": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "type": "number",
+                                      "description": "ID de la tarea",
+                                      "example": 1
+                                    },
+                                    "nombreTarea": {
+                                      "type": "string",
+                                      "description": "Nombre de la tarea",
+                                      "example": "Reparación de canillas"
+                                    },
+                                    "descripcionTarea": {
+                                      "type": "string",
+                                      "description": "Descripción de la tarea",
+                                      "example": "Arreglo de grifería"
+                                    },
+                                    "duracionTarea": {
+                                      "type": "number",
+                                      "description": "Duración de la tarea en minutos",
+                                      "example": 60
+                                    },
+                                    "tipoServicio": {
+                                      "type": "number",
+                                      "description": "ID del tipo de servicio",
+                                      "example": 2
+                                    }
+                                  },
+                                  "required": [
+                                    "id",
+                                    "nombreTarea",
+                                    "descripcionTarea",
+                                    "duracionTarea",
+                                    "tipoServicio"
+                                  ],
+                                  "description": "Tarea asociada al servicio"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "precio",
+                                "estado",
+                                "tarea"
+                              ]
+                            },
+                            "description": "Servicios ofrecidos por el usuario"
+                          },
+                          "tiposDeServicio": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number",
+                                  "description": "ID del tipo de servicio",
+                                  "example": 1
+                                },
+                                "nombreTipo": {
+                                  "type": "string",
+                                  "description": "Nombre del tipo de servicio",
+                                  "example": "Plomería"
+                                },
+                                "descripcionTipo": {
+                                  "type": "string",
+                                  "description": "Descripción del tipo de servicio",
+                                  "example": "Servicios de plomería profesional"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "nombreTipo",
+                                "descripcionTipo"
+                              ]
+                            },
+                            "description": "Tipos de servicio que ofrece el usuario"
+                          },
+                          "horarios": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number",
+                                  "description": "ID del horario",
+                                  "example": 1
+                                },
+                                "diaSemana": {
+                                  "type": "string",
+                                  "description": "Día de la semana",
+                                  "example": "Lunes"
+                                },
+                                "horaInicio": {
+                                  "type": "string",
+                                  "description": "Hora de inicio",
+                                  "example": "09:00"
+                                },
+                                "horaFin": {
+                                  "type": "string",
+                                  "description": "Hora de fin",
+                                  "example": "17:00"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "diaSemana",
+                                "horaInicio",
+                                "horaFin"
+                              ]
+                            },
+                            "description": "Horarios de disponibilidad del usuario"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "mail",
+                          "nombre",
+                          "apellido",
+                          "tipoDoc",
+                          "numeroDoc",
+                          "telefono",
+                          "direccion",
+                          "nombreFantasia",
+                          "descripcion",
+                          "foto",
+                          "estado",
+                          "turnos",
+                          "servicios",
+                          "tiposDeServicio",
+                          "horarios"
+                        ]
                       }
                     }
                   },
@@ -1221,7 +1874,40 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "email"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Email inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
                 }
               }
             }
@@ -1283,7 +1969,40 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "email"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Email inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
                 }
               }
             }
@@ -1293,7 +2012,40 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "email"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Email inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
                 }
               }
             }
@@ -1361,7 +2113,40 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "email"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Email inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
                 }
               }
             }
@@ -1371,7 +2156,40 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "email"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Email inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
                 }
               }
             }
@@ -1446,7 +2264,40 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "email"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Email inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
                 }
               }
             }
@@ -1456,7 +2307,40 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "email"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Email inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
                 }
               }
             }
@@ -1494,13 +2378,10 @@
                 "properties": {
                   "profileImage": {
                     "type": "string",
-                    "format": "binary",
-                    "description": "Archivo de imagen para el perfil del usuario"
+                    "description": "Archivo de imagen para el perfil del usuario",
+                    "format": "binary"
                   }
-                },
-                "required": [
-                  "profileImage"
-                ]
+                }
               }
             }
           }
@@ -1555,7 +2436,40 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "email"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Email inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
                 }
               }
             }
@@ -1565,7 +2479,40 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "email"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Email inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
                 }
               }
             }
@@ -1668,7 +2615,40 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "email"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Email inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
                 }
               }
             }
@@ -1678,7 +2658,40 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "email"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Email inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
                 }
               }
             }
@@ -1688,7 +2701,1068 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "email"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Email inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/usuario/cookie": {
+      "get": {
+        "description": "Obtener el usuario autenticado mediante el token JWT",
+        "summary": "Obtener usuario por token",
+        "tags": [
+          "Usuarios"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario encontrado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "found one usuario"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "number",
+                          "description": "ID único del usuario",
+                          "example": 1
+                        },
+                        "mail": {
+                          "type": "string",
+                          "description": "Email del usuario",
+                          "example": "usuario@example.com"
+                        },
+                        "nombre": {
+                          "type": "string",
+                          "description": "Nombre del usuario",
+                          "example": "Juan"
+                        },
+                        "apellido": {
+                          "type": "string",
+                          "description": "Apellido del usuario",
+                          "example": "Pérez"
+                        },
+                        "tipoDoc": {
+                          "type": "string",
+                          "description": "Tipo de documento",
+                          "example": "DNI"
+                        },
+                        "numeroDoc": {
+                          "type": "string",
+                          "description": "Número de documento",
+                          "example": "12345678"
+                        },
+                        "telefono": {
+                          "type": "string",
+                          "description": "Teléfono",
+                          "example": "+54 11 1234-5678"
+                        },
+                        "direccion": {
+                          "type": "string",
+                          "description": "Dirección",
+                          "example": "Av. Corrientes 1234"
+                        },
+                        "nombreFantasia": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Nombre de fantasía",
+                          "example": "Plomería Pérez"
+                        },
+                        "descripcion": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Descripción",
+                          "example": "Plomero con experiencia"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "mail",
+                        "nombre",
+                        "apellido",
+                        "tipoDoc",
+                        "numeroDoc",
+                        "telefono",
+                        "direccion",
+                        "nombreFantasia",
+                        "descripcion"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Usuario no autenticado o token inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "email"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Email inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token no proporcionado o inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "email"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Email inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuario no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "email"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Email inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "email"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Email inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/usuario/onlyInfo/{id}": {
+      "get": {
+        "description": "Obtener un usuario por ID sin relaciones",
+        "summary": "Obtener usuario básico",
+        "tags": [
+          "Usuarios"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "description": "ID numérico del usuario",
+              "example": "1"
+            },
+            "required": true,
+            "description": "ID numérico del usuario",
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "found one usuario"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "number",
+                          "description": "ID único del usuario",
+                          "example": 1
+                        },
+                        "mail": {
+                          "type": "string",
+                          "description": "Email del usuario",
+                          "example": "usuario@example.com"
+                        },
+                        "nombre": {
+                          "type": "string",
+                          "description": "Nombre del usuario",
+                          "example": "Juan"
+                        },
+                        "apellido": {
+                          "type": "string",
+                          "description": "Apellido del usuario",
+                          "example": "Pérez"
+                        },
+                        "tipoDoc": {
+                          "type": "string",
+                          "description": "Tipo de documento",
+                          "example": "DNI"
+                        },
+                        "numeroDoc": {
+                          "type": "string",
+                          "description": "Número de documento",
+                          "example": "12345678"
+                        },
+                        "telefono": {
+                          "type": "string",
+                          "description": "Teléfono",
+                          "example": "+54 11 1234-5678"
+                        },
+                        "direccion": {
+                          "type": "string",
+                          "description": "Dirección",
+                          "example": "Av. Corrientes 1234"
+                        },
+                        "nombreFantasia": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Nombre de fantasía",
+                          "example": "Plomería Pérez"
+                        },
+                        "descripcion": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Descripción",
+                          "example": "Plomero con experiencia"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "mail",
+                        "nombre",
+                        "apellido",
+                        "tipoDoc",
+                        "numeroDoc",
+                        "telefono",
+                        "direccion",
+                        "nombreFantasia",
+                        "descripcion"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuario no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "email"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Email inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "email"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Email inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/usuario/comments/{id}": {
+      "get": {
+        "description": "Obtener comentarios de un usuario específico",
+        "summary": "Obtener comentarios por ID de usuario",
+        "tags": [
+          "Usuarios"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "description": "ID numérico del usuario",
+              "example": "1"
+            },
+            "required": true,
+            "description": "ID numérico del usuario",
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 5,
+              "description": "Número máximo de elementos por página",
+              "example": 5
+            },
+            "required": false,
+            "description": "Número máximo de elementos por página",
+            "name": "maxItems",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "number",
+              "minimum": 1,
+              "default": 1,
+              "description": "Número de página",
+              "example": 1
+            },
+            "required": false,
+            "description": "Número de página",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Campo por el cual ordenar los resultados",
+              "example": "nombre"
+            },
+            "required": false,
+            "description": "Campo por el cual ordenar los resultados",
+            "name": "orderBy",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comentarios encontrados exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Comentarios encontrados"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "number"
+                          },
+                          "comentario": {
+                            "type": "string"
+                          },
+                          "calificacion": {
+                            "type": "number",
+                            "minimum": 1,
+                            "maximum": 5
+                          },
+                          "fechaCreacion": {
+                            "type": "string"
+                          },
+                          "cliente": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "number"
+                              },
+                              "nombre": {
+                                "type": "string"
+                              },
+                              "apellido": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "nombre",
+                              "apellido"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "comentario",
+                          "calificacion",
+                          "fechaCreacion",
+                          "cliente"
+                        ]
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "page": {
+                          "type": "number"
+                        },
+                        "maxItems": {
+                          "type": "number"
+                        },
+                        "totalComments": {
+                          "type": "number"
+                        },
+                        "totalPages": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "page",
+                        "maxItems",
+                        "totalComments",
+                        "totalPages"
+                      ]
+                    },
+                    "average": {
+                      "type": "number",
+                      "description": "Calificación promedio",
+                      "example": 4.2
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "data",
+                    "pagination",
+                    "average"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuario no encontrado o sin comentarios",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "email"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Email inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "email"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Email inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/usuario/prestatarios/{tipoServicio}/{tarea}/{zona}/{orderBy}": {
+      "get": {
+        "tags": [
+          "Usuarios"
+        ],
+        "summary": "Buscar prestatarios por tipo de servicio, zona y tarea",
+        "description": "Busca prestatarios filtrados por tipo de servicio, zona y tarea específica con paginación",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "description": "Tipo de servicio a filtrar (\"Todos\" para no filtrar)",
+              "example": "Plomería"
+            },
+            "required": true,
+            "description": "Tipo de servicio a filtrar (\"Todos\" para no filtrar)",
+            "name": "tipoServicio",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Zona a filtrar (\"Todas\" para no filtrar)",
+              "example": "Centro"
+            },
+            "required": true,
+            "description": "Zona a filtrar (\"Todas\" para no filtrar)",
+            "name": "zona",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Tarea específica a filtrar (opcional)",
+              "example": "Reparación de canillas"
+            },
+            "required": false,
+            "description": "Tarea específica a filtrar (opcional)",
+            "name": "tarea",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "nombre",
+                "calificacion"
+              ],
+              "description": "Campo por el cual ordenar los resultados",
+              "example": "calificacion"
+            },
+            "required": false,
+            "description": "Campo por el cual ordenar los resultados",
+            "name": "orderBy",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 6,
+              "description": "Número máximo de elementos por página",
+              "example": 6
+            },
+            "required": false,
+            "description": "Número máximo de elementos por página",
+            "name": "maxItems",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "number",
+              "minimum": 1,
+              "default": 1,
+              "description": "Número de página",
+              "example": 1
+            },
+            "required": false,
+            "description": "Número de página",
+            "name": "page",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Prestatarios encontrados exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de respuesta",
+                      "example": "found prestatarios"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "number",
+                            "description": "ID único del prestatario",
+                            "example": 1
+                          },
+                          "nombre": {
+                            "type": "string",
+                            "description": "Nombre del prestatario",
+                            "example": "Juan"
+                          },
+                          "apellido": {
+                            "type": "string",
+                            "description": "Apellido del prestatario",
+                            "example": "Pérez"
+                          },
+                          "nombreFantasia": {
+                            "type": "string",
+                            "description": "Nombre de fantasía del prestatario",
+                            "example": "Plomería Pérez"
+                          },
+                          "descripcion": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Descripción del prestatario",
+                            "example": "Plomero con más de 10 años de experiencia"
+                          },
+                          "foto": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "URL de la foto de perfil",
+                            "example": "http://localhost:3000/uploads/profiles/optimized_1.webp"
+                          },
+                          "tiposDeServicio": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number",
+                                  "description": "ID del tipo de servicio",
+                                  "example": 1
+                                },
+                                "nombreTipo": {
+                                  "type": "string",
+                                  "description": "Nombre del tipo de servicio",
+                                  "example": "Plomería"
+                                },
+                                "descripcionTipo": {
+                                  "type": "string",
+                                  "description": "Descripción del tipo de servicio",
+                                  "example": "Servicios de plomería profesional"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "nombreTipo",
+                                "descripcionTipo"
+                              ]
+                            },
+                            "description": "Tipos de servicio que ofrece el prestatario"
+                          },
+                          "tareas": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "nombreTarea": {
+                                  "type": "string",
+                                  "description": "Nombre de la tarea",
+                                  "example": "Reparación de canillas"
+                                }
+                              },
+                              "required": [
+                                "nombreTarea"
+                              ]
+                            },
+                            "description": "Tareas específicas que puede realizar"
+                          },
+                          "calificacion": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 5,
+                            "description": "Calificación promedio del prestatario (0-5)",
+                            "example": 4.5
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "nombre",
+                          "apellido",
+                          "nombreFantasia",
+                          "descripcion",
+                          "foto",
+                          "tiposDeServicio",
+                          "tareas",
+                          "calificacion"
+                        ]
+                      },
+                      "description": "Lista de prestatarios encontrados"
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "page": {
+                          "type": "number",
+                          "description": "Página actual",
+                          "example": 1
+                        },
+                        "maxItems": {
+                          "type": "number",
+                          "description": "Elementos por página",
+                          "example": 6
+                        },
+                        "totalPages": {
+                          "type": "number",
+                          "description": "Total de páginas disponibles",
+                          "example": 5
+                        }
+                      },
+                      "required": [
+                        "page",
+                        "maxItems",
+                        "totalPages"
+                      ],
+                      "description": "Información de paginación"
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "data",
+                    "pagination"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No se encontraron prestatarios con los criterios especificados",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error cuando no se encuentran prestatarios",
+                      "example": "No prestatarios found for the given tipoServicio and zona"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "email"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Email inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
                 }
               }
             }
@@ -1708,11 +3782,11 @@
             "schema": {
               "type": "string",
               "pattern": "^\\d+$",
-              "description": "ID del usuario",
+              "description": "ID numérico del usuario",
               "example": "1"
             },
             "required": true,
-            "description": "ID del usuario",
+            "description": "ID numérico del usuario",
             "name": "id",
             "in": "path"
           }
@@ -1730,7 +3804,276 @@
                       "example": "found one usuario"
                     },
                     "data": {
-                      "$ref": "#/components/schemas/FindAllUsuariosResponse"
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "number",
+                          "description": "ID único del usuario",
+                          "example": 1
+                        },
+                        "mail": {
+                          "type": "string",
+                          "description": "Email del usuario",
+                          "example": "usuario@example.com"
+                        },
+                        "nombre": {
+                          "type": "string",
+                          "description": "Nombre del usuario",
+                          "example": "Juan"
+                        },
+                        "apellido": {
+                          "type": "string",
+                          "description": "Apellido del usuario",
+                          "example": "Pérez"
+                        },
+                        "tipoDoc": {
+                          "type": "string",
+                          "description": "Tipo de documento",
+                          "example": "DNI"
+                        },
+                        "numeroDoc": {
+                          "type": "string",
+                          "description": "Número de documento",
+                          "example": "12345678"
+                        },
+                        "telefono": {
+                          "type": "string",
+                          "description": "Teléfono",
+                          "example": "+54 11 1234-5678"
+                        },
+                        "direccion": {
+                          "type": "string",
+                          "description": "Dirección",
+                          "example": "Av. Corrientes 1234"
+                        },
+                        "nombreFantasia": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Nombre de fantasía",
+                          "example": "Plomería Pérez"
+                        },
+                        "descripcion": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Descripción",
+                          "example": "Plomero con experiencia"
+                        },
+                        "foto": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "URL de la foto de perfil",
+                          "example": "http://localhost:3000/uploads/profiles/optimized_1.webp"
+                        },
+                        "estado": {
+                          "type": "string",
+                          "description": "Estado del usuario",
+                          "example": "activo"
+                        },
+                        "turnos": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "number",
+                                "description": "ID del turno",
+                                "example": 1
+                              },
+                              "fechaTurno": {
+                                "type": "string",
+                                "description": "Fecha del turno",
+                                "example": "2024-03-15"
+                              },
+                              "horaTurno": {
+                                "type": "string",
+                                "description": "Hora del turno",
+                                "example": "14:30"
+                              },
+                              "estado": {
+                                "type": "string",
+                                "description": "Estado del turno",
+                                "example": "confirmado"
+                              },
+                              "calificacion": {
+                                "type": "number",
+                                "nullable": true,
+                                "description": "Calificación del turno (1-5)",
+                                "example": 4.5
+                              },
+                              "comentario": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Comentario del cliente",
+                                "example": "Excelente servicio"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "fechaTurno",
+                              "horaTurno",
+                              "estado",
+                              "calificacion",
+                              "comentario"
+                            ]
+                          },
+                          "description": "Turnos asociados al usuario"
+                        },
+                        "servicios": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "number",
+                                "description": "ID del servicio",
+                                "example": 1
+                              },
+                              "descripcionServicio": {
+                                "type": "string",
+                                "description": "Descripción del servicio",
+                                "example": "Servicio de plomería profesional"
+                              },
+                              "precio": {
+                                "type": "number",
+                                "description": "Precio del servicio",
+                                "example": 2500
+                              },
+                              "estado": {
+                                "type": "string",
+                                "description": "Estado del servicio",
+                                "example": "activo"
+                              },
+                              "tarea": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "number",
+                                    "description": "ID de la tarea",
+                                    "example": 1
+                                  },
+                                  "nombreTarea": {
+                                    "type": "string",
+                                    "description": "Nombre de la tarea",
+                                    "example": "Reparación de canillas"
+                                  },
+                                  "descripcionTarea": {
+                                    "type": "string",
+                                    "description": "Descripción de la tarea",
+                                    "example": "Arreglo de grifería"
+                                  },
+                                  "duracionTarea": {
+                                    "type": "number",
+                                    "description": "Duración de la tarea en minutos",
+                                    "example": 60
+                                  },
+                                  "tipoServicio": {
+                                    "type": "number",
+                                    "description": "ID del tipo de servicio",
+                                    "example": 2
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "nombreTarea",
+                                  "descripcionTarea",
+                                  "duracionTarea",
+                                  "tipoServicio"
+                                ],
+                                "description": "Tarea asociada al servicio"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "precio",
+                              "estado",
+                              "tarea"
+                            ]
+                          },
+                          "description": "Servicios ofrecidos por el usuario"
+                        },
+                        "tiposDeServicio": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "number",
+                                "description": "ID del tipo de servicio",
+                                "example": 1
+                              },
+                              "nombreTipo": {
+                                "type": "string",
+                                "description": "Nombre del tipo de servicio",
+                                "example": "Plomería"
+                              },
+                              "descripcionTipo": {
+                                "type": "string",
+                                "description": "Descripción del tipo de servicio",
+                                "example": "Servicios de plomería profesional"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "nombreTipo",
+                              "descripcionTipo"
+                            ]
+                          },
+                          "description": "Tipos de servicio que ofrece el usuario"
+                        },
+                        "horarios": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "number",
+                                "description": "ID del horario",
+                                "example": 1
+                              },
+                              "diaSemana": {
+                                "type": "string",
+                                "description": "Día de la semana",
+                                "example": "Lunes"
+                              },
+                              "horaInicio": {
+                                "type": "string",
+                                "description": "Hora de inicio",
+                                "example": "09:00"
+                              },
+                              "horaFin": {
+                                "type": "string",
+                                "description": "Hora de fin",
+                                "example": "17:00"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "diaSemana",
+                              "horaInicio",
+                              "horaFin"
+                            ]
+                          },
+                          "description": "Horarios de disponibilidad del usuario"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "mail",
+                        "nombre",
+                        "apellido",
+                        "tipoDoc",
+                        "numeroDoc",
+                        "telefono",
+                        "direccion",
+                        "nombreFantasia",
+                        "descripcion",
+                        "foto",
+                        "estado",
+                        "turnos",
+                        "servicios",
+                        "tiposDeServicio",
+                        "horarios"
+                      ]
                     }
                   },
                   "required": [
@@ -1746,7 +4089,40 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "email"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Email inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
                 }
               }
             }
@@ -1756,7 +4132,40 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "email"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Email inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
                 }
               }
             }
@@ -1774,11 +4183,11 @@
             "schema": {
               "type": "string",
               "pattern": "^\\d+$",
-              "description": "ID del usuario",
+              "description": "ID numérico del usuario",
               "example": "1"
             },
             "required": true,
-            "description": "ID del usuario",
+            "description": "ID numérico del usuario",
             "name": "id",
             "in": "path"
           }
@@ -1897,7 +4306,73 @@
                       "example": "updated usuario"
                     },
                     "data": {
-                      "$ref": "#/components/schemas/UsuarioResponse"
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "number",
+                          "description": "ID único del usuario",
+                          "example": 1
+                        },
+                        "mail": {
+                          "type": "string",
+                          "description": "Email del usuario",
+                          "example": "usuario@example.com"
+                        },
+                        "nombre": {
+                          "type": "string",
+                          "description": "Nombre del usuario",
+                          "example": "Juan"
+                        },
+                        "apellido": {
+                          "type": "string",
+                          "description": "Apellido del usuario",
+                          "example": "Pérez"
+                        },
+                        "tipoDoc": {
+                          "type": "string",
+                          "description": "Tipo de documento",
+                          "example": "DNI"
+                        },
+                        "numeroDoc": {
+                          "type": "string",
+                          "description": "Número de documento",
+                          "example": "12345678"
+                        },
+                        "telefono": {
+                          "type": "string",
+                          "description": "Teléfono",
+                          "example": "+54 11 1234-5678"
+                        },
+                        "direccion": {
+                          "type": "string",
+                          "description": "Dirección",
+                          "example": "Av. Corrientes 1234"
+                        },
+                        "nombreFantasia": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Nombre de fantasía",
+                          "example": "Plomería Pérez"
+                        },
+                        "descripcion": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Descripción",
+                          "example": "Plomero con experiencia"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "mail",
+                        "nombre",
+                        "apellido",
+                        "tipoDoc",
+                        "numeroDoc",
+                        "telefono",
+                        "direccion",
+                        "nombreFantasia",
+                        "descripcion"
+                      ]
                     }
                   },
                   "required": [
@@ -1913,7 +4388,40 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "email"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Email inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
                 }
               }
             }
@@ -1947,7 +4455,40 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "email"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Email inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
                 }
               }
             }
@@ -1965,11 +4506,11 @@
             "schema": {
               "type": "string",
               "pattern": "^\\d+$",
-              "description": "ID del usuario a eliminar",
+              "description": "ID numérico del usuario",
               "example": "1"
             },
             "required": true,
-            "description": "ID del usuario a eliminar",
+            "description": "ID numérico del usuario",
             "name": "id",
             "in": "path"
           }
@@ -1987,7 +4528,73 @@
                       "example": "deleted usuario"
                     },
                     "data": {
-                      "$ref": "#/components/schemas/UsuarioResponse"
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "number",
+                          "description": "ID único del usuario",
+                          "example": 1
+                        },
+                        "mail": {
+                          "type": "string",
+                          "description": "Email del usuario",
+                          "example": "usuario@example.com"
+                        },
+                        "nombre": {
+                          "type": "string",
+                          "description": "Nombre del usuario",
+                          "example": "Juan"
+                        },
+                        "apellido": {
+                          "type": "string",
+                          "description": "Apellido del usuario",
+                          "example": "Pérez"
+                        },
+                        "tipoDoc": {
+                          "type": "string",
+                          "description": "Tipo de documento",
+                          "example": "DNI"
+                        },
+                        "numeroDoc": {
+                          "type": "string",
+                          "description": "Número de documento",
+                          "example": "12345678"
+                        },
+                        "telefono": {
+                          "type": "string",
+                          "description": "Teléfono",
+                          "example": "+54 11 1234-5678"
+                        },
+                        "direccion": {
+                          "type": "string",
+                          "description": "Dirección",
+                          "example": "Av. Corrientes 1234"
+                        },
+                        "nombreFantasia": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Nombre de fantasía",
+                          "example": "Plomería Pérez"
+                        },
+                        "descripcion": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Descripción",
+                          "example": "Plomero con experiencia"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "mail",
+                        "nombre",
+                        "apellido",
+                        "tipoDoc",
+                        "numeroDoc",
+                        "telefono",
+                        "direccion",
+                        "nombreFantasia",
+                        "descripcion"
+                      ]
                     }
                   },
                   "required": [
@@ -2003,463 +4610,83 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Error interno del servidor",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/usuario/onlyInfo/{id}": {
-      "get": {
-        "description": "Obtener un usuario por ID sin relaciones",
-        "summary": "Obtener usuario básico",
-        "tags": [
-          "Usuarios"
-        ],
-        "parameters": [
-          {
-            "schema": {
-              "type": "string",
-              "pattern": "^\\d+$",
-              "description": "ID del usuario",
-              "example": "1"
-            },
-            "required": true,
-            "description": "ID del usuario",
-            "name": "id",
-            "in": "path"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Usuario encontrado",
-            "content": {
-              "application/json": {
-                "schema": {
                   "type": "object",
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "found one usuario"
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
                     },
-                    "data": {
-                      "$ref": "#/components/schemas/UsuarioResponse"
-                    }
-                  },
-                  "required": [
-                    "message",
-                    "data"
-                  ]
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Usuario no encontrado",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Error interno del servidor",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/usuario/cookie": {
-      "get": {
-        "description": "Obtener el usuario autenticado mediante el token JWT",
-        "summary": "Obtener usuario por token",
-        "tags": [
-          "Usuarios"
-        ],
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Usuario encontrado exitosamente",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "found one usuario",
-                      "description": "Mensaje de confirmación"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/UsuarioResponse"
-                    }
-                  },
-                  "required": [
-                    "message",
-                    "data"
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Usuario no autenticado o token inválido",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Token no proporcionado o inválido",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Usuario no encontrado",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Error interno del servidor",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/usuario/comments/{userId}": {
-      "get": {
-        "description": "Obtener comentarios de un usuario específico",
-        "summary": "Obtener comentarios por ID de usuario",
-        "tags": [
-          "Usuarios"
-        ],
-        "parameters": [
-          {
-            "schema": {
-              "type": "string",
-              "pattern": "^\\d+$",
-              "description": "ID del usuario",
-              "example": "1"
-            },
-            "required": true,
-            "description": "ID del usuario",
-            "name": "userId",
-            "in": "path"
-          },
-          {
-            "schema": {
-              "type": "number",
-              "minimum": 1,
-              "maximum": 50,
-              "default": 5,
-              "description": "Número máximo de comentarios por página",
-              "example": 5
-            },
-            "required": false,
-            "description": "Número máximo de comentarios por página",
-            "name": "maxItems",
-            "in": "query"
-          },
-          {
-            "schema": {
-              "type": "number",
-              "minimum": 1,
-              "default": 1,
-              "description": "Número de página",
-              "example": 1
-            },
-            "required": false,
-            "description": "Número de página",
-            "name": "page",
-            "in": "query"
-          },
-          {
-            "schema": {
-              "type": "string",
-              "description": "Campo por el cual ordenar",
-              "example": "fecha"
-            },
-            "required": false,
-            "description": "Campo por el cual ordenar",
-            "name": "orderBy",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Comentarios encontrados exitosamente",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "found comments for user"
-                    },
-                    "data": {
+                    "errors": {
                       "type": "array",
                       "items": {
                         "type": "object",
                         "properties": {
-                          "id": {
-                            "type": "number"
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "email"
                           },
-                          "comentario": {
-                            "type": "string"
-                          },
-                          "calificacion": {
-                            "type": "number",
-                            "minimum": 1,
-                            "maximum": 5
-                          },
-                          "fechaCreacion": {
-                            "type": "string"
-                          },
-                          "cliente": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "number"
-                              },
-                              "nombre": {
-                                "type": "string"
-                              },
-                              "apellido": {
-                                "type": "string"
-                              }
-                            },
-                            "required": [
-                              "id",
-                              "nombre",
-                              "apellido"
-                            ]
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Email inválido"
                           }
                         },
                         "required": [
-                          "id",
-                          "comentario",
-                          "calificacion",
-                          "fechaCreacion",
-                          "cliente"
+                          "field",
+                          "message"
                         ]
-                      }
-                    },
-                    "pagination": {
-                      "type": "object",
-                      "properties": {
-                        "page": {
-                          "type": "number"
-                        },
-                        "maxItems": {
-                          "type": "number"
-                        },
-                        "totalComments": {
-                          "type": "number"
-                        },
-                        "totalPages": {
-                          "type": "number"
-                        }
                       },
-                      "required": [
-                        "page",
-                        "maxItems",
-                        "totalComments",
-                        "totalPages"
-                      ]
-                    },
-                    "average": {
-                      "type": "number",
-                      "example": 4.2
+                      "description": "Detalles de errores de validación"
                     }
                   },
                   "required": [
-                    "message",
-                    "data",
-                    "pagination",
-                    "average"
+                    "message"
                   ]
                 }
               }
             }
           },
-          "404": {
-            "description": "Usuario no encontrado o sin comentarios",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "500": {
             "description": "Error interno del servidor",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/usuario/prestatarios/{tipoServicio}/{tarea}/{zona}/{orderBy}": {
-      "get": {
-        "tags": [
-          "Usuarios"
-        ],
-        "summary": "Buscar prestatarios por tipo de servicio, zona y tarea",
-        "description": "Busca prestatarios filtrados por tipo de servicio, zona y tarea específica con paginación",
-        "parameters": [
-          {
-            "schema": {
-              "type": "string",
-              "description": "Tipo de servicio a filtrar (\"Todos\" para no filtrar)",
-              "example": "Plomería"
-            },
-            "required": true,
-            "description": "Tipo de servicio a filtrar (\"Todos\" para no filtrar)",
-            "name": "tipoServicio",
-            "in": "path"
-          },
-          {
-            "schema": {
-              "type": "string",
-              "description": "Zona a filtrar (\"Todas\" para no filtrar)",
-              "example": "Centro"
-            },
-            "required": true,
-            "description": "Zona a filtrar (\"Todas\" para no filtrar)",
-            "name": "zona",
-            "in": "path"
-          },
-          {
-            "schema": {
-              "type": "string",
-              "description": "Tarea específica a filtrar (opcional)",
-              "example": "Reparación de canillas"
-            },
-            "required": false,
-            "description": "Tarea específica a filtrar (opcional)",
-            "name": "tarea",
-            "in": "path"
-          },
-          {
-            "schema": {
-              "type": "string",
-              "enum": [
-                "nombre",
-                "calificacion"
-              ],
-              "description": "Campo por el cual ordenar los resultados",
-              "example": "calificacion"
-            },
-            "required": false,
-            "description": "Campo por el cual ordenar los resultados",
-            "name": "orderBy",
-            "in": "path"
-          },
-          {
-            "schema": {
-              "type": "number",
-              "minimum": 1,
-              "maximum": 50,
-              "default": 6,
-              "description": "Número máximo de elementos por página",
-              "example": 6
-            },
-            "required": false,
-            "description": "Número máximo de elementos por página",
-            "name": "maxItems",
-            "in": "query"
-          },
-          {
-            "schema": {
-              "type": "number",
-              "minimum": 1,
-              "default": 1,
-              "description": "Número de página",
-              "example": 1
-            },
-            "required": false,
-            "description": "Número de página",
-            "name": "page",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Prestatarios encontrados exitosamente",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FindPrestatariosResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "No se encontraron prestatarios con los criterios especificados",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NotFoundResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Error interno del servidor",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "email"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Email inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
                 }
               }
             }
