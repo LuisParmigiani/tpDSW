@@ -1,9 +1,7 @@
 import {
   Entity,
   Property,
-  OneToOne,
   Cascade,
-  Rel,
   ManyToMany,
   OneToMany,
   Collection,

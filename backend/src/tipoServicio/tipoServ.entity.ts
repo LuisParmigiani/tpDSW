@@ -9,8 +9,7 @@ import {
 import { BaseEntity } from '../shared/db/baseEntity.entity.js';
 import { Usuario } from '../usuario/usuario.entity.js';
 import { Tarea } from '../tarea/tarea.entity.js';
-//import { Usuario } from './../usuario.entity.js'
-//import { Tarea } from './../tarea.entity.js'
+
 @Entity()
 export class TipoServicio extends BaseEntity {
   @Property({ nullable: false, unique: true })

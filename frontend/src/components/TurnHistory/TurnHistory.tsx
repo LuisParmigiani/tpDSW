@@ -271,6 +271,7 @@ function TurnHistory({ estado }: Props) {
           data={data}
           closeModal={closeModal}
           SaveRating={SaveRating}
+          setFlagged={setFlagged}
           flagged={flagged}
         />
       )}

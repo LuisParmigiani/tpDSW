@@ -1,3 +1,4 @@
+// src/shared/db/orm.ts
 import dotenv from 'dotenv';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -7,6 +8,7 @@ import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
 // Cargar .env solo en desarrollo
 if (process.env.NODE_ENV !== 'production') {
   dotenv.config({ path: path.join(__dirname, './../../../../.env') });
@@ -24,11 +26,19 @@ const DEBUG = local ? true : process.env.DEBUG_SQL === '1';
 
 const orm = await MikroORM.init({
   driver: MySqlDriver,
-  entities: ['dist/**/*.entity.js'],
-  entitiesTs: ['src/**/*.entity.ts'],
+  entities: ['dist/**/*.entity.js'], // para producción
+  entitiesTs: ['src/**/*.entity.ts'], // para desarrollo TS
   clientUrl: DB_URL,
   highlighter: new SqlHighlighter(),
   debug: DEBUG,
+  seeder: {
+    path: path.join(__dirname, '../../seeders'), // ruta compilada (dist) a seeders
+    pathTs: path.join(__dirname, '../seeders'), // ruta TS a seeders
+    defaultSeeder: 'DatabaseSeeder',
+    glob: '!(*.d).{js,ts}',
+    emit: 'ts',
+    fileName: (className: string) => className,
+  },
   schemaGenerator: {
     disableForeignKeys: true,
     createForeignKeyConstraints: true,
@@ -37,17 +47,40 @@ const orm = await MikroORM.init({
 });
 
 export const syncSchema = async () => {
-  const generator = orm.getSchemaGenerator();
-  //  await generator.dropSchema();
+  try {
+    const generator = orm.getSchemaGenerator();
+    // console.log('❌ Borrando todas las tablas...');
+    // await generator.dropSchema();
 
-  // await generator.createSchema();
-   //await generator.updateSchema(); // Desactivado para producción: evita cambios automáticos en el esquema
+    // console.log('✅ Creando tablas nuevas...');
+    // await generator.createSchema();
 
-  //Lineas para borrar y crear la base de datos
-  //await generator.dropSchema();
-  //await generator.createSchema();
+    // console.log('🌱 Ejecutando seeders...');
+    // const seeder = orm.getSeeder();
 
-  // await generator.updateSchema();
+    // try {
+    //   console.log(
+    //     '🔍 Debugger: Intentando ejecutar seed con DatabaseSeeder...'
+    //   );
+    //   // Importar el DatabaseSeeder y ejecutarlo específicamente
+    //   const { DatabaseSeeder } = await import(
+    //     '../../seeders/DatabaseSeeder.js'
+    //   );
+    //   await seeder.seed(DatabaseSeeder);
+    //   console.log('✅ Debugger: DatabaseSeeder ejecutado exitosamente');
+    // } catch (error: any) {
+    //   console.error('❌ Error en seeder:', error);
+    //   console.error('❌ Stack:', error?.stack);
+    // }
+
+    // // Verificación rápida
+    // const em = orm.em.fork();
+  } catch (error) {
+    console.error('❌ Error ejecutando seeders:', error);
+    throw error;
+  } finally {
+    await orm.close(true);
+  }
 };
 
 export { orm };

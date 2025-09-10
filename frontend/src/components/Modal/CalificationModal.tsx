@@ -1,6 +1,5 @@
 import StarRating from '../stars/RatingStars';
 import { Alert, AlertTitle, AlertDescription } from '../Alerts/Alerts.tsx';
-import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -50,11 +49,17 @@ type Props = {
   data: Turno;
   closeModal: () => void;
   SaveRating: (rating: number, comentario: string) => void;
+  setFlagged: (value: boolean) => void;
   flagged: boolean;
 };
 
-function CalificationModal({ data, closeModal, SaveRating, flagged }: Props) {
-  const [alertVisible, setAlertVisible] = useState(flagged);
+function CalificationModal({
+  data,
+  closeModal,
+  SaveRating,
+  setFlagged,
+  flagged,
+}: Props) {
   // alertas de errores del back
 
   const {
@@ -77,11 +82,11 @@ function CalificationModal({ data, closeModal, SaveRating, flagged }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-5 backdrop-blur-xs  bg-opacity-40">
-      {alertVisible && (
+      {flagged && (
         <Alert
           variant="danger"
           className="max-w-xl mx-auto mb-4"
-          onClose={() => setAlertVisible(false)}
+          onClose={() => setFlagged(false)}
           autoClose={true}
           autoCloseDelay={10000}
         >
