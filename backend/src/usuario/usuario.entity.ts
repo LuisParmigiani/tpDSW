@@ -93,5 +93,5 @@ export class Usuario extends BaseEntity {
   zonas = new Collection<Zona>(this);
 
   @Property({ nullable: false })
-  esatdo!: string;
+  estado!: string;
 }
