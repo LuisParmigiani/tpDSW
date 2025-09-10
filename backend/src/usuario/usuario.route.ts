@@ -1,45 +1,109 @@
 import { Router } from 'express';
 import {
-  sanitizeUsuarioInput,
+  validateBody,
+  validateParams,
+  validateQuery,
+  authenticateToken,
+} from '../utils/apiMiddleware.js';
+import {
+  createUsuarioValidation,
+  updateUsuarioValidation,
+  loginValidation,
+  recuperarContrasenaValidation,
+  validarCodigoValidation,
+  cambiarPasswordValidation,
+  idParamValidation,
+  userIdParamValidation,
+  paginationQueryValidation,
+  findPrestatariosByTipoServicioAndZonaParamsSchema,
+  findPrestatariosByTipoServicioAndZonaQuerySchema,
+} from './usuario.schemas.js';
+import {
   findAll,
-  findOne,
-  findOneOnlyInfo,
-  findPrestatariosByTipoServicioAndZona,
   add,
   update,
   remove,
-  getCommentsByUserId,
+  findOne,
+  findOneOnlyInfo,
   loginUsuario,
-  findOneByCookie,
   recuperarContrasena,
   validarCodigoRecuperacion,
   cambiarPassword,
   uploadProfileImage,
+  getCommentsByUserId,
+  findOneByCookie,
+  findPrestatariosByTipoServicioAndZona,
 } from './usuario.controler.js';
-import { verifyToken } from '../shared/middleware/auth.middleware.js';
 import { uploadProfile } from '../utils/uploadMiddleware.js';
 
-export const usuarioRouter = Router();
+const usuarioRouter = Router();
 
-usuarioRouter.get('/', findAll);
-usuarioRouter.get(
-  '/prestatarios/:tipoServicio/:tarea?/:zona/:orderBy',
-  findPrestatariosByTipoServicioAndZona
+// ==================== POST ROUTES ====================
+usuarioRouter.post('/', validateBody(createUsuarioValidation), add);
+
+usuarioRouter.post(
+  '/recuperar',
+  validateBody(recuperarContrasenaValidation),
+  recuperarContrasena
 );
-usuarioRouter.get('/login', loginUsuario);
-usuarioRouter.get('/cookie', verifyToken, findOneByCookie);
-usuarioRouter.post('/validar-codigo', validarCodigoRecuperacion);
-usuarioRouter.post('/recuperar', recuperarContrasena);
-usuarioRouter.get('/:id', findOne);
-usuarioRouter.get('/onlyInfo/:id', findOneOnlyInfo);
-usuarioRouter.get('/comments/:id', getCommentsByUserId);
-usuarioRouter.post('/', sanitizeUsuarioInput, add);
-usuarioRouter.put('/:id', sanitizeUsuarioInput, update);
-usuarioRouter.patch('/:id', sanitizeUsuarioInput, update);
-usuarioRouter.delete('/:id', remove);
-usuarioRouter.post('/cambiar-password', cambiarPassword);
+
+usuarioRouter.post(
+  '/validar-codigo',
+  validateBody(validarCodigoValidation),
+  validarCodigoRecuperacion
+);
+
+usuarioRouter.post(
+  '/cambiar-password',
+  validateBody(cambiarPasswordValidation),
+  cambiarPassword
+);
+
 usuarioRouter.post(
   '/upload-profile-image/:userId',
   uploadProfile.single('profileImage'),
+  validateParams(userIdParamValidation),
   uploadProfileImage
 );
+
+// ==================== GET ROUTES ====================
+usuarioRouter.get('/login', validateQuery(loginValidation), loginUsuario);
+
+usuarioRouter.get('/', findAll);
+
+usuarioRouter.get('/cookie', authenticateToken, findOneByCookie);
+
+usuarioRouter.get(
+  '/onlyInfo/:id',
+  validateParams(idParamValidation),
+  findOneOnlyInfo
+);
+
+usuarioRouter.get(
+  '/comments/:id',
+  validateParams(idParamValidation),
+  validateQuery(paginationQueryValidation),
+  getCommentsByUserId
+);
+
+usuarioRouter.get(
+  '/prestatarios/:tipoServicio/:tarea/:zona/:orderBy',
+  validateParams(findPrestatariosByTipoServicioAndZonaParamsSchema),
+  validateQuery(findPrestatariosByTipoServicioAndZonaQuerySchema),
+  findPrestatariosByTipoServicioAndZona
+);
+
+usuarioRouter.get('/:id', validateParams(idParamValidation), findOne);
+
+// ==================== PUT ROUTES ====================
+usuarioRouter.put(
+  '/:id',
+  validateParams(idParamValidation),
+  validateBody(updateUsuarioValidation),
+  update
+);
+
+// ==================== DELETE ROUTES ====================
+usuarioRouter.delete('/:id', validateParams(idParamValidation), remove);
+
+export { usuarioRouter };
