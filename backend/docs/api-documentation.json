@@ -555,7 +555,7 @@
           "message": {
             "type": "string",
             "description": "Mensaje de error",
-            "example": "Validation failed"
+            "example": "Turno no encontrado"
           },
           "errors": {
             "type": "array",
@@ -737,7 +737,7 @@
           "message": {
             "type": "string",
             "description": "Mensaje de respuesta",
-            "example": "found all Usuarios"
+            "example": "Usuarios encontrados"
           },
           "data": {
             "type": "array",
@@ -1314,18 +1314,26 @@
           },
           "usuarioId": {
             "type": "number",
-            "description": "ID del usuario"
+            "description": "ID del usuario",
+            "example": 2
           },
           "servicioId": {
             "type": "number",
-            "description": "ID del servicio"
+            "description": "ID del servicio",
+            "example": 1
+          },
+          "zonaId": {
+            "type": "number",
+            "description": "ID de la zona",
+            "example": 3
           }
         },
         "required": [
           "fecha",
           "hora",
           "usuarioId",
-          "servicioId"
+          "servicioId",
+          "zonaId"
         ]
       },
       "TurnoResponse": {
@@ -1333,19 +1341,33 @@
         "properties": {
           "id": {
             "type": "number",
-            "description": "ID del turno"
+            "description": "ID del turno",
+            "example": 1
           },
           "fecha": {
-            "type": "string"
+            "type": "string",
+            "description": "Fecha del turno",
+            "example": "2025-09-30"
           },
           "hora": {
-            "type": "string"
+            "type": "string",
+            "description": "Hora del turno",
+            "example": "14:00"
           },
           "usuarioId": {
-            "type": "number"
+            "type": "number",
+            "description": "ID del usuario",
+            "example": 2
           },
           "servicioId": {
-            "type": "number"
+            "type": "number",
+            "description": "ID del servicio",
+            "example": 1
+          },
+          "zonaId": {
+            "type": "number",
+            "description": "ID de la zona",
+            "example": 3
           }
         },
         "required": [
@@ -1353,7 +1375,66 @@
           "fecha",
           "hora",
           "usuarioId",
-          "servicioId"
+          "servicioId",
+          "zonaId"
+        ]
+      },
+      "TurnoApiResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensaje de respuesta",
+            "example": "Turno creado exitosamente"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number",
+                "description": "ID del turno",
+                "example": 1
+              },
+              "fecha": {
+                "type": "string",
+                "description": "Fecha del turno",
+                "example": "2025-09-30"
+              },
+              "hora": {
+                "type": "string",
+                "description": "Hora del turno",
+                "example": "14:00"
+              },
+              "usuarioId": {
+                "type": "number",
+                "description": "ID del usuario",
+                "example": 2
+              },
+              "servicioId": {
+                "type": "number",
+                "description": "ID del servicio",
+                "example": 1
+              },
+              "zonaId": {
+                "type": "number",
+                "description": "ID de la zona",
+                "example": 3
+              }
+            },
+            "required": [
+              "id",
+              "fecha",
+              "hora",
+              "usuarioId",
+              "servicioId",
+              "zonaId"
+            ],
+            "description": "Datos del turno creado"
+          }
+        },
+        "required": [
+          "message",
+          "data"
         ]
       },
       "CreateZona": {
@@ -2264,7 +2345,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-                      "example": "Validation failed"
+                      "example": "Turno no encontrado"
                     },
                     "errors": {
                       "type": "array",
@@ -2307,7 +2388,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-                      "example": "Validation failed"
+                      "example": "Turno no encontrado"
                     },
                     "errors": {
                       "type": "array",
@@ -2654,7 +2735,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-                      "example": "Validation failed"
+                      "example": "Turno no encontrado"
                     },
                     "errors": {
                       "type": "array",
@@ -2749,7 +2830,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-                      "example": "Validation failed"
+                      "example": "Turno no encontrado"
                     },
                     "errors": {
                       "type": "array",
@@ -2792,7 +2873,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-                      "example": "Validation failed"
+                      "example": "Turno no encontrado"
                     },
                     "errors": {
                       "type": "array",
@@ -2893,7 +2974,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-                      "example": "Validation failed"
+                      "example": "Turno no encontrado"
                     },
                     "errors": {
                       "type": "array",
@@ -2936,7 +3017,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-                      "example": "Validation failed"
+                      "example": "Turno no encontrado"
                     },
                     "errors": {
                       "type": "array",
@@ -3044,7 +3125,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-                      "example": "Validation failed"
+                      "example": "Turno no encontrado"
                     },
                     "errors": {
                       "type": "array",
@@ -3087,7 +3168,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-                      "example": "Validation failed"
+                      "example": "Turno no encontrado"
                     },
                     "errors": {
                       "type": "array",
@@ -3216,7 +3297,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-                      "example": "Validation failed"
+                      "example": "Turno no encontrado"
                     },
                     "errors": {
                       "type": "array",
@@ -3259,7 +3340,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-                      "example": "Validation failed"
+                      "example": "Turno no encontrado"
                     },
                     "errors": {
                       "type": "array",
@@ -3395,7 +3476,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-                      "example": "Validation failed"
+                      "example": "Turno no encontrado"
                     },
                     "errors": {
                       "type": "array",
@@ -3438,7 +3519,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-                      "example": "Validation failed"
+                      "example": "Turno no encontrado"
                     },
                     "errors": {
                       "type": "array",
@@ -3481,7 +3562,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-                      "example": "Validation failed"
+                      "example": "Turno no encontrado"
                     },
                     "errors": {
                       "type": "array",
@@ -3629,7 +3710,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-                      "example": "Validation failed"
+                      "example": "Turno no encontrado"
                     },
                     "errors": {
                       "type": "array",
@@ -3672,7 +3753,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-                      "example": "Validation failed"
+                      "example": "Turno no encontrado"
                     },
                     "errors": {
                       "type": "array",
@@ -3715,7 +3796,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-                      "example": "Validation failed"
+                      "example": "Turno no encontrado"
                     },
                     "errors": {
                       "type": "array",
@@ -3758,7 +3839,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-                      "example": "Validation failed"
+                      "example": "Turno no encontrado"
                     },
                     "errors": {
                       "type": "array",
@@ -3915,7 +3996,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-                      "example": "Validation failed"
+                      "example": "Turno no encontrado"
                     },
                     "errors": {
                       "type": "array",
@@ -3958,7 +4039,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-                      "example": "Validation failed"
+                      "example": "Turno no encontrado"
                     },
                     "errors": {
                       "type": "array",
@@ -4162,7 +4243,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-                      "example": "Validation failed"
+                      "example": "Turno no encontrado"
                     },
                     "errors": {
                       "type": "array",
@@ -4205,7 +4286,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-                      "example": "Validation failed"
+                      "example": "Turno no encontrado"
                     },
                     "errors": {
                       "type": "array",
@@ -4509,7 +4590,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-                      "example": "Validation failed"
+                      "example": "Turno no encontrado"
                     },
                     "errors": {
                       "type": "array",
@@ -4869,7 +4950,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-                      "example": "Validation failed"
+                      "example": "Turno no encontrado"
                     },
                     "errors": {
                       "type": "array",
@@ -4912,7 +4993,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-                      "example": "Validation failed"
+                      "example": "Turno no encontrado"
                     },
                     "errors": {
                       "type": "array",
@@ -5188,7 +5269,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-                      "example": "Validation failed"
+                      "example": "Turno no encontrado"
                     },
                     "errors": {
                       "type": "array",
@@ -5255,7 +5336,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-                      "example": "Validation failed"
+                      "example": "Turno no encontrado"
                     },
                     "errors": {
                       "type": "array",
@@ -5410,7 +5491,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-                      "example": "Validation failed"
+                      "example": "Turno no encontrado"
                     },
                     "errors": {
                       "type": "array",
@@ -5453,7 +5534,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-                      "example": "Validation failed"
+                      "example": "Turno no encontrado"
                     },
                     "errors": {
                       "type": "array",
@@ -5515,18 +5596,26 @@
                   },
                   "usuarioId": {
                     "type": "number",
-                    "description": "ID del usuario"
+                    "description": "ID del usuario",
+                    "example": 2
                   },
                   "servicioId": {
                     "type": "number",
-                    "description": "ID del servicio"
+                    "description": "ID del servicio",
+                    "example": 1
+                  },
+                  "zonaId": {
+                    "type": "number",
+                    "description": "ID de la zona",
+                    "example": 3
                   }
                 },
                 "required": [
                   "fecha",
                   "hora",
                   "usuarioId",
-                  "servicioId"
+                  "servicioId",
+                  "zonaId"
                 ]
               }
             }
@@ -5540,30 +5629,76 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "id": {
-                      "type": "number",
-                      "description": "ID del turno"
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de respuesta",
+                      "example": "Turno creado exitosamente"
                     },
-                    "fecha": {
-                      "type": "string"
-                    },
-                    "hora": {
-                      "type": "string"
-                    },
-                    "usuarioId": {
-                      "type": "number"
-                    },
-                    "servicioId": {
-                      "type": "number"
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "number",
+                          "description": "ID del turno",
+                          "example": 1
+                        },
+                        "fecha": {
+                          "type": "string",
+                          "description": "Fecha del turno",
+                          "example": "2025-09-30"
+                        },
+                        "hora": {
+                          "type": "string",
+                          "description": "Hora del turno",
+                          "example": "14:00"
+                        },
+                        "usuarioId": {
+                          "type": "number",
+                          "description": "ID del usuario",
+                          "example": 2
+                        },
+                        "servicioId": {
+                          "type": "number",
+                          "description": "ID del servicio",
+                          "example": 1
+                        },
+                        "zonaId": {
+                          "type": "number",
+                          "description": "ID de la zona",
+                          "example": 3
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "fecha",
+                        "hora",
+                        "usuarioId",
+                        "servicioId",
+                        "zonaId"
+                      ],
+                      "description": "Datos del turno creado"
                     }
                   },
                   "required": [
-                    "id",
-                    "fecha",
-                    "hora",
-                    "usuarioId",
-                    "servicioId"
+                    "message",
+                    "data"
                   ]
+                },
+                "examples": {
+                  "ejemploExitoso": {
+                    "summary": "Ejemplo de respuesta exitosa",
+                    "value": {
+                      "message": "Turno creado exitosamente",
+                      "data": {
+                        "id": 1,
+                        "fecha": "2025-09-30",
+                        "hora": "14:00",
+                        "usuarioId": 2,
+                        "servicioId": 1,
+                        "zonaId": 3
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -5612,19 +5747,33 @@
                         "properties": {
                           "id": {
                             "type": "number",
-                            "description": "ID del turno"
+                            "description": "ID del turno",
+                            "example": 1
                           },
                           "fecha": {
-                            "type": "string"
+                            "type": "string",
+                            "description": "Fecha del turno",
+                            "example": "2025-09-30"
                           },
                           "hora": {
-                            "type": "string"
+                            "type": "string",
+                            "description": "Hora del turno",
+                            "example": "14:00"
                           },
                           "usuarioId": {
-                            "type": "number"
+                            "type": "number",
+                            "description": "ID del usuario",
+                            "example": 2
                           },
                           "servicioId": {
-                            "type": "number"
+                            "type": "number",
+                            "description": "ID del servicio",
+                            "example": 1
+                          },
+                          "zonaId": {
+                            "type": "number",
+                            "description": "ID de la zona",
+                            "example": 3
                           }
                         },
                         "required": [
@@ -5632,7 +5781,8 @@
                           "fecha",
                           "hora",
                           "usuarioId",
-                          "servicioId"
+                          "servicioId",
+                          "zonaId"
                         ]
                       }
                     }
@@ -5641,6 +5791,24 @@
                     "message",
                     "data"
                   ]
+                },
+                "examples": {
+                  "ejemploLista": {
+                    "summary": "Ejemplo de lista de turnos",
+                    "value": {
+                      "message": "Turnos encontrados",
+                      "data": [
+                        {
+                          "id": 1,
+                          "fecha": "2025-09-30",
+                          "hora": "14:00",
+                          "usuarioId": 2,
+                          "servicioId": 1,
+                          "zonaId": 3
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -5682,19 +5850,33 @@
                       "properties": {
                         "id": {
                           "type": "number",
-                          "description": "ID del turno"
+                          "description": "ID del turno",
+                          "example": 1
                         },
                         "fecha": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "Fecha del turno",
+                          "example": "2025-09-30"
                         },
                         "hora": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "Hora del turno",
+                          "example": "14:00"
                         },
                         "usuarioId": {
-                          "type": "number"
+                          "type": "number",
+                          "description": "ID del usuario",
+                          "example": 2
                         },
                         "servicioId": {
-                          "type": "number"
+                          "type": "number",
+                          "description": "ID del servicio",
+                          "example": 1
+                        },
+                        "zonaId": {
+                          "type": "number",
+                          "description": "ID de la zona",
+                          "example": 3
                         }
                       },
                       "required": [
@@ -5702,7 +5884,8 @@
                         "fecha",
                         "hora",
                         "usuarioId",
-                        "servicioId"
+                        "servicioId",
+                        "zonaId"
                       ]
                     }
                   },
@@ -5710,6 +5893,22 @@
                     "message",
                     "data"
                   ]
+                },
+                "examples": {
+                  "ejemploEncontrado": {
+                    "summary": "Ejemplo de turno encontrado",
+                    "value": {
+                      "message": "Turno encontrado",
+                      "data": {
+                        "id": 1,
+                        "fecha": "2025-09-30",
+                        "hora": "14:00",
+                        "usuarioId": 2,
+                        "servicioId": 1,
+                        "zonaId": 3
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -5722,7 +5921,8 @@
                   "type": "object",
                   "properties": {
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Turno no encontrado"
                     }
                   },
                   "required": [
@@ -5770,11 +5970,18 @@
                   },
                   "usuarioId": {
                     "type": "number",
-                    "description": "ID del usuario"
+                    "description": "ID del usuario",
+                    "example": 2
                   },
                   "servicioId": {
                     "type": "number",
-                    "description": "ID del servicio"
+                    "description": "ID del servicio",
+                    "example": 1
+                  },
+                  "zonaId": {
+                    "type": "number",
+                    "description": "ID de la zona",
+                    "example": 3
                   }
                 }
               }
@@ -5797,19 +6004,33 @@
                       "properties": {
                         "id": {
                           "type": "number",
-                          "description": "ID del turno"
+                          "description": "ID del turno",
+                          "example": 1
                         },
                         "fecha": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "Fecha del turno",
+                          "example": "2025-09-30"
                         },
                         "hora": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "Hora del turno",
+                          "example": "14:00"
                         },
                         "usuarioId": {
-                          "type": "number"
+                          "type": "number",
+                          "description": "ID del usuario",
+                          "example": 2
                         },
                         "servicioId": {
-                          "type": "number"
+                          "type": "number",
+                          "description": "ID del servicio",
+                          "example": 1
+                        },
+                        "zonaId": {
+                          "type": "number",
+                          "description": "ID de la zona",
+                          "example": 3
                         }
                       },
                       "required": [
@@ -5817,7 +6038,8 @@
                         "fecha",
                         "hora",
                         "usuarioId",
-                        "servicioId"
+                        "servicioId",
+                        "zonaId"
                       ]
                     }
                   },
@@ -5825,6 +6047,22 @@
                     "message",
                     "data"
                   ]
+                },
+                "examples": {
+                  "ejemploActualizado": {
+                    "summary": "Ejemplo de turno actualizado",
+                    "value": {
+                      "message": "Turno actualizado",
+                      "data": {
+                        "id": 1,
+                        "fecha": "2025-09-30",
+                        "hora": "14:00",
+                        "usuarioId": 2,
+                        "servicioId": 1,
+                        "zonaId": 3
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -5837,7 +6075,8 @@
                   "type": "object",
                   "properties": {
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Turno no encontrado"
                     }
                   },
                   "required": [
@@ -5882,19 +6121,33 @@
                       "properties": {
                         "id": {
                           "type": "number",
-                          "description": "ID del turno"
+                          "description": "ID del turno",
+                          "example": 1
                         },
                         "fecha": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "Fecha del turno",
+                          "example": "2025-09-30"
                         },
                         "hora": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "Hora del turno",
+                          "example": "14:00"
                         },
                         "usuarioId": {
-                          "type": "number"
+                          "type": "number",
+                          "description": "ID del usuario",
+                          "example": 2
                         },
                         "servicioId": {
-                          "type": "number"
+                          "type": "number",
+                          "description": "ID del servicio",
+                          "example": 1
+                        },
+                        "zonaId": {
+                          "type": "number",
+                          "description": "ID de la zona",
+                          "example": 3
                         }
                       },
                       "required": [
@@ -5902,7 +6155,8 @@
                         "fecha",
                         "hora",
                         "usuarioId",
-                        "servicioId"
+                        "servicioId",
+                        "zonaId"
                       ]
                     }
                   },
@@ -5910,6 +6164,22 @@
                     "message",
                     "data"
                   ]
+                },
+                "examples": {
+                  "ejemploEliminado": {
+                    "summary": "Ejemplo de turno eliminado",
+                    "value": {
+                      "message": "Turno eliminado",
+                      "data": {
+                        "id": 1,
+                        "fecha": "2025-09-30",
+                        "hora": "14:00",
+                        "usuarioId": 2,
+                        "servicioId": 1,
+                        "zonaId": 3
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -5922,7 +6192,8 @@
                   "type": "object",
                   "properties": {
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Turno no encontrado"
                     }
                   },
                   "required": [

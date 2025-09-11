@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 
-// Extend Zod with OpenAPI functionality
 extendZodWithOpenApi(z);
 
 export const usuarioBaseSchema = z.object({
@@ -121,8 +120,7 @@ export const createUsuarioSchema = usuarioBaseSchema.extend({
     .openapi({
       example: 'Password123',
     }),
-
-  // ✅ FIX: Handle empty strings properly
+  //Campos opcionales
   nombreFantasia: z
     .string()
     .min(2, 'El nombre de fantasía debe tener al menos 2 caracteres')
@@ -134,7 +132,6 @@ export const createUsuarioSchema = usuarioBaseSchema.extend({
       example: 'Servicios SRL',
     }),
 
-  // ✅ FIX: Same for descripcion
   descripcion: z
     .string()
     .optional()
@@ -211,7 +208,6 @@ export const findPrestatariosByTipoServicioAndZonaQuerySchema = z.object({
     }),
 });
 
-// Additional schemas for related entities
 export const tareaSchema = z.object({
   id: z.number().describe('ID de la tarea').openapi({
     example: 1,
@@ -308,7 +304,6 @@ export const turnoSchema = z.object({
   }),
 });
 
-// Complete user response schema with all relationships
 export const usuarioCompleteResponseSchema = z.object({
   id: z.number().describe('ID único del usuario').openapi({ example: 1 }),
   mail: z.string().describe('Email del usuario').openapi({
@@ -356,10 +351,9 @@ export const usuarioCompleteResponseSchema = z.object({
     .describe('Horarios de disponibilidad del usuario'),
 });
 
-// Update the findAll response schema
 export const findAllUsuariosResponseSchema = z.object({
   message: z.string().describe('Mensaje de respuesta').openapi({
-    example: 'found all Usuarios',
+    example: 'Usuarios encontrados',
   }),
   data: z
     .array(usuarioCompleteResponseSchema)
@@ -496,16 +490,16 @@ export const usuarioResponseSchema = z.object({
     .describe('Dirección')
     .openapi({ example: 'Av. Corrientes 1234' }),
   nombreFantasia: z.string().nullable().describe('Nombre de fantasía').openapi({
-    example: 'Plomería Pérez',
+    example: 'Plomerín',
   }),
   descripcion: z.string().nullable().describe('Descripción').openapi({
-    example: 'Plomero con experiencia',
+    example: 'Servicio de plomería con experiencia',
   }),
 });
 
 export const errorResponseSchema = z.object({
   message: z.string().describe('Mensaje de error').openapi({
-    example: 'Validation failed',
+    example: 'Turno no encontrado',
   }),
   errors: z
     .array(
