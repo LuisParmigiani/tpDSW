@@ -51,7 +51,6 @@ function ServiciosSection() {
   const [error, setError] = useState<string | null>(null);
   
   // Estados para la funcionalidad de guardado
-  const [guardando, setGuardando] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertType, setAlertType] = useState<'success' | 'danger'>('success');
   const [alertMessage, setAlertMessage] = useState('');
@@ -296,8 +295,23 @@ function ServiciosSection() {
     setTareasVisibles(nuevasTareasVisibles);
   }, [tiposServicio, tareas, tipoServicioActivo]);
 
-  const handleTipoServicioChange = (tipoId: number) => {
+  const handleTipoServicioChange = async (tipoId: number) => {
+    if (!usuario) {
+      setAlertType('danger');
+      setAlertMessage('Error: Usuario no autenticado');
+      setShowAlert(true);
+      return;
+    }
+
     console.log(`=== Cambiando estado del tipo de servicio ${tipoId} ===`);
+    
+    // Encontrar el tipo de servicio actual
+    const tipoActual = tiposServicio.find(tipo => tipo.id === tipoId);
+    if (!tipoActual) return;
+
+    const seraDesactivado = tipoActual.activo; // Si está activo, será desactivado
+
+    // Actualizar el estado del tipo de servicio
     setTiposServicio(prev => {
       const nuevosTimpos = prev.map(tipo => 
         tipo.id === tipoId ? { ...tipo, activo: !tipo.activo } : tipo
@@ -305,6 +319,49 @@ function ServiciosSection() {
       console.log('Nuevos tipos de servicio:', nuevosTimpos);
       return nuevosTimpos;
     });
+
+    // Si se está desactivando el tipo, desactivar automáticamente todos los servicios relacionados
+    if (seraDesactivado) {
+      console.log(`Desactivando servicios del tipo ${tipoId}`);
+      
+      // Encontrar todas las tareas relacionadas con este tipo
+      const tareasDelTipo = tareas.filter(tarea => tarea.tipoServicioId === tipoId);
+      
+      if (tareasDelTipo.length > 0) {
+        try {
+          // Desactivar servicios en el backend
+          await Promise.allSettled(
+            tareasDelTipo.map(async (tarea) => {
+              try {
+                await serviciosApi.deactivateByUserAndTask(usuario.id, tarea.id);
+                console.log(`Servicio desactivado: Usuario ${usuario.id}, Tarea ${tarea.id}`);
+              } catch (error) {
+                console.warn(`Error al desactivar servicio (Usuario ${usuario.id}, Tarea ${tarea.id}):`, error);
+                // Ignorar errores - probablemente el servicio no existía
+              }
+            })
+          );
+
+          // Actualizar estado local - marcar como no seleccionadas
+          setTareas(prev => 
+            prev.map(tarea => 
+              tarea.tipoServicioId === tipoId 
+                ? { ...tarea, seleccionada: false }
+                : tarea
+            )
+          );
+
+          setAlertType('success');
+          setAlertMessage(`✅ Tipo de servicio desactivado. Servicios relacionados han sido desactivados automáticamente.`);
+          setShowAlert(true);
+        } catch (error) {
+          console.error('Error al desactivar servicios automáticamente:', error);
+          setAlertType('danger');
+          setAlertMessage('⚠️ Tipo desactivado, pero hubo problemas al desactivar algunos servicios. Revisa el estado individual.');
+          setShowAlert(true);
+        }
+      }
+    }
   };
 
   const handleTareaChange = (tareaId: number, campo: 'seleccionada' | 'precio', valor: boolean | number) => {
@@ -408,84 +465,6 @@ function ServiciosSection() {
   };
 
   // Función para guardar cambios por tipo de servicio
-  const guardarServicios = async () => {
-    if (!usuario) {
-      setAlertType('danger');
-      setAlertMessage('Error: Usuario no autenticado');
-      setShowAlert(true);
-      return;
-    }
-
-    // Verificar si es caso de "desactivar todos los servicios"
-    const tiposActivos = tiposServicio.filter(tipo => tipo.activo);
-    const esDarDeBaja = tiposActivos.length === 0;
-
-    setGuardando(true);
-    try {
-      if (esDarDeBaja) {
-        // Caso especial: desactivar TODOS los servicios del usuario
-        await Promise.allSettled(
-          tareas.map(async (tarea) => {
-            try {
-              await serviciosApi.deactivateByUserAndTask(usuario.id, tarea.id);
-            } catch {
-              // Ignorar errores de desactivación (probablemente no existía)
-            }
-          })
-        );
-        
-        // Actualizar estado local
-        setTareas(prev => 
-          prev.map(tarea => ({ ...tarea, seleccionada: false }))
-        );
-        
-        setAlertType('success');
-        setAlertMessage('✅ Todos los servicios han sido desactivados exitosamente');
-      } else {
-        // Desactivaciones por tipo de servicio
-        const tiposInactivos = tiposServicio.filter(tipo => !tipo.activo);
-        
-        if (tiposInactivos.length > 0) {
-          // Obtener todas las tareas de tipos deseleccionados
-          const tareasADesactivar = tareas.filter(tarea => 
-            tiposInactivos.some(tipo => tipo.id === tarea.tipoServicioId)
-          );
-          
-          await Promise.allSettled(
-            tareasADesactivar.map(async (tarea) => {
-              try {
-                await serviciosApi.deactivateByUserAndTask(usuario.id, tarea.id);
-              } catch {
-                // Ignorar errores de desactivación
-              }
-            })
-          );
-          
-          // Actualizar estado local
-          setTareas(prev => 
-            prev.map(tarea => 
-              tareasADesactivar.some(t => t.id === tarea.id) 
-                ? { ...tarea, seleccionada: false }
-                : tarea
-            )
-          );
-        }
-        
-        setAlertType('success');
-        setAlertMessage('✅ Cambios aplicados exitosamente');
-      }
-      
-      setShowAlert(true);
-    } catch (error) {
-      console.error('Error general al guardar servicios:', error);
-      setAlertType('danger');
-      setAlertMessage('❌ Error inesperado al guardar. Intenta nuevamente.');
-      setShowAlert(true);
-    } finally {
-      setGuardando(false);
-    }
-  };
-
   return (
     <DashboardSection>
       <StripeConnection loadingMessage="Cargando configuración de servicios...">
@@ -647,33 +626,6 @@ function ServiciosSection() {
             </p>
           </div>
         )}
-
-        {/* Botón para aplicar cambios en tipos de servicio */}
-        <div className="flex justify-center">
-          <button
-            onClick={guardarServicios}
-            disabled={guardando}
-            className={`px-8 py-3 rounded-lg font-medium text-white transition-all duration-200 ${
-              guardando
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-orange-500 hover:bg-orange-600 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2'
-            }`}
-          >
-            {guardando ? (
-              <div className="flex items-center">
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Guardando...
-              </div>
-            ) : (
-              tiposServicio.filter(tipo => tipo.activo).length === 0 
-                ? 'Desactivar Todos los Servicios' 
-                : 'Aplicar Cambios de Tipos'
-            )}
-          </button>
-        </div>
 
         {/* Alert de confirmación */}
         {showAlert && (
