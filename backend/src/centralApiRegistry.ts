@@ -114,14 +114,12 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 }
 
 // Permite ejecutar la generación del documento si se corre este archivo directamente con Node.js o tsx
-/*const scriptName = process.argv[1]?.replace(/\\/g, '/');
+const scriptName = process.argv[1]?.replace(/\\/g, '/');
 if (
   scriptName?.endsWith('/centralApiRegistry.ts') ||
   scriptName?.endsWith('/centralApiRegistry.js')
 ) {
   generateOpenApiDocument();
 }
-
-*/
 
 export { generateOpenApiDocument };

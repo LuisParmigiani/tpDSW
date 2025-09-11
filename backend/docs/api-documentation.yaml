@@ -422,7 +422,7 @@ components:
         message:
           type: string
           description: Mensaje de error
-          example: Validation failed
+          example: Turno no encontrado
         errors:
           type: array
           items:
@@ -561,7 +561,7 @@ components:
         message:
           type: string
           description: Mensaje de respuesta
-          example: found all Usuarios
+          example: Usuarios encontrados
         data:
           type: array
           items:
@@ -1001,34 +1001,100 @@ components:
         usuarioId:
           type: number
           description: ID del usuario
+          example: 2
         servicioId:
           type: number
           description: ID del servicio
+          example: 1
+        zonaId:
+          type: number
+          description: ID de la zona
+          example: 3
       required:
         - fecha
         - hora
         - usuarioId
         - servicioId
+        - zonaId
     TurnoResponse:
       type: object
       properties:
         id:
           type: number
           description: ID del turno
+          example: 1
         fecha:
           type: string
+          description: Fecha del turno
+          example: 2025-09-30
         hora:
           type: string
+          description: Hora del turno
+          example: 14:00
         usuarioId:
           type: number
+          description: ID del usuario
+          example: 2
         servicioId:
           type: number
+          description: ID del servicio
+          example: 1
+        zonaId:
+          type: number
+          description: ID de la zona
+          example: 3
       required:
         - id
         - fecha
         - hora
         - usuarioId
         - servicioId
+        - zonaId
+    TurnoApiResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Mensaje de respuesta
+          example: Turno creado exitosamente
+        data:
+          type: object
+          properties:
+            id:
+              type: number
+              description: ID del turno
+              example: 1
+            fecha:
+              type: string
+              description: Fecha del turno
+              example: 2025-09-30
+            hora:
+              type: string
+              description: Hora del turno
+              example: 14:00
+            usuarioId:
+              type: number
+              description: ID del usuario
+              example: 2
+            servicioId:
+              type: number
+              description: ID del servicio
+              example: 1
+            zonaId:
+              type: number
+              description: ID de la zona
+              example: 3
+          required:
+            - id
+            - fecha
+            - hora
+            - usuarioId
+            - servicioId
+            - zonaId
+          description: Datos del turno creado
+      required:
+        - message
+        - data
     CreateZona:
       type: object
       properties:
@@ -1383,7 +1449,7 @@ paths:
                   message:
                     type: string
                     description: Mensaje de error
-                    example: Validation failed
+                    example: Turno no encontrado
                   errors:
                     type: array
                     items:
@@ -1413,7 +1479,7 @@ paths:
                   message:
                     type: string
                     description: Mensaje de error
-                    example: Validation failed
+                    example: Turno no encontrado
                   errors:
                     type: array
                     items:
@@ -1681,7 +1747,7 @@ paths:
                   message:
                     type: string
                     description: Mensaje de error
-                    example: Validation failed
+                    example: Turno no encontrado
                   errors:
                     type: array
                     items:
@@ -1745,7 +1811,7 @@ paths:
                   message:
                     type: string
                     description: Mensaje de error
-                    example: Validation failed
+                    example: Turno no encontrado
                   errors:
                     type: array
                     items:
@@ -1775,7 +1841,7 @@ paths:
                   message:
                     type: string
                     description: Mensaje de error
-                    example: Validation failed
+                    example: Turno no encontrado
                   errors:
                     type: array
                     items:
@@ -1844,7 +1910,7 @@ paths:
                   message:
                     type: string
                     description: Mensaje de error
-                    example: Validation failed
+                    example: Turno no encontrado
                   errors:
                     type: array
                     items:
@@ -1874,7 +1940,7 @@ paths:
                   message:
                     type: string
                     description: Mensaje de error
-                    example: Validation failed
+                    example: Turno no encontrado
                   errors:
                     type: array
                     items:
@@ -1949,7 +2015,7 @@ paths:
                   message:
                     type: string
                     description: Mensaje de error
-                    example: Validation failed
+                    example: Turno no encontrado
                   errors:
                     type: array
                     items:
@@ -1979,7 +2045,7 @@ paths:
                   message:
                     type: string
                     description: Mensaje de error
-                    example: Validation failed
+                    example: Turno no encontrado
                   errors:
                     type: array
                     items:
@@ -2068,7 +2134,7 @@ paths:
                   message:
                     type: string
                     description: Mensaje de error
-                    example: Validation failed
+                    example: Turno no encontrado
                   errors:
                     type: array
                     items:
@@ -2098,7 +2164,7 @@ paths:
                   message:
                     type: string
                     description: Mensaje de error
-                    example: Validation failed
+                    example: Turno no encontrado
                   errors:
                     type: array
                     items:
@@ -2195,7 +2261,7 @@ paths:
                   message:
                     type: string
                     description: Mensaje de error
-                    example: Validation failed
+                    example: Turno no encontrado
                   errors:
                     type: array
                     items:
@@ -2225,7 +2291,7 @@ paths:
                   message:
                     type: string
                     description: Mensaje de error
-                    example: Validation failed
+                    example: Turno no encontrado
                   errors:
                     type: array
                     items:
@@ -2255,7 +2321,7 @@ paths:
                   message:
                     type: string
                     description: Mensaje de error
-                    example: Validation failed
+                    example: Turno no encontrado
                   errors:
                     type: array
                     items:
@@ -2363,7 +2429,7 @@ paths:
                   message:
                     type: string
                     description: Mensaje de error
-                    example: Validation failed
+                    example: Turno no encontrado
                   errors:
                     type: array
                     items:
@@ -2393,7 +2459,7 @@ paths:
                   message:
                     type: string
                     description: Mensaje de error
-                    example: Validation failed
+                    example: Turno no encontrado
                   errors:
                     type: array
                     items:
@@ -2423,7 +2489,7 @@ paths:
                   message:
                     type: string
                     description: Mensaje de error
-                    example: Validation failed
+                    example: Turno no encontrado
                   errors:
                     type: array
                     items:
@@ -2453,7 +2519,7 @@ paths:
                   message:
                     type: string
                     description: Mensaje de error
-                    example: Validation failed
+                    example: Turno no encontrado
                   errors:
                     type: array
                     items:
@@ -2569,7 +2635,7 @@ paths:
                   message:
                     type: string
                     description: Mensaje de error
-                    example: Validation failed
+                    example: Turno no encontrado
                   errors:
                     type: array
                     items:
@@ -2599,7 +2665,7 @@ paths:
                   message:
                     type: string
                     description: Mensaje de error
-                    example: Validation failed
+                    example: Turno no encontrado
                   errors:
                     type: array
                     items:
@@ -2744,7 +2810,7 @@ paths:
                   message:
                     type: string
                     description: Mensaje de error
-                    example: Validation failed
+                    example: Turno no encontrado
                   errors:
                     type: array
                     items:
@@ -2774,7 +2840,7 @@ paths:
                   message:
                     type: string
                     description: Mensaje de error
-                    example: Validation failed
+                    example: Turno no encontrado
                   errors:
                     type: array
                     items:
@@ -2999,7 +3065,7 @@ paths:
                   message:
                     type: string
                     description: Mensaje de error
-                    example: Validation failed
+                    example: Turno no encontrado
                   errors:
                     type: array
                     items:
@@ -3275,7 +3341,7 @@ paths:
                   message:
                     type: string
                     description: Mensaje de error
-                    example: Validation failed
+                    example: Turno no encontrado
                   errors:
                     type: array
                     items:
@@ -3305,7 +3371,7 @@ paths:
                   message:
                     type: string
                     description: Mensaje de error
-                    example: Validation failed
+                    example: Turno no encontrado
                   errors:
                     type: array
                     items:
@@ -3505,7 +3571,7 @@ paths:
                   message:
                     type: string
                     description: Mensaje de error
-                    example: Validation failed
+                    example: Turno no encontrado
                   errors:
                     type: array
                     items:
@@ -3551,7 +3617,7 @@ paths:
                   message:
                     type: string
                     description: Mensaje de error
-                    example: Validation failed
+                    example: Turno no encontrado
                   errors:
                     type: array
                     items:
@@ -3666,7 +3732,7 @@ paths:
                   message:
                     type: string
                     description: Mensaje de error
-                    example: Validation failed
+                    example: Turno no encontrado
                   errors:
                     type: array
                     items:
@@ -3696,7 +3762,7 @@ paths:
                   message:
                     type: string
                     description: Mensaje de error
-                    example: Validation failed
+                    example: Turno no encontrado
                   errors:
                     type: array
                     items:
@@ -3740,14 +3806,21 @@ paths:
                 usuarioId:
                   type: number
                   description: ID del usuario
+                  example: 2
                 servicioId:
                   type: number
                   description: ID del servicio
+                  example: 1
+                zonaId:
+                  type: number
+                  description: ID de la zona
+                  example: 3
               required:
                 - fecha
                 - hora
                 - usuarioId
                 - servicioId
+                - zonaId
       responses:
         "201":
           description: Turno creado exitosamente
@@ -3756,23 +3829,60 @@ paths:
               schema:
                 type: object
                 properties:
-                  id:
-                    type: number
-                    description: ID del turno
-                  fecha:
+                  message:
                     type: string
-                  hora:
-                    type: string
-                  usuarioId:
-                    type: number
-                  servicioId:
-                    type: number
+                    description: Mensaje de respuesta
+                    example: Turno creado exitosamente
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: number
+                        description: ID del turno
+                        example: 1
+                      fecha:
+                        type: string
+                        description: Fecha del turno
+                        example: 2025-09-30
+                      hora:
+                        type: string
+                        description: Hora del turno
+                        example: 14:00
+                      usuarioId:
+                        type: number
+                        description: ID del usuario
+                        example: 2
+                      servicioId:
+                        type: number
+                        description: ID del servicio
+                        example: 1
+                      zonaId:
+                        type: number
+                        description: ID de la zona
+                        example: 3
+                    required:
+                      - id
+                      - fecha
+                      - hora
+                      - usuarioId
+                      - servicioId
+                      - zonaId
+                    description: Datos del turno creado
                 required:
-                  - id
-                  - fecha
-                  - hora
-                  - usuarioId
-                  - servicioId
+                  - message
+                  - data
+              examples:
+                ejemploExitoso:
+                  summary: Ejemplo de respuesta exitosa
+                  value:
+                    message: Turno creado exitosamente
+                    data:
+                      id: 1
+                      fecha: 2025-09-30
+                      hora: 14:00
+                      usuarioId: 2
+                      servicioId: 1
+                      zonaId: 3
         "400":
           description: Error de validación
           content:
@@ -3807,23 +3917,49 @@ paths:
                         id:
                           type: number
                           description: ID del turno
+                          example: 1
                         fecha:
                           type: string
+                          description: Fecha del turno
+                          example: 2025-09-30
                         hora:
                           type: string
+                          description: Hora del turno
+                          example: 14:00
                         usuarioId:
                           type: number
+                          description: ID del usuario
+                          example: 2
                         servicioId:
                           type: number
+                          description: ID del servicio
+                          example: 1
+                        zonaId:
+                          type: number
+                          description: ID de la zona
+                          example: 3
                       required:
                         - id
                         - fecha
                         - hora
                         - usuarioId
                         - servicioId
+                        - zonaId
                 required:
                   - message
                   - data
+              examples:
+                ejemploLista:
+                  summary: Ejemplo de lista de turnos
+                  value:
+                    message: Turnos encontrados
+                    data:
+                      - id: 1
+                        fecha: 2025-09-30
+                        hora: 14:00
+                        usuarioId: 2
+                        servicioId: 1
+                        zonaId: 3
   /api/turno/{id}:
     get:
       description: Obtener un turno por ID
@@ -3853,23 +3989,49 @@ paths:
                       id:
                         type: number
                         description: ID del turno
+                        example: 1
                       fecha:
                         type: string
+                        description: Fecha del turno
+                        example: 2025-09-30
                       hora:
                         type: string
+                        description: Hora del turno
+                        example: 14:00
                       usuarioId:
                         type: number
+                        description: ID del usuario
+                        example: 2
                       servicioId:
                         type: number
+                        description: ID del servicio
+                        example: 1
+                      zonaId:
+                        type: number
+                        description: ID de la zona
+                        example: 3
                     required:
                       - id
                       - fecha
                       - hora
                       - usuarioId
                       - servicioId
+                      - zonaId
                 required:
                   - message
                   - data
+              examples:
+                ejemploEncontrado:
+                  summary: Ejemplo de turno encontrado
+                  value:
+                    message: Turno encontrado
+                    data:
+                      id: 1
+                      fecha: 2025-09-30
+                      hora: 14:00
+                      usuarioId: 2
+                      servicioId: 1
+                      zonaId: 3
         "404":
           description: Turno no encontrado
           content:
@@ -3879,6 +4041,7 @@ paths:
                 properties:
                   message:
                     type: string
+                    example: Turno no encontrado
                 required:
                   - message
     put:
@@ -3911,9 +4074,15 @@ paths:
                 usuarioId:
                   type: number
                   description: ID del usuario
+                  example: 2
                 servicioId:
                   type: number
                   description: ID del servicio
+                  example: 1
+                zonaId:
+                  type: number
+                  description: ID de la zona
+                  example: 3
       responses:
         "200":
           description: Turno actualizado
@@ -3930,23 +4099,49 @@ paths:
                       id:
                         type: number
                         description: ID del turno
+                        example: 1
                       fecha:
                         type: string
+                        description: Fecha del turno
+                        example: 2025-09-30
                       hora:
                         type: string
+                        description: Hora del turno
+                        example: 14:00
                       usuarioId:
                         type: number
+                        description: ID del usuario
+                        example: 2
                       servicioId:
                         type: number
+                        description: ID del servicio
+                        example: 1
+                      zonaId:
+                        type: number
+                        description: ID de la zona
+                        example: 3
                     required:
                       - id
                       - fecha
                       - hora
                       - usuarioId
                       - servicioId
+                      - zonaId
                 required:
                   - message
                   - data
+              examples:
+                ejemploActualizado:
+                  summary: Ejemplo de turno actualizado
+                  value:
+                    message: Turno actualizado
+                    data:
+                      id: 1
+                      fecha: 2025-09-30
+                      hora: 14:00
+                      usuarioId: 2
+                      servicioId: 1
+                      zonaId: 3
         "404":
           description: Turno no encontrado
           content:
@@ -3956,6 +4151,7 @@ paths:
                 properties:
                   message:
                     type: string
+                    example: Turno no encontrado
                 required:
                   - message
     delete:
@@ -3986,23 +4182,49 @@ paths:
                       id:
                         type: number
                         description: ID del turno
+                        example: 1
                       fecha:
                         type: string
+                        description: Fecha del turno
+                        example: 2025-09-30
                       hora:
                         type: string
+                        description: Hora del turno
+                        example: 14:00
                       usuarioId:
                         type: number
+                        description: ID del usuario
+                        example: 2
                       servicioId:
                         type: number
+                        description: ID del servicio
+                        example: 1
+                      zonaId:
+                        type: number
+                        description: ID de la zona
+                        example: 3
                     required:
                       - id
                       - fecha
                       - hora
                       - usuarioId
                       - servicioId
+                      - zonaId
                 required:
                   - message
                   - data
+              examples:
+                ejemploEliminado:
+                  summary: Ejemplo de turno eliminado
+                  value:
+                    message: Turno eliminado
+                    data:
+                      id: 1
+                      fecha: 2025-09-30
+                      hora: 14:00
+                      usuarioId: 2
+                      servicioId: 1
+                      zonaId: 3
         "404":
           description: Turno no encontrado
           content:
@@ -4012,6 +4234,7 @@ paths:
                 properties:
                   message:
                     type: string
+                    example: Turno no encontrado
                 required:
                   - message
   /api/zona:

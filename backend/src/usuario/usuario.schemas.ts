@@ -359,7 +359,7 @@ export const usuarioCompleteResponseSchema = z.object({
 // Update the findAll response schema
 export const findAllUsuariosResponseSchema = z.object({
   message: z.string().describe('Mensaje de respuesta').openapi({
-    example: 'found all Usuarios',
+    example: 'Usuarios encontrados',
   }),
   data: z
     .array(usuarioCompleteResponseSchema)
@@ -505,7 +505,7 @@ export const usuarioResponseSchema = z.object({
 
 export const errorResponseSchema = z.object({
   message: z.string().describe('Mensaje de error').openapi({
-    example: 'Validation failed',
+    example: 'Turno no encontrado',
   }),
   errors: z
     .array(
