@@ -6,6 +6,7 @@ import fs from 'fs/promises';
 import path from 'path';
 //* SE importan los registros de los endpoints
 import { usuarioRegistry } from './usuario/usuario.registry.js';
+import { turnoRegistry } from './turno/turno.registry.js';
 
 async function generateOpenApiDocument() {
   const registry = new OpenAPIRegistry();
@@ -21,6 +22,7 @@ async function generateOpenApiDocument() {
   const allDefinitions = [
     ...registry.definitions, // Esquemas de seguridad
     ...usuarioRegistry.definitions, // Esquemas y definiciones del usuario
+    ...turnoRegistry.definitions, // Esquemas y definiciones de turno
     // ,...servicioRegistry.definitions, // Esquemas y definiciones del servicio
     // ...reservaRegistry.definitions,
   ];
@@ -55,6 +57,10 @@ async function generateOpenApiDocument() {
       {
         name: 'Usuarios',
         description: 'Operaciones para el manejo de Usuarios',
+      },
+      {
+        name: 'Turnos',
+        description: 'Operaciones para el manejo de Turnos',
       },
       {
         name: 'Servicios',
@@ -100,4 +106,16 @@ async function generateOpenApiDocument() {
 if (import.meta.url === `file://${process.argv[1]}`) {
   generateOpenApiDocument();
 }
+
+// Permite ejecutar la generación del documento si se corre este archivo directamente con Node.js o tsx
+/*const scriptName = process.argv[1]?.replace(/\\/g, '/');
+if (
+  scriptName?.endsWith('/centralApiRegistry.ts') ||
+  scriptName?.endsWith('/centralApiRegistry.js')
+) {
+  generateOpenApiDocument();
+}
+
+*/
+
 export { generateOpenApiDocument };

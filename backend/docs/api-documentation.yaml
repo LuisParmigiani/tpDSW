@@ -16,6 +16,8 @@ security:
 tags:
   - name: Usuarios
     description: Operaciones para el manejo de Usuarios
+  - name: Turnos
+    description: Operaciones para el manejo de Turnos
   - name: Servicios
     description: Operaciones para el manejo de Servicios
   - name: Reservas
@@ -975,6 +977,48 @@ components:
         - data
         - pagination
         - average
+    CreateTurno:
+      type: object
+      properties:
+        fecha:
+          type: string
+          description: Fecha del turno
+          example: 2025-09-30
+        hora:
+          type: string
+          description: Hora del turno
+          example: 14:00
+        usuarioId:
+          type: number
+          description: ID del usuario
+        servicioId:
+          type: number
+          description: ID del servicio
+      required:
+        - fecha
+        - hora
+        - usuarioId
+        - servicioId
+    TurnoResponse:
+      type: object
+      properties:
+        id:
+          type: number
+          description: ID del turno
+        fecha:
+          type: string
+        hora:
+          type: string
+        usuarioId:
+          type: number
+        servicioId:
+          type: number
+      required:
+        - id
+        - fecha
+        - hora
+        - usuarioId
+        - servicioId
   parameters: {}
 paths:
   /api/usuario:
@@ -3472,5 +3516,303 @@ paths:
                         - field
                         - message
                     description: Detalles de errores de validación
+                required:
+                  - message
+  /api/turno:
+    post:
+      description: Crear un nuevo turno
+      summary: Crear turno
+      tags:
+        - Turnos
+      requestBody:
+        description: Datos del turno a crear
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fecha:
+                  type: string
+                  description: Fecha del turno
+                  example: 2025-09-30
+                hora:
+                  type: string
+                  description: Hora del turno
+                  example: 14:00
+                usuarioId:
+                  type: number
+                  description: ID del usuario
+                servicioId:
+                  type: number
+                  description: ID del servicio
+              required:
+                - fecha
+                - hora
+                - usuarioId
+                - servicioId
+      responses:
+        "201":
+          description: Turno creado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                    description: ID del turno
+                  fecha:
+                    type: string
+                  hora:
+                    type: string
+                  usuarioId:
+                    type: number
+                  servicioId:
+                    type: number
+                required:
+                  - id
+                  - fecha
+                  - hora
+                  - usuarioId
+                  - servicioId
+        "400":
+          description: Error de validación
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+    get:
+      description: Obtener todos los turnos
+      summary: Listar turnos
+      tags:
+        - Turnos
+      responses:
+        "200":
+          description: Lista de turnos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: number
+                          description: ID del turno
+                        fecha:
+                          type: string
+                        hora:
+                          type: string
+                        usuarioId:
+                          type: number
+                        servicioId:
+                          type: number
+                      required:
+                        - id
+                        - fecha
+                        - hora
+                        - usuarioId
+                        - servicioId
+                required:
+                  - message
+                  - data
+  /api/turno/{id}:
+    get:
+      description: Obtener un turno por ID
+      summary: Obtener turno
+      tags:
+        - Turnos
+      parameters:
+        - schema:
+            type: string
+            pattern: ^\d+$
+          required: true
+          name: id
+          in: path
+      responses:
+        "200":
+          description: Turno encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: number
+                        description: ID del turno
+                      fecha:
+                        type: string
+                      hora:
+                        type: string
+                      usuarioId:
+                        type: number
+                      servicioId:
+                        type: number
+                    required:
+                      - id
+                      - fecha
+                      - hora
+                      - usuarioId
+                      - servicioId
+                required:
+                  - message
+                  - data
+        "404":
+          description: Turno no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+    put:
+      description: Actualizar un turno por ID
+      summary: Actualizar turno
+      tags:
+        - Turnos
+      parameters:
+        - schema:
+            type: string
+            pattern: ^\d+$
+          required: true
+          name: id
+          in: path
+      requestBody:
+        description: Datos del turno a actualizar
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fecha:
+                  type: string
+                  description: Fecha del turno
+                  example: 2025-09-30
+                hora:
+                  type: string
+                  description: Hora del turno
+                  example: 14:00
+                usuarioId:
+                  type: number
+                  description: ID del usuario
+                servicioId:
+                  type: number
+                  description: ID del servicio
+      responses:
+        "200":
+          description: Turno actualizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: number
+                        description: ID del turno
+                      fecha:
+                        type: string
+                      hora:
+                        type: string
+                      usuarioId:
+                        type: number
+                      servicioId:
+                        type: number
+                    required:
+                      - id
+                      - fecha
+                      - hora
+                      - usuarioId
+                      - servicioId
+                required:
+                  - message
+                  - data
+        "404":
+          description: Turno no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+    delete:
+      description: Eliminar un turno por ID
+      summary: Eliminar turno
+      tags:
+        - Turnos
+      parameters:
+        - schema:
+            type: string
+            pattern: ^\d+$
+          required: true
+          name: id
+          in: path
+      responses:
+        "200":
+          description: Turno eliminado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: number
+                        description: ID del turno
+                      fecha:
+                        type: string
+                      hora:
+                        type: string
+                      usuarioId:
+                        type: number
+                      servicioId:
+                        type: number
+                    required:
+                      - id
+                      - fecha
+                      - hora
+                      - usuarioId
+                      - servicioId
+                required:
+                  - message
+                  - data
+        "404":
+          description: Turno no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
                 required:
                   - message
