@@ -12,7 +12,7 @@ FROM node:20-alpine AS build
 WORKDIR /app
 # Instalar dependencias con npm
 COPY package.json ./
-RUN npm install
+RUN npm install --legacy-peer-deps=true --auto-install-peers=true
 # Copiar código y compilar
 COPY tsconfig.json ./
 COPY src ./src

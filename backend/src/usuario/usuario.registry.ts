@@ -1,7 +1,4 @@
-import {
-  OpenAPIRegistry,
-  OpenApiGeneratorV3,
-} from '@asteasolutions/zod-to-openapi';
+import { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 import {
   createUsuarioSchema,
   loginSchema,
@@ -12,74 +9,90 @@ import {
   findPrestatariosByTipoServicioAndZonaResponseSchema,
   notFoundResponseSchema,
   findAllUsuariosResponseSchema,
+  usuarioCompleteResponseSchema,
 } from '../usuario/usuario.schemas.js';
 import { z } from 'zod';
+import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
+
+// Extend Zod with OpenAPI functionality
+extendZodWithOpenApi(z);
 
 // Create the usuarioRegistry
 export const usuarioRegistry = new OpenAPIRegistry();
 
-// At the top, create schema constants for reuse
+// Create schema constants for reuse (v3 syntax)
 const recuperarContrasenaSchema = z.object({
-  mail: z.string().email().openapi({
-    description: 'Correo electrónico del usuario',
+  mail: z.string().email().describe('Correo electrónico del usuario').openapi({
     example: 'juan.perez@gmail.com',
   }),
 });
 
 const validarCodigoSchema = z.object({
-  mail: z.string().email().openapi({
-    description: 'Correo electrónico del usuario',
+  mail: z.string().email().describe('Correo electrónico del usuario').openapi({
     example: 'juan.perez@gmail.com',
   }),
-  codigo: z.string().openapi({
-    description: 'Código de recuperación de 6 dígitos',
+  codigo: z.string().describe('Código de recuperación de 6 dígitos').openapi({
     example: '123456',
   }),
 });
 
 const cambiarPasswordSchema = z.object({
-  mail: z.string().email().openapi({
-    description: 'Correo electrónico del usuario',
+  mail: z.string().email().describe('Correo electrónico del usuario').openapi({
     example: 'juan.perez@gmail.com',
   }),
-  codigo: z.string().openapi({
-    description: 'Código de recuperación de 6 dígitos',
+  codigo: z.string().describe('Código de recuperación de 6 dígitos').openapi({
     example: '123456',
   }),
-  nuevaContrasena: z.string().min(6).openapi({
-    description: 'Nueva contraseña (mínimo 6 caracteres)',
-    example: 'NuevaPassword123',
-  }),
+  nuevaContrasena: z
+    .string()
+    .min(6)
+    .describe('Nueva contraseña (mínimo 6 caracteres)')
+    .openapi({
+      example: 'NuevaPassword123',
+    }),
 });
 
 const successMessageSchema = z.object({
-  message: z.string().openapi({
-    description: 'Mensaje de éxito',
+  message: z.string().describe('Mensaje de éxito').openapi({
     example: 'Operación completada exitosamente',
   }),
 });
 
 const userIdParamSchema = z.object({
-  userId: z.string().regex(/^\d+$/, 'ID debe ser un número').openapi({
-    description: 'ID numérico del usuario',
-    example: '1',
-  }),
+  userId: z
+    .string()
+    .regex(/^\d+$/, 'ID debe ser un número')
+    .describe('ID numérico del usuario')
+    .openapi({
+      example: '1',
+    }),
+});
+
+const idParamSchema = z.object({
+  id: z
+    .string()
+    .regex(/^\d+$/, 'ID debe ser un número')
+    .describe('ID numérico del usuario')
+    .openapi({
+      example: '1',
+    }),
 });
 
 const fileUploadSchema = z.object({
-  profileImage: z.instanceof(File).openapi({
-    type: 'string',
-    format: 'binary',
-    description: 'Archivo de imagen para el perfil del usuario',
-  }),
+  profileImage: z
+    .any()
+    .describe('Archivo de imagen para el perfil del usuario')
+    .openapi({
+      type: 'string',
+      format: 'binary',
+    }),
 });
 
 const imageUploadResponseSchema = z.object({
   message: z.string().openapi({
     example: 'Foto de perfil actualizada correctamente',
   }),
-  imageUrl: z.string().url().openapi({
-    description: 'URL de la imagen subida',
+  imageUrl: z.string().url().describe('URL de la imagen subida').openapi({
     example: 'http://localhost:3000/uploads/profiles/usuario1.jpg',
   }),
   user: z.object({
@@ -88,10 +101,69 @@ const imageUploadResponseSchema = z.object({
   }),
 });
 
+const paginationQuerySchema = z.object({
+  maxItems: z.coerce
+    .number()
+    .min(1)
+    .max(50)
+    .default(5)
+    .optional()
+    .describe('Número máximo de elementos por página')
+    .openapi({
+      example: 5,
+    }),
+  page: z.coerce
+    .number()
+    .min(1)
+    .default(1)
+    .optional()
+    .describe('Número de página')
+    .openapi({
+      example: 1,
+    }),
+  orderBy: z
+    .string()
+    .optional()
+    .describe('Campo por el cual ordenar los resultados')
+    .openapi({
+      example: 'nombre',
+    }),
+});
+
+const commentsResponseSchema = z.object({
+  message: z.string().openapi({ example: 'Comentarios encontrados' }),
+  data: z.array(
+    z.object({
+      id: z.number(),
+      comentario: z.string(),
+      calificacion: z.number().min(1).max(5),
+      fechaCreacion: z.string(),
+      cliente: z.object({
+        id: z.number(),
+        nombre: z.string(),
+        apellido: z.string(),
+      }),
+    })
+  ),
+  pagination: z.object({
+    page: z.number(),
+    maxItems: z.number(),
+    totalComments: z.number(),
+    totalPages: z.number(),
+  }),
+  average: z.number().describe('Calificación promedio').openapi({
+    example: 4.2,
+  }),
+});
+
 // Register schemas
 usuarioRegistry.register('CreateUsuario', createUsuarioSchema);
 usuarioRegistry.register('LoginUsuario', loginSchema);
 usuarioRegistry.register('UsuarioResponse', usuarioResponseSchema);
+usuarioRegistry.register(
+  'UsuarioCompleteResponse',
+  usuarioCompleteResponseSchema
+);
 usuarioRegistry.register('ErrorResponse', errorResponseSchema);
 usuarioRegistry.register(
   'FindPrestatarioByTipoServicioAndZona',
@@ -99,152 +171,20 @@ usuarioRegistry.register(
 );
 usuarioRegistry.register('FindAllUsuarios', findAllUsuariosResponseSchema);
 usuarioRegistry.register('NotFoundResponse', notFoundResponseSchema);
-
-// Recovery schemas
 usuarioRegistry.register('RecuperarContrasena', recuperarContrasenaSchema);
 usuarioRegistry.register('ValidarCodigo', validarCodigoSchema);
 usuarioRegistry.register('CambiarPassword', cambiarPasswordSchema);
-
-// Parameter schemas
-usuarioRegistry.register(
-  'IdParam',
-  z.object({
-    id: z.string().regex(/^\d+$/, 'ID debe ser un número').openapi({
-      description: 'ID numérico del usuario',
-      example: '1',
-    }),
-  })
-);
-
-usuarioRegistry.register(
-  'UserIdParam',
-  z.object({
-    userId: z.string().regex(/^\d+$/, 'ID debe ser un número').openapi({
-      description: 'ID numérico del usuario',
-      example: '1',
-    }),
-  })
-);
-
-// Query schemas
-usuarioRegistry.register(
-  'PaginationQuery',
-  z.object({
-    maxItems: z.coerce.number().min(1).max(50).default(5).optional().openapi({
-      description: 'Número máximo de elementos por página',
-      example: 5,
-    }),
-    page: z.coerce.number().min(1).default(1).optional().openapi({
-      description: 'Número de página',
-      example: 1,
-    }),
-    orderBy: z.string().optional().openapi({
-      description: 'Campo por el cual ordenar los resultados',
-      example: 'nombre',
-    }),
-  })
-);
-
-// File upload schema
-usuarioRegistry.register(
-  'FileUpload',
-  z.object({
-    profileImage: z.instanceof(File).openapi({
-      type: 'string',
-      format: 'binary',
-      description: 'Archivo de imagen para el perfil del usuario',
-    }),
-  })
-);
-
-// Success response schemas
-usuarioRegistry.register(
-  'SuccessMessage',
-  z.object({
-    message: z.string().openapi({
-      description: 'Mensaje de éxito',
-      example: 'Operación completada exitosamente',
-    }),
-  })
-);
-
-usuarioRegistry.register(
-  'LoginResponse',
-  z.object({
-    message: z.string().openapi({ example: 'Login exitoso' }),
-    token: z.string().openapi({
-      description: 'JWT token para autenticación',
-      example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    }),
-    data: usuarioResponseSchema,
-  })
-);
-
-usuarioRegistry.register(
-  'ImageUploadResponse',
-  z.object({
-    message: z.string().openapi({
-      example: 'Foto de perfil actualizada correctamente',
-    }),
-    imageUrl: z.string().url().openapi({
-      description: 'URL de la imagen subida',
-      example: 'http://localhost:3000/uploads/profiles/usuario1.jpg',
-    }),
-    user: z.object({
-      id: z.number(),
-      foto: z.string().url().nullable(),
-    }),
-  })
-);
-
-usuarioRegistry.register(
-  'CommentsResponse',
-  z.object({
-    message: z.string().openapi({ example: 'Comentarios encontrados' }),
-    data: z.array(
-      z.object({
-        id: z.number(),
-        comentario: z.string(),
-        calificacion: z.number().min(1).max(5),
-        fechaCreacion: z.string().datetime(),
-        cliente: z.object({
-          id: z.number(),
-          nombre: z.string(),
-          apellido: z.string(),
-        }),
-      })
-    ),
-    pagination: z.object({
-      page: z.number(),
-      maxItems: z.number(),
-      totalComments: z.number(),
-      totalPages: z.number(),
-    }),
-    average: z.number().openapi({
-      description: 'Calificación promedio',
-      example: 4.2,
-    }),
-  })
-);
-
-// Conflict error schema (for update operations)
-usuarioRegistry.register(
-  'ConflictResponse',
-  z.object({
-    error: z.string().openapi({
-      description: 'Código del error de conflicto',
-      example: 'EMAIL_ALREADY_EXISTS',
-    }),
-    message: z.string().openapi({
-      description: 'Descripción del error',
-      example: 'El mail ya está registrado por otro usuario',
-    }),
-  })
-);
+usuarioRegistry.register('SuccessMessage', successMessageSchema);
+usuarioRegistry.register('IdParam', idParamSchema);
+usuarioRegistry.register('UserIdParam', userIdParamSchema);
+usuarioRegistry.register('PaginationQuery', paginationQuerySchema);
+usuarioRegistry.register('FileUpload', fileUploadSchema);
+usuarioRegistry.register('ImageUploadResponse', imageUploadResponseSchema);
+usuarioRegistry.register('CommentsResponse', commentsResponseSchema);
 
 // ==================== POST METHODS ====================
 
-//*Check - POST /api/usuario
+// POST /api/usuario
 usuarioRegistry.registerPath({
   method: 'post',
   path: '/api/usuario',
@@ -294,7 +234,7 @@ usuarioRegistry.registerPath({
   },
 });
 
-//*Check - POST /api/usuario/recuperar
+// POST /api/usuario/recuperar
 usuarioRegistry.registerPath({
   method: 'post',
   path: '/api/usuario/recuperar',
@@ -306,7 +246,7 @@ usuarioRegistry.registerPath({
       description: 'Correo electrónico para recuperación de contraseña',
       content: {
         'application/json': {
-          schema: recuperarContrasenaSchema, // ✅ Direct reference
+          schema: recuperarContrasenaSchema,
         },
       },
     },
@@ -316,7 +256,7 @@ usuarioRegistry.registerPath({
       description: 'Correo de recuperación enviado',
       content: {
         'application/json': {
-          schema: successMessageSchema, // ✅ Direct reference
+          schema: successMessageSchema,
         },
       },
     },
@@ -324,7 +264,7 @@ usuarioRegistry.registerPath({
       description: 'Usuario no encontrado',
       content: {
         'application/json': {
-          schema: errorResponseSchema, // ✅ Direct reference
+          schema: errorResponseSchema,
         },
       },
     },
@@ -332,14 +272,14 @@ usuarioRegistry.registerPath({
       description: 'Error interno del servidor',
       content: {
         'application/json': {
-          schema: errorResponseSchema, // ✅ Direct reference
+          schema: errorResponseSchema,
         },
       },
     },
   },
 });
 
-//*Check - POST /api/usuario/validar-codigo
+// POST /api/usuario/validar-codigo
 usuarioRegistry.registerPath({
   method: 'post',
   path: '/api/usuario/validar-codigo',
@@ -351,7 +291,7 @@ usuarioRegistry.registerPath({
       description: 'Código de recuperación y correo electrónico',
       content: {
         'application/json': {
-          schema: validarCodigoSchema, // ✅ Direct reference
+          schema: validarCodigoSchema,
         },
       },
     },
@@ -361,7 +301,7 @@ usuarioRegistry.registerPath({
       description: 'Código de recuperación válido',
       content: {
         'application/json': {
-          schema: successMessageSchema, // ✅ Direct reference
+          schema: successMessageSchema,
         },
       },
     },
@@ -369,7 +309,7 @@ usuarioRegistry.registerPath({
       description: 'Código inválido o expirado',
       content: {
         'application/json': {
-          schema: errorResponseSchema, // ✅ Direct reference
+          schema: errorResponseSchema,
         },
       },
     },
@@ -377,14 +317,14 @@ usuarioRegistry.registerPath({
       description: 'Error interno del servidor',
       content: {
         'application/json': {
-          schema: errorResponseSchema, // ✅ Direct reference
+          schema: errorResponseSchema,
         },
       },
     },
   },
 });
 
-// NEW - POST /api/usuario/cambiar-password
+// POST /api/usuario/cambiar-password
 usuarioRegistry.registerPath({
   method: 'post',
   path: '/api/usuario/cambiar-password',
@@ -396,7 +336,7 @@ usuarioRegistry.registerPath({
       description: 'Datos para cambiar la contraseña',
       content: {
         'application/json': {
-          schema: cambiarPasswordSchema, // ✅ Direct reference
+          schema: cambiarPasswordSchema,
         },
       },
     },
@@ -406,7 +346,7 @@ usuarioRegistry.registerPath({
       description: 'Contraseña cambiada exitosamente',
       content: {
         'application/json': {
-          schema: successMessageSchema, // ✅ Direct reference
+          schema: successMessageSchema,
         },
       },
     },
@@ -414,7 +354,7 @@ usuarioRegistry.registerPath({
       description: 'Código inválido o expirado',
       content: {
         'application/json': {
-          schema: errorResponseSchema, // ✅ Direct reference
+          schema: errorResponseSchema,
         },
       },
     },
@@ -422,14 +362,14 @@ usuarioRegistry.registerPath({
       description: 'Error interno del servidor',
       content: {
         'application/json': {
-          schema: errorResponseSchema, // ✅ Direct reference
+          schema: errorResponseSchema,
         },
       },
     },
   },
 });
 
-//*Check - POST /api/usuario/upload-profile-image/{userId}
+// POST /api/usuario/upload-profile-image/{userId}
 usuarioRegistry.registerPath({
   method: 'post',
   path: '/api/usuario/upload-profile-image/{userId}',
@@ -437,12 +377,12 @@ usuarioRegistry.registerPath({
   summary: 'Subir imagen de perfil',
   tags: ['Usuarios'],
   request: {
-    params: userIdParamSchema, // ✅ Direct reference
+    params: userIdParamSchema,
     body: {
       description: 'Archivo de imagen a subir',
       content: {
         'multipart/form-data': {
-          schema: fileUploadSchema, // ✅ Direct reference
+          schema: fileUploadSchema,
         },
       },
     },
@@ -452,7 +392,7 @@ usuarioRegistry.registerPath({
       description: 'Imagen de perfil subida exitosamente',
       content: {
         'application/json': {
-          schema: imageUploadResponseSchema, // ✅ Direct reference
+          schema: imageUploadResponseSchema,
         },
       },
     },
@@ -460,7 +400,7 @@ usuarioRegistry.registerPath({
       description: 'Solicitud inválida',
       content: {
         'application/json': {
-          schema: errorResponseSchema, // ✅ Direct reference
+          schema: errorResponseSchema,
         },
       },
     },
@@ -468,7 +408,7 @@ usuarioRegistry.registerPath({
       description: 'Error interno del servidor',
       content: {
         'application/json': {
-          schema: errorResponseSchema, // ✅ Direct reference
+          schema: errorResponseSchema,
         },
       },
     },
@@ -477,7 +417,7 @@ usuarioRegistry.registerPath({
 
 // ==================== GET METHODS ====================
 
-//*Check - GET /api/usuario/login
+// GET /api/usuario/login
 usuarioRegistry.registerPath({
   method: 'get',
   path: '/api/usuario/login',
@@ -494,9 +434,9 @@ usuarioRegistry.registerPath({
         'application/json': {
           schema: z.object({
             message: z.string().openapi({ example: 'Login exitoso' }),
-            token: z
-              .string()
-              .openapi({ example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' }),
+            token: z.string().openapi({
+              example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+            }),
             data: usuarioResponseSchema.pick({
               id: true,
               mail: true,
@@ -534,7 +474,7 @@ usuarioRegistry.registerPath({
   },
 });
 
-//*Check - GET /api/usuario
+// GET /api/usuario
 usuarioRegistry.registerPath({
   method: 'get',
   path: '/api/usuario',
@@ -549,7 +489,7 @@ usuarioRegistry.registerPath({
         'application/json': {
           schema: z.object({
             message: z.string().openapi({ example: 'found all Usuarios' }),
-            data: z.array(findAllUsuariosResponseSchema),
+            data: z.array(usuarioCompleteResponseSchema),
           }),
         },
       },
@@ -565,99 +505,7 @@ usuarioRegistry.registerPath({
   },
 });
 
-//*Check - GET /api/usuario/{id}
-usuarioRegistry.registerPath({
-  method: 'get',
-  path: '/api/usuario/{id}',
-  description: 'Obtener un usuario por ID pero con todas sus relaciones',
-  summary: 'Trae un usuario y toda su información',
-  tags: ['Usuarios'],
-  request: {
-    params: z.object({
-      id: z.string().regex(/^\d+$/, 'ID debe ser un número').openapi({
-        description: 'ID del usuario',
-        example: '1',
-      }),
-    }),
-  },
-  responses: {
-    200: {
-      description: 'Usuario encontrado',
-      content: {
-        'application/json': {
-          schema: z.object({
-            message: z.string().openapi({ example: 'found one usuario' }),
-            data: findAllUsuariosResponseSchema,
-          }),
-        },
-      },
-    },
-    404: {
-      description: 'Usuario no encontrado',
-      content: {
-        'application/json': {
-          schema: errorResponseSchema,
-        },
-      },
-    },
-    500: {
-      description: 'Error interno del servidor',
-      content: {
-        'application/json': {
-          schema: errorResponseSchema,
-        },
-      },
-    },
-  },
-});
-
-//*Check - GET /api/usuario/onlyInfo/{id}
-usuarioRegistry.registerPath({
-  method: 'get',
-  path: '/api/usuario/onlyInfo/{id}',
-  description: 'Obtener un usuario por ID sin relaciones',
-  summary: 'Obtener usuario básico',
-  tags: ['Usuarios'],
-  request: {
-    params: z.object({
-      id: z.string().regex(/^\d+$/, 'ID debe ser un número').openapi({
-        description: 'ID del usuario',
-        example: '1',
-      }),
-    }),
-  },
-  responses: {
-    200: {
-      description: 'Usuario encontrado',
-      content: {
-        'application/json': {
-          schema: z.object({
-            message: z.string().openapi({ example: 'found one usuario' }),
-            data: usuarioResponseSchema,
-          }),
-        },
-      },
-    },
-    404: {
-      description: 'Usuario no encontrado',
-      content: {
-        'application/json': {
-          schema: errorResponseSchema,
-        },
-      },
-    },
-    500: {
-      description: 'Error interno del servidor',
-      content: {
-        'application/json': {
-          schema: errorResponseSchema,
-        },
-      },
-    },
-  },
-});
-
-//*Check - GET /api/usuario/cookie
+// GET /api/usuario/cookie
 usuarioRegistry.registerPath({
   method: 'get',
   path: '/api/usuario/cookie',
@@ -673,7 +521,6 @@ usuarioRegistry.registerPath({
           schema: z.object({
             message: z.string().openapi({
               example: 'found one usuario',
-              description: 'Mensaje de confirmación',
             }),
             data: usuarioResponseSchema,
           }),
@@ -715,63 +562,64 @@ usuarioRegistry.registerPath({
   },
 });
 
-// NEW - GET /api/usuario/comments/{userId}
+// GET /api/usuario/onlyInfo/{id}
 usuarioRegistry.registerPath({
   method: 'get',
-  path: '/api/usuario/comments/{userId}',
+  path: '/api/usuario/onlyInfo/{id}',
+  description: 'Obtener un usuario por ID sin relaciones',
+  summary: 'Obtener usuario básico',
+  tags: ['Usuarios'],
+  request: {
+    params: idParamSchema,
+  },
+  responses: {
+    200: {
+      description: 'Usuario encontrado',
+      content: {
+        'application/json': {
+          schema: z.object({
+            message: z.string().openapi({ example: 'found one usuario' }),
+            data: usuarioResponseSchema,
+          }),
+        },
+      },
+    },
+    404: {
+      description: 'Usuario no encontrado',
+      content: {
+        'application/json': {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+    500: {
+      description: 'Error interno del servidor',
+      content: {
+        'application/json': {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+  },
+});
+
+// GET /api/usuario/comments/{id}
+usuarioRegistry.registerPath({
+  method: 'get',
+  path: '/api/usuario/comments/{id}',
   description: 'Obtener comentarios de un usuario específico',
   summary: 'Obtener comentarios por ID de usuario',
   tags: ['Usuarios'],
   request: {
-    params: z.object({
-      userId: z.string().regex(/^\d+$/, 'ID debe ser un número').openapi({
-        description: 'ID del usuario',
-        example: '1',
-      }),
-    }),
-    query: z.object({
-      maxItems: z.coerce.number().min(1).max(50).default(5).optional().openapi({
-        description: 'Número máximo de comentarios por página',
-        example: 5,
-      }),
-      page: z.coerce.number().min(1).default(1).optional().openapi({
-        description: 'Número de página',
-        example: 1,
-      }),
-      orderBy: z.string().optional().openapi({
-        description: 'Campo por el cual ordenar',
-        example: 'fecha',
-      }),
-    }),
+    params: idParamSchema,
+    query: paginationQuerySchema,
   },
   responses: {
     200: {
       description: 'Comentarios encontrados exitosamente',
       content: {
         'application/json': {
-          schema: z.object({
-            message: z.string().openapi({ example: 'found comments for user' }),
-            data: z.array(
-              z.object({
-                id: z.number(),
-                comentario: z.string(),
-                calificacion: z.number().min(1).max(5),
-                fechaCreacion: z.string(),
-                cliente: z.object({
-                  id: z.number(),
-                  nombre: z.string(),
-                  apellido: z.string(),
-                }),
-              })
-            ),
-            pagination: z.object({
-              page: z.number(),
-              maxItems: z.number(),
-              totalComments: z.number(),
-              totalPages: z.number(),
-            }),
-            average: z.number().openapi({ example: 4.2 }),
-          }),
+          schema: commentsResponseSchema,
         },
       },
     },
@@ -794,7 +642,7 @@ usuarioRegistry.registerPath({
   },
 });
 
-//*Check - GET /api/usuarios/prestatarios/{tipoServicio}/{tarea}/{zona}/{orderBy}
+// GET /api/usuario/prestatarios/{tipoServicio}/{tarea}/{zona}/{orderBy}
 usuarioRegistry.registerPath({
   method: 'get',
   path: '/api/usuario/prestatarios/{tipoServicio}/{tarea}/{zona}/{orderBy}',
@@ -835,9 +683,50 @@ usuarioRegistry.registerPath({
   },
 });
 
+// GET /api/usuario/{id}
+usuarioRegistry.registerPath({
+  method: 'get',
+  path: '/api/usuario/{id}',
+  description: 'Obtener un usuario por ID pero con todas sus relaciones',
+  summary: 'Trae un usuario y toda su información',
+  tags: ['Usuarios'],
+  request: {
+    params: idParamSchema,
+  },
+  responses: {
+    200: {
+      description: 'Usuario encontrado',
+      content: {
+        'application/json': {
+          schema: z.object({
+            message: z.string().openapi({ example: 'found one usuario' }),
+            data: usuarioCompleteResponseSchema,
+          }),
+        },
+      },
+    },
+    404: {
+      description: 'Usuario no encontrado',
+      content: {
+        'application/json': {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+    500: {
+      description: 'Error interno del servidor',
+      content: {
+        'application/json': {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+  },
+});
+
 // ==================== PUT METHODS ====================
 
-// NEW - PUT /api/usuario/{id}
+// PUT /api/usuario/{id}
 usuarioRegistry.registerPath({
   method: 'put',
   path: '/api/usuario/{id}',
@@ -845,12 +734,7 @@ usuarioRegistry.registerPath({
   summary: 'Actualizar usuario',
   tags: ['Usuarios'],
   request: {
-    params: z.object({
-      id: z.string().regex(/^\d+$/, 'ID debe ser un número').openapi({
-        description: 'ID del usuario',
-        example: '1',
-      }),
-    }),
+    params: idParamSchema,
     body: {
       description: 'Datos del usuario a actualizar',
       content: {
@@ -906,7 +790,7 @@ usuarioRegistry.registerPath({
 
 // ==================== DELETE METHODS ====================
 
-// NEW - DELETE /api/usuario/{id}
+// DELETE /api/usuario/{id}
 usuarioRegistry.registerPath({
   method: 'delete',
   path: '/api/usuario/{id}',
@@ -914,12 +798,7 @@ usuarioRegistry.registerPath({
   summary: 'Eliminar usuario',
   tags: ['Usuarios'],
   request: {
-    params: z.object({
-      id: z.string().regex(/^\d+$/, 'ID debe ser un número').openapi({
-        description: 'ID del usuario a eliminar',
-        example: '1',
-      }),
-    }),
+    params: idParamSchema,
   },
   responses: {
     200: {

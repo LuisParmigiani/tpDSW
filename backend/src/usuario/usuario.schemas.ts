@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 
+// Extend Zod with OpenAPI functionality
 extendZodWithOpenApi(z);
 
 export const usuarioBaseSchema = z.object({
@@ -13,8 +14,8 @@ export const usuarioBaseSchema = z.object({
       /^[a-zA-ZÀ-ÿ\s]+$/,
       'El nombre solo puede contener letras y espacios'
     )
+    .describe('Nombre del usuario')
     .openapi({
-      description: 'Nombre del usuario',
       example: 'Juan',
     }),
   apellido: z
@@ -26,24 +27,24 @@ export const usuarioBaseSchema = z.object({
       /^[a-zA-ZÀ-ÿ\s]+$/,
       'El apellido solo puede contener letras y espacios'
     )
+    .describe('Apellido del usuario')
     .openapi({
-      description: 'Apellido del usuario',
       example: 'Pérez',
     }),
   mail: z
     .string()
     .email('El email debe tener un formato válido')
     .max(100, 'El email no puede exceder los 100 caracteres')
+    .describe('Correo electrónico del usuario')
     .openapi({
-      description: 'Correo electrónico del usuario',
       example: 'juan.perez@gmail.com',
     }),
   tipoDoc: z
     .enum(['DNI', 'CUIT', 'CUIL'], {
       message: 'Tipo de documento debe ser DNI, CUIT o CUIL',
     })
+    .describe('Tipo de documento')
     .openapi({
-      description: 'Tipo de documento',
       example: 'DNI',
     }),
   numeroDoc: z
@@ -54,23 +55,23 @@ export const usuarioBaseSchema = z.object({
       /^[0-9\-]+$/,
       'Número de documento solo puede contener números y guiones'
     )
+    .describe('Número de documento')
     .openapi({
-      description: 'Número de documento',
       example: '12345678',
     }),
   telefono: z
     .string()
     .regex(/^[+]?[0-9\s\-()]{8,20}$/, 'Formato de teléfono inválido')
+    .describe('Número de teléfono')
     .openapi({
-      description: 'Número de teléfono',
       example: '+54 11 1234-5678',
     }),
   direccion: z
     .string()
     .min(5, 'Dirección debe ser más específica')
     .max(200, 'Dirección no puede exceder 200 caracteres')
+    .describe('Dirección del usuario')
     .openapi({
-      description: 'Dirección del usuario',
       example: 'Av. Corrientes 1234',
     }),
   contrasena: z
@@ -88,8 +89,8 @@ export const usuarioBaseSchema = z.object({
     .url('La foto debe ser una URL válida')
     .max(200, 'La URL de la foto no puede exceder los 200 caracteres')
     .optional()
+    .describe('URL de la foto de perfil del usuario')
     .openapi({
-      description: 'URL de la foto de perfil del usuario',
       example: 'http://example.com/foto.jpg',
     }),
   estado: z
@@ -97,473 +98,430 @@ export const usuarioBaseSchema = z.object({
       message: 'El estado debe ser "activo" o "inactivo"',
     })
     .default('activo')
+    .describe('Estado del usuario')
     .openapi({
-      description: 'Estado del usuario',
       example: 'activo',
     }),
 });
 
-export const createUsuarioSchema = usuarioBaseSchema
-  .extend({
-    //Campos obligatorios
-    mail: usuarioBaseSchema.shape.mail,
-    nombre: usuarioBaseSchema.shape.nombre,
-    apellido: usuarioBaseSchema.shape.apellido,
-    tipoDoc: usuarioBaseSchema.shape.tipoDoc,
-    numeroDoc: usuarioBaseSchema.shape.numeroDoc,
-    telefono: usuarioBaseSchema.shape.telefono,
-    direccion: usuarioBaseSchema.shape.direccion,
-    estado: usuarioBaseSchema.shape.estado,
-    contrasena: z
-      .string()
-      .min(
-        6,
-        'La contraseña debe tener al menos 6 caracteres, una letra mayúscula, una letra minúscula y un número'
-      )
-      .openapi({
-        description: 'Contraseña del usuario',
-        example: 'Password123',
-      }),
-    nombreFantasia: z
-      .string()
-      .min(2, 'El nombre de fantasía debe tener al menos 2 caracteres')
-      .max(30, 'El nombre de fantasía no puede exceder los 30 caracteres')
-      .optional()
-      .openapi({
-        description: 'Nombre de fantasía del prestatario',
-        example: 'Servicios SRL',
-      }),
-    descripcion: z.string().optional().openapi({
-      description: 'Descripción del prestatario',
+export const createUsuarioSchema = usuarioBaseSchema.extend({
+  //Campos obligatorios
+  mail: usuarioBaseSchema.shape.mail,
+  nombre: usuarioBaseSchema.shape.nombre,
+  apellido: usuarioBaseSchema.shape.apellido,
+  tipoDoc: usuarioBaseSchema.shape.tipoDoc,
+  numeroDoc: usuarioBaseSchema.shape.numeroDoc,
+  telefono: usuarioBaseSchema.shape.telefono,
+  direccion: usuarioBaseSchema.shape.direccion,
+  estado: usuarioBaseSchema.shape.estado,
+  contrasena: z
+    .string()
+    .min(6, 'La contraseña debe tener al menos 6 caracteres')
+    .describe('Contraseña del usuario')
+    .openapi({
+      example: 'Password123',
+    }),
+
+  // ✅ FIX: Handle empty strings properly
+  nombreFantasia: z
+    .string()
+    .min(2, 'El nombre de fantasía debe tener al menos 2 caracteres')
+    .max(30, 'El nombre de fantasía no puede exceder los 30 caracteres')
+    .optional()
+    .or(z.literal('').transform(() => undefined))
+    .describe('Nombre de fantasía del prestatario')
+    .openapi({
+      example: 'Servicios SRL',
+    }),
+
+  // ✅ FIX: Same for descripcion
+  descripcion: z
+    .string()
+    .optional()
+    .or(z.literal('').transform(() => undefined))
+    .describe('Descripción del prestatario')
+    .openapi({
       example: 'Ofrecemos servicios de plomería y electricidad.',
     }),
-  })
-  .openapi('CreateUsuario');
+});
 
-export const loginSchema = z
-  .object({
-    mail: z.string().email('El email debe tener un formato válido').openapi({
-      description: 'Correo electrónico del usuario',
+export const loginSchema = z.object({
+  mail: z
+    .string()
+    .email('El email debe tener un formato válido')
+    .describe('Correo electrónico del usuario')
+    .openapi({
       example: 'juan.perez@gmail.com',
     }),
-    contrasena: z
-      .string()
-      .min(6, 'La contraseña debe tener al menos 6 caracteres')
-      .openapi({
-        description: 'Contraseña del usuario',
-        example: 'Password123',
-      }),
-  })
-  .openapi('Login');
+  contrasena: z
+    .string()
+    .min(6, 'La contraseña debe tener al menos 6 caracteres')
+    .describe('Contraseña del usuario')
+    .openapi({
+      example: 'Password123',
+    }),
+});
 
-export const findPrestatariosByTipoServicioAndZonaParamsSchema = z
-  .object({
-    tipoServicio: z.string().openapi({
-      description: 'Tipo de servicio a filtrar ("Todos" para no filtrar)',
+export const findPrestatariosByTipoServicioAndZonaParamsSchema = z.object({
+  tipoServicio: z
+    .string()
+    .describe('Tipo de servicio a filtrar ("Todos" para no filtrar)')
+    .openapi({
       example: 'Plomería',
     }),
-    zona: z.string().openapi({
-      description: 'Zona a filtrar ("Todas" para no filtrar)',
+  zona: z
+    .string()
+    .describe('Zona a filtrar ("Todas" para no filtrar)')
+    .openapi({
       example: 'Centro',
     }),
-    tarea: z.string().optional().openapi({
-      description: 'Tarea específica a filtrar (opcional)',
+  tarea: z
+    .string()
+    .optional()
+    .describe('Tarea específica a filtrar (opcional)')
+    .openapi({
       example: 'Reparación de canillas',
     }),
-    orderBy: z.enum(['nombre', 'calificacion']).optional().openapi({
-      description: 'Campo por el cual ordenar los resultados',
+  orderBy: z
+    .enum(['nombre', 'calificacion'])
+    .optional()
+    .describe('Campo por el cual ordenar los resultados')
+    .openapi({
       example: 'calificacion',
     }),
-  })
-  .openapi('FindPrestatariosParams');
+});
 
-export const findPrestatariosByTipoServicioAndZonaQuerySchema = z
-  .object({
-    maxItems: z.coerce.number().min(1).max(50).default(6).openapi({
-      description: 'Número máximo de elementos por página',
+export const findPrestatariosByTipoServicioAndZonaQuerySchema = z.object({
+  maxItems: z.coerce
+    .number()
+    .min(1)
+    .max(50)
+    .default(6)
+    .describe('Número máximo de elementos por página')
+    .openapi({
       example: 6,
     }),
-    page: z.coerce.number().min(1).default(1).openapi({
-      description: 'Número de página',
+  page: z.coerce
+    .number()
+    .min(1)
+    .default(1)
+    .describe('Número de página')
+    .openapi({
       example: 1,
     }),
-  })
-  .openapi('FindPrestatariosQuery');
-
-//! Response schemas
-//! Response Schemas
-// ...existing code...
+});
 
 // Additional schemas for related entities
-export const tareaSchema = z
-  .object({
-    id: z.number().openapi({
-      description: 'ID de la tarea',
-      example: 1,
-    }),
-    nombreTarea: z.string().openapi({
-      description: 'Nombre de la tarea',
-      example: 'Reparación de canillas',
-    }),
-    descripcionTarea: z.string().openapi({
-      description: 'Descripción de la tarea',
-      example: 'Arreglo de grifería',
-    }),
-    duracionTarea: z.number().openapi({
-      description: 'Duración de la tarea en minutos',
+export const tareaSchema = z.object({
+  id: z.number().describe('ID de la tarea').openapi({
+    example: 1,
+  }),
+  nombreTarea: z.string().describe('Nombre de la tarea').openapi({
+    example: 'Reparación de canillas',
+  }),
+  descripcionTarea: z.string().describe('Descripción de la tarea').openapi({
+    example: 'Arreglo de grifería',
+  }),
+  duracionTarea: z
+    .number()
+    .describe('Duración de la tarea en minutos')
+    .openapi({
       example: 60,
     }),
-    tipoServicio: z.number().openapi({
-      description: 'ID del tipo de servicio',
-      example: 2,
-    }),
-  })
-  .openapi('Tarea');
+  tipoServicio: z.number().describe('ID del tipo de servicio').openapi({
+    example: 2,
+  }),
+});
 
-export const servicioSchema = z
-  .object({
-    id: z.number().openapi({
-      description: 'ID del servicio',
-      example: 1,
-    }),
-    descripcionServicio: z.string().optional().openapi({
-      description: 'Descripción del servicio',
+export const servicioSchema = z.object({
+  id: z.number().describe('ID del servicio').openapi({
+    example: 1,
+  }),
+  descripcionServicio: z
+    .string()
+    .optional()
+    .describe('Descripción del servicio')
+    .openapi({
       example: 'Servicio de plomería profesional',
     }),
-    precio: z.number().openapi({
-      description: 'Precio del servicio',
-      example: 2500.0,
-    }),
-    estado: z.string().openapi({
-      description: 'Estado del servicio',
-      example: 'activo',
-    }),
-    tarea: tareaSchema.openapi({
-      description: 'Tarea asociada al servicio',
-    }),
-  })
-  .openapi('Servicio');
+  precio: z.number().describe('Precio del servicio').openapi({
+    example: 2500.0,
+  }),
+  estado: z.string().describe('Estado del servicio').openapi({
+    example: 'activo',
+  }),
+  tarea: tareaSchema.describe('Tarea asociada al servicio'),
+});
 
-export const tipoServicioSchema = z
-  .object({
-    id: z.number().openapi({
-      description: 'ID del tipo de servicio',
-      example: 1,
-    }),
-    nombreTipo: z.string().openapi({
-      description: 'Nombre del tipo de servicio',
-      example: 'Plomería',
-    }),
-    descripcionTipo: z.string().openapi({
-      description: 'Descripción del tipo de servicio',
+export const tipoServicioSchema = z.object({
+  id: z.number().describe('ID del tipo de servicio').openapi({
+    example: 1,
+  }),
+  nombreTipo: z.string().describe('Nombre del tipo de servicio').openapi({
+    example: 'Plomería',
+  }),
+  descripcionTipo: z
+    .string()
+    .describe('Descripción del tipo de servicio')
+    .openapi({
       example: 'Servicios de plomería profesional',
     }),
-  })
-  .openapi('TipoServicio');
+});
 
-export const horarioSchema = z
-  .object({
-    id: z.number().openapi({
-      description: 'ID del horario',
-      example: 1,
-    }),
-    diaSemana: z.string().openapi({
-      description: 'Día de la semana',
-      example: 'Lunes',
-    }),
-    horaInicio: z.string().openapi({
-      description: 'Hora de inicio',
-      example: '09:00',
-    }),
-    horaFin: z.string().openapi({
-      description: 'Hora de fin',
-      example: '17:00',
-    }),
-  })
-  .openapi('Horario');
+export const horarioSchema = z.object({
+  id: z.number().describe('ID del horario').openapi({
+    example: 1,
+  }),
+  diaSemana: z.string().describe('Día de la semana').openapi({
+    example: 'Lunes',
+  }),
+  horaInicio: z.string().describe('Hora de inicio').openapi({
+    example: '09:00',
+  }),
+  horaFin: z.string().describe('Hora de fin').openapi({
+    example: '17:00',
+  }),
+});
 
-export const turnoSchema = z
-  .object({
-    id: z.number().openapi({
-      description: 'ID del turno',
-      example: 1,
-    }),
-    fechaTurno: z.string().openapi({
-      description: 'Fecha del turno',
-      example: '2024-03-15',
-    }),
-    horaTurno: z.string().openapi({
-      description: 'Hora del turno',
-      example: '14:30',
-    }),
-    estado: z.string().openapi({
-      description: 'Estado del turno',
-      example: 'confirmado',
-    }),
-    calificacion: z.number().nullable().openapi({
-      description: 'Calificación del turno (1-5)',
+export const turnoSchema = z.object({
+  id: z.number().describe('ID del turno').openapi({
+    example: 1,
+  }),
+  fechaTurno: z.string().describe('Fecha del turno').openapi({
+    example: '2024-03-15',
+  }),
+  horaTurno: z.string().describe('Hora del turno').openapi({
+    example: '14:30',
+  }),
+  estado: z.string().describe('Estado del turno').openapi({
+    example: 'confirmado',
+  }),
+  calificacion: z
+    .number()
+    .nullable()
+    .describe('Calificación del turno (1-5)')
+    .openapi({
       example: 4.5,
     }),
-    comentario: z.string().nullable().openapi({
-      description: 'Comentario del cliente',
-      example: 'Excelente servicio',
-    }),
-  })
-  .openapi('Turno');
+  comentario: z.string().nullable().describe('Comentario del cliente').openapi({
+    example: 'Excelente servicio',
+  }),
+});
 
 // Complete user response schema with all relationships
-export const usuarioCompleteResponseSchema = z
-  .object({
-    id: z.number().openapi({ description: 'ID único del usuario', example: 1 }),
-    mail: z.string().openapi({
-      description: 'Email del usuario',
-      example: 'usuario@example.com',
-    }),
-    nombre: z.string().openapi({
-      description: 'Nombre del usuario',
-      example: 'Juan',
-    }),
-    apellido: z.string().openapi({
-      description: 'Apellido del usuario',
-      example: 'Pérez',
-    }),
-    tipoDoc: z.string().openapi({
-      description: 'Tipo de documento',
-      example: 'DNI',
-    }),
-    numeroDoc: z.string().openapi({
-      description: 'Número de documento',
-      example: '12345678',
-    }),
-    telefono: z.string().openapi({
-      description: 'Teléfono',
-      example: '+54 11 1234-5678',
-    }),
-    direccion: z.string().openapi({
-      description: 'Dirección',
-      example: 'Av. Corrientes 1234',
-    }),
-    nombreFantasia: z.string().nullable().openapi({
-      description: 'Nombre de fantasía',
-      example: 'Plomería Pérez',
-    }),
-    descripcion: z.string().nullable().openapi({
-      description: 'Descripción',
-      example: 'Plomero con experiencia',
-    }),
-    foto: z.string().nullable().openapi({
-      description: 'URL de la foto de perfil',
-      example: 'http://localhost:3000/uploads/profiles/optimized_1.webp',
-    }),
-    estado: z.string().openapi({
-      description: 'Estado del usuario',
-      example: 'activo',
-    }),
-    turnos: z.array(turnoSchema).openapi({
-      description: 'Turnos asociados al usuario',
-    }),
-    servicios: z.array(servicioSchema).openapi({
-      description: 'Servicios ofrecidos por el usuario',
-    }),
-    tiposDeServicio: z.array(tipoServicioSchema).openapi({
-      description: 'Tipos de servicio que ofrece el usuario',
-    }),
-    horarios: z.array(horarioSchema).openapi({
-      description: 'Horarios de disponibilidad del usuario',
-    }),
-  })
-  .openapi('UsuarioCompleteResponse');
+export const usuarioCompleteResponseSchema = z.object({
+  id: z.number().describe('ID único del usuario').openapi({ example: 1 }),
+  mail: z.string().describe('Email del usuario').openapi({
+    example: 'usuario@example.com',
+  }),
+  nombre: z.string().describe('Nombre del usuario').openapi({
+    example: 'Juan',
+  }),
+  apellido: z.string().describe('Apellido del usuario').openapi({
+    example: 'Pérez',
+  }),
+  tipoDoc: z.string().describe('Tipo de documento').openapi({
+    example: 'DNI',
+  }),
+  numeroDoc: z.string().describe('Número de documento').openapi({
+    example: '12345678',
+  }),
+  telefono: z.string().describe('Teléfono').openapi({
+    example: '+54 11 1234-5678',
+  }),
+  direccion: z.string().describe('Dirección').openapi({
+    example: 'Av. Corrientes 1234',
+  }),
+  nombreFantasia: z.string().nullable().describe('Nombre de fantasía').openapi({
+    example: 'Plomería Pérez',
+  }),
+  descripcion: z.string().nullable().describe('Descripción').openapi({
+    example: 'Plomero con experiencia',
+  }),
+  foto: z.string().nullable().describe('URL de la foto de perfil').openapi({
+    example: 'http://localhost:3000/uploads/profiles/optimized_1.webp',
+  }),
+  estado: z.string().describe('Estado del usuario').openapi({
+    example: 'activo',
+  }),
+  turnos: z.array(turnoSchema).describe('Turnos asociados al usuario'),
+  servicios: z
+    .array(servicioSchema)
+    .describe('Servicios ofrecidos por el usuario'),
+  tiposDeServicio: z
+    .array(tipoServicioSchema)
+    .describe('Tipos de servicio que ofrece el usuario'),
+  horarios: z
+    .array(horarioSchema)
+    .describe('Horarios de disponibilidad del usuario'),
+});
 
 // Update the findAll response schema
-export const findAllUsuariosResponseSchema = z
-  .object({
-    message: z.string().openapi({
-      description: 'Mensaje de respuesta',
-      example: 'found all Usuarios',
-    }),
-    data: z.array(usuarioCompleteResponseSchema).openapi({
-      description: 'Lista completa de usuarios con todas sus relaciones',
-    }),
-  })
-  .openapi('FindAllUsuariosResponse');
+export const findAllUsuariosResponseSchema = z.object({
+  message: z.string().describe('Mensaje de respuesta').openapi({
+    example: 'found all Usuarios',
+  }),
+  data: z
+    .array(usuarioCompleteResponseSchema)
+    .describe('Lista completa de usuarios con todas sus relaciones'),
+});
 
-export const tareaInfoSchema = z
-  .object({
-    nombreTarea: z.string().openapi({
-      description: 'Nombre de la tarea',
-      example: 'Reparación de canillas',
-    }),
-  })
-  .openapi('TareaInfo');
+export const tareaInfoSchema = z.object({
+  nombreTarea: z.string().describe('Nombre de la tarea').openapi({
+    example: 'Reparación de canillas',
+  }),
+});
 
-export const tipoServicioInfoSchema = z
-  .object({
-    id: z.number().openapi({
-      description: 'ID del tipo de servicio',
-      example: 1,
-    }),
-    nombreTipo: z.string().openapi({
-      description: 'Nombre del tipo de servicio',
-      example: 'Plomería',
-    }),
-    descripcionTipo: z.string().openapi({
-      description: 'Descripción del tipo de servicio',
+export const tipoServicioInfoSchema = z.object({
+  id: z.number().describe('ID del tipo de servicio').openapi({
+    example: 1,
+  }),
+  nombreTipo: z.string().describe('Nombre del tipo de servicio').openapi({
+    example: 'Plomería',
+  }),
+  descripcionTipo: z
+    .string()
+    .describe('Descripción del tipo de servicio')
+    .openapi({
       example: 'Servicios de plomería profesional',
     }),
-  })
-  .openapi('TipoServicioInfo');
+});
 
-export const zonaInfoSchema = z
-  .object({
-    id: z.number().openapi({
-      description: 'ID de la zona',
-      example: 1,
-    }),
-    descripcion_zona: z.string().openapi({
-      description: 'Descripción de la zona',
-      example: 'Centro',
-    }),
-  })
-  .openapi('ZonaInfo');
+export const zonaInfoSchema = z.object({
+  id: z.number().describe('ID de la zona').openapi({
+    example: 1,
+  }),
+  descripcion_zona: z.string().describe('Descripción de la zona').openapi({
+    example: 'Centro',
+  }),
+});
 
-export const prestatarioWithRatingSchema = z
-  .object({
-    id: z.number().openapi({
-      description: 'ID único del prestatario',
-      example: 1,
-    }),
-    nombre: z.string().openapi({
-      description: 'Nombre del prestatario',
-      example: 'Juan',
-    }),
-    apellido: z.string().openapi({
-      description: 'Apellido del prestatario',
-      example: 'Pérez',
-    }),
-    nombreFantasia: z.string().openapi({
-      description: 'Nombre de fantasía del prestatario',
+export const prestatarioWithRatingSchema = z.object({
+  id: z.number().describe('ID único del prestatario').openapi({
+    example: 1,
+  }),
+  nombre: z.string().describe('Nombre del prestatario').openapi({
+    example: 'Juan',
+  }),
+  apellido: z.string().describe('Apellido del prestatario').openapi({
+    example: 'Pérez',
+  }),
+  nombreFantasia: z
+    .string()
+    .describe('Nombre de fantasía del prestatario')
+    .openapi({
       example: 'Plomería Pérez',
     }),
-    descripcion: z.string().nullable().openapi({
-      description: 'Descripción del prestatario',
+  descripcion: z
+    .string()
+    .nullable()
+    .describe('Descripción del prestatario')
+    .openapi({
       example: 'Plomero con más de 10 años de experiencia',
     }),
-    foto: z.string().nullable().openapi({
-      description: 'URL de la foto de perfil',
-      example: 'http://localhost:3000/uploads/profiles/optimized_1.webp',
-    }),
-    tiposDeServicio: z.array(tipoServicioInfoSchema).openapi({
-      description: 'Tipos de servicio que ofrece el prestatario',
-    }),
-    tareas: z.array(tareaInfoSchema).openapi({
-      description: 'Tareas específicas que puede realizar',
-    }),
-    calificacion: z.number().min(0).max(5).openapi({
-      description: 'Calificación promedio del prestatario (0-5)',
+  foto: z.string().nullable().describe('URL de la foto de perfil').openapi({
+    example: 'http://localhost:3000/uploads/profiles/optimized_1.webp',
+  }),
+  tiposDeServicio: z
+    .array(tipoServicioInfoSchema)
+    .describe('Tipos de servicio que ofrece el prestatario'),
+  tareas: z
+    .array(tareaInfoSchema)
+    .describe('Tareas específicas que puede realizar'),
+  calificacion: z
+    .number()
+    .min(0)
+    .max(5)
+    .describe('Calificación promedio del prestatario (0-5)')
+    .openapi({
       example: 4.5,
     }),
-  })
-  .openapi('PrestatarioWithRating');
+});
 
-export const paginationInfoSchema = z
-  .object({
-    page: z.number().openapi({
-      description: 'Página actual',
-      example: 1,
-    }),
-    maxItems: z.number().openapi({
-      description: 'Elementos por página',
-      example: 6,
-    }),
-    totalPages: z.number().openapi({
-      description: 'Total de páginas disponibles',
-      example: 5,
-    }),
-  })
-  .openapi('PaginationInfo');
+export const paginationInfoSchema = z.object({
+  page: z.number().describe('Página actual').openapi({
+    example: 1,
+  }),
+  maxItems: z.number().describe('Elementos por página').openapi({
+    example: 6,
+  }),
+  totalPages: z.number().describe('Total de páginas disponibles').openapi({
+    example: 5,
+  }),
+});
 
-export const findPrestatariosByTipoServicioAndZonaResponseSchema = z
-  .object({
-    message: z.string().openapi({
-      description: 'Mensaje de respuesta',
-      example: 'found prestatarios',
-    }),
-    data: z.array(prestatarioWithRatingSchema).openapi({
-      description: 'Lista de prestatarios encontrados',
-    }),
-    pagination: paginationInfoSchema.openapi({
-      description: 'Información de paginación',
-    }),
-  })
-  .openapi('FindPrestatariosResponse');
+export const findPrestatariosByTipoServicioAndZonaResponseSchema = z.object({
+  message: z.string().describe('Mensaje de respuesta').openapi({
+    example: 'found prestatarios',
+  }),
+  data: z
+    .array(prestatarioWithRatingSchema)
+    .describe('Lista de prestatarios encontrados'),
+  pagination: paginationInfoSchema.describe('Información de paginación'),
+});
 
-export const notFoundResponseSchema = z
-  .object({
-    message: z.string().openapi({
-      description: 'Mensaje de error cuando no se encuentran prestatarios',
+export const notFoundResponseSchema = z.object({
+  message: z
+    .string()
+    .describe('Mensaje de error cuando no se encuentran prestatarios')
+    .openapi({
       example: 'No prestatarios found for the given tipoServicio and zona',
     }),
-  })
-  .openapi('NotFoundResponse');
+});
 
-export const usuarioResponseSchema = z
-  .object({
-    id: z.number().openapi({ description: 'ID único del usuario', example: 1 }),
-    mail: z.string().openapi({
-      description: 'Email del usuario',
-      example: 'usuario@example.com',
-    }),
-    nombre: z
-      .string()
-      .openapi({ description: 'Nombre del usuario', example: 'Juan' }),
-    apellido: z
-      .string()
-      .openapi({ description: 'Apellido del usuario', example: 'Pérez' }),
-    tipoDoc: z
-      .string()
-      .openapi({ description: 'Tipo de documento', example: 'DNI' }),
-    numeroDoc: z
-      .string()
-      .openapi({ description: 'Número de documento', example: '12345678' }),
-    telefono: z
-      .string()
-      .openapi({ description: 'Teléfono', example: '+54 11 1234-5678' }),
-    direccion: z
-      .string()
-      .openapi({ description: 'Dirección', example: 'Av. Corrientes 1234' }),
-    nombreFantasia: z.string().nullable().openapi({
-      description: 'Nombre de fantasía',
-      example: 'Plomería Pérez',
-    }),
-    descripcion: z.string().nullable().openapi({
-      description: 'Descripción',
-      example: 'Plomero con experiencia',
-    }),
-  })
-  .openapi('UsuarioResponse');
+export const usuarioResponseSchema = z.object({
+  id: z.number().describe('ID único del usuario').openapi({ example: 1 }),
+  mail: z.string().describe('Email del usuario').openapi({
+    example: 'usuario@example.com',
+  }),
+  nombre: z
+    .string()
+    .describe('Nombre del usuario')
+    .openapi({ example: 'Juan' }),
+  apellido: z
+    .string()
+    .describe('Apellido del usuario')
+    .openapi({ example: 'Pérez' }),
+  tipoDoc: z.string().describe('Tipo de documento').openapi({ example: 'DNI' }),
+  numeroDoc: z
+    .string()
+    .describe('Número de documento')
+    .openapi({ example: '12345678' }),
+  telefono: z
+    .string()
+    .describe('Teléfono')
+    .openapi({ example: '+54 11 1234-5678' }),
+  direccion: z
+    .string()
+    .describe('Dirección')
+    .openapi({ example: 'Av. Corrientes 1234' }),
+  nombreFantasia: z.string().nullable().describe('Nombre de fantasía').openapi({
+    example: 'Plomería Pérez',
+  }),
+  descripcion: z.string().nullable().describe('Descripción').openapi({
+    example: 'Plomero con experiencia',
+  }),
+});
 
-export const errorResponseSchema = z
-  .object({
-    message: z.string().openapi({
-      description: 'Mensaje de error',
-      example: 'Validation failed',
-    }),
-    errors: z
-      .array(
-        z.object({
-          field: z
-            .string()
-            .openapi({ description: 'Campo que falló', example: 'email' }),
-          message: z.string().openapi({
-            description: 'Mensaje de error',
-            example: 'Email inválido',
-          }),
-        })
-      )
-      .optional()
-      .openapi({ description: 'Detalles de errores de validación' }),
-  })
-  .openapi('ErrorResponse');
+export const errorResponseSchema = z.object({
+  message: z.string().describe('Mensaje de error').openapi({
+    example: 'Validation failed',
+  }),
+  errors: z
+    .array(
+      z.object({
+        field: z
+          .string()
+          .describe('Campo que falló')
+          .openapi({ example: 'email' }),
+        message: z.string().describe('Mensaje de error').openapi({
+          example: 'Email inválido',
+        }),
+      })
+    )
+    .optional()
+    .describe('Detalles de errores de validación'),
+});
 
 //! Exporto los esquemas para usar en el middleware de validación
 
