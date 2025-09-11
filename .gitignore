@@ -13,7 +13,12 @@ node_modules
 # OS metadata
 .DS_Store
 Thumbs.db
-
+##fotos
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.webp
 # ignore built ts files
 dist/**/*
 backend/dist/**/*
