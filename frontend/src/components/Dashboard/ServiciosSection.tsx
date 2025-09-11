@@ -7,6 +7,7 @@ import { tareasApi } from '../../services/tareasApi';
 import { serviciosApi } from '../../services/serviciosApi';
 import { Alert, AlertDescription } from '../Alerts/Alerts';
 import useAuth from '../../cookie/useAuth';
+import StripeConnection from '../StripeConnection/StripeConnection';
 
 // Función para convertir datos del API al formato del componente
 const convertirTipoServicioADisplay = (tipoServicio: unknown): TipoServicioData => {
@@ -461,12 +462,13 @@ function ServiciosSection() {
 
   return (
     <DashboardSection>
-      <div className="space-y-8">
-        {/* Header */}
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Mis Servicios</h2>
-          <p className="text-gray-600">Selecciona los tipos de servicio y las tareas que prestas.</p>
-        </div>
+      <StripeConnection loadingMessage="Cargando configuración de servicios...">
+        <div className="space-y-8">
+          {/* Header */}
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Mis Servicios</h2>
+            <p className="text-gray-600">Selecciona los tipos de servicio y las tareas que prestas.</p>
+          </div>
 
         {/* Selector de Tipos de Servicio */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -691,6 +693,7 @@ function ServiciosSection() {
           </Alert>
         )}
       </div>
+      </StripeConnection>
     </DashboardSection>
   );
 }
