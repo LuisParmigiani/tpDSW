@@ -7,6 +7,7 @@ import path from 'path';
 //* SE importan los registros de los endpoints
 import { usuarioRegistry } from './usuario/usuario.registry.js';
 import { turnoRegistry } from './turno/turno.registry.js';
+import { zonaRegistry } from './zona/zona.registry.js';
 
 async function generateOpenApiDocument() {
   const registry = new OpenAPIRegistry();
@@ -23,6 +24,7 @@ async function generateOpenApiDocument() {
     ...registry.definitions, // Esquemas de seguridad
     ...usuarioRegistry.definitions, // Esquemas y definiciones del usuario
     ...turnoRegistry.definitions, // Esquemas y definiciones de turno
+    ...zonaRegistry.definitions,
     // ,...servicioRegistry.definitions, // Esquemas y definiciones del servicio
     // ...reservaRegistry.definitions,
   ];
@@ -65,6 +67,10 @@ async function generateOpenApiDocument() {
       {
         name: 'Servicios',
         description: 'Operaciones para el manejo de Servicios',
+      },
+      {
+        name: 'Zonas',
+        description: 'Operaciones para el manejo de Zonas',
       },
       {
         name: 'Reservas',

@@ -1,18 +1,42 @@
 import { Router } from 'express';
 import {
-  findAll,
-  findOne,
-  add,
-  update,
-  remove,
-  sanitizeZonaInput,
-} from './zona.controller.js';
+  validateBody,
+  validateParams,
+  validateQuery,
+  authenticateToken,
+} from '../utils/apiMiddleware.js';
+import {
+  createZonaValidation,
+  updateZonaValidation,
+  idParamValidation,
+} from './zona.schemas.js';
+import { findAll, findOne, add, update, remove } from './zona.controller.js';
 
 export const zonaRouter = Router();
 
-zonaRouter.get('/', sanitizeZonaInput, findAll);
-zonaRouter.get('/:id', sanitizeZonaInput, findOne);
-zonaRouter.post('/', sanitizeZonaInput, add);
-zonaRouter.put('/:id', sanitizeZonaInput, update);
-zonaRouter.patch('/:id', sanitizeZonaInput, update);
-zonaRouter.delete('/:id', sanitizeZonaInput, remove);
+// ==================== POST ROUTES ====================
+zonaRouter.post('/', validateBody(createZonaValidation), add);
+
+// ==================== GET ROUTES ====================
+zonaRouter.get('/', findAll);
+
+zonaRouter.get('/:id', validateParams(idParamValidation), findOne);
+
+// ==================== PUT ROUTES ====================
+zonaRouter.put(
+  '/:id',
+  validateParams(idParamValidation),
+  validateBody(updateZonaValidation),
+  update
+);
+
+// ==================== PATCH ROUTES ====================
+zonaRouter.patch(
+  '/:id',
+  validateParams(idParamValidation),
+  validateBody(updateZonaValidation),
+  update
+);
+
+// ==================== DELETE ROUTES ====================
+zonaRouter.delete('/:id', validateParams(idParamValidation), remove);
