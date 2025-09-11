@@ -39,12 +39,9 @@ function PagosSection() {
           return;
         }
 
-        // TODO: Implementar llamada al API para verificar si Stripe está conectado
-        // const response = await stripApi.verificarConexion(usuario.id);
-        // setConectadoStripe(response.data.conectado);
-
-        // Por ahora usar un valor temporal
-        setConectadoStripe(false);
+        // Verificar si el usuario tiene stripeAccountId
+        const tieneStripeConectado = Boolean(usuario.stripeAccountId);
+        setConectadoStripe(tieneStripeConectado);
         
         setLoading(false);
       } catch (err) {

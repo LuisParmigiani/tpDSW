@@ -9,6 +9,11 @@ interface User {
   mail?: string; // Por si el backend usa 'mail' en lugar de 'email'
   foto?: string;
   urlFoto?: string; // Por si el backend usa este campo para la imagen
+  // Campos de Stripe
+  stripeAccountId?: string;
+  onboardingStatus?: string;
+  chargesEnabled?: boolean;
+  payoutsEnabled?: boolean;
 }
 
 const useAuth = () => {
