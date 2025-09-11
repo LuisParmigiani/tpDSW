@@ -18,6 +18,8 @@ tags:
     description: Operaciones para el manejo de Usuarios
   - name: Servicios
     description: Operaciones para el manejo de Servicios
+  - name: Zonas
+    description: Operaciones para el manejo de Zonas
   - name: Reservas
     description: Operaciones para el manejo de Reservas
   - name: Autenticación
@@ -98,13 +100,21 @@ components:
           description: Estado del usuario
           example: activo
         nombreFantasia:
-          type: string
-          minLength: 2
-          maxLength: 30
+          anyOf:
+            - type: string
+              minLength: 2
+              maxLength: 30
+            - type: string
+              enum:
+                - ""
           description: Nombre de fantasía del prestatario
           example: Servicios SRL
         descripcion:
-          type: string
+          anyOf:
+            - type: string
+            - type: string
+              enum:
+                - ""
           description: Descripción del prestatario
           example: Ofrecemos servicios de plomería y electricidad.
       required:
@@ -975,6 +985,178 @@ components:
         - data
         - pagination
         - average
+    CreateZona:
+      type: object
+      properties:
+        descripcionZona:
+          type: string
+          minLength: 2
+          maxLength: 100
+          pattern: ^[a-zA-ZÀ-ÿ\s\-\.]+$
+          description: Descripción de la zona
+          example: Centro
+      required:
+        - descripcionZona
+    UpdateZona:
+      type: object
+      properties:
+        descripcionZona:
+          type: string
+          minLength: 2
+          maxLength: 100
+          pattern: ^[a-zA-ZÀ-ÿ\s\-\.]+$
+          description: Descripción de la zona
+          example: Centro
+    ZonaResponse:
+      type: object
+      properties:
+        id:
+          type: number
+          description: ID único de la zona
+          example: 1
+        descripcionZona:
+          type: string
+          description: Descripción de la zona
+          example: Centro
+      required:
+        - id
+        - descripcionZona
+    ZonaCompleteResponse:
+      type: object
+      properties:
+        id:
+          type: number
+          description: ID único de la zona
+          example: 1
+        descripcionZona:
+          type: string
+          description: Descripción de la zona
+          example: Centro
+        usuarios:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: number
+                description: ID del usuario
+                example: 1
+              nombre:
+                type: string
+                description: Nombre del usuario
+                example: Juan
+              apellido:
+                type: string
+                description: Apellido del usuario
+                example: Pérez
+              mail:
+                type: string
+                description: Email del usuario
+                example: juan.perez@gmail.com
+              nombreFantasia:
+                type: string
+                nullable: true
+                description: Nombre de fantasía del prestatario
+                example: Plomería Pérez
+            required:
+              - id
+              - nombre
+              - apellido
+              - mail
+              - nombreFantasia
+          description: Usuarios asociados a esta zona
+      required:
+        - id
+        - descripcionZona
+        - usuarios
+    FindAllZonasResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Mensaje de respuesta
+          example: found all Zonas
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: number
+                description: ID único de la zona
+                example: 1
+              descripcionZona:
+                type: string
+                description: Descripción de la zona
+                example: Centro
+              usuarios:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                      description: ID del usuario
+                      example: 1
+                    nombre:
+                      type: string
+                      description: Nombre del usuario
+                      example: Juan
+                    apellido:
+                      type: string
+                      description: Apellido del usuario
+                      example: Pérez
+                    mail:
+                      type: string
+                      description: Email del usuario
+                      example: juan.perez@gmail.com
+                    nombreFantasia:
+                      type: string
+                      nullable: true
+                      description: Nombre de fantasía del prestatario
+                      example: Plomería Pérez
+                  required:
+                    - id
+                    - nombre
+                    - apellido
+                    - mail
+                    - nombreFantasia
+                description: Usuarios asociados a esta zona
+            required:
+              - id
+              - descripcionZona
+              - usuarios
+          description: Lista completa de zonas con sus usuarios asociados
+      required:
+        - message
+        - data
+    FindAllZonasSimpleResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Mensaje de respuesta
+          example: found all Zonas
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: number
+                description: ID único de la zona
+                example: 1
+              descripcionZona:
+                type: string
+                description: Descripción de la zona
+                example: Centro
+            required:
+              - id
+              - descripcionZona
+          description: Lista simple de zonas sin relaciones
+      required:
+        - message
+        - data
   parameters: {}
 paths:
   /api/usuario:
@@ -1051,13 +1233,21 @@ paths:
                   description: Estado del usuario
                   example: activo
                 nombreFantasia:
-                  type: string
-                  minLength: 2
-                  maxLength: 30
+                  anyOf:
+                    - type: string
+                      minLength: 2
+                      maxLength: 30
+                    - type: string
+                      enum:
+                        - ""
                   description: Nombre de fantasía del prestatario
                   example: Servicios SRL
                 descripcion:
-                  type: string
+                  anyOf:
+                    - type: string
+                    - type: string
+                      enum:
+                        - ""
                   description: Descripción del prestatario
                   example: Ofrecemos servicios de plomería y electricidad.
               required:
@@ -3174,13 +3364,21 @@ paths:
                   description: Estado del usuario
                   example: activo
                 nombreFantasia:
-                  type: string
-                  minLength: 2
-                  maxLength: 30
+                  anyOf:
+                    - type: string
+                      minLength: 2
+                      maxLength: 30
+                    - type: string
+                      enum:
+                        - ""
                   description: Nombre de fantasía del prestatario
                   example: Servicios SRL
                 descripcion:
-                  type: string
+                  anyOf:
+                    - type: string
+                    - type: string
+                      enum:
+                        - ""
                   description: Descripción del prestatario
                   example: Ofrecemos servicios de plomería y electricidad.
       responses:
@@ -3468,6 +3666,667 @@ paths:
                           type: string
                           description: Mensaje de error
                           example: Email inválido
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+  /api/zona:
+    post:
+      description: Crear una nueva zona
+      summary: Crear zona
+      tags:
+        - Zonas
+      requestBody:
+        description: Datos de la zona a crear
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                descripcionZona:
+                  type: string
+                  minLength: 2
+                  maxLength: 100
+                  pattern: ^[a-zA-ZÀ-ÿ\s\-\.]+$
+                  description: Descripción de la zona
+                  example: Centro
+              required:
+                - descripcionZona
+      responses:
+        "201":
+          description: Zona creada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Zona creada exitosamente
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: number
+                        description: ID único de la zona
+                        example: 1
+                      descripcionZona:
+                        type: string
+                        description: Descripción de la zona
+                        example: Centro
+                    required:
+                      - id
+                      - descripcionZona
+                required:
+                  - message
+                  - data
+        "400":
+          description: Error de validación
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Validation failed
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: descripcionZona
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: Descripción inválida
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+        "409":
+          description: Conflicto - la zona ya existe
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: ZONA_ALREADY_EXISTS
+                  message:
+                    type: string
+                    example: Ya existe una zona con esa descripción
+                required:
+                  - error
+                  - message
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Validation failed
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: descripcionZona
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: Descripción inválida
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+    get:
+      description: Obtener todas las zonas con sus usuarios asociados
+      summary: Listar todas las zonas completas
+      tags:
+        - Zonas
+      responses:
+        "200":
+          description: Lista de zonas con usuarios asociados obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de respuesta
+                    example: found all Zonas
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: number
+                          description: ID único de la zona
+                          example: 1
+                        descripcionZona:
+                          type: string
+                          description: Descripción de la zona
+                          example: Centro
+                        usuarios:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: number
+                                description: ID del usuario
+                                example: 1
+                              nombre:
+                                type: string
+                                description: Nombre del usuario
+                                example: Juan
+                              apellido:
+                                type: string
+                                description: Apellido del usuario
+                                example: Pérez
+                              mail:
+                                type: string
+                                description: Email del usuario
+                                example: juan.perez@gmail.com
+                              nombreFantasia:
+                                type: string
+                                nullable: true
+                                description: Nombre de fantasía del prestatario
+                                example: Plomería Pérez
+                            required:
+                              - id
+                              - nombre
+                              - apellido
+                              - mail
+                              - nombreFantasia
+                          description: Usuarios asociados a esta zona
+                      required:
+                        - id
+                        - descripcionZona
+                        - usuarios
+                    description: Lista completa de zonas con sus usuarios asociados
+                required:
+                  - message
+                  - data
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Validation failed
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: descripcionZona
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: Descripción inválida
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+  /api/zona/simple:
+    get:
+      description: Obtener todas las zonas sin relaciones (versión simple)
+      summary: Listar zonas simples
+      tags:
+        - Zonas
+      responses:
+        "200":
+          description: Lista simple de zonas obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de respuesta
+                    example: found all Zonas
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: number
+                          description: ID único de la zona
+                          example: 1
+                        descripcionZona:
+                          type: string
+                          description: Descripción de la zona
+                          example: Centro
+                      required:
+                        - id
+                        - descripcionZona
+                    description: Lista simple de zonas sin relaciones
+                required:
+                  - message
+                  - data
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Validation failed
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: descripcionZona
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: Descripción inválida
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+  /api/zona/{id}:
+    get:
+      description: Obtener una zona específica por ID con sus usuarios asociados
+      summary: Obtener zona por ID
+      tags:
+        - Zonas
+      parameters:
+        - schema:
+            type: string
+            pattern: ^\d+$
+            description: ID numérico de la zona
+            example: "1"
+          required: true
+          description: ID numérico de la zona
+          name: id
+          in: path
+      responses:
+        "200":
+          description: Zona encontrada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: found one zona
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: number
+                        description: ID único de la zona
+                        example: 1
+                      descripcionZona:
+                        type: string
+                        description: Descripción de la zona
+                        example: Centro
+                      usuarios:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: number
+                              description: ID del usuario
+                              example: 1
+                            nombre:
+                              type: string
+                              description: Nombre del usuario
+                              example: Juan
+                            apellido:
+                              type: string
+                              description: Apellido del usuario
+                              example: Pérez
+                            mail:
+                              type: string
+                              description: Email del usuario
+                              example: juan.perez@gmail.com
+                            nombreFantasia:
+                              type: string
+                              nullable: true
+                              description: Nombre de fantasía del prestatario
+                              example: Plomería Pérez
+                          required:
+                            - id
+                            - nombre
+                            - apellido
+                            - mail
+                            - nombreFantasia
+                        description: Usuarios asociados a esta zona
+                    required:
+                      - id
+                      - descripcionZona
+                      - usuarios
+                required:
+                  - message
+                  - data
+        "404":
+          description: Zona no encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Zona no encontrada
+                required:
+                  - message
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Validation failed
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: descripcionZona
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: Descripción inválida
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+    put:
+      description: Actualizar información de una zona
+      summary: Actualizar zona
+      tags:
+        - Zonas
+      parameters:
+        - schema:
+            type: string
+            pattern: ^\d+$
+            description: ID numérico de la zona
+            example: "1"
+          required: true
+          description: ID numérico de la zona
+          name: id
+          in: path
+      requestBody:
+        description: Datos de la zona a actualizar
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                descripcionZona:
+                  type: string
+                  minLength: 2
+                  maxLength: 100
+                  pattern: ^[a-zA-ZÀ-ÿ\s\-\.]+$
+                  description: Descripción de la zona
+                  example: Centro
+      responses:
+        "200":
+          description: Zona actualizada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: updated zona
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: number
+                        description: ID único de la zona
+                        example: 1
+                      descripcionZona:
+                        type: string
+                        description: Descripción de la zona
+                        example: Centro
+                    required:
+                      - id
+                      - descripcionZona
+                required:
+                  - message
+                  - data
+        "400":
+          description: Error de validación
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Validation failed
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: descripcionZona
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: Descripción inválida
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+        "404":
+          description: Zona no encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Zona no encontrada
+                required:
+                  - message
+        "409":
+          description: Conflicto - descripción ya existe
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: DESCRIPCION_ALREADY_EXISTS
+                  message:
+                    type: string
+                    example: Ya existe una zona con esa descripción
+                required:
+                  - error
+                  - message
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Validation failed
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: descripcionZona
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: Descripción inválida
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+    delete:
+      description: Eliminar una zona
+      summary: Eliminar zona
+      tags:
+        - Zonas
+      parameters:
+        - schema:
+            type: string
+            pattern: ^\d+$
+            description: ID numérico de la zona
+            example: "1"
+          required: true
+          description: ID numérico de la zona
+          name: id
+          in: path
+      responses:
+        "200":
+          description: Zona eliminada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: deleted zona
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: number
+                        description: ID único de la zona
+                        example: 1
+                      descripcionZona:
+                        type: string
+                        description: Descripción de la zona
+                        example: Centro
+                    required:
+                      - id
+                      - descripcionZona
+                required:
+                  - message
+                  - data
+        "404":
+          description: Zona no encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Zona no encontrada
+                required:
+                  - message
+        "409":
+          description: Conflicto - la zona tiene usuarios asociados
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: ZONA_HAS_USERS
+                  message:
+                    type: string
+                    example: No se puede eliminar la zona porque tiene usuarios asociados
+                required:
+                  - error
+                  - message
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Validation failed
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: descripcionZona
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: Descripción inválida
                       required:
                         - field
                         - message
