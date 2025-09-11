@@ -232,32 +232,28 @@ function TurnHistory({ estado }: Props) {
       <Navbar />
       {/* Alertas de exito o error */}
       {updateError && (
-        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-xl flex justify-center">
-          <Alert
-            autoClose={true}
-            autoCloseDelay={3000}
-            variant="danger"
-            onClose={() => setUpdateError(null)}
-            className="w-full"
-          >
-            <AlertTitle>{updateError.error}</AlertTitle>
-            <AlertDescription>{updateError.message}</AlertDescription>
-          </Alert>
-        </div>
+        <Alert
+          autoClose={true}
+          autoCloseDelay={3000}
+          variant="danger"
+          onClose={() => setUpdateError(null)}
+          className="w-full"
+        >
+          <AlertTitle>{updateError.error}</AlertTitle>
+          <AlertDescription>{updateError.message}</AlertDescription>
+        </Alert>
       )}
       {updateSuccess && (
-        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-xl flex justify-center">
-          <Alert
-            autoClose={true}
-            autoCloseDelay={3000}
-            variant="success"
-            onClose={() => setUpdateSuccess(null)}
-            className="w-full"
-          >
-            <AlertTitle>{updateSuccess.success}</AlertTitle>
-            <AlertDescription>{updateSuccess.message}</AlertDescription>
-          </Alert>
-        </div>
+        <Alert
+          autoClose={true}
+          autoCloseDelay={3000}
+          variant="success"
+          onClose={() => setUpdateSuccess(null)}
+          className="w-full"
+        >
+          <AlertTitle>{updateSuccess.success}</AlertTitle>
+          <AlertDescription>{updateSuccess.message}</AlertDescription>
+        </Alert>
       )}
       {/* Modal de devolucion */}
       {estado && abrirDevolucion && (
