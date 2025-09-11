@@ -21,9 +21,10 @@ type TareaRowProps = {
   tipoServicio: TipoServicioData | undefined;
   onTareaChange: (id: number, field: 'seleccionada' | 'precio', value: boolean | number) => void;
   onActivateDeactivate: (id: number, activate: boolean) => void;
+  onPriceUpdate: (id: number, precio: number) => void;
 };
 
-const TareaRow: React.FC<TareaRowProps> = ({ tarea, tipoServicio, onTareaChange, onActivateDeactivate }) => {
+const TareaRow: React.FC<TareaRowProps> = ({ tarea, tipoServicio, onTareaChange, onActivateDeactivate, onPriceUpdate }) => {
   return (
     <tr 
       key={tarea.id} 
@@ -61,10 +62,19 @@ const TareaRow: React.FC<TareaRowProps> = ({ tarea, tipoServicio, onTareaChange,
             min="0"
             step="100"
             value={tarea.precio}
+            placeholder={tarea.seleccionada ? "Presiona Enter para actualizar" : "Precio"}
             onChange={(e) => {
               onTareaChange(tarea.id, 'precio', parseInt(e.target.value) || 0);
             }}
-            className="w-24 px-2 py-1 text-sm border border-gray-300 bg-white text-gray-900 rounded focus:ring-1 focus:ring-orange-500 focus:border-orange-500 hover:border-orange-300 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && tarea.seleccionada) {
+                // Si la tarea está activa y presiona Enter, actualizar el precio
+                onPriceUpdate(tarea.id, tarea.precio);
+              }
+            }}
+            className={`w-24 px-2 py-1 text-sm border border-gray-300 bg-white text-gray-900 rounded focus:ring-1 focus:ring-orange-500 focus:border-orange-500 hover:border-orange-300 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
+              tarea.seleccionada ? 'placeholder:text-xs placeholder:text-blue-400' : 'placeholder:text-gray-400'
+            }`}
           />
         </div>
       </td>

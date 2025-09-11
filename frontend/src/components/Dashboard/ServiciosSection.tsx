@@ -202,48 +202,48 @@ function ServiciosSection() {
         console.log('Servicios existentes:', serviciosExistentes);
         
         // Extraer información de los servicios
-        const tiposActivosSet = new Set<number>();
+        const tiposConServicios = new Set<number>(); // Tipos que tienen cualquier servicio (activo o inactivo)
         const tareasConPrecios = new Map<number, number>(); // tareaId -> precio
+        const tareasActivas = new Map<number, boolean>(); // tareaId -> isActive
         
         serviciosExistentes.forEach((servicio: {
           tarea?: { id: number; tipoServicio?: { id: number } } | number;
           precio: number;
           estado?: string;
         }) => {
-          // Solo procesar servicios activos
-          if (servicio.estado !== 'activo') {
-            return;
-          }
-          
           const tareaId = typeof servicio.tarea === 'object' ? servicio.tarea?.id : servicio.tarea;
           const tipoServicioId = typeof servicio.tarea === 'object' ? servicio.tarea?.tipoServicio?.id : undefined;
           const precio = servicio.precio;
+          const isActive = servicio.estado === 'activo';
           
           if (tareaId && precio) {
             tareasConPrecios.set(tareaId, precio);
+            tareasActivas.set(tareaId, isActive);
           }
           
+          // Marcar tipos como activos si tienen cualquier servicio (activo o inactivo)
           if (tipoServicioId) {
-            tiposActivosSet.add(tipoServicioId);
+            tiposConServicios.add(tipoServicioId);
           }
         });
         
-        console.log('Tipos activos extraídos:', Array.from(tiposActivosSet));
+        console.log('Tipos con servicios extraídos:', Array.from(tiposConServicios));
         console.log('Tareas con precios:', Array.from(tareasConPrecios.entries()));
+        console.log('Tareas activas:', Array.from(tareasActivas.entries()));
         
-        // Actualizar tipos de servicio (marcar como activos)
+        // Actualizar tipos de servicio (marcar como activos si tienen cualquier servicio)
         setTiposServicio(prev => 
           prev.map(tipo => ({
             ...tipo,
-            activo: tiposActivosSet.has(tipo.id)
+            activo: tiposConServicios.has(tipo.id)
           }))
         );
         
-        // Actualizar tareas (marcar como seleccionadas y establecer precios)
+        // Actualizar tareas (marcar como seleccionadas según su estado y establecer precios)
         setTareas(prev => 
           prev.map(tarea => ({
             ...tarea,
-            seleccionada: tareasConPrecios.has(tarea.id),
+            seleccionada: tareasActivas.get(tarea.id) || false, // true solo si está activa
             precio: tareasConPrecios.get(tarea.id) || 0
           }))
         );
@@ -364,6 +364,49 @@ function ServiciosSection() {
     }
   };
 
+  // Función para actualizar solo el precio de una tarea activa
+  const handlePriceUpdate = async (tareaId: number, nuevoPrecio: number) => {
+    if (!usuario) {
+      setAlertType('danger');
+      setAlertMessage('Error: Usuario no autenticado');
+      setShowAlert(true);
+      return;
+    }
+
+    const tarea = tareas.find(t => t.id === tareaId);
+    if (!tarea || !tarea.seleccionada) {
+      setAlertType('danger');
+      setAlertMessage('Solo se puede actualizar el precio de tareas activas');
+      setShowAlert(true);
+      return;
+    }
+
+    if (nuevoPrecio <= 0) {
+      setAlertType('danger');
+      setAlertMessage('El precio debe ser mayor a 0');
+      setShowAlert(true);
+      return;
+    }
+
+    try {
+      // Actualizar el precio usando el mismo endpoint de upsert
+      await serviciosApi.upsertByUserAndTask({
+        tareaId: tarea.id,
+        usuarioId: usuario.id,
+        precio: nuevoPrecio
+      });
+      
+      setAlertType('success');
+      setAlertMessage('✅ Precio actualizado exitosamente');
+      setShowAlert(true);
+    } catch (error) {
+      console.error('Error al actualizar precio:', error);
+      setAlertType('danger');
+      setAlertMessage('❌ Error al actualizar el precio. Intenta nuevamente.');
+      setShowAlert(true);
+    }
+  };
+
   // Función para guardar cambios por tipo de servicio
   const guardarServicios = async () => {
     if (!usuario) {
@@ -450,9 +493,6 @@ function ServiciosSection() {
           {/* Header */}
           <div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Mis Servicios</h2>
-            <p className="text-gray-600">
-              Selecciona los tipos de servicio que ofreces. Luego, activa/desactiva tareas individuales y define sus precios.
-            </p>
           </div>
 
         {/* Selector de Tipos de Servicio */}
@@ -514,12 +554,6 @@ function ServiciosSection() {
               <h3 className="text-lg font-semibold text-gray-900 text-left">
                 Tareas
               </h3>
-              <div className="mt-2 bg-blue-50 border border-blue-200 rounded-lg p-3">
-                <p className="text-sm text-blue-800">
-                  <span className="font-medium">💡 Cómo funciona:</span> Usa los botones "Activar/Desactivar" para controlar cada tarea individualmente. 
-                  Define el precio antes de activar. Los cambios se aplican inmediatamente.
-                </p>
-              </div>
             </div>
 
             {/* Navegación por tipos de servicio */}
@@ -577,6 +611,7 @@ function ServiciosSection() {
                         tipoServicio={tipoServicio}
                         onTareaChange={handleTareaChange}
                         onActivateDeactivate={handleActivateDeactivate}
+                        onPriceUpdate={handlePriceUpdate}
                       />
                     );
                   })}
