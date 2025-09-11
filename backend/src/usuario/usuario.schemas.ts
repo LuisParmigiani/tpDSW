@@ -116,26 +116,29 @@ export const createUsuarioSchema = usuarioBaseSchema.extend({
   estado: usuarioBaseSchema.shape.estado,
   contrasena: z
     .string()
-    .min(
-      6,
-      'La contraseña debe tener al menos 6 caracteres, una letra mayúscula, una letra minúscula y un número'
-    )
+    .min(6, 'La contraseña debe tener al menos 6 caracteres')
     .describe('Contraseña del usuario')
     .openapi({
       example: 'Password123',
     }),
+
+  // ✅ FIX: Handle empty strings properly
   nombreFantasia: z
     .string()
     .min(2, 'El nombre de fantasía debe tener al menos 2 caracteres')
     .max(30, 'El nombre de fantasía no puede exceder los 30 caracteres')
     .optional()
+    .or(z.literal('').transform(() => undefined))
     .describe('Nombre de fantasía del prestatario')
     .openapi({
       example: 'Servicios SRL',
     }),
+
+  // ✅ FIX: Same for descripcion
   descripcion: z
     .string()
     .optional()
+    .or(z.literal('').transform(() => undefined))
     .describe('Descripción del prestatario')
     .openapi({
       example: 'Ofrecemos servicios de plomería y electricidad.',
