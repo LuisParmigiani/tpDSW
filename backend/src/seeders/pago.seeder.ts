@@ -49,7 +49,10 @@ export class PagoSeeder extends Seeder {
 
     const cantidad = Math.floor(turnosSinComentario.length * 0.6);
     for (let i = 0; i < cantidad; i++) {
-      const turno = turnosSinComentario[i];
+      const turno =
+        turnosSinComentario[
+          Math.floor(Math.random() * turnosSinComentario.length)
+        ];
       const estado = faker.helpers.arrayElement([
         'succeeded',
         'succeeded',

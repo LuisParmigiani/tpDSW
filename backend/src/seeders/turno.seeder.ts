@@ -24,7 +24,7 @@ export class TurnoSeeder extends Seeder {
 
     for (const cliente of clientes) {
       // Cada cliente tiene entre 10 y 30 turnos
-      const numTurnos = faker.number.int({ min: 10, max: 30 });
+      const numTurnos = faker.number.int({ min: 50, max: 100 });
       console.log(`Cliente ${cliente.id} - Creando ${numTurnos} turnos...`);
 
       for (let i = 0; i < numTurnos; i++) {

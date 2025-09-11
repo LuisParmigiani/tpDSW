@@ -28,6 +28,35 @@ export class UsuarioSeeder extends Seeder {
       });
     }
 
+    em.create(Usuario, {
+      mail: 'juan.perez@email.com',
+      contrasena:
+        '$2b$10$0E9iYMk1AvFZNbpfu0yroOGq2/X8NzjWQjQv4cGAiS0dJsaRCh9oG',
+      tipoDoc: 'DNI',
+      numeroDoc: faker.number.int({ min: 10000000, max: 50000000 }).toString(),
+      foto: 'https://backend-patient-morning-1303.fly.dev/uploads/profiles/default-avatar.webp',
+      telefono: faker.phone.number(),
+      nombre: faker.person.firstName(),
+      apellido: faker.person.lastName(),
+      direccion: faker.location.streetAddress(),
+      estado: 'activo',
+    });
+    em.create(Usuario, {
+      mail: 'plomero.herrera@email.com',
+      contrasena:
+        '$2b$10$0E9iYMk1AvFZNbpfu0yroOGq2/X8NzjWQjQv4cGAiS0dJsaRCh9oG',
+      tipoDoc: 'DNI',
+      numeroDoc: faker.number.int({ min: 10000000, max: 50000000 }).toString(),
+      foto: 'https://backend-patient-morning-1303.fly.dev/uploads/profiles/default-avatar.webp',
+      telefono: faker.phone.number(),
+      nombre: 'Carlos',
+      apellido: 'Herrera',
+      direccion: faker.location.streetAddress(),
+      nombreFantasia: 'Plomería Herrera',
+      descripcion: 'Lo que quieras, lo hacemos',
+      estado: 'activo',
+    });
+
     for (let i = 0; i < 25; i++) {
       // Prestatarios activos
       em.create(Usuario, {
