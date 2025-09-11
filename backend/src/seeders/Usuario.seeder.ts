@@ -10,11 +10,11 @@ export class UsuarioSeeder extends Seeder {
       'Iniciando UsuarioSeeder........................................................................................................'
     );
     // Clientes
-    for (let i = 0; i < 35; i++) {
+    for (let i = 0; i < 50; i++) {
       em.create(Usuario, {
         mail: faker.internet.email(),
         contrasena:
-          '$2b$10$dHhuYx1ljMyZh5hFdi0Kl.kk/Dj.AXbifyeuh7zpUwEDvyJNwqQqC',
+          '$2b$10$0E9iYMk1AvFZNbpfu0yroOGq2/X8NzjWQjQv4cGAiS0dJsaRCh9oG',
         tipoDoc: 'DNI',
         numeroDoc: faker.number
           .int({ min: 10000000, max: 50000000 })
@@ -36,7 +36,7 @@ export class UsuarioSeeder extends Seeder {
         mail: faker.internet.email(),
         telefono: faker.phone.number(),
         contrasena:
-          '$2b$10$dHhuYx1ljMyZh5hFdi0Kl.kk/Dj.AXbifyeuh7zpUwEDvyJNwqQqC',
+          '$2b$10$0E9iYMk1AvFZNbpfu0yroOGq2/X8NzjWQjQv4cGAiS0dJsaRCh9oG',
         tipoDoc: 'CUIT',
         direccion: faker.location.streetAddress(),
         numeroDoc: faker.number
@@ -57,7 +57,7 @@ export class UsuarioSeeder extends Seeder {
         mail: faker.internet.email(),
         telefono: faker.phone.number(),
         contrasena:
-          '$2b$10$dHhuYx1ljMyZh5hFdi0Kl.kk/Dj.AXbifyeuh7zpUwEDvyJNwqQqC',
+          '$2b$10$0E9iYMk1AvFZNbpfu0yroOGq2/X8NzjWQjQv4cGAiS0dJsaRCh9oG',
         tipoDoc: 'CUIT',
         direccion: faker.location.streetAddress(),
         numeroDoc: faker.number

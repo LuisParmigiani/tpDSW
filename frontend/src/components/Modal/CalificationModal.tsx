@@ -81,21 +81,7 @@ function CalificationModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-5 backdrop-blur-xs  bg-opacity-40">
-      {flagged && (
-        <Alert
-          variant="danger"
-          className="max-w-xl mx-auto mb-4"
-          onClose={() => setFlagged(false)}
-          autoClose={true}
-          autoCloseDelay={10000}
-        >
-          <AlertTitle>¡Atencion!</AlertTitle>
-          <AlertDescription className="mx-auto">
-            Su comentario ha sido bloqueado por contener palabras inapropiadas.
-          </AlertDescription>
-        </Alert>
-      )}
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-5 backdrop-blur-xs flex-col bg-opacity-40">
       <div className="bg-white md:rounded-lg md:shadow-2xl md:p-10 text-black lg:w-6/12 md:w-9/12  lg:min-h-6/12 md:h-auto w-full px-10 h-full p-15">
         <h1 className="text-2xl font-bold mb-4">Detalles del Turno</h1>
         <div className="flex flex-col gap-2 pb-3 items-start text-left md:pl-25">
@@ -209,6 +195,20 @@ function CalificationModal({
           </button>
         </div>
       </div>
+      {flagged && (
+        <Alert
+          variant="danger"
+          className="max-w-xl mx-auto mb-4"
+          onClose={() => setFlagged(false)}
+          autoClose={true}
+          autoCloseDelay={10000}
+        >
+          <AlertTitle>¡Atencion!</AlertTitle>
+          <AlertDescription className="mx-auto">
+            Su comentario ha sido bloqueado por contener palabras inapropiadas.
+          </AlertDescription>
+        </Alert>
+      )}
     </div>
   );
 }

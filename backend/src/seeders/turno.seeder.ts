@@ -21,50 +21,46 @@ export class TurnoSeeder extends Seeder {
       'completado',
       'completado',
     ];
-    // Crear 100 turnos con fechas entre -20 y +20 días desde hoy
-    for (let i = 0; i < 300; i++) {
-      // Fecha aleatoria entre -20 y +20 días desde hoy
-      const fechaHora = faker.date.between({
-        from: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
-        to: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000),
-      });
 
-      // Determinar el estado según la fecha
-      let estado: string;
-      if (fechaHora < new Date()) {
-        estado = faker.helpers.arrayElement(estadosPasados);
-      } else {
-        estado = faker.helpers.arrayElement(estadosFuturos);
-      }
+    for (const cliente of clientes) {
+      // Cada cliente tiene entre 10 y 30 turnos
+      const numTurnos = faker.number.int({ min: 10, max: 30 });
+      console.log(`Cliente ${cliente.id} - Creando ${numTurnos} turnos...`);
 
-      // Usuario cliente aleatorio
-      const cliente = faker.helpers.arrayElement(clientes);
-
-      // Servicio aleatorio
-      const servicio = faker.helpers.arrayElement(servicios);
-
-      // Calificación y comentario solo si completado y fecha futura
-      let calificacion: number | undefined;
-      let comentario: string | undefined;
-      if (estado === 'completado') {
-        if (i < 20) {
-          // mitad con comentario/calificación
-          calificacion = faker.number.int({ min: 1, max: 5 });
-          comentario = faker.lorem.sentence();
+      for (let i = 0; i < numTurnos; i++) {
+        const fechaHora = faker.date.between({
+          from: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+          to: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000),
+        });
+        let estado: string;
+        if (fechaHora < new Date()) {
+          estado = faker.helpers.arrayElement(estadosPasados);
+        } else {
+          estado = faker.helpers.arrayElement(estadosFuturos);
         }
+        // Servicio aleatorio
+        const servicio = faker.helpers.arrayElement(servicios);
+        let calificacion: number | undefined;
+        let comentario: string | undefined;
+        if (estado === 'completado') {
+          if (i < 7) {
+            calificacion = faker.number.int({ min: 1, max: 5 });
+            comentario = faker.lorem.sentence();
+          }
+        }
+
+        const montoFinal = Math.round(servicio.precio * 1.05); // precio + 5%
+
+        em.create(Turno, {
+          fechaHora,
+          estado,
+          usuario: cliente,
+          servicio,
+          calificacion,
+          comentario,
+          montoFinal,
+        });
       }
-
-      const montoFinal = Math.round(servicio.precio * 1.05); // precio + 5%
-
-      em.create(Turno, {
-        fechaHora,
-        estado,
-        usuario: cliente,
-        servicio,
-        calificacion,
-        comentario,
-        montoFinal,
-      });
     }
 
     await em.flush();

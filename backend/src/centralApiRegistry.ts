@@ -8,7 +8,7 @@ import path from 'path';
 import { usuarioRegistry } from './usuario/usuario.registry.js';
 import { turnoRegistry } from './turno/turno.registry.js';
 import { zonaRegistry } from './zona/zona.registry.js';
-
+import { horarioRegistry } from './horario/horario.registry.js';
 async function generateOpenApiDocument() {
   const registry = new OpenAPIRegistry();
 
@@ -25,7 +25,8 @@ async function generateOpenApiDocument() {
     ...usuarioRegistry.definitions, // Esquemas y definiciones del usuario
     ...turnoRegistry.definitions, // Esquemas y definiciones de turno
     ...zonaRegistry.definitions,
-    // ,...servicioRegistry.definitions, // Esquemas y definiciones del servicio
+    ...horarioRegistry.definitions,
+    // ...servicioRegistry.definitions, // Esquemas y definiciones del servicio
     // ...reservaRegistry.definitions,
   ];
 
@@ -81,6 +82,10 @@ async function generateOpenApiDocument() {
         description:
           'Operaciones relacionadas con la autenticación y autorización de usuarios',
       },
+      {
+        name: 'Horarios',
+        description: 'Operaciones para el manejo de Horarios',
+      },
     ],
   });
 
@@ -114,14 +119,12 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 }
 
 // Permite ejecutar la generación del documento si se corre este archivo directamente con Node.js o tsx
-/*const scriptName = process.argv[1]?.replace(/\\/g, '/');
+const scriptName = process.argv[1]?.replace(/\\/g, '/');
 if (
   scriptName?.endsWith('/centralApiRegistry.ts') ||
   scriptName?.endsWith('/centralApiRegistry.js')
 ) {
   generateOpenApiDocument();
 }
-
-*/
 
 export { generateOpenApiDocument };

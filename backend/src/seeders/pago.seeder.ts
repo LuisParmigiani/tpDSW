@@ -17,7 +17,6 @@ export class PagoSeeder extends Seeder {
     });
 
     for (const turno of turnos) {
-      // Estado del pago: mayoría succeeded, algunos processing
       const estado = faker.helpers.arrayElement([
         'succeeded',
         'succeeded',
@@ -28,6 +27,37 @@ export class PagoSeeder extends Seeder {
 
       const amount = turno.montoFinal * 100; // monto en centavos
       const amountReceived = Math.round(turno.montoFinal * 0.95 * 100); // 95% en centavos
+
+      em.create(Pago, {
+        paymentIntentId: `pi_${faker.string.alphanumeric(24)}`,
+        amount,
+        currency: 'usd',
+        estado,
+        sellerStripeId: `acct_${faker.string.alphanumeric(16)}`,
+        amountReceived,
+        turno,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+    }
+
+    // Turnos completados sin comentario
+    const turnosSinComentario = await em.find(Turno, {
+      estado: 'completado',
+      comentario: null,
+    });
+
+    const cantidad = Math.floor(turnosSinComentario.length * 0.6);
+    for (let i = 0; i < cantidad; i++) {
+      const turno = turnosSinComentario[i];
+      const estado = faker.helpers.arrayElement([
+        'succeeded',
+        'succeeded',
+        'succeeded',
+        'processing',
+      ]);
+      const amount = turno.montoFinal * 100;
+      const amountReceived = Math.round(turno.montoFinal * 0.95 * 100);
 
       em.create(Pago, {
         paymentIntentId: `pi_${faker.string.alphanumeric(24)}`,

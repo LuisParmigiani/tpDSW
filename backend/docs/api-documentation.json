@@ -48,6 +48,10 @@
     {
       "name": "Autenticación",
       "description": "Operaciones relacionadas con la autenticación y autorización de usuarios"
+    },
+    {
+      "name": "Horarios",
+      "description": "Operaciones para el manejo de Horarios"
     }
   ],
   "components": {
@@ -1577,6 +1581,445 @@
         "required": [
           "message",
           "data"
+        ]
+      },
+      "CreateHorario": {
+        "type": "object",
+        "properties": {
+          "diaSemana": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 6,
+            "description": "Día de la semana (0-6, donde 0 es Lunes y 6 es Domingo)",
+            "example": 0
+          },
+          "horaDesde": {
+            "type": "string",
+            "pattern": "^([0-1]\\d|2[0-3]):([0-5]\\d):([0-5]\\d)$",
+            "description": "Hora de inicio en formato HH:mm:ss",
+            "example": "08:00:00"
+          },
+          "horaHasta": {
+            "type": "string",
+            "pattern": "^([0-1]\\d|2[0-3]):([0-5]\\d):([0-5]\\d)$",
+            "description": "Hora de fin en formato HH:mm:ss",
+            "example": "17:00:00"
+          },
+          "usuario": {
+            "type": "object",
+            "properties": {
+              "nombre": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 50,
+                "pattern": "^[a-zA-ZÀ-ÿ\\s]+$",
+                "description": "Nombre del usuario",
+                "example": "Juan"
+              },
+              "apellido": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 50,
+                "pattern": "^[a-zA-ZÀ-ÿ\\s]+$",
+                "description": "Apellido del usuario",
+                "example": "Pérez"
+              },
+              "mail": {
+                "type": "string",
+                "maxLength": 100,
+                "format": "email",
+                "description": "Correo electrónico del usuario",
+                "example": "juan.perez@gmail.com"
+              },
+              "tipoDoc": {
+                "type": "string",
+                "enum": [
+                  "DNI",
+                  "CUIT",
+                  "CUIL"
+                ],
+                "description": "Tipo de documento",
+                "example": "DNI"
+              },
+              "numeroDoc": {
+                "type": "string",
+                "minLength": 7,
+                "maxLength": 13,
+                "pattern": "^[0-9\\-]+$",
+                "description": "Número de documento",
+                "example": "12345678"
+              },
+              "telefono": {
+                "type": "string",
+                "pattern": "^[+]?[0-9\\s\\-()]{8,20}$",
+                "description": "Número de teléfono",
+                "example": "+54 11 1234-5678"
+              },
+              "direccion": {
+                "type": "string",
+                "minLength": 5,
+                "maxLength": 200,
+                "description": "Dirección del usuario",
+                "example": "Av. Corrientes 1234"
+              },
+              "foto": {
+                "type": "string",
+                "maxLength": 200,
+                "format": "uri",
+                "description": "URL de la foto de perfil del usuario",
+                "example": "http://example.com/foto.jpg"
+              },
+              "estado": {
+                "type": "string",
+                "enum": [
+                  "activo",
+                  "inactivo"
+                ],
+                "default": "activo",
+                "description": "Estado del usuario",
+                "example": "activo"
+              },
+              "nombreFantasia": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 30
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      ""
+                    ]
+                  }
+                ],
+                "description": "Nombre de fantasía del prestatario",
+                "example": "Servicios SRL"
+              },
+              "descripcion": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      ""
+                    ]
+                  }
+                ],
+                "description": "Descripción del prestatario",
+                "example": "Ofrecemos servicios de plomería y electricidad."
+              }
+            },
+            "required": [
+              "nombre",
+              "apellido",
+              "mail",
+              "tipoDoc",
+              "numeroDoc",
+              "telefono",
+              "direccion"
+            ]
+          }
+        },
+        "required": [
+          "diaSemana",
+          "horaDesde",
+          "horaHasta",
+          "usuario"
+        ],
+        "title": "CrearHorario",
+        "description": "Esquema para crear un nuevo horario"
+      },
+      "UpdateHorario": {
+        "type": "object",
+        "properties": {
+          "diaSemana": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 6,
+            "description": "Día de la semana (0-6, donde 0 es Lunes y 6 es Domingo)",
+            "example": 0
+          },
+          "horaDesde": {
+            "type": "string",
+            "pattern": "^([0-1]\\d|2[0-3]):([0-5]\\d):([0-5]\\d)$",
+            "description": "Hora de inicio en formato HH:mm:ss",
+            "example": "08:00:00"
+          },
+          "horaHasta": {
+            "type": "string",
+            "pattern": "^([0-1]\\d|2[0-3]):([0-5]\\d):([0-5]\\d)$",
+            "description": "Hora de fin en formato HH:mm:ss",
+            "example": "17:00:00"
+          },
+          "usuario": {
+            "type": "object",
+            "properties": {
+              "nombre": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 50,
+                "pattern": "^[a-zA-ZÀ-ÿ\\s]+$",
+                "description": "Nombre del usuario",
+                "example": "Juan"
+              },
+              "apellido": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 50,
+                "pattern": "^[a-zA-ZÀ-ÿ\\s]+$",
+                "description": "Apellido del usuario",
+                "example": "Pérez"
+              },
+              "mail": {
+                "type": "string",
+                "maxLength": 100,
+                "format": "email",
+                "description": "Correo electrónico del usuario",
+                "example": "juan.perez@gmail.com"
+              },
+              "tipoDoc": {
+                "type": "string",
+                "enum": [
+                  "DNI",
+                  "CUIT",
+                  "CUIL"
+                ],
+                "description": "Tipo de documento",
+                "example": "DNI"
+              },
+              "numeroDoc": {
+                "type": "string",
+                "minLength": 7,
+                "maxLength": 13,
+                "pattern": "^[0-9\\-]+$",
+                "description": "Número de documento",
+                "example": "12345678"
+              },
+              "telefono": {
+                "type": "string",
+                "pattern": "^[+]?[0-9\\s\\-()]{8,20}$",
+                "description": "Número de teléfono",
+                "example": "+54 11 1234-5678"
+              },
+              "direccion": {
+                "type": "string",
+                "minLength": 5,
+                "maxLength": 200,
+                "description": "Dirección del usuario",
+                "example": "Av. Corrientes 1234"
+              },
+              "foto": {
+                "type": "string",
+                "maxLength": 200,
+                "format": "uri",
+                "description": "URL de la foto de perfil del usuario",
+                "example": "http://example.com/foto.jpg"
+              },
+              "estado": {
+                "type": "string",
+                "enum": [
+                  "activo",
+                  "inactivo"
+                ],
+                "default": "activo",
+                "description": "Estado del usuario",
+                "example": "activo"
+              },
+              "nombreFantasia": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 30
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      ""
+                    ]
+                  }
+                ],
+                "description": "Nombre de fantasía del prestatario",
+                "example": "Servicios SRL"
+              },
+              "descripcion": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      ""
+                    ]
+                  }
+                ],
+                "description": "Descripción del prestatario",
+                "example": "Ofrecemos servicios de plomería y electricidad."
+              }
+            },
+            "required": [
+              "nombre",
+              "apellido",
+              "mail",
+              "tipoDoc",
+              "numeroDoc",
+              "telefono",
+              "direccion"
+            ]
+          }
+        },
+        "title": "ActualizarHorario",
+        "description": "Esquema para actualizar un horario existente"
+      },
+      "Horario": {
+        "type": "object",
+        "properties": {
+          "diaSemana": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 6,
+            "description": "Día de la semana (0-6, donde 0 es Lunes y 6 es Domingo)",
+            "example": 0
+          },
+          "horaDesde": {
+            "type": "string",
+            "pattern": "^([0-1]\\d|2[0-3]):([0-5]\\d):([0-5]\\d)$",
+            "description": "Hora de inicio en formato HH:mm:ss",
+            "example": "08:00:00"
+          },
+          "horaHasta": {
+            "type": "string",
+            "pattern": "^([0-1]\\d|2[0-3]):([0-5]\\d):([0-5]\\d)$",
+            "description": "Hora de fin en formato HH:mm:ss",
+            "example": "17:00:00"
+          },
+          "usuario": {
+            "type": "object",
+            "properties": {
+              "nombre": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 50,
+                "pattern": "^[a-zA-ZÀ-ÿ\\s]+$",
+                "description": "Nombre del usuario",
+                "example": "Juan"
+              },
+              "apellido": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 50,
+                "pattern": "^[a-zA-ZÀ-ÿ\\s]+$",
+                "description": "Apellido del usuario",
+                "example": "Pérez"
+              },
+              "mail": {
+                "type": "string",
+                "maxLength": 100,
+                "format": "email",
+                "description": "Correo electrónico del usuario",
+                "example": "juan.perez@gmail.com"
+              },
+              "tipoDoc": {
+                "type": "string",
+                "enum": [
+                  "DNI",
+                  "CUIT",
+                  "CUIL"
+                ],
+                "description": "Tipo de documento",
+                "example": "DNI"
+              },
+              "numeroDoc": {
+                "type": "string",
+                "minLength": 7,
+                "maxLength": 13,
+                "pattern": "^[0-9\\-]+$",
+                "description": "Número de documento",
+                "example": "12345678"
+              },
+              "telefono": {
+                "type": "string",
+                "pattern": "^[+]?[0-9\\s\\-()]{8,20}$",
+                "description": "Número de teléfono",
+                "example": "+54 11 1234-5678"
+              },
+              "direccion": {
+                "type": "string",
+                "minLength": 5,
+                "maxLength": 200,
+                "description": "Dirección del usuario",
+                "example": "Av. Corrientes 1234"
+              },
+              "foto": {
+                "type": "string",
+                "maxLength": 200,
+                "format": "uri",
+                "description": "URL de la foto de perfil del usuario",
+                "example": "http://example.com/foto.jpg"
+              },
+              "estado": {
+                "type": "string",
+                "enum": [
+                  "activo",
+                  "inactivo"
+                ],
+                "default": "activo",
+                "description": "Estado del usuario",
+                "example": "activo"
+              },
+              "nombreFantasia": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 30
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      ""
+                    ]
+                  }
+                ],
+                "description": "Nombre de fantasía del prestatario",
+                "example": "Servicios SRL"
+              },
+              "descripcion": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      ""
+                    ]
+                  }
+                ],
+                "description": "Descripción del prestatario",
+                "example": "Ofrecemos servicios de plomería y electricidad."
+              }
+            },
+            "required": [
+              "nombre",
+              "apellido",
+              "mail",
+              "tipoDoc",
+              "numeroDoc",
+              "telefono",
+              "direccion"
+            ]
+          }
+        },
+        "required": [
+          "diaSemana",
+          "horaDesde",
+          "horaHasta",
+          "usuario"
         ]
       }
     },
@@ -6433,6 +6876,1265 @@
                   "required": [
                     "message"
                   ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/horario": {
+      "post": {
+        "description": "Crear un nuevo horario para un usuario determinado",
+        "summary": "Crear horario",
+        "tags": [
+          "Horarios"
+        ],
+        "requestBody": {
+          "description": "Datos del horario a crear ",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "diaSemana": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 6,
+                    "description": "Día de la semana (0-6, donde 0 es Lunes y 6 es Domingo)",
+                    "example": 0
+                  },
+                  "horaDesde": {
+                    "type": "string",
+                    "pattern": "^([0-1]\\d|2[0-3]):([0-5]\\d):([0-5]\\d)$",
+                    "description": "Hora de inicio en formato HH:mm:ss",
+                    "example": "08:00:00"
+                  },
+                  "horaHasta": {
+                    "type": "string",
+                    "pattern": "^([0-1]\\d|2[0-3]):([0-5]\\d):([0-5]\\d)$",
+                    "description": "Hora de fin en formato HH:mm:ss",
+                    "example": "17:00:00"
+                  },
+                  "usuario": {
+                    "type": "object",
+                    "properties": {
+                      "nombre": {
+                        "type": "string",
+                        "minLength": 2,
+                        "maxLength": 50,
+                        "pattern": "^[a-zA-ZÀ-ÿ\\s]+$",
+                        "description": "Nombre del usuario",
+                        "example": "Juan"
+                      },
+                      "apellido": {
+                        "type": "string",
+                        "minLength": 2,
+                        "maxLength": 50,
+                        "pattern": "^[a-zA-ZÀ-ÿ\\s]+$",
+                        "description": "Apellido del usuario",
+                        "example": "Pérez"
+                      },
+                      "mail": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "format": "email",
+                        "description": "Correo electrónico del usuario",
+                        "example": "juan.perez@gmail.com"
+                      },
+                      "tipoDoc": {
+                        "type": "string",
+                        "enum": [
+                          "DNI",
+                          "CUIT",
+                          "CUIL"
+                        ],
+                        "description": "Tipo de documento",
+                        "example": "DNI"
+                      },
+                      "numeroDoc": {
+                        "type": "string",
+                        "minLength": 7,
+                        "maxLength": 13,
+                        "pattern": "^[0-9\\-]+$",
+                        "description": "Número de documento",
+                        "example": "12345678"
+                      },
+                      "telefono": {
+                        "type": "string",
+                        "pattern": "^[+]?[0-9\\s\\-()]{8,20}$",
+                        "description": "Número de teléfono",
+                        "example": "+54 11 1234-5678"
+                      },
+                      "direccion": {
+                        "type": "string",
+                        "minLength": 5,
+                        "maxLength": 200,
+                        "description": "Dirección del usuario",
+                        "example": "Av. Corrientes 1234"
+                      },
+                      "foto": {
+                        "type": "string",
+                        "maxLength": 200,
+                        "format": "uri",
+                        "description": "URL de la foto de perfil del usuario",
+                        "example": "http://example.com/foto.jpg"
+                      },
+                      "estado": {
+                        "type": "string",
+                        "enum": [
+                          "activo",
+                          "inactivo"
+                        ],
+                        "default": "activo",
+                        "description": "Estado del usuario",
+                        "example": "activo"
+                      },
+                      "nombreFantasia": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "minLength": 2,
+                            "maxLength": 30
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              ""
+                            ]
+                          }
+                        ],
+                        "description": "Nombre de fantasía del prestatario",
+                        "example": "Servicios SRL"
+                      },
+                      "descripcion": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              ""
+                            ]
+                          }
+                        ],
+                        "description": "Descripción del prestatario",
+                        "example": "Ofrecemos servicios de plomería y electricidad."
+                      }
+                    },
+                    "required": [
+                      "nombre",
+                      "apellido",
+                      "mail",
+                      "tipoDoc",
+                      "numeroDoc",
+                      "telefono",
+                      "direccion"
+                    ]
+                  }
+                },
+                "required": [
+                  "diaSemana",
+                  "horaDesde",
+                  "horaHasta",
+                  "usuario"
+                ],
+                "title": "CrearHorario",
+                "description": "Esquema para crear un nuevo horario"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Horario creado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Horario creado exitosamente"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "diaSemana": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 6,
+                          "description": "Día de la semana (0-6, donde 0 es Lunes y 6 es Domingo)",
+                          "example": 0
+                        },
+                        "horaDesde": {
+                          "type": "string",
+                          "pattern": "^([0-1]\\d|2[0-3]):([0-5]\\d):([0-5]\\d)$",
+                          "description": "Hora de inicio en formato HH:mm:ss",
+                          "example": "08:00:00"
+                        },
+                        "horaHasta": {
+                          "type": "string",
+                          "pattern": "^([0-1]\\d|2[0-3]):([0-5]\\d):([0-5]\\d)$",
+                          "description": "Hora de fin en formato HH:mm:ss",
+                          "example": "17:00:00"
+                        },
+                        "usuario": {
+                          "type": "object",
+                          "properties": {
+                            "nombre": {
+                              "type": "string",
+                              "minLength": 2,
+                              "maxLength": 50,
+                              "pattern": "^[a-zA-ZÀ-ÿ\\s]+$",
+                              "description": "Nombre del usuario",
+                              "example": "Juan"
+                            },
+                            "apellido": {
+                              "type": "string",
+                              "minLength": 2,
+                              "maxLength": 50,
+                              "pattern": "^[a-zA-ZÀ-ÿ\\s]+$",
+                              "description": "Apellido del usuario",
+                              "example": "Pérez"
+                            },
+                            "mail": {
+                              "type": "string",
+                              "maxLength": 100,
+                              "format": "email",
+                              "description": "Correo electrónico del usuario",
+                              "example": "juan.perez@gmail.com"
+                            },
+                            "tipoDoc": {
+                              "type": "string",
+                              "enum": [
+                                "DNI",
+                                "CUIT",
+                                "CUIL"
+                              ],
+                              "description": "Tipo de documento",
+                              "example": "DNI"
+                            },
+                            "numeroDoc": {
+                              "type": "string",
+                              "minLength": 7,
+                              "maxLength": 13,
+                              "pattern": "^[0-9\\-]+$",
+                              "description": "Número de documento",
+                              "example": "12345678"
+                            },
+                            "telefono": {
+                              "type": "string",
+                              "pattern": "^[+]?[0-9\\s\\-()]{8,20}$",
+                              "description": "Número de teléfono",
+                              "example": "+54 11 1234-5678"
+                            },
+                            "direccion": {
+                              "type": "string",
+                              "minLength": 5,
+                              "maxLength": 200,
+                              "description": "Dirección del usuario",
+                              "example": "Av. Corrientes 1234"
+                            },
+                            "foto": {
+                              "type": "string",
+                              "maxLength": 200,
+                              "format": "uri",
+                              "description": "URL de la foto de perfil del usuario",
+                              "example": "http://example.com/foto.jpg"
+                            },
+                            "estado": {
+                              "type": "string",
+                              "enum": [
+                                "activo",
+                                "inactivo"
+                              ],
+                              "default": "activo",
+                              "description": "Estado del usuario",
+                              "example": "activo"
+                            },
+                            "nombreFantasia": {
+                              "anyOf": [
+                                {
+                                  "type": "string",
+                                  "minLength": 2,
+                                  "maxLength": 30
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": [
+                                    ""
+                                  ]
+                                }
+                              ],
+                              "description": "Nombre de fantasía del prestatario",
+                              "example": "Servicios SRL"
+                            },
+                            "descripcion": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": [
+                                    ""
+                                  ]
+                                }
+                              ],
+                              "description": "Descripción del prestatario",
+                              "example": "Ofrecemos servicios de plomería y electricidad."
+                            }
+                          },
+                          "required": [
+                            "nombre",
+                            "apellido",
+                            "mail",
+                            "tipoDoc",
+                            "numeroDoc",
+                            "telefono",
+                            "direccion"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "diaSemana",
+                        "horaDesde",
+                        "horaHasta",
+                        "usuario"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "El horario no fue encontrado"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "id"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "id inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Lista de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "title": "Error",
+                  "description": "Esquema para representar un error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "El horario no fue encontrado"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "id"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "id inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Lista de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "title": "Error",
+                  "description": "Esquema para representar un error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/horario/{id}": {
+      "get": {
+        "description": "Obtener un horario por ID",
+        "summary": "Obtener horario",
+        "tags": [
+          "Horarios"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Horario encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Horario encontrado"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "diaSemana": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 6,
+                          "description": "Día de la semana (0-6, donde 0 es Lunes y 6 es Domingo)",
+                          "example": 0
+                        },
+                        "horaDesde": {
+                          "type": "string",
+                          "pattern": "^([0-1]\\d|2[0-3]):([0-5]\\d):([0-5]\\d)$",
+                          "description": "Hora de inicio en formato HH:mm:ss",
+                          "example": "08:00:00"
+                        },
+                        "horaHasta": {
+                          "type": "string",
+                          "pattern": "^([0-1]\\d|2[0-3]):([0-5]\\d):([0-5]\\d)$",
+                          "description": "Hora de fin en formato HH:mm:ss",
+                          "example": "17:00:00"
+                        },
+                        "usuario": {
+                          "type": "object",
+                          "properties": {
+                            "nombre": {
+                              "type": "string",
+                              "minLength": 2,
+                              "maxLength": 50,
+                              "pattern": "^[a-zA-ZÀ-ÿ\\s]+$",
+                              "description": "Nombre del usuario",
+                              "example": "Juan"
+                            },
+                            "apellido": {
+                              "type": "string",
+                              "minLength": 2,
+                              "maxLength": 50,
+                              "pattern": "^[a-zA-ZÀ-ÿ\\s]+$",
+                              "description": "Apellido del usuario",
+                              "example": "Pérez"
+                            },
+                            "mail": {
+                              "type": "string",
+                              "maxLength": 100,
+                              "format": "email",
+                              "description": "Correo electrónico del usuario",
+                              "example": "juan.perez@gmail.com"
+                            },
+                            "tipoDoc": {
+                              "type": "string",
+                              "enum": [
+                                "DNI",
+                                "CUIT",
+                                "CUIL"
+                              ],
+                              "description": "Tipo de documento",
+                              "example": "DNI"
+                            },
+                            "numeroDoc": {
+                              "type": "string",
+                              "minLength": 7,
+                              "maxLength": 13,
+                              "pattern": "^[0-9\\-]+$",
+                              "description": "Número de documento",
+                              "example": "12345678"
+                            },
+                            "telefono": {
+                              "type": "string",
+                              "pattern": "^[+]?[0-9\\s\\-()]{8,20}$",
+                              "description": "Número de teléfono",
+                              "example": "+54 11 1234-5678"
+                            },
+                            "direccion": {
+                              "type": "string",
+                              "minLength": 5,
+                              "maxLength": 200,
+                              "description": "Dirección del usuario",
+                              "example": "Av. Corrientes 1234"
+                            },
+                            "foto": {
+                              "type": "string",
+                              "maxLength": 200,
+                              "format": "uri",
+                              "description": "URL de la foto de perfil del usuario",
+                              "example": "http://example.com/foto.jpg"
+                            },
+                            "estado": {
+                              "type": "string",
+                              "enum": [
+                                "activo",
+                                "inactivo"
+                              ],
+                              "default": "activo",
+                              "description": "Estado del usuario",
+                              "example": "activo"
+                            },
+                            "nombreFantasia": {
+                              "anyOf": [
+                                {
+                                  "type": "string",
+                                  "minLength": 2,
+                                  "maxLength": 30
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": [
+                                    ""
+                                  ]
+                                }
+                              ],
+                              "description": "Nombre de fantasía del prestatario",
+                              "example": "Servicios SRL"
+                            },
+                            "descripcion": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": [
+                                    ""
+                                  ]
+                                }
+                              ],
+                              "description": "Descripción del prestatario",
+                              "example": "Ofrecemos servicios de plomería y electricidad."
+                            }
+                          },
+                          "required": [
+                            "nombre",
+                            "apellido",
+                            "mail",
+                            "tipoDoc",
+                            "numeroDoc",
+                            "telefono",
+                            "direccion"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "diaSemana",
+                        "horaDesde",
+                        "horaHasta",
+                        "usuario"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Horario no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "El horario no fue encontrado"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "id"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "id inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Lista de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "title": "Error",
+                  "description": "Esquema para representar un error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "El horario no fue encontrado"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "id"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "id inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Lista de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "title": "Error",
+                  "description": "Esquema para representar un error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "Actualizar un horario existente",
+        "summary": "Actualizar horario",
+        "tags": [
+          "Horarios"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "description": "Datos del horario a actualizar",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "diaSemana": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 6,
+                    "description": "Día de la semana (0-6, donde 0 es Lunes y 6 es Domingo)",
+                    "example": 0
+                  },
+                  "horaDesde": {
+                    "type": "string",
+                    "pattern": "^([0-1]\\d|2[0-3]):([0-5]\\d):([0-5]\\d)$",
+                    "description": "Hora de inicio en formato HH:mm:ss",
+                    "example": "08:00:00"
+                  },
+                  "horaHasta": {
+                    "type": "string",
+                    "pattern": "^([0-1]\\d|2[0-3]):([0-5]\\d):([0-5]\\d)$",
+                    "description": "Hora de fin en formato HH:mm:ss",
+                    "example": "17:00:00"
+                  },
+                  "usuario": {
+                    "type": "object",
+                    "properties": {
+                      "nombre": {
+                        "type": "string",
+                        "minLength": 2,
+                        "maxLength": 50,
+                        "pattern": "^[a-zA-ZÀ-ÿ\\s]+$",
+                        "description": "Nombre del usuario",
+                        "example": "Juan"
+                      },
+                      "apellido": {
+                        "type": "string",
+                        "minLength": 2,
+                        "maxLength": 50,
+                        "pattern": "^[a-zA-ZÀ-ÿ\\s]+$",
+                        "description": "Apellido del usuario",
+                        "example": "Pérez"
+                      },
+                      "mail": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "format": "email",
+                        "description": "Correo electrónico del usuario",
+                        "example": "juan.perez@gmail.com"
+                      },
+                      "tipoDoc": {
+                        "type": "string",
+                        "enum": [
+                          "DNI",
+                          "CUIT",
+                          "CUIL"
+                        ],
+                        "description": "Tipo de documento",
+                        "example": "DNI"
+                      },
+                      "numeroDoc": {
+                        "type": "string",
+                        "minLength": 7,
+                        "maxLength": 13,
+                        "pattern": "^[0-9\\-]+$",
+                        "description": "Número de documento",
+                        "example": "12345678"
+                      },
+                      "telefono": {
+                        "type": "string",
+                        "pattern": "^[+]?[0-9\\s\\-()]{8,20}$",
+                        "description": "Número de teléfono",
+                        "example": "+54 11 1234-5678"
+                      },
+                      "direccion": {
+                        "type": "string",
+                        "minLength": 5,
+                        "maxLength": 200,
+                        "description": "Dirección del usuario",
+                        "example": "Av. Corrientes 1234"
+                      },
+                      "foto": {
+                        "type": "string",
+                        "maxLength": 200,
+                        "format": "uri",
+                        "description": "URL de la foto de perfil del usuario",
+                        "example": "http://example.com/foto.jpg"
+                      },
+                      "estado": {
+                        "type": "string",
+                        "enum": [
+                          "activo",
+                          "inactivo"
+                        ],
+                        "default": "activo",
+                        "description": "Estado del usuario",
+                        "example": "activo"
+                      },
+                      "nombreFantasia": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "minLength": 2,
+                            "maxLength": 30
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              ""
+                            ]
+                          }
+                        ],
+                        "description": "Nombre de fantasía del prestatario",
+                        "example": "Servicios SRL"
+                      },
+                      "descripcion": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              ""
+                            ]
+                          }
+                        ],
+                        "description": "Descripción del prestatario",
+                        "example": "Ofrecemos servicios de plomería y electricidad."
+                      }
+                    },
+                    "required": [
+                      "nombre",
+                      "apellido",
+                      "mail",
+                      "tipoDoc",
+                      "numeroDoc",
+                      "telefono",
+                      "direccion"
+                    ]
+                  }
+                },
+                "title": "ActualizarHorario",
+                "description": "Esquema para actualizar un horario existente"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Horario actualizado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Horario actualizado exitosamente"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "diaSemana": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 6,
+                          "description": "Día de la semana (0-6, donde 0 es Lunes y 6 es Domingo)",
+                          "example": 0
+                        },
+                        "horaDesde": {
+                          "type": "string",
+                          "pattern": "^([0-1]\\d|2[0-3]):([0-5]\\d):([0-5]\\d)$",
+                          "description": "Hora de inicio en formato HH:mm:ss",
+                          "example": "08:00:00"
+                        },
+                        "horaHasta": {
+                          "type": "string",
+                          "pattern": "^([0-1]\\d|2[0-3]):([0-5]\\d):([0-5]\\d)$",
+                          "description": "Hora de fin en formato HH:mm:ss",
+                          "example": "17:00:00"
+                        },
+                        "usuario": {
+                          "type": "object",
+                          "properties": {
+                            "nombre": {
+                              "type": "string",
+                              "minLength": 2,
+                              "maxLength": 50,
+                              "pattern": "^[a-zA-ZÀ-ÿ\\s]+$",
+                              "description": "Nombre del usuario",
+                              "example": "Juan"
+                            },
+                            "apellido": {
+                              "type": "string",
+                              "minLength": 2,
+                              "maxLength": 50,
+                              "pattern": "^[a-zA-ZÀ-ÿ\\s]+$",
+                              "description": "Apellido del usuario",
+                              "example": "Pérez"
+                            },
+                            "mail": {
+                              "type": "string",
+                              "maxLength": 100,
+                              "format": "email",
+                              "description": "Correo electrónico del usuario",
+                              "example": "juan.perez@gmail.com"
+                            },
+                            "tipoDoc": {
+                              "type": "string",
+                              "enum": [
+                                "DNI",
+                                "CUIT",
+                                "CUIL"
+                              ],
+                              "description": "Tipo de documento",
+                              "example": "DNI"
+                            },
+                            "numeroDoc": {
+                              "type": "string",
+                              "minLength": 7,
+                              "maxLength": 13,
+                              "pattern": "^[0-9\\-]+$",
+                              "description": "Número de documento",
+                              "example": "12345678"
+                            },
+                            "telefono": {
+                              "type": "string",
+                              "pattern": "^[+]?[0-9\\s\\-()]{8,20}$",
+                              "description": "Número de teléfono",
+                              "example": "+54 11 1234-5678"
+                            },
+                            "direccion": {
+                              "type": "string",
+                              "minLength": 5,
+                              "maxLength": 200,
+                              "description": "Dirección del usuario",
+                              "example": "Av. Corrientes 1234"
+                            },
+                            "foto": {
+                              "type": "string",
+                              "maxLength": 200,
+                              "format": "uri",
+                              "description": "URL de la foto de perfil del usuario",
+                              "example": "http://example.com/foto.jpg"
+                            },
+                            "estado": {
+                              "type": "string",
+                              "enum": [
+                                "activo",
+                                "inactivo"
+                              ],
+                              "default": "activo",
+                              "description": "Estado del usuario",
+                              "example": "activo"
+                            },
+                            "nombreFantasia": {
+                              "anyOf": [
+                                {
+                                  "type": "string",
+                                  "minLength": 2,
+                                  "maxLength": 30
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": [
+                                    ""
+                                  ]
+                                }
+                              ],
+                              "description": "Nombre de fantasía del prestatario",
+                              "example": "Servicios SRL"
+                            },
+                            "descripcion": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": [
+                                    ""
+                                  ]
+                                }
+                              ],
+                              "description": "Descripción del prestatario",
+                              "example": "Ofrecemos servicios de plomería y electricidad."
+                            }
+                          },
+                          "required": [
+                            "nombre",
+                            "apellido",
+                            "mail",
+                            "tipoDoc",
+                            "numeroDoc",
+                            "telefono",
+                            "direccion"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "diaSemana",
+                        "horaDesde",
+                        "horaHasta",
+                        "usuario"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Horario no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "El horario no fue encontrado"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "id"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "id inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Lista de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "title": "Error",
+                  "description": "Esquema para representar un error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "El horario no fue encontrado"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "id"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "id inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Lista de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "title": "Error",
+                  "description": "Esquema para representar un error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Eliminar un horario por ID",
+        "summary": "Eliminar horario",
+        "tags": [
+          "Horarios"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Horario eliminado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Horario eliminado exitosamente"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Horario no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "El horario no fue encontrado"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "id"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "id inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Lista de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "title": "Error",
+                  "description": "Esquema para representar un error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "El horario no fue encontrado"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "id"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "id inválido"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Lista de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "title": "Error",
+                  "description": "Esquema para representar un error"
                 }
               }
             }

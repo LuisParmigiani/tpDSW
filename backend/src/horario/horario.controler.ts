@@ -1,24 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { Horario } from './horario.entity.js';
-import { request } from 'http';
+
 import { orm } from '../shared/db/orm.js';
 const em = orm.em;
-
-function sanitizeHorarioInput(req: Request, res: Response, next: NextFunction) {
-  req.body.sanitizeHorarioInput = {
-    id: req.body.id,
-    diaSemana: req.body.diaSemana,
-    horaDesde: req.body.horaDesde,
-    horaHasta: req.body.horaHasta,
-    usuario: req.body.usuario,
-  };
-  Object.keys(req.body.sanitizeHorarioInput).forEach((key) => {
-    if (req.body.sanitizeHorarioInput[key] === undefined) {
-      delete req.body.sanitizeHorarioInput[key];
-    }
-  });
-  next();
-}
 
 async function findAll(req: Request, res: Response) {
   try {
@@ -77,4 +61,4 @@ async function remove(req: Request, res: Response) {
   }
 }
 
-export { sanitizeHorarioInput, findAll, findManyByUser, add, update, remove };
+export { findAll, findManyByUser, add, update, remove };
