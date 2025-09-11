@@ -49,32 +49,32 @@ const orm = await MikroORM.init({
 export const syncSchema = async () => {
   try {
     const generator = orm.getSchemaGenerator();
-    // console.log('❌ Borrando todas las tablas...');
-    // await generator.dropSchema();
+    /* console.log('❌ Borrando todas las tablas...');
+    await generator.dropSchema();
 
-    // console.log('✅ Creando tablas nuevas...');
-    // await generator.createSchema();
+    console.log('✅ Creando tablas nuevas...');
+    await generator.createSchema();
 
-    // console.log('🌱 Ejecutando seeders...');
-    // const seeder = orm.getSeeder();
+    console.log('🌱 Ejecutando seeders...');
+    const seeder = orm.getSeeder();
 
-    // try {
-    //   console.log(
-    //     '🔍 Debugger: Intentando ejecutar seed con DatabaseSeeder...'
-    //   );
-    //   // Importar el DatabaseSeeder y ejecutarlo específicamente
-    //   const { DatabaseSeeder } = await import(
-    //     '../../seeders/DatabaseSeeder.js'
-    //   );
-    //   await seeder.seed(DatabaseSeeder);
-    //   console.log('✅ Debugger: DatabaseSeeder ejecutado exitosamente');
-    // } catch (error: any) {
-    //   console.error('❌ Error en seeder:', error);
-    //   console.error('❌ Stack:', error?.stack);
-    // }
+    try {
+      console.log(
+        '🔍 Debugger: Intentando ejecutar seed con DatabaseSeeder...'
+      );
+      // Importar el DatabaseSeeder y ejecutarlo específicamente
+      const { DatabaseSeeder } = await import(
+        '../../seeders/DatabaseSeeder.js'
+      );
+      await seeder.seed(DatabaseSeeder);
+      console.log('✅ Debugger: DatabaseSeeder ejecutado exitosamente');
+    } catch (error: any) {
+      console.error('❌ Error en seeder:', error);
+      console.error('❌ Stack:', error?.stack);
+    }
 
     // // Verificación rápida
-    // const em = orm.em.fork();
+    const em = orm.em.fork(); */
   } catch (error) {
     console.error('❌ Error ejecutando seeders:', error);
     throw error;

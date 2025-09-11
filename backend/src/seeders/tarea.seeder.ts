@@ -10,11 +10,13 @@ export class TareaSeeder extends Seeder {
     console.log(
       'Iniciando TareaSeeder........................................................................................................'
     );
-    
+
     // Verificar si ya existen tareas
     const existingCount = await em.count(Tarea);
     if (existingCount > 0) {
-      console.log(`Tarea ya tiene ${existingCount} registros. Omitiendo seeder.`);
+      console.log(
+        `Tarea ya tiene ${existingCount} registros. Omitiendo seeder.`
+      );
       return;
     }
 
@@ -66,7 +68,7 @@ export class TareaSeeder extends Seeder {
             ]);
             break;
           default:
-            nombreTarea = `${tipo.nombreTipo} tarea ${i}`;
+            nombreTarea = `${tipo.nombreTipo} `;
         }
 
         // Verificar si ya existe una tarea con este nombre

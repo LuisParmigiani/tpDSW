@@ -10,7 +10,7 @@ export class UsuarioSeeder extends Seeder {
       'Iniciando UsuarioSeeder........................................................................................................'
     );
     // Clientes
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 35; i++) {
       em.create(Usuario, {
         mail: faker.internet.email(),
         contrasena:
@@ -28,12 +28,13 @@ export class UsuarioSeeder extends Seeder {
       });
     }
 
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 25; i++) {
       // Prestatarios activos
       em.create(Usuario, {
         nombre: faker.person.firstName(),
         apellido: faker.person.lastName(),
         mail: faker.internet.email(),
+        telefono: faker.phone.number(),
         contrasena:
           '$2b$10$dHhuYx1ljMyZh5hFdi0Kl.kk/Dj.AXbifyeuh7zpUwEDvyJNwqQqC',
         tipoDoc: 'CUIT',
@@ -54,6 +55,7 @@ export class UsuarioSeeder extends Seeder {
         nombre: faker.person.firstName(),
         apellido: faker.person.lastName(),
         mail: faker.internet.email(),
+        telefono: faker.phone.number(),
         contrasena:
           '$2b$10$dHhuYx1ljMyZh5hFdi0Kl.kk/Dj.AXbifyeuh7zpUwEDvyJNwqQqC',
         tipoDoc: 'CUIT',

@@ -13,19 +13,26 @@ export class TurnoSeeder extends Seeder {
     const clientes = await em.find(Usuario, { nombreFantasia: null }); // usuarios cliente
     const servicios = await em.find(Servicio, { estado: 'activo' }); // servicios activos
 
-    const estadosFuturos = ['pendiente', 'confirmado', 'completado'];
-
-    for (let i = 0; i < 30; i++) {
+    const estadosFuturos = ['pendiente', 'confirmado'];
+    const estadosPasados = [
+      'completado',
+      'cancelado',
+      'completado',
+      'completado',
+      'completado',
+    ];
+    // Crear 100 turnos con fechas entre -20 y +20 días desde hoy
+    for (let i = 0; i < 300; i++) {
       // Fecha aleatoria entre -20 y +20 días desde hoy
       const fechaHora = faker.date.between({
-        from: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
+        from: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
         to: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000),
       });
 
       // Determinar el estado según la fecha
       let estado: string;
       if (fechaHora < new Date()) {
-        estado = 'cancelado'; // todas las fechas pasadas son canceladas
+        estado = faker.helpers.arrayElement(estadosPasados);
       } else {
         estado = faker.helpers.arrayElement(estadosFuturos);
       }
@@ -40,7 +47,7 @@ export class TurnoSeeder extends Seeder {
       let calificacion: number | undefined;
       let comentario: string | undefined;
       if (estado === 'completado') {
-        if (i < 10) {
+        if (i < 20) {
           // mitad con comentario/calificación
           calificacion = faker.number.int({ min: 1, max: 5 });
           comentario = faker.lorem.sentence();
