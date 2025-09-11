@@ -208,7 +208,13 @@ function ServiciosSection() {
         serviciosExistentes.forEach((servicio: {
           tarea?: { id: number; tipoServicio?: { id: number } } | number;
           precio: number;
+          estado?: string;
         }) => {
+          // Solo procesar servicios activos
+          if (servicio.estado !== 'activo') {
+            return;
+          }
+          
           const tareaId = typeof servicio.tarea === 'object' ? servicio.tarea?.id : servicio.tarea;
           const tipoServicioId = typeof servicio.tarea === 'object' ? servicio.tarea?.tipoServicio?.id : undefined;
           const precio = servicio.precio;
@@ -309,22 +315,56 @@ function ServiciosSection() {
     );
   };
 
-  // Función para seleccionar/deseleccionar todas las tareas visibles
-  const handleSelectAll = (seleccionar: boolean) => {
-    setTareas(prev => 
-      prev.map(tarea => 
-        tareasVisibles.some(visible => visible.id === tarea.id) 
-          ? { ...tarea, seleccionada: seleccionar }
-          : tarea
-      )
-    );
+  // Función para activar/desactivar tareas individualmente
+  const handleActivateDeactivate = async (tareaId: number, activate: boolean) => {
+    if (!usuario) {
+      setAlertType('danger');
+      setAlertMessage('Error: Usuario no autenticado');
+      setShowAlert(true);
+      return;
+    }
+
+    const tarea = tareas.find(t => t.id === tareaId);
+    if (!tarea) return;
+
+    // Si está activando, necesita un precio
+    if (activate && tarea.precio <= 0) {
+      setAlertType('danger');
+      setAlertMessage('Debes asignar un precio mayor a 0 antes de activar la tarea');
+      setShowAlert(true);
+      return;
+    }
+
+    try {
+      if (activate) {
+        // Activar: crear/actualizar servicio
+        await serviciosApi.upsertByUserAndTask({
+          tareaId: tarea.id,
+          usuarioId: usuario.id,
+          precio: tarea.precio
+        });
+        // Actualizar estado local
+        handleTareaChange(tareaId, 'seleccionada', true);
+        setAlertType('success');
+        setAlertMessage('✅ Tarea activada exitosamente');
+      } else {
+        // Desactivar: cambiar estado a inactivo
+        await serviciosApi.deactivateByUserAndTask(usuario.id, tarea.id);
+        // Actualizar estado local
+        handleTareaChange(tareaId, 'seleccionada', false);
+        setAlertType('success');
+        setAlertMessage('✅ Tarea desactivada exitosamente');
+      }
+      setShowAlert(true);
+    } catch (error) {
+      console.error('Error al activar/desactivar tarea:', error);
+      setAlertType('danger');
+      setAlertMessage('❌ Error al actualizar la tarea. Intenta nuevamente.');
+      setShowAlert(true);
+    }
   };
 
-  // Verificar si todas las tareas visibles están seleccionadas
-  const todasSeleccionadas = tareasVisibles.length > 0 && tareasVisibles.every(tarea => tarea.seleccionada);
-  const algunasSeleccionadas = tareasVisibles.some(tarea => tarea.seleccionada);
-
-  // Función para guardar servicios
+  // Función para guardar cambios por tipo de servicio
   const guardarServicios = async () => {
     if (!usuario) {
       setAlertType('danger');
@@ -333,120 +373,63 @@ function ServiciosSection() {
       return;
     }
 
-    // Obtener tareas seleccionadas con precio > 0
-    const tareasSeleccionadas = tareas.filter(tarea => 
-      tarea.seleccionada && tarea.precio > 0
-    );
-
-    // Verificar si es caso de "dar de baja todos los servicios"
+    // Verificar si es caso de "desactivar todos los servicios"
     const tiposActivos = tiposServicio.filter(tipo => tipo.activo);
     const esDarDeBaja = tiposActivos.length === 0;
 
-    // Solo validar tareas seleccionadas si NO es el caso de dar de baja
-    if (!esDarDeBaja && tareasSeleccionadas.length === 0) {
-      setAlertType('danger');
-      setAlertMessage('Debes seleccionar al menos una tarea y asignarle un precio mayor a 0');
-      setShowAlert(true);
-      return;
-    }
-
     setGuardando(true);
     try {
-      let resultados: Array<{ success: boolean; tareaId: number; error?: unknown }> = [];
-      
-      // Solo procesar tareas seleccionadas si NO es el caso de dar de baja
-      if (!esDarDeBaja) {
-        // Procesar cada tarea seleccionada
-        const promiseResults = await Promise.allSettled(
-          tareasSeleccionadas.map(async (tarea) => {
+      if (esDarDeBaja) {
+        // Caso especial: desactivar TODOS los servicios del usuario
+        await Promise.allSettled(
+          tareas.map(async (tarea) => {
             try {
-              await serviciosApi.upsertByUserAndTask({
-                tareaId: tarea.id,
-                usuarioId: usuario.id,
-                precio: tarea.precio
-              });
-              return { success: true, tareaId: tarea.id };
-            } catch (error) {
-              return { success: false, tareaId: tarea.id, error };
+              await serviciosApi.deactivateByUserAndTask(usuario.id, tarea.id);
+            } catch {
+              // Ignorar errores de desactivación (probablemente no existía)
             }
           })
         );
         
-        resultados = promiseResults.map(result => 
-          result.status === 'fulfilled' ? result.value : { success: false, tareaId: -1, error: result.reason }
+        // Actualizar estado local
+        setTareas(prev => 
+          prev.map(tarea => ({ ...tarea, seleccionada: false }))
         );
-      }
-
-      // Procesar eliminaciones
-      if (esDarDeBaja) {
-        // Caso especial: eliminar TODOS los servicios del usuario
-        try {
-          // Hacer una llamada al backend para eliminar todos los servicios del usuario
-          // Por ahora, eliminaremos uno por uno todas las tareas
-          await Promise.allSettled(
-            tareas.map(async (tarea) => {
-              try {
-                await serviciosApi.deleteByUserAndTask(usuario.id, tarea.id);
-              } catch {
-                // Ignorar errores de eliminación (probablemente no existía)
-              }
-            })
-          );
-        } catch (error) {
-          console.error('Error al eliminar todos los servicios:', error);
-        }
+        
+        setAlertType('success');
+        setAlertMessage('✅ Todos los servicios han sido desactivados exitosamente');
       } else {
-        // Eliminaciones normales
-        // 1. Obtener tipos de servicio inactivos (deseleccionados)
+        // Desactivaciones por tipo de servicio
         const tiposInactivos = tiposServicio.filter(tipo => !tipo.activo);
         
-        // 2. Obtener todas las tareas de tipos deseleccionados
-        const tareasDetiposInactivos = tareas.filter(tarea => 
-          tiposInactivos.some(tipo => tipo.id === tarea.tipoServicioId)
-        );
-        
-        // 3. Eliminar servicios de tareas específicamente deseleccionadas (dentro de tipos activos)
-        const tareasDeseleccionadas = tareasVisibles.filter(tarea => !tarea.seleccionada);
-        
-        // 4. Combinar todas las tareas a eliminar (evitar duplicados)
-        const todasTareasAEliminar = [
-          ...tareasDetiposInactivos,
-          ...tareasDeseleccionadas
-        ].filter((tarea, index, array) => 
-          array.findIndex(t => t.id === tarea.id) === index
-        );
-        
-        if (todasTareasAEliminar.length > 0) {
+        if (tiposInactivos.length > 0) {
+          // Obtener todas las tareas de tipos deseleccionados
+          const tareasADesactivar = tareas.filter(tarea => 
+            tiposInactivos.some(tipo => tipo.id === tarea.tipoServicioId)
+          );
+          
           await Promise.allSettled(
-            todasTareasAEliminar.map(async (tarea) => {
+            tareasADesactivar.map(async (tarea) => {
               try {
-                await serviciosApi.deleteByUserAndTask(usuario.id, tarea.id);
+                await serviciosApi.deactivateByUserAndTask(usuario.id, tarea.id);
               } catch {
-                // Ignorar errores de eliminación (probablemente no existía)
+                // Ignorar errores de desactivación
               }
             })
           );
+          
+          // Actualizar estado local
+          setTareas(prev => 
+            prev.map(tarea => 
+              tareasADesactivar.some(t => t.id === tarea.id) 
+                ? { ...tarea, seleccionada: false }
+                : tarea
+            )
+          );
         }
-      }
-
-      // Analizar resultados y mostrar mensaje apropiado
-      if (esDarDeBaja) {
+        
         setAlertType('success');
-        setAlertMessage('✅ Todos los servicios han sido dados de baja exitosamente');
-      } else {
-        const exitosos = resultados.filter(result => result.success).length;
-        const fallidos = resultados.filter(result => !result.success).length;
-
-        if (exitosos > 0 && fallidos === 0) {
-          setAlertType('success');
-          setAlertMessage(`✅ Se guardaron exitosamente ${exitosos} servicios`);
-        } else if (exitosos > 0 && fallidos > 0) {
-          setAlertType('success');
-          setAlertMessage(`⚠️ Se guardaron ${exitosos} servicios, ${fallidos} fallaron`);
-        } else {
-          setAlertType('danger');
-          setAlertMessage('❌ Error al guardar los servicios. Intenta nuevamente.');
-        }
+        setAlertMessage('✅ Cambios aplicados exitosamente');
       }
       
       setShowAlert(true);
@@ -467,7 +450,9 @@ function ServiciosSection() {
           {/* Header */}
           <div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Mis Servicios</h2>
-            <p className="text-gray-600">Selecciona los tipos de servicio y las tareas que prestas.</p>
+            <p className="text-gray-600">
+              Selecciona los tipos de servicio que ofreces. Luego, activa/desactiva tareas individuales y define sus precios.
+            </p>
           </div>
 
         {/* Selector de Tipos de Servicio */}
@@ -529,6 +514,12 @@ function ServiciosSection() {
               <h3 className="text-lg font-semibold text-gray-900 text-left">
                 Tareas
               </h3>
+              <div className="mt-2 bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <p className="text-sm text-blue-800">
+                  <span className="font-medium">💡 Cómo funciona:</span> Usa los botones "Activar/Desactivar" para controlar cada tarea individualmente. 
+                  Define el precio antes de activar. Los cambios se aplican inmediatamente.
+                </p>
+              </div>
             </div>
 
             {/* Navegación por tipos de servicio */}
@@ -563,38 +554,7 @@ function ServiciosSection() {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      <div className="flex items-center justify-start">
-                        <span className="relative flex items-center justify-center">
-                          <input
-                            type="checkbox"
-                            checked={todasSeleccionadas}
-                            ref={(input) => {
-                              if (input) input.indeterminate = algunasSeleccionadas && !todasSeleccionadas;
-                            }}
-                            onChange={(e) => handleSelectAll(e.target.checked)}
-                            className="peer h-5 w-5 rounded border border-gray-500 bg-white appearance-none cursor-pointer focus:ring-2 focus:ring-orange-500 checked:bg-orange-500 checked:border-orange-500"
-                          />
-                          <span className="absolute pointer-events-none inset-0 flex items-center justify-center">
-                            {todasSeleccionadas && (
-                              <svg
-                                width="20"
-                                height="20"
-                                viewBox="0 0 20 20"
-                                fill="none"
-                                style={{ display: 'block' }}
-                              >
-                                <path
-                                  d="M5 10.5L9 14.5L15 7.5"
-                                  stroke="#fff"
-                                  strokeWidth="1.4"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
-                            )}
-                          </span>
-                        </span>
-                      </div>
+                      Estado
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Tarea
@@ -616,6 +576,7 @@ function ServiciosSection() {
                         tarea={tarea}
                         tipoServicio={tipoServicio}
                         onTareaChange={handleTareaChange}
+                        onActivateDeactivate={handleActivateDeactivate}
                       />
                     );
                   })}
@@ -652,7 +613,7 @@ function ServiciosSection() {
           </div>
         )}
 
-        {/* Botón Guardar - Siempre visible para permitir dar de baja todos los servicios */}
+        {/* Botón para aplicar cambios en tipos de servicio */}
         <div className="flex justify-center">
           <button
             onClick={guardarServicios}
@@ -673,8 +634,8 @@ function ServiciosSection() {
               </div>
             ) : (
               tiposServicio.filter(tipo => tipo.activo).length === 0 
-                ? 'Dar de Baja Todos los Servicios' 
-                : 'Guardar Servicios'
+                ? 'Desactivar Todos los Servicios' 
+                : 'Aplicar Cambios de Tipos'
             )}
           </button>
         </div>

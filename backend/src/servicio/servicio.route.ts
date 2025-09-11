@@ -9,6 +9,7 @@ import {
   getByUser,
   upsertByUserAndTask,
   deleteByUserAndTask,
+  deactivateByUserAndTask,
 } from './servicio.controler.js';
 
 export const servicioRouter = Router();
@@ -24,3 +25,4 @@ servicioRouter.delete('/:id', remove);
 servicioRouter.get('/user/:usuarioId', getByUser);
 servicioRouter.post('/upsert', upsertByUserAndTask);
 servicioRouter.delete('/user/:usuarioId/task/:tareaId', deleteByUserAndTask);
+servicioRouter.patch('/user/:usuarioId/task/:tareaId/deactivate', deactivateByUserAndTask);

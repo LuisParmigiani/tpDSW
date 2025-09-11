@@ -171,8 +171,9 @@ async function upsertByUserAndTask(req: Request, res: Response) {
     });
 
     if (servicioExistente) {
-      // Actualizar precio del servicio existente
+      // Actualizar precio del servicio existente y reactivarlo
       servicioExistente.precio = precio;
+      servicioExistente.estado = 'activo';
       await em.persistAndFlush(servicioExistente);
       res.status(200).json({ 
         message: 'Servicio actualizado', 
@@ -185,7 +186,7 @@ async function upsertByUserAndTask(req: Request, res: Response) {
         precio,
         tarea: tareaId,
         usuario: usuarioId,
-        estado: 'inactivo',
+        estado: 'activo',
       });
       await em.persistAndFlush(nuevoServicio);
       res.status(201).json({ 
@@ -232,6 +233,42 @@ async function deleteByUserAndTask(req: Request, res: Response) {
   }
 }
 
+// Desactivar servicio por usuario y tarea (cambiar estado a inactivo)
+async function deactivateByUserAndTask(req: Request, res: Response) {
+  try {
+    const { tareaId, usuarioId } = req.params;
+
+    if (!tareaId || !usuarioId) {
+      return res.status(400).json({ 
+        message: 'tareaId y usuarioId son requeridos' 
+      });
+    }
+
+    const servicio = await em.findOne(Servicio, {
+      tarea: Number(tareaId),
+      usuario: Number(usuarioId),
+    });
+
+    if (!servicio) {
+      return res.status(404).json({ 
+        message: 'Servicio no encontrado' 
+      });
+    }
+
+    // Cambiar estado a inactivo en lugar de eliminar
+    servicio.estado = 'inactivo';
+    await em.persistAndFlush(servicio);
+    
+    res.status(200).json({ 
+      message: 'Servicio desactivado exitosamente',
+      data: servicio
+    });
+  } catch (error: any) {
+    console.error('Error en deactivateByUserAndTask:', error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
 export {
   sanitizeServicioInput,
   findall,
@@ -245,4 +282,5 @@ export {
   getByUser,
   upsertByUserAndTask,
   deleteByUserAndTask,
+  deactivateByUserAndTask,
 };
