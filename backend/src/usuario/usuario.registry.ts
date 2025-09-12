@@ -215,7 +215,7 @@ usuarioRegistry.registerPath({
         },
       },
     },
-    400: {
+    409: {
       description: 'Error de validación',
       content: {
         'application/json': {
