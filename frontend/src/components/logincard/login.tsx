@@ -48,6 +48,8 @@ function Logincard() {
     } catch (error: AxiosError | any) {
       if (error.response.data.errors[0].message) {
         setMessage(error.response.data.errors[0].message);
+      } else if (error.response.data.message) {
+        setMessage(error.response.data.message);
       } else {
         setMessage('Error en el servidor, intente nuevamente mas tarde');
       }
