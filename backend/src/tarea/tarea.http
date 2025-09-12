@@ -12,11 +12,10 @@ POST http://localhost:3000/api/tarea
 Content-Type: application/json
 
 {
-  "nombreTarea": "Destapar cañerias",
+  "nombreTarea": "Deatar caias",
   "descripcionTarea": "Se debe destapar las cañerias de la cocina",
   "duracionTarea": 60,
-  "tipoServicio": 
-    [2]
+  "tipoServicio": 10
 }
 
 ###Hacemos un PUT
@@ -42,4 +41,4 @@ Content-Type: application/json
 }
 
 ###HAcemos un delete
-DELETE http://localhost:3000/api/tarea/a02b91bc-3769-4221-beb1-d7a3aeba7dad
+DELETE http://localhost:3000/api/tarea/1

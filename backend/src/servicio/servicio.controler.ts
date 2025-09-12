@@ -7,25 +7,6 @@ import { Usuario } from '../usuario/usuario.entity.js';
 
 const em = orm.em;
 
-function sanitizeServicioInput(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  req.body.sanitizeServicioInput = {
-    precio: req.body.precio,
-    tarea: req.body.tarea,
-    usuarios: req.body.usuarios,
-    turnos: req.body.turnos,
-  };
-  Object.keys(req.body.sanitizeServicioInput).forEach((key) => {
-    if (req.body.sanitizeServicioInput[key] === undefined) {
-      delete req.body.sanitizeServicioInput[key];
-    }
-  });
-  next();
-}
-
 // Find all services
 async function findall(req: Request, res: Response) {
   try {
@@ -51,6 +32,11 @@ async function findone(req: Request, res: Response) {
     );
     res.status(200).json({ message: 'found one service', data: service });
   } catch (error: any) {
+    if (error.name === 'NotFoundError') {
+      return res.status(404).json({
+        message: 'Servicio no encontrado',
+      });
+    }
     res.status(500).json({ message: error.message });
   }
 }
@@ -58,7 +44,8 @@ async function findone(req: Request, res: Response) {
 // Add a new service
 async function add(req: Request, res: Response) {
   try {
-    const service = em.create(Servicio, req.body.sanitizeServicioInput);
+    const servicioData = req.body;
+    const service = em.create(Servicio, servicioData);
     await em.persistAndFlush(service);
     res.status(201).json({ message: 'created service', data: service });
   } catch (error: any) {
@@ -69,12 +56,20 @@ async function add(req: Request, res: Response) {
 // Update an existing service
 async function update(req: Request, res: Response) {
   try {
-    const id = Number.parseInt(req.params.id);
-    const service = await em.findOneOrFail(Servicio, { id });
-    em.assign(service, req.body.sanitizeServicioInput);
+    const { id } = req.params;
+    const updateData = req.body;
+    const service = await em.findOneOrFail(Servicio, {
+      id: Number.parseInt(id),
+    });
+    em.assign(service, updateData);
     await em.persistAndFlush(service);
     res.status(200).json({ message: 'updated service', data: service });
   } catch (error: any) {
+    if (error.name === 'NotFoundError') {
+      return res.status(404).json({
+        message: 'Servicio no encontrado',
+      });
+    }
     res.status(500).json({ message: error.message });
   }
 }
@@ -82,11 +77,18 @@ async function update(req: Request, res: Response) {
 // Remove a service
 async function remove(req: Request, res: Response) {
   try {
-    const id = Number.parseInt(req.params.id);
-    const service = await em.findOneOrFail(Servicio, { id });
+    const { id } = req.params;
+    const service = await em.findOneOrFail(Servicio, {
+      id: Number.parseInt(id),
+    });
     await em.removeAndFlush(service);
     res.status(200).json({ message: 'removed service', data: service });
   } catch (error: any) {
+    if (error.name === 'NotFoundError') {
+      return res.status(404).json({
+        message: 'Servicio no encontrado',
+      });
+    }
     res.status(500).json({ message: error.message });
   }
 }
@@ -129,23 +131,28 @@ async function getById(id: number) {
 // Obtener servicios por usuario
 async function getByUser(req: Request, res: Response) {
   try {
-    const usuarioId = Number.parseInt(req.params.usuarioId);
+    const { usuarioId } = req.params;
+    const usuarioIdNum = Number.parseInt(usuarioId);
 
-    if (!usuarioId) {
-      return res.status(400).json({ 
-        message: 'usuarioId es requerido' 
+    if (!usuarioIdNum) {
+      return res.status(400).json({
+        message: 'usuarioId es requerido',
       });
     }
 
-    const servicios = await em.find(Servicio, {
-      usuario: usuarioId,
-    }, {
-      populate: ['tarea', 'tarea.tipoServicio', 'usuario']
-    });
+    const servicios = await em.find(
+      Servicio,
+      {
+        usuario: usuarioIdNum,
+      },
+      {
+        populate: ['tarea', 'tarea.tipoServicio', 'usuario'],
+      }
+    );
 
-    res.status(200).json({ 
-      message: 'Servicios encontrados', 
-      data: servicios 
+    res.status(200).json({
+      message: 'Servicios encontrados',
+      data: servicios,
     });
   } catch (error: any) {
     console.error('Error en getByUser:', error);
@@ -159,8 +166,8 @@ async function upsertByUserAndTask(req: Request, res: Response) {
     const { tareaId, usuarioId, precio } = req.body;
 
     if (!tareaId || !usuarioId || !precio || precio <= 0) {
-      return res.status(400).json({ 
-        message: 'tareaId, usuarioId y precio (>0) son requeridos' 
+      return res.status(400).json({
+        message: 'tareaId, usuarioId y precio (>0) son requeridos',
       });
     }
 
@@ -171,13 +178,14 @@ async function upsertByUserAndTask(req: Request, res: Response) {
     });
 
     if (servicioExistente) {
-      // Actualizar precio del servicio existente
+      // Actualizar precio del servicio existente y reactivarlo
       servicioExistente.precio = precio;
+      servicioExistente.estado = 'activo';
       await em.persistAndFlush(servicioExistente);
-      res.status(200).json({ 
-        message: 'Servicio actualizado', 
+      res.status(200).json({
+        message: 'Servicio actualizado',
         data: servicioExistente,
-        action: 'updated'
+        action: 'updated',
       });
     } else {
       // Crear nuevo servicio
@@ -185,13 +193,13 @@ async function upsertByUserAndTask(req: Request, res: Response) {
         precio,
         tarea: tareaId,
         usuario: usuarioId,
-        estado: 'inactivo',
+        estado: 'activo',
       });
       await em.persistAndFlush(nuevoServicio);
-      res.status(201).json({ 
-        message: 'Servicio creado', 
+      res.status(201).json({
+        message: 'Servicio creado',
         data: nuevoServicio,
-        action: 'created'
+        action: 'created',
       });
     }
   } catch (error: any) {
@@ -206,8 +214,8 @@ async function deleteByUserAndTask(req: Request, res: Response) {
     const { tareaId, usuarioId } = req.params;
 
     if (!tareaId || !usuarioId) {
-      return res.status(400).json({ 
-        message: 'tareaId y usuarioId son requeridos' 
+      return res.status(400).json({
+        message: 'tareaId y usuarioId son requeridos',
       });
     }
 
@@ -217,14 +225,14 @@ async function deleteByUserAndTask(req: Request, res: Response) {
     });
 
     if (!servicio) {
-      return res.status(404).json({ 
-        message: 'Servicio no encontrado' 
+      return res.status(404).json({
+        message: 'Servicio no encontrado',
       });
     }
 
     await em.removeAndFlush(servicio);
-    res.status(200).json({ 
-      message: 'Servicio eliminado exitosamente' 
+    res.status(200).json({
+      message: 'Servicio eliminado exitosamente',
     });
   } catch (error: any) {
     console.error('Error en deleteByUserAndTask:', error);
@@ -232,8 +240,43 @@ async function deleteByUserAndTask(req: Request, res: Response) {
   }
 }
 
+// Desactivar servicio por usuario y tarea (cambiar estado a inactivo)
+async function deactivateByUserAndTask(req: Request, res: Response) {
+  try {
+    const { tareaId, usuarioId } = req.params;
+
+    if (!tareaId || !usuarioId) {
+      return res.status(400).json({
+        message: 'tareaId y usuarioId son requeridos',
+      });
+    }
+
+    const servicio = await em.findOne(Servicio, {
+      tarea: Number(tareaId),
+      usuario: Number(usuarioId),
+    });
+
+    if (!servicio) {
+      return res.status(404).json({
+        message: 'Servicio no encontrado',
+      });
+    }
+
+    // Cambiar estado a inactivo en lugar de eliminar
+    servicio.estado = 'inactivo';
+    await em.persistAndFlush(servicio);
+
+    res.status(200).json({
+      message: 'Servicio desactivado exitosamente',
+      data: servicio,
+    });
+  } catch (error: any) {
+    console.error('Error en deactivateByUserAndTask:', error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
 export {
-  sanitizeServicioInput,
   findall,
   findone,
   getById,
@@ -245,4 +288,5 @@ export {
   getByUser,
   upsertByUserAndTask,
   deleteByUserAndTask,
+  deactivateByUserAndTask,
 };

@@ -56,7 +56,7 @@ type Props = {
 
 function TurnHistory({ estado }: Props) {
   const { usuario, loading: authLoading } = useProtectRoute(['cliente']);
-  const [abrirDevolucion, setAbrirDevolucion] = useState(true);
+  const [abrirDevolucion, setAbrirDevolucion] = useState(false);
   const navigate = useNavigate();
   const [turns, setTurns] = useState<Turno[] | null>(null); // Se guardan todos los turnos del usuario
   const [loading, setLoading] = useState(false);
@@ -74,6 +74,9 @@ function TurnHistory({ estado }: Props) {
   const [totalPages, setTotalPages] = useState(1); // Total de páginas
   const [flagged, setFlagged] = useState(false); //Bandera para saber si el comentario es inapropiado
 
+  if (estado) {
+    setAbrirDevolucion(true);
+  }
   // alertas para la devolucion del back
   const [updateError, setUpdateError] = useState<{
     error: string;

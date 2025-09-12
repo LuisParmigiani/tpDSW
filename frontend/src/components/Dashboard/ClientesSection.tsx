@@ -7,6 +7,7 @@ import { turnosApi } from '../../services/turnosApi';
 import TurnoDetailsModal from '../Modal/TurnoDetailsModal';
 import ConfirmationModal from '../Modal/ConfirmationModal';
 import useAuth from '../../cookie/useAuth';
+import StripeConnection from '../StripeConnection/StripeConnection';
 
 
 // Función auxiliar para capitalizar la primera letra
@@ -511,12 +512,14 @@ function ClientesSection() {
 	if (loading) {
 		return (
 			<DashboardSection>
-				<div className="flex items-center justify-center h-48 sm:h-64 px-4">
-					<div className="text-center">
-						<div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-orange-500 mx-auto mb-4"></div>
-						<p className="text-gray-600 text-sm sm:text-base">Cargando turnos...</p>
+				<StripeConnection loadingMessage="Cargando información de clientes...">
+					<div className="flex items-center justify-center h-48 sm:h-64 px-4">
+						<div className="text-center">
+							<div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-orange-500 mx-auto mb-4"></div>
+							<p className="text-gray-600 text-sm sm:text-base">Cargando turnos...</p>
+						</div>
 					</div>
-				</div>
+				</StripeConnection>
 			</DashboardSection>
 		);
 	}
@@ -525,144 +528,147 @@ function ClientesSection() {
 	if (error) {
 		return (
 			<DashboardSection>
-				<div className="text-center py-6 sm:py-8 px-4">
-					<div className="text-red-500 mb-4 text-sm sm:text-base">{error}</div>
-					<button 
-						onClick={() => cargarTurnos(currentPage, sortBy, estadoFilters, false, activeSearchQuery)}  // Mantener búsqueda activa
-						className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 text-sm sm:text-base"
-					>
-						Reintentar
-					</button>
-				</div>
+				<StripeConnection loadingMessage="Cargando información de clientes...">
+					<div className="text-center py-6 sm:py-8 px-4">
+						<div className="text-red-500 mb-4 text-sm sm:text-base">{error}</div>
+						<button 
+							onClick={() => cargarTurnos(currentPage, sortBy, estadoFilters, false, activeSearchQuery)}  // Mantener búsqueda activa
+							className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 text-sm sm:text-base"
+						>
+							Reintentar
+						</button>
+					</div>
+				</StripeConnection>
 			</DashboardSection>
 		);
 	}
 
 	return (
 		<DashboardSection>
-			{/* Header responsive */}
-			<div className={`mb-4 sm:mb-6 flex ${isMobileLayout ? 'flex-col' : 'flex-col sm:flex-row'} ${isMobileLayout ? '' : 'sm:items-center sm:justify-between'} gap-3 sm:gap-2 px-2 sm:px-0 relative`}>
-				<h2 className="text-lg sm:text-xl font-semibold text-gray-900">Turnos</h2>
-				<div className={`flex ${isMobileLayout ? 'flex-col' : 'flex-col sm:flex-row'} gap-2 sm:gap-2 relative`}>
-					<input
-						type="text"
-						placeholder="Buscar cliente..."
-						value={searchQuery}
-						onChange={(e) => setSearchQuery(e.target.value)}
-						onKeyDown={handleKeyDown}
-						className={`${isMobileLayout ? 'w-full' : 'w-full sm:w-auto'} border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500`}
-					/>
-					{/* Dropdown de ordenar - personalizado para coincidir con "Filtrar por" */}
-					<div ref={sortDropdownRef} className={`relative ${isMobileLayout ? 'w-full' : 'w-full sm:w-auto'}`}>
-						<button
-							onClick={() => setShowSortDropdown(!showSortDropdown)}
-							className={`${isMobileLayout ? 'w-full' : 'w-full sm:w-auto'} border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 flex items-center ${isMobileLayout ? 'justify-between' : 'justify-between sm:justify-center'} gap-2`}
-						>
-							<span>
-								{sortBy === '' ? 'Ordenar por' : 
-								 sortBy === 'fecha' ? 'Fecha (más reciente)' :
-								 sortBy === 'fechaAsc' ? 'Fecha (más antigua)' :
-								 sortBy === 'monto' ? 'Monto (mayor)' :
-								 sortBy === 'montoMenor' ? 'Monto (menor)' : 'Ordenar por'}
-							</span>
-							<svg 
-								className={`w-4 h-4 transition-transform ${showSortDropdown ? 'rotate-180' : ''}`} 
-								fill="none" 
-								stroke="currentColor" 
-								viewBox="0 0 24 24"
+			<StripeConnection loadingMessage="Cargando información de clientes...">
+				{/* Header responsive */}
+				<div className={`mb-4 sm:mb-6 flex ${isMobileLayout ? 'flex-col' : 'flex-col sm:flex-row'} ${isMobileLayout ? '' : 'sm:items-center sm:justify-between'} gap-3 sm:gap-2 px-2 sm:px-0 relative`}>
+					<h2 className="text-lg sm:text-xl font-semibold text-gray-900">Turnos</h2>
+					<div className={`flex ${isMobileLayout ? 'flex-col' : 'flex-col sm:flex-row'} gap-2 sm:gap-2 relative`}>
+						<input
+							type="text"
+							placeholder="Buscar cliente..."
+							value={searchQuery}
+							onChange={(e) => setSearchQuery(e.target.value)}
+							onKeyDown={handleKeyDown}
+							className={`${isMobileLayout ? 'w-full' : 'w-full sm:w-auto'} border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500`}
+						/>
+						{/* Dropdown de ordenar - personalizado para coincidir con "Filtrar por" */}
+						<div ref={sortDropdownRef} className={`relative ${isMobileLayout ? 'w-full' : 'w-full sm:w-auto'}`}>
+							<button
+								onClick={() => setShowSortDropdown(!showSortDropdown)}
+								className={`${isMobileLayout ? 'w-full' : 'w-full sm:w-auto'} border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 flex items-center ${isMobileLayout ? 'justify-between' : 'justify-between sm:justify-center'} gap-2`}
 							>
-								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-							</svg>
-						</button>
-						
-						{showSortDropdown && (
-							<div className={`absolute top-full right-0 mt-1 ${isMobileLayout ? 'w-full' : 'w-full sm:w-48'} bg-white border border-gray-300 rounded-lg shadow-lg z-20`}>
-								<div className="p-1">
-									<button
-										onClick={() => { handleSortSelect(''); setShowSortDropdown(false); }}
-										className={`w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 ${sortBy === '' ? 'bg-orange-50 text-orange-700' : 'text-gray-700'}`}
-									>
-										Ordenar por
-									</button>
-									<button
-										onClick={() => { handleSortSelect('fecha'); setShowSortDropdown(false); }}
-										className={`w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 ${sortBy === 'fecha' ? 'bg-orange-50 text-orange-700' : 'text-gray-700'}`}
-									>
-										Fecha (más reciente)
-									</button>
-									<button
-										onClick={() => { handleSortSelect('fechaAsc'); setShowSortDropdown(false); }}
-										className={`w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 ${sortBy === 'fechaAsc' ? 'bg-orange-50 text-orange-700' : 'text-gray-700'}`}
-									>
-										Fecha (más antigua)
-									</button>
-									<button
-										onClick={() => { handleSortSelect('monto'); setShowSortDropdown(false); }}
-										className={`w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 ${sortBy === 'monto' ? 'bg-orange-50 text-orange-700' : 'text-gray-700'}`}
-									>
-										Monto (mayor)
-									</button>
-									<button
-										onClick={() => { handleSortSelect('montoMenor'); setShowSortDropdown(false); }}
-										className={`w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 ${sortBy === 'montoMenor' ? 'bg-orange-50 text-orange-700' : 'text-gray-700'}`}
-									>
-										Monto (menor)
-									</button>
-								</div>
-							</div>
-						)}
-					</div>
-					
-					{/* Dropdown de filtrar por estado */}
-					<div className={`relative ${isMobileLayout ? 'w-full' : 'w-full sm:w-auto'}`} ref={dropdownRef}>
-						<button
-							onClick={() => setShowEstadoDropdown(!showEstadoDropdown)}
-							className={`${isMobileLayout ? 'w-full' : 'w-full sm:w-auto'} border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 flex items-center ${isMobileLayout ? 'justify-between' : 'justify-between sm:justify-center'} gap-2`}
-						>
-							<span>
-								Filtrar por {estadoFilters.length > 0 && `(${estadoFilters.length})`}
-							</span>
-							<svg 
-								className={`w-4 h-4 transition-transform ${showEstadoDropdown ? 'rotate-180' : ''}`} 
-								fill="none" 
-								stroke="currentColor" 
-								viewBox="0 0 24 24"
-							>
-								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-							</svg>
-						</button>
-						
-						{showEstadoDropdown && (
-							<div className={`absolute top-full right-0 mt-1 ${isMobileLayout ? 'w-full' : 'w-full sm:w-48'} bg-white border border-gray-300 rounded-lg shadow-lg z-20`}>
-								<div className="p-3">
-									<div className="flex justify-between items-center mb-2">
-										<span className="text-sm font-medium text-gray-700">Estados</span>
-										{estadoFilters.length > 0 && (
-											<button
-												onClick={clearEstadoFilters}
-												className="text-xs text-orange-600 hover:text-orange-700"
-											>
-												Limpiar
-											</button>
-										)}
+								<span>
+									{sortBy === '' ? 'Ordenar por' : 
+									 sortBy === 'fecha' ? 'Fecha (más reciente)' :
+									 sortBy === 'fechaAsc' ? 'Fecha (más antigua)' :
+									 sortBy === 'monto' ? 'Monto (mayor)' :
+									 sortBy === 'montoMenor' ? 'Monto (menor)' : 'Ordenar por'}
+								</span>
+								<svg 
+									className={`w-4 h-4 transition-transform ${showSortDropdown ? 'rotate-180' : ''}`} 
+									fill="none" 
+									stroke="currentColor" 
+									viewBox="0 0 24 24"
+								>
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+								</svg>
+							</button>
+							
+							{showSortDropdown && (
+								<div className={`absolute top-full right-0 mt-1 ${isMobileLayout ? 'w-full' : 'w-full sm:w-48'} bg-white border border-gray-300 rounded-lg shadow-lg z-20`}>
+									<div className="p-1">
+										<button
+											onClick={() => { handleSortSelect(''); setShowSortDropdown(false); }}
+											className={`w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 ${sortBy === '' ? 'bg-orange-50 text-orange-700' : 'text-gray-700'}`}
+										>
+											Ordenar por
+										</button>
+										<button
+											onClick={() => { handleSortSelect('fecha'); setShowSortDropdown(false); }}
+											className={`w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 ${sortBy === 'fecha' ? 'bg-orange-50 text-orange-700' : 'text-gray-700'}`}
+										>
+											Fecha (más reciente)
+										</button>
+										<button
+											onClick={() => { handleSortSelect('fechaAsc'); setShowSortDropdown(false); }}
+											className={`w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 ${sortBy === 'fechaAsc' ? 'bg-orange-50 text-orange-700' : 'text-gray-700'}`}
+										>
+											Fecha (más antigua)
+										</button>
+										<button
+											onClick={() => { handleSortSelect('monto'); setShowSortDropdown(false); }}
+											className={`w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 ${sortBy === 'monto' ? 'bg-orange-50 text-orange-700' : 'text-gray-700'}`}
+										>
+											Monto (mayor)
+										</button>
+										<button
+											onClick={() => { handleSortSelect('montoMenor'); setShowSortDropdown(false); }}
+											className={`w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 ${sortBy === 'montoMenor' ? 'bg-orange-50 text-orange-700' : 'text-gray-700'}`}
+										>
+											Monto (menor)
+										</button>
 									</div>
-									{estadosDisponibles.map(estado => (
-										<label key={estado} className="flex items-center gap-2 py-1 cursor-pointer hover:bg-gray-50 rounded px-1">
-											<input
-												type="checkbox"
-												checked={estadoFilters.includes(estado)}
-												onChange={() => handleEstadoFilterChange(estado)}
-												className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
-											/>
-											<span className="text-sm text-gray-700">{estado}</span>
-										</label>
-									))}
 								</div>
-							</div>
-						)}
+							)}
+						</div>
+						
+						{/* Dropdown de filtrar por estado */}
+						<div className={`relative ${isMobileLayout ? 'w-full' : 'w-full sm:w-auto'}`} ref={dropdownRef}>
+							<button
+								onClick={() => setShowEstadoDropdown(!showEstadoDropdown)}
+								className={`${isMobileLayout ? 'w-full' : 'w-full sm:w-auto'} border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 flex items-center ${isMobileLayout ? 'justify-between' : 'justify-between sm:justify-center'} gap-2`}
+							>
+								<span>
+									Filtrar por {estadoFilters.length > 0 && `(${estadoFilters.length})`}
+								</span>
+								<svg 
+									className={`w-4 h-4 transition-transform ${showEstadoDropdown ? 'rotate-180' : ''}`} 
+									fill="none" 
+									stroke="currentColor" 
+									viewBox="0 0 24 24"
+								>
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+								</svg>
+							</button>
+							
+							{showEstadoDropdown && (
+								<div className={`absolute top-full right-0 mt-1 ${isMobileLayout ? 'w-full' : 'w-full sm:w-48'} bg-white border border-gray-300 rounded-lg shadow-lg z-20`}>
+									<div className="p-3">
+										<div className="flex justify-between items-center mb-2">
+											<span className="text-sm font-medium text-gray-700">Estados</span>
+											{estadoFilters.length > 0 && (
+												<button
+													onClick={clearEstadoFilters}
+													className="text-xs text-orange-600 hover:text-orange-700"
+												>
+													Limpiar
+												</button>
+											)}
+										</div>
+										{estadosDisponibles.map(estado => (
+											<label key={estado} className="flex items-center gap-2 py-1 cursor-pointer hover:bg-gray-50 rounded px-1">
+												<input
+													type="checkbox"
+													checked={estadoFilters.includes(estado)}
+													onChange={() => handleEstadoFilterChange(estado)}
+													className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+												/>
+												<span className="text-sm text-gray-700">{estado}</span>
+											</label>
+										))}
+									</div>
+								</div>
+							)}
+						</div>
 					</div>
 				</div>
-			</div>
 			
 			
 			<div className="overflow-x-auto bg-white rounded-lg shadow relative mx-2 sm:mx-0">
@@ -804,6 +810,7 @@ function ClientesSection() {
 					onClose={() => setShowDetailsModal(false)}
 				/>
 			</div>
+			</StripeConnection>
 		</DashboardSection>
 	);
 }

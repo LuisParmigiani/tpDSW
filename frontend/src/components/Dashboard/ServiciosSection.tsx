@@ -7,6 +7,7 @@ import { tareasApi } from '../../services/tareasApi';
 import { serviciosApi } from '../../services/serviciosApi';
 import { Alert, AlertDescription } from '../Alerts/Alerts';
 import useAuth from '../../cookie/useAuth';
+import StripeConnection from '../StripeConnection/StripeConnection';
 
 // Función para convertir datos del API al formato del componente
 const convertirTipoServicioADisplay = (tipoServicio: unknown): TipoServicioData => {
@@ -50,7 +51,6 @@ function ServiciosSection() {
   const [error, setError] = useState<string | null>(null);
   
   // Estados para la funcionalidad de guardado
-  const [guardando, setGuardando] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertType, setAlertType] = useState<'success' | 'danger'>('success');
   const [alertMessage, setAlertMessage] = useState('');
@@ -201,42 +201,48 @@ function ServiciosSection() {
         console.log('Servicios existentes:', serviciosExistentes);
         
         // Extraer información de los servicios
-        const tiposActivosSet = new Set<number>();
+        const tiposConServicios = new Set<number>(); // Tipos que tienen cualquier servicio (activo o inactivo)
         const tareasConPrecios = new Map<number, number>(); // tareaId -> precio
+        const tareasActivas = new Map<number, boolean>(); // tareaId -> isActive
         
         serviciosExistentes.forEach((servicio: {
           tarea?: { id: number; tipoServicio?: { id: number } } | number;
           precio: number;
+          estado?: string;
         }) => {
           const tareaId = typeof servicio.tarea === 'object' ? servicio.tarea?.id : servicio.tarea;
           const tipoServicioId = typeof servicio.tarea === 'object' ? servicio.tarea?.tipoServicio?.id : undefined;
           const precio = servicio.precio;
+          const isActive = servicio.estado === 'activo';
           
           if (tareaId && precio) {
             tareasConPrecios.set(tareaId, precio);
+            tareasActivas.set(tareaId, isActive);
           }
           
+          // Marcar tipos como activos si tienen cualquier servicio (activo o inactivo)
           if (tipoServicioId) {
-            tiposActivosSet.add(tipoServicioId);
+            tiposConServicios.add(tipoServicioId);
           }
         });
         
-        console.log('Tipos activos extraídos:', Array.from(tiposActivosSet));
+        console.log('Tipos con servicios extraídos:', Array.from(tiposConServicios));
         console.log('Tareas con precios:', Array.from(tareasConPrecios.entries()));
+        console.log('Tareas activas:', Array.from(tareasActivas.entries()));
         
-        // Actualizar tipos de servicio (marcar como activos)
+        // Actualizar tipos de servicio (marcar como activos si tienen cualquier servicio)
         setTiposServicio(prev => 
           prev.map(tipo => ({
             ...tipo,
-            activo: tiposActivosSet.has(tipo.id)
+            activo: tiposConServicios.has(tipo.id)
           }))
         );
         
-        // Actualizar tareas (marcar como seleccionadas y establecer precios)
+        // Actualizar tareas (marcar como seleccionadas según su estado y establecer precios)
         setTareas(prev => 
           prev.map(tarea => ({
             ...tarea,
-            seleccionada: tareasConPrecios.has(tarea.id),
+            seleccionada: tareasActivas.get(tarea.id) || false, // true solo si está activa
             precio: tareasConPrecios.get(tarea.id) || 0
           }))
         );
@@ -289,8 +295,23 @@ function ServiciosSection() {
     setTareasVisibles(nuevasTareasVisibles);
   }, [tiposServicio, tareas, tipoServicioActivo]);
 
-  const handleTipoServicioChange = (tipoId: number) => {
+  const handleTipoServicioChange = async (tipoId: number) => {
+    if (!usuario) {
+      setAlertType('danger');
+      setAlertMessage('Error: Usuario no autenticado');
+      setShowAlert(true);
+      return;
+    }
+
     console.log(`=== Cambiando estado del tipo de servicio ${tipoId} ===`);
+    
+    // Encontrar el tipo de servicio actual
+    const tipoActual = tiposServicio.find(tipo => tipo.id === tipoId);
+    if (!tipoActual) return;
+
+    const seraDesactivado = tipoActual.activo; // Si está activo, será desactivado
+
+    // Actualizar el estado del tipo de servicio
     setTiposServicio(prev => {
       const nuevosTimpos = prev.map(tipo => 
         tipo.id === tipoId ? { ...tipo, activo: !tipo.activo } : tipo
@@ -298,6 +319,49 @@ function ServiciosSection() {
       console.log('Nuevos tipos de servicio:', nuevosTimpos);
       return nuevosTimpos;
     });
+
+    // Si se está desactivando el tipo, desactivar automáticamente todos los servicios relacionados
+    if (seraDesactivado) {
+      console.log(`Desactivando servicios del tipo ${tipoId}`);
+      
+      // Encontrar todas las tareas relacionadas con este tipo
+      const tareasDelTipo = tareas.filter(tarea => tarea.tipoServicioId === tipoId);
+      
+      if (tareasDelTipo.length > 0) {
+        try {
+          // Desactivar servicios en el backend
+          await Promise.allSettled(
+            tareasDelTipo.map(async (tarea) => {
+              try {
+                await serviciosApi.deactivateByUserAndTask(usuario.id, tarea.id);
+                console.log(`Servicio desactivado: Usuario ${usuario.id}, Tarea ${tarea.id}`);
+              } catch (error) {
+                console.warn(`Error al desactivar servicio (Usuario ${usuario.id}, Tarea ${tarea.id}):`, error);
+                // Ignorar errores - probablemente el servicio no existía
+              }
+            })
+          );
+
+          // Actualizar estado local - marcar como no seleccionadas
+          setTareas(prev => 
+            prev.map(tarea => 
+              tarea.tipoServicioId === tipoId 
+                ? { ...tarea, seleccionada: false }
+                : tarea
+            )
+          );
+
+          setAlertType('success');
+          setAlertMessage(`✅ Tipo de servicio desactivado. Servicios relacionados han sido desactivados automáticamente.`);
+          setShowAlert(true);
+        } catch (error) {
+          console.error('Error al desactivar servicios automáticamente:', error);
+          setAlertType('danger');
+          setAlertMessage('⚠️ Tipo desactivado, pero hubo problemas al desactivar algunos servicios. Revisa el estado individual.');
+          setShowAlert(true);
+        }
+      }
+    }
   };
 
   const handleTareaChange = (tareaId: number, campo: 'seleccionada' | 'precio', valor: boolean | number) => {
@@ -308,23 +372,8 @@ function ServiciosSection() {
     );
   };
 
-  // Función para seleccionar/deseleccionar todas las tareas visibles
-  const handleSelectAll = (seleccionar: boolean) => {
-    setTareas(prev => 
-      prev.map(tarea => 
-        tareasVisibles.some(visible => visible.id === tarea.id) 
-          ? { ...tarea, seleccionada: seleccionar }
-          : tarea
-      )
-    );
-  };
-
-  // Verificar si todas las tareas visibles están seleccionadas
-  const todasSeleccionadas = tareasVisibles.length > 0 && tareasVisibles.every(tarea => tarea.seleccionada);
-  const algunasSeleccionadas = tareasVisibles.some(tarea => tarea.seleccionada);
-
-  // Función para guardar servicios
-  const guardarServicios = async () => {
+  // Función para activar/desactivar tareas individualmente
+  const handleActivateDeactivate = async (tareaId: number, activate: boolean) => {
     if (!usuario) {
       setAlertType('danger');
       setAlertMessage('Error: Usuario no autenticado');
@@ -332,141 +381,98 @@ function ServiciosSection() {
       return;
     }
 
-    // Obtener tareas seleccionadas con precio > 0
-    const tareasSeleccionadas = tareas.filter(tarea => 
-      tarea.seleccionada && tarea.precio > 0
-    );
+    const tarea = tareas.find(t => t.id === tareaId);
+    if (!tarea) return;
 
-    // Verificar si es caso de "dar de baja todos los servicios"
-    const tiposActivos = tiposServicio.filter(tipo => tipo.activo);
-    const esDarDeBaja = tiposActivos.length === 0;
-
-    // Solo validar tareas seleccionadas si NO es el caso de dar de baja
-    if (!esDarDeBaja && tareasSeleccionadas.length === 0) {
+    // Si está activando, necesita un precio
+    if (activate && tarea.precio <= 0) {
       setAlertType('danger');
-      setAlertMessage('Debes seleccionar al menos una tarea y asignarle un precio mayor a 0');
+      setAlertMessage('Debes asignar un precio mayor a 0 antes de activar la tarea');
       setShowAlert(true);
       return;
     }
 
-    setGuardando(true);
     try {
-      let resultados: Array<{ success: boolean; tareaId: number; error?: unknown }> = [];
-      
-      // Solo procesar tareas seleccionadas si NO es el caso de dar de baja
-      if (!esDarDeBaja) {
-        // Procesar cada tarea seleccionada
-        const promiseResults = await Promise.allSettled(
-          tareasSeleccionadas.map(async (tarea) => {
-            try {
-              await serviciosApi.upsertByUserAndTask({
-                tareaId: tarea.id,
-                usuarioId: usuario.id,
-                precio: tarea.precio
-              });
-              return { success: true, tareaId: tarea.id };
-            } catch (error) {
-              return { success: false, tareaId: tarea.id, error };
-            }
-          })
-        );
-        
-        resultados = promiseResults.map(result => 
-          result.status === 'fulfilled' ? result.value : { success: false, tareaId: -1, error: result.reason }
-        );
-      }
-
-      // Procesar eliminaciones
-      if (esDarDeBaja) {
-        // Caso especial: eliminar TODOS los servicios del usuario
-        try {
-          // Hacer una llamada al backend para eliminar todos los servicios del usuario
-          // Por ahora, eliminaremos uno por uno todas las tareas
-          await Promise.allSettled(
-            tareas.map(async (tarea) => {
-              try {
-                await serviciosApi.deleteByUserAndTask(usuario.id, tarea.id);
-              } catch {
-                // Ignorar errores de eliminación (probablemente no existía)
-              }
-            })
-          );
-        } catch (error) {
-          console.error('Error al eliminar todos los servicios:', error);
-        }
-      } else {
-        // Eliminaciones normales
-        // 1. Obtener tipos de servicio inactivos (deseleccionados)
-        const tiposInactivos = tiposServicio.filter(tipo => !tipo.activo);
-        
-        // 2. Obtener todas las tareas de tipos deseleccionados
-        const tareasDetiposInactivos = tareas.filter(tarea => 
-          tiposInactivos.some(tipo => tipo.id === tarea.tipoServicioId)
-        );
-        
-        // 3. Eliminar servicios de tareas específicamente deseleccionadas (dentro de tipos activos)
-        const tareasDeseleccionadas = tareasVisibles.filter(tarea => !tarea.seleccionada);
-        
-        // 4. Combinar todas las tareas a eliminar (evitar duplicados)
-        const todasTareasAEliminar = [
-          ...tareasDetiposInactivos,
-          ...tareasDeseleccionadas
-        ].filter((tarea, index, array) => 
-          array.findIndex(t => t.id === tarea.id) === index
-        );
-        
-        if (todasTareasAEliminar.length > 0) {
-          await Promise.allSettled(
-            todasTareasAEliminar.map(async (tarea) => {
-              try {
-                await serviciosApi.deleteByUserAndTask(usuario.id, tarea.id);
-              } catch {
-                // Ignorar errores de eliminación (probablemente no existía)
-              }
-            })
-          );
-        }
-      }
-
-      // Analizar resultados y mostrar mensaje apropiado
-      if (esDarDeBaja) {
+      if (activate) {
+        // Activar: crear/actualizar servicio
+        await serviciosApi.upsertByUserAndTask({
+          tareaId: tarea.id,
+          usuarioId: usuario.id,
+          precio: tarea.precio
+        });
+        // Actualizar estado local
+        handleTareaChange(tareaId, 'seleccionada', true);
         setAlertType('success');
-        setAlertMessage('✅ Todos los servicios han sido dados de baja exitosamente');
+        setAlertMessage('✅ Tarea activada exitosamente');
       } else {
-        const exitosos = resultados.filter(result => result.success).length;
-        const fallidos = resultados.filter(result => !result.success).length;
-
-        if (exitosos > 0 && fallidos === 0) {
-          setAlertType('success');
-          setAlertMessage(`✅ Se guardaron exitosamente ${exitosos} servicios`);
-        } else if (exitosos > 0 && fallidos > 0) {
-          setAlertType('success');
-          setAlertMessage(`⚠️ Se guardaron ${exitosos} servicios, ${fallidos} fallaron`);
-        } else {
-          setAlertType('danger');
-          setAlertMessage('❌ Error al guardar los servicios. Intenta nuevamente.');
-        }
+        // Desactivar: cambiar estado a inactivo
+        await serviciosApi.deactivateByUserAndTask(usuario.id, tarea.id);
+        // Actualizar estado local
+        handleTareaChange(tareaId, 'seleccionada', false);
+        setAlertType('success');
+        setAlertMessage('✅ Tarea desactivada exitosamente');
       }
-      
       setShowAlert(true);
     } catch (error) {
-      console.error('Error general al guardar servicios:', error);
+      console.error('Error al activar/desactivar tarea:', error);
       setAlertType('danger');
-      setAlertMessage('❌ Error inesperado al guardar. Intenta nuevamente.');
+      setAlertMessage('❌ Error al actualizar la tarea. Intenta nuevamente.');
       setShowAlert(true);
-    } finally {
-      setGuardando(false);
     }
   };
 
+  // Función para actualizar solo el precio de una tarea activa
+  const handlePriceUpdate = async (tareaId: number, nuevoPrecio: number) => {
+    if (!usuario) {
+      setAlertType('danger');
+      setAlertMessage('Error: Usuario no autenticado');
+      setShowAlert(true);
+      return;
+    }
+
+    const tarea = tareas.find(t => t.id === tareaId);
+    if (!tarea || !tarea.seleccionada) {
+      setAlertType('danger');
+      setAlertMessage('Solo se puede actualizar el precio de tareas activas');
+      setShowAlert(true);
+      return;
+    }
+
+    if (nuevoPrecio <= 0) {
+      setAlertType('danger');
+      setAlertMessage('El precio debe ser mayor a 0');
+      setShowAlert(true);
+      return;
+    }
+
+    try {
+      // Actualizar el precio usando el mismo endpoint de upsert
+      await serviciosApi.upsertByUserAndTask({
+        tareaId: tarea.id,
+        usuarioId: usuario.id,
+        precio: nuevoPrecio
+      });
+      
+      setAlertType('success');
+      setAlertMessage('✅ Precio actualizado exitosamente');
+      setShowAlert(true);
+    } catch (error) {
+      console.error('Error al actualizar precio:', error);
+      setAlertType('danger');
+      setAlertMessage('❌ Error al actualizar el precio. Intenta nuevamente.');
+      setShowAlert(true);
+    }
+  };
+
+  // Función para guardar cambios por tipo de servicio
   return (
     <DashboardSection>
-      <div className="space-y-8">
-        {/* Header */}
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Mis Servicios</h2>
-          <p className="text-gray-600">Selecciona los tipos de servicio y las tareas que prestas.</p>
-        </div>
+      <StripeConnection loadingMessage="Cargando configuración de servicios...">
+        <div className="space-y-8">
+          {/* Header */}
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Mis Servicios</h2>
+          </div>
 
         {/* Selector de Tipos de Servicio */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -561,38 +567,7 @@ function ServiciosSection() {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      <div className="flex items-center justify-start">
-                        <span className="relative flex items-center justify-center">
-                          <input
-                            type="checkbox"
-                            checked={todasSeleccionadas}
-                            ref={(input) => {
-                              if (input) input.indeterminate = algunasSeleccionadas && !todasSeleccionadas;
-                            }}
-                            onChange={(e) => handleSelectAll(e.target.checked)}
-                            className="peer h-5 w-5 rounded border border-gray-500 bg-white appearance-none cursor-pointer focus:ring-2 focus:ring-orange-500 checked:bg-orange-500 checked:border-orange-500"
-                          />
-                          <span className="absolute pointer-events-none inset-0 flex items-center justify-center">
-                            {todasSeleccionadas && (
-                              <svg
-                                width="20"
-                                height="20"
-                                viewBox="0 0 20 20"
-                                fill="none"
-                                style={{ display: 'block' }}
-                              >
-                                <path
-                                  d="M5 10.5L9 14.5L15 7.5"
-                                  stroke="#fff"
-                                  strokeWidth="1.4"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
-                            )}
-                          </span>
-                        </span>
-                      </div>
+                      Estado
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Tarea
@@ -614,6 +589,8 @@ function ServiciosSection() {
                         tarea={tarea}
                         tipoServicio={tipoServicio}
                         onTareaChange={handleTareaChange}
+                        onActivateDeactivate={handleActivateDeactivate}
+                        onPriceUpdate={handlePriceUpdate}
                       />
                     );
                   })}
@@ -650,33 +627,6 @@ function ServiciosSection() {
           </div>
         )}
 
-        {/* Botón Guardar - Siempre visible para permitir dar de baja todos los servicios */}
-        <div className="flex justify-center">
-          <button
-            onClick={guardarServicios}
-            disabled={guardando}
-            className={`px-8 py-3 rounded-lg font-medium text-white transition-all duration-200 ${
-              guardando
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-orange-500 hover:bg-orange-600 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2'
-            }`}
-          >
-            {guardando ? (
-              <div className="flex items-center">
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Guardando...
-              </div>
-            ) : (
-              tiposServicio.filter(tipo => tipo.activo).length === 0 
-                ? 'Dar de Baja Todos los Servicios' 
-                : 'Guardar Servicios'
-            )}
-          </button>
-        </div>
-
         {/* Alert de confirmación */}
         {showAlert && (
           <Alert
@@ -691,6 +641,7 @@ function ServiciosSection() {
           </Alert>
         )}
       </div>
+      </StripeConnection>
     </DashboardSection>
   );
 }

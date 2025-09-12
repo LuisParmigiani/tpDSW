@@ -42,6 +42,11 @@ router.get('/verificar', verifyToken, async (req: AuthRequest, res) => {
           email: usuario.mail,
           mail: usuario.mail,
           foto: usuario.foto,
+          // Campos de Stripe
+          stripeAccountId: usuario.stripeAccountId,
+          onboardingStatus: usuario.onboardingStatus,
+          chargesEnabled: usuario.chargesEnabled,
+          payoutsEnabled: usuario.payoutsEnabled,
         },
       });
     } catch (error) {
