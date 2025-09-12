@@ -14,32 +14,14 @@ function StripeConnection({
   children, 
   loadingMessage = "Cargando información de pagos...",
   errorMessage = "Error al verificar la conexión con Stripe",
-  showAutoRefresh = true
+  
 }: StripeConnectionProps) {
   const { usuario, loading: authLoading } = useAuth();
   const [conectadoStripe, setConectadoStripe] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Detectar cuando el usuario regresa de Stripe y refrescar la página
-  useEffect(() => {
-    if (!showAutoRefresh) return;
 
-    const handleVisibilityChange = () => {
-      if (!document.hidden && !conectadoStripe) {
-        // Si la página se vuelve visible y no estaba conectado a Stripe,
-        // refrescar para verificar si ahora está conectado
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [conectadoStripe, showAutoRefresh]);
 
   // Verificar si el usuario ya tiene Stripe conectado
   useEffect(() => {
