@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { Pago } from './pago.entity.js';
+import { Usuario } from '../usuario/usuario.entity.js';
+import { Servicio } from '../servicio/servicio.entity.js';
+import { Turno } from '../turno/turno.entity.js';
 import { orm } from '../shared/db/orm.js';
 
 const em = orm.em;
@@ -282,6 +285,139 @@ async function remove(req: Request, res: Response) {
   }
 }
 
+async function debugPagosByUser(req: Request, res: Response) {
+  try {
+    const usuarioId = req.params.usuarioId;
+    
+    console.log(`=== DEBUG ENDPOINT: Usuario ${usuarioId} ===`);
+    
+    // 1. Verificar que el usuario existe
+    const usuario = await em.findOne(Usuario, { id: Number(usuarioId) });
+    console.log('Usuario encontrado:', usuario ? { id: usuario.id, nombre: usuario.nombre } : 'NO ENCONTRADO');
+    
+    // 2. Buscar servicios del usuario
+    const servicios = await em.find(Servicio, { usuario: { id: Number(usuarioId) } });
+    console.log(`Servicios del usuario: ${servicios.length}`);
+    
+    // 3. Buscar turnos de esos servicios
+    const turnos = await em.find(Turno, { servicio: { usuario: { id: Number(usuarioId) } } });
+    console.log(`Turnos del usuario: ${turnos.length}`);
+    
+    // 4. Buscar pagos de esos turnos
+    const pagos = await em.find(Pago, {}, { populate: ['turno.servicio.usuario'] });
+    console.log(`Total de pagos en la base: ${pagos.length}`);
+    
+    // Filtrar pagos del usuario manualmente
+    const pagosDelUsuario = pagos.filter(pago => 
+      pago.turno?.servicio?.usuario?.id === Number(usuarioId)
+    );
+    console.log(`Pagos del usuario ${usuarioId}: ${pagosDelUsuario.length}`);
+    
+    pagosDelUsuario.forEach((pago, index) => {
+      console.log(`Pago ${index + 1}:`, {
+        id: pago.id,
+        estado: pago.estado,
+        amountReceived: pago.amountReceived,
+        createdAt: pago.createdAt,
+        turnoId: pago.turno?.id,
+        servicioId: pago.turno?.servicio?.id,
+        usuarioId: pago.turno?.servicio?.usuario?.id
+      });
+    });
+    
+    res.json({
+      usuario: usuario ? { id: usuario.id, nombre: usuario.nombre } : null,
+      servicios: servicios.length,
+      turnos: turnos.length,
+      totalPagos: pagos.length,
+      pagosDelUsuario: pagosDelUsuario.length,
+      pagos: pagosDelUsuario.map(p => ({
+        id: p.id,
+        estado: p.estado,
+        amountReceived: p.amountReceived,
+        createdAt: p.createdAt
+      }))
+    });
+    
+  } catch (error) {
+    console.error('Error en debug:', error);
+    res.status(500).json({ 
+      error: error instanceof Error ? error.message : 'Error desconocido'
+    });
+  }
+}
+
+async function getEstadisticasByUser(req: Request, res: Response) {
+  try {
+    const usuarioId = req.params.usuarioId;
+    
+    if (!usuarioId) {
+      return res.status(400).json({ 
+        message: 'ID de usuario requerido' 
+      });
+    }
+
+    console.log(`=== DEBUG: Obteniendo estadísticas para usuario ${usuarioId} ===`);
+
+    // Obtener fechas para filtros de mes actual
+    const ahora = new Date();
+    const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+
+    // Ingresos del mes actual
+    const pagosMes = await em.find(Pago, {
+      estado: 'succeeded' as const,
+      createdAt: { $gte: inicioMes },
+      turno: {
+        servicio: {
+          usuario: { id: Number(usuarioId) }
+        }
+      }
+    }, {
+      populate: ['turno.servicio.usuario']
+    });
+
+    const ingresosMes = pagosMes.reduce((total, pago) => total + (pago.amountReceived || 0), 0);
+    const clientesMes = pagosMes.length;
+
+    // Ingresos TOTALES (todos los pagos exitosos, sin filtro de fecha)
+    const pagosTotales = await em.find(Pago, {
+      estado: 'succeeded' as const,
+      turno: {
+        servicio: {
+          usuario: { id: Number(usuarioId) }
+        }
+      }
+    }, {
+      populate: ['turno.servicio.usuario']
+    });
+
+    const ingresosTotales = pagosTotales.reduce((total, pago) => total + (pago.amountReceived || 0), 0);
+    const clientesTotales = pagosTotales.length;
+
+    // Convertir de centavos a pesos y asegurar que siempre sean números válidos
+    const estadisticas = {
+      ingresosMes: Number((ingresosMes / 100).toFixed(2)) || 0,
+      ingresosAnio: Number((ingresosTotales / 100).toFixed(2)) || 0, // Ahora son totales
+      clientesMes: clientesMes || 0,
+      clientesAnio: clientesTotales || 0 // Ahora son totales
+    };
+
+    console.log(`Estadísticas calculadas:`, estadisticas);
+
+    res.status(200).json({
+      message: 'Estadísticas obtenidas exitosamente',
+      data: estadisticas
+    });
+
+  } catch (error) {
+    console.error('Error al obtener estadísticas:', error);
+    res.status(500).json({ 
+      message: 'Error interno del servidor',
+      error: error instanceof Error ? error.message : 'Error desconocido'
+    });
+  }
+}
+
 export {
   findall,
   findone,
@@ -289,6 +425,8 @@ export {
   findByTurno,
   findBySeller,
   updatePagoSplit,
+  getEstadisticasByUser,
+  debugPagosByUser,
   add,
   update,
   remove,
