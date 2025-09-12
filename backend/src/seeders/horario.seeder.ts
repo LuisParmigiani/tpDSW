@@ -15,7 +15,7 @@ export class HorarioSeeder extends Seeder {
     });
     for (const prest of prestatarios) {
       // Creamos 6 horarios
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 6; i++) {
         em.create(Horario, {
           diaSemana: i, // 0 = lunes, 6 = domingo
           horaDesde: '08:00:00',

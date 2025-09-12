@@ -4,6 +4,7 @@ import { Usuario } from '../usuario/usuario.entity.js';
 import { Servicio } from '../servicio/servicio.entity.js';
 import { Turno } from '../turno/turno.entity.js';
 import { orm } from '../shared/db/orm.js';
+import { sendEmail } from '../mail/mail.js';
 
 const em = orm.em;
 
@@ -190,7 +191,18 @@ async function updatePagoSplit(
         // Nota: turno debe ser asignado externamente o extraído de metadata
         turno: Number(paymentIntent.metadata.turnoId),
       });
-
+      sendEmail(
+        nuevoPago.buyerEmail ?? '',
+        'Pago recibido',
+        `Hemos recibido tu pago de $${(amountReceived / 100).toFixed(
+          2
+        )} ${paymentIntent.currency.toUpperCase()}. Gracias por tu compra.`
+      );
+      sendEmail(
+        paymentIntent.metadata.userMail,
+        'Tu pago ha sido procesado',
+        `Tu pago ha sido procesado con estado: ${status}. Gracias por tu compra.`
+      );
       await em.persistAndFlush(nuevoPago);
       return nuevoPago;
     }

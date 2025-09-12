@@ -3,7 +3,9 @@ import Stripe from 'stripe';
 import dotenv from 'dotenv';
 import { putOauth } from '../usuario/usuario.controler.js';
 import { updatePagoSplit } from '../pago/pago.controller.js';
-
+import { sendEmail } from '../mail/mail.js';
+import { email } from 'zod';
+import send from 'send';
 dotenv.config();
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
@@ -64,8 +66,8 @@ async function stripeWebhook(req: Request, res: Response) {
     } else {
       console.warn('Stripe account does not have an email.');
     }
+    sendEmail(email ?? '', 'Stripe', 'Cuenta Stripe actualizada correctamente');
   }
-
   // Detectar pagos completados (opcional)
   if (event.type === 'payment_intent.succeeded') {
     const paymentIntent = event.data.object as Stripe.PaymentIntent;
@@ -143,7 +145,6 @@ async function handleCheckoutSessionCompleted(
 
     // Guardamos en la DB usando tu función
     await updatePagoSplit(paymentIntent.id, 'succeeded', paymentIntent);
-
     console.log('✅ Pago guardado correctamente en DB:', paymentIntent.id);
   } catch (err) {
     console.error('Error guardando pago tras checkout session:', err);
