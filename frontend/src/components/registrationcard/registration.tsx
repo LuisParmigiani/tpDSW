@@ -4,7 +4,8 @@ import { usuariosApi } from '../../services/usuariosApi';
 import { z } from 'zod';
 import { cn } from '../../lib/utils.ts';
 import ProfilePicture from '../ProfilePic/ProfilePicture.tsx';
-
+import { Alert, AlertDescription, AlertTitle } from '../Alerts/Alerts.tsx';
+import { AxiosError } from 'axios';
 //Algunas validaciones no son necesarias pero las dejo para poder crear el objeto
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -22,24 +23,30 @@ export const usuarioSchema = z.object({
       'La contraseña debe contener al menos una letra mayúscula, una letra minúscula y un número'
     ),
   tipoDoc: z.string().min(1, 'El tipo de documento es obligatorio'),
-  numeroDoc: z.string().regex(/^[0-9]+$/, 'Solo números'),
-  telefono: z.string().regex(/^[0-9]+$/, 'Solo números'),
+  numeroDoc: z
+    .string()
+    .regex(/^[0-9]+$/, 'El número de documento solo debe contener números'),
+  telefono: z
+    .string()
+    .regex(/^[0-9]+$/, 'El teléfono debe contener solo números'),
   apellido: z.string().min(1, 'El apellido es obligatorio'),
   direccion: z.string().min(1, 'La dirección es obligatoria'),
-  nombreFantasia: z.string(),
-  descripcion: z.string(),
-  foto: z.string().optional(),
+  foto: z
+    .string()
+    .url('La foto debe ser una URL válida')
+    .optional()
+    .or(z.literal('')),
+  nombreFantasia: z.string().optional().or(z.literal('')),
+  descripcion: z.string().optional().or(z.literal('')),
 });
 
 export type Usuario = z.infer<typeof usuarioSchema>;
 
 function RegisCard() {
   const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
-  // ✅ Add uploading state for image
   const [uploading, setUploading] = useState(false);
-  // ✅ Track pending image file for form submission
+  const [success, setSuccess] = useState(false);
   const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
 
   //Clases de tailwind para sacar los spinners del input type number en formato desktop
@@ -61,9 +68,10 @@ function RegisCard() {
     foto: '',
   });
 
-  const [tipoUsuario, setearTipoUsuario] = useState('usuario');
+  const [tipoUsuario, setearTipoUsuario] = useState<'usuario' | 'prestatario'>(
+    'usuario'
+  );
 
-  // ✅ Handle image selection (following PerfilSection pattern)
   const handleImageChange = async (file: File) => {
     if (!file) return;
 
@@ -76,7 +84,7 @@ function RegisCard() {
     // Update form state with temp URL
     setForm((prev) => ({ ...prev, foto: tempUrl }));
 
-    console.log('📸 Image selected for registration');
+    console.log('Imagen seleccionada✅');
   };
 
   const camposComunes = (
@@ -120,6 +128,19 @@ function RegisCard() {
         )}
         onChange={(e) => setForm({ ...form, mail: e.target.value })}
       />
+      <input
+        type="text"
+        name="contrasena"
+        value={form.contrasena}
+        placeholder="Contraseña"
+        className={cn(
+          'w-full pt-3 pb-3 pr-20 pl-12 text-base border-none',
+          'rounded-4xl bg-white shadow-inner outline-none mb-4',
+          'text-black font-inter hover:shadow-lg hover:bg-orange-50 transition-all ease-in-out duration-300',
+          'focus:ring-2 focus:ring-naranja-1 focus:border-transparent'
+        )}
+        onChange={(e) => setForm({ ...form, contrasena: e.target.value })}
+      />
       <select
         name="tipoDoc"
         value={form.tipoDoc}
@@ -150,19 +171,6 @@ function RegisCard() {
         onChange={(e) =>
           setForm({ ...form, numeroDoc: e.target.value.toString() })
         }
-      />
-      <input
-        type="text"
-        name="contrasena"
-        value={form.contrasena}
-        placeholder="Contraseña"
-        className={cn(
-          'w-full pt-3 pb-3 pr-20 pl-12 text-base border-none',
-          'rounded-4xl bg-white shadow-inner outline-none mb-4',
-          'text-black font-inter hover:shadow-lg hover:bg-orange-50 transition-all ease-in-out duration-300',
-          'focus:ring-2 focus:ring-naranja-1 focus:border-transparent'
-        )}
-        onChange={(e) => setForm({ ...form, contrasena: e.target.value })}
       />
       <input
         type="number"
@@ -229,7 +237,7 @@ function RegisCard() {
 
   // ✅ Updated form submission with image upload (following PerfilSection pattern)
   const envioFormulario = async () => {
-    setOpen(true);
+    setMessage('');
     setUploading(true);
 
     const resultado = usuarioSchema.safeParse(form);
@@ -241,11 +249,9 @@ function RegisCard() {
     }
 
     try {
-      // ✅ First create user
       const userResponse = await usuariosApi.create(form);
       console.log('User created:', userResponse);
 
-      // ✅ Then upload image if there's a pending one (only for prestatarios)
       if (pendingImageFile && userResponse.data?.data?.id) {
         console.log('📤 Uploading profile image for new user...');
         try {
@@ -256,16 +262,19 @@ function RegisCard() {
           console.log('✅ Profile image uploaded successfully:', imageResponse);
         } catch (imageError) {
           console.error(
-            '❌ Image upload failed (but user was created):',
+            'No se pudo subir la imagen, pero se creo el usuario',
             imageError
           );
-          // Don't fail the whole process if image upload fails
         }
       }
 
       setMessage('Usuario creado correctamente');
+      setSuccess(true);
+      // Redirect to login after a short delay to show success message
+      setTimeout(() => {
+        navigate('/login');
+      }, 1500);
 
-      // ✅ Reset form and clear pending image
       setForm({
         nombre: '',
         mail: '',
@@ -280,19 +289,13 @@ function RegisCard() {
         foto: '',
       });
       setPendingImageFile(null);
-    } catch (error) {
-      const err = error as { response?: { data?: { message?: string } } };
-      const msg = err?.response?.data?.message?.toLowerCase() || '';
-      if (msg.includes('usuario.usuario_mail_unique')) {
-        setMessage('Ya existe un usuario con ese mail.');
-      } else if (msg.includes('usuario.usuario_numero_doc_unique')) {
-        setMessage('Ya existe un usuario con ese número de documento.');
-      } else if (msg.includes('duplicate')) {
-        setMessage('Ya existe un usuario con ese numero de telefono.');
+    } catch (error: AxiosError | any) {
+      setSuccess(false);
+      if (error.response?.data.message) {
+        setMessage(error.response.data.message);
       } else {
-        setMessage('Error al crear usuario');
+        setMessage('Error en el servidor, intente nuevamente mas tarde');
       }
-      console.error('Error al crear usuario', error);
     } finally {
       setUploading(false);
     }
@@ -300,48 +303,6 @@ function RegisCard() {
 
   return (
     <>
-      {open && (
-        <div className="fixed inset-0 flex items-center justify-center bg-neutral-5 backdrop-blur-md bg-opacity-40">
-          <div className="text-black bg-white p-4 rounded shadow-md">
-            <div className="flex justify-end z-30 bg-transparent w-auto">
-              <button
-                onClick={() => {
-                  setOpen(false);
-                }}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
-                aria-label="Cerrar modal"
-              >
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M18 6L6 18M6 6L18 18"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-            </div>
-            <p>{message}</p>
-            <button
-              onClick={
-                message === 'Usuario creado correctamente'
-                  ? () => navigate('/login')
-                  : () => setOpen(false)
-              }
-              className="mt-2 px-4 py-2 bg-naranja-1 text-white rounded hover:bg-naranja-2"
-            >
-              Cerrar
-            </button>
-          </div>
-        </div>
-      )}
       <div className="flex flex-col min-h-screen items-center justify-center bg-white py-8 ">
         <div className="flex flex-col md:flex-row w-full max-w-4xl mx-auto  bg-gray-100 rounded-4xl shadow-lg mt-8 overflow-hidden min-h-[700px] ">
           <div className="w-full md:w-1/2 flex flex-col justify-start items-center p-6 md:p-10 ">
@@ -375,11 +336,12 @@ function RegisCard() {
                       uploading={uploading}
                     />
                   </div>
-
-                  <p className="text-center text-gray-600 text-sm mt-2 mb-4 font-inter">
-                    Elija una foto para su cuenta, podrá cambiarla luego desde
-                    su perfil.
-                  </p>
+                  {!pendingImageFile && (
+                    <p className="text-center text-gray-600 text-sm mt-2 mb-4 font-inter">
+                      Elija una foto para su cuenta, podrá cambiarla luego desde
+                      su perfil.
+                    </p>
+                  )}
                   {pendingImageFile && (
                     <p className="text-center text-naranja-1 text-sm mb-4 font-inter">
                       📸 Imagen seleccionada - se subirá al crear la cuenta
@@ -442,7 +404,6 @@ function RegisCard() {
                         )
                   }
                 >
-                  {/* ✅ Show loading state */}
                   {uploading ? 'Creando cuenta...' : 'Crear cuenta'}
                 </button>
               </form>
@@ -457,6 +418,24 @@ function RegisCard() {
                 Inicia sesión
               </Link>
             </p>
+            {message && (
+              <Alert
+                variant={success ? 'success' : 'danger'}
+                className="max-w-xl mt-4 scroll-mt-4"
+                onClose={() => setMessage('')}
+                autoClose={true}
+                autoCloseDelay={5000}
+                tabIndex={-1}
+                ref={(el) =>
+                  el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                }
+              >
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription className="mx-auto">
+                  {message}
+                </AlertDescription>
+              </Alert>
+            )}
           </div>
           <div className="w-full md:w-1/2">
             <img

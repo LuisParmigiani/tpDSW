@@ -4,6 +4,8 @@ import { usuariosApi } from '../../services/usuariosApi';
 import { useParams } from 'react-router-dom';
 import useAuth from '../../cookie/useAuth';
 import { cn } from '../../lib/utils.ts';
+import { AxiosError } from 'axios';
+import { Alert, AlertTitle, AlertDescription } from './../Alerts/Alerts.tsx';
 
 function Logincard() {
   const { id, servicio, Tarea, horario, dia } = useParams<{
@@ -15,7 +17,6 @@ function Logincard() {
   }>();
   const { verificarAuth } = useAuth();
   const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
 
   // ✅ Simplified state management
@@ -44,57 +45,17 @@ function Logincard() {
           navigate('/');
         }
       }
-    } catch (error) {
-      setOpen(true);
-      const err = error as { response?: { status?: number } };
-      if (err.response && err.response.status === 401) {
-        setMessage('Mail o contraseña incorrectos');
+    } catch (error: AxiosError | any) {
+      if (error.response.data.errors[0].message) {
+        setMessage(error.response.data.errors[0].message);
       } else {
-        setMessage('Error en el login');
+        setMessage('Error en el servidor, intente nuevamente mas tarde');
       }
     }
   };
 
   return (
     <>
-      {open && (
-        <div className="fixed inset-0 flex items-center justify-center bg-neutral-5 backdrop-blur-md bg-opacity-40 z-50">
-          <div className="text-black bg-white p-4 rounded shadow-md">
-            <div className="flex justify-end z-30 bg-transparent w-auto">
-              <button
-                onClick={() => {
-                  setOpen(false);
-                }}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
-                aria-label="Cerrar modal"
-              >
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M18 6L6 18M6 6L18 18"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-            </div>
-            <p>{message}</p>
-            <button
-              onClick={() => setOpen(false)}
-              className="mt-2 px-4 py-2 bg-naranja-1 text-white rounded hover:bg-naranja-2"
-            >
-              Cerrar
-            </button>
-          </div>
-        </div>
-      )}
       <div className="flex flex-col min-h-screen items-center justify-center bg-white py-8">
         <div className="flex flex-col md:flex-row w-full max-w-4xl mx-auto bg-gray-100 rounded-4xl shadow-lg mt-8 overflow-hidden">
           <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-6 md:p-10">
@@ -192,6 +153,18 @@ function Logincard() {
             />
           </div>
         </div>
+        {message && (
+          <Alert
+            variant={'danger'}
+            className="max-w-xl mt-4"
+            onClose={() => setMessage('')}
+            autoClose={true}
+            autoCloseDelay={5000}
+          >
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription className="mx-auto">{message}</AlertDescription>
+          </Alert>
+        )}
       </div>
     </>
   );
