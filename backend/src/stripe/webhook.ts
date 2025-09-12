@@ -4,8 +4,6 @@ import dotenv from 'dotenv';
 import { putOauth } from '../usuario/usuario.controler.js';
 import { updatePagoSplit } from '../pago/pago.controller.js';
 import { sendEmail } from '../mail/mail.js';
-import { email } from 'zod';
-import send from 'send';
 dotenv.config();
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
