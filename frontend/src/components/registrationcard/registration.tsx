@@ -314,7 +314,7 @@ function RegisCard() {
             </p>
             <select
               value={tipoUsuario}
-              onChange={(e) => setearTipoUsuario(e.target.value)}
+              onChange={(e) => setearTipoUsuario(e.target.value as 'usuario' | 'prestatario')}
               className="mb-4 p-2 rounded bg-white text-black border border-gray-400"
             >
               <option value="usuario">Cliente</option>
