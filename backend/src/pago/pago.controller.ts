@@ -1,41 +1,18 @@
 import { Request, Response, NextFunction } from 'express';
 import { Pago } from './pago.entity.js';
+import { Usuario } from '../usuario/usuario.entity.js';
+import { Servicio } from '../servicio/servicio.entity.js';
+import { Turno } from '../turno/turno.entity.js';
 import { orm } from '../shared/db/orm.js';
 
 const em = orm.em;
-
-function sanitizePagoInput(req: Request, res: Response, next: NextFunction) {
-  req.body.sanitizePagoInput = {
-    paymentIntentId: req.body.paymentIntentId,
-    amount: req.body.amount,
-    currency: req.body.currency,
-    status: req.body.status,
-    sellerStripeId: req.body.sellerStripeId,
-    amountReceived: req.body.amountReceived,
-    applicationFeeAmount: req.body.applicationFeeAmount,
-    transferId: req.body.transferId,
-    buyerEmail: req.body.buyerEmail,
-    metadata: req.body.metadata,
-    paymentMethodType: req.body.paymentMethodType,
-    description: req.body.description,
-    createdAt: req.body.createdAt,
-    updatedAt: req.body.updatedAt,
-    turno: req.body.turno,
-  };
-  Object.keys(req.body.sanitizePagoInput).forEach((key) => {
-    if (req.body.sanitizePagoInput[key] === undefined) {
-      delete req.body.sanitizePagoInput[key];
-    }
-  });
-  next();
-}
 
 async function findall(req: Request, res: Response) {
   try {
     const { status, limit = 50, offset = 0 } = req.query;
     const whereConditions: any = {};
     if (status) {
-      whereConditions.status = status;
+      whereConditions.estado = status; // Cambiado de "status" a "estado"
     }
     const [pagos, total] = await em.findAndCount(Pago, whereConditions, {
       populate: ['turno'],
@@ -225,17 +202,25 @@ async function updatePagoSplit(
 
 async function add(req: Request, res: Response) {
   try {
-    const sanitizedInput = req.body.sanitizePagoInput;
-    // Validaciones básicas
-    if (!sanitizedInput.paymentIntentId) {
-      return res.status(400).json({ error: 'Payment Intent ID es requerido' });
+    const input = req.body;
+
+    // Validar que el turno tiene fechaHora
+    if (!input.turno || !input.turno.fechaHora) {
+      return res.status(400).json({
+        message: 'Validation error',
+        errors: [
+          {
+            path: 'turno.fechaHora',
+            message:
+              'El campo fechaHora es obligatorio y debe ser un string válido',
+          },
+        ],
+      });
     }
-    if (!sanitizedInput.turno) {
-      return res.status(400).json({ error: 'Turno es requerido' });
-    }
+
     // Verificar si ya existe un pago con este Payment Intent ID
     const pagoExistente = await em.findOne(Pago, {
-      paymentIntentId: sanitizedInput.paymentIntentId,
+      paymentIntentId: input.paymentIntentId,
     });
     if (pagoExistente) {
       return res.status(409).json({
@@ -243,16 +228,17 @@ async function add(req: Request, res: Response) {
         pagoExistente: pagoExistente.id,
       });
     }
-    // Establecer valores por defecto
-    sanitizedInput.createdAt = sanitizedInput.createdAt || new Date();
-    sanitizedInput.updatedAt = new Date();
-    sanitizedInput.status = sanitizedInput.status || 'pending';
-    sanitizedInput.currency = sanitizedInput.currency || 'usd';
-    const newPago = em.create(Pago, sanitizedInput);
+
+    input.createdAt = input.createdAt || new Date();
+    input.updatedAt = new Date();
+    input.estado = input.estado || 'pending';
+    input.currency = input.currency || 'usd';
+
+    const newPago = em.create(Pago, input);
     await em.persistAndFlush(newPago);
+
     res.status(201).json({ message: 'Pago creado:', data: newPago });
   } catch (error: any) {
-    console.error('Error creando pago:', error);
     res.status(500).json({ error: error.message });
   }
 }
@@ -261,9 +247,8 @@ async function update(req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id);
     const pago = await em.findOneOrFail(Pago, { id });
-    // Actualizar fecha de actualización automáticamente
-    req.body.sanitizePagoInput.updatedAt = new Date();
-    em.assign(pago, req.body.sanitizePagoInput);
+    req.body.updatedAt = new Date(); // Actualiza automáticamente la fecha
+    em.assign(pago, req.body); // Cambiado de req.body.sanitizePagoInput a req.body
     await em.persistAndFlush(pago);
     res.status(200).json({ message: 'Pago actualizado:', data: pago });
   } catch (error) {
@@ -282,6 +267,249 @@ async function remove(req: Request, res: Response) {
   }
 }
 
+async function debugPagosByUser(req: Request, res: Response) {
+  try {
+    const usuarioId = req.params.usuarioId;
+
+    console.log(`=== DEBUG ENDPOINT: Usuario ${usuarioId} ===`);
+
+    // 1. Verificar que el usuario existe
+    const usuario = await em.findOne(Usuario, { id: Number(usuarioId) });
+    console.log(
+      'Usuario encontrado:',
+      usuario ? { id: usuario.id, nombre: usuario.nombre } : 'NO ENCONTRADO'
+    );
+
+    // 2. Buscar servicios del usuario
+    const servicios = await em.find(Servicio, {
+      usuario: { id: Number(usuarioId) },
+    });
+    console.log(`Servicios del usuario: ${servicios.length}`);
+
+    // 3. Buscar turnos de esos servicios
+    const turnos = await em.find(Turno, {
+      servicio: { usuario: { id: Number(usuarioId) } },
+    });
+    console.log(`Turnos del usuario: ${turnos.length}`);
+
+    // 4. Buscar pagos de esos turnos
+    const pagos = await em.find(
+      Pago,
+      {},
+      { populate: ['turno.servicio.usuario'] }
+    );
+    console.log(`Total de pagos en la base: ${pagos.length}`);
+
+    // Filtrar pagos del usuario manualmente
+    const pagosDelUsuario = pagos.filter(
+      (pago) => pago.turno?.servicio?.usuario?.id === Number(usuarioId)
+    );
+    console.log(`Pagos del usuario ${usuarioId}: ${pagosDelUsuario.length}`);
+
+    pagosDelUsuario.forEach((pago, index) => {
+      console.log(`Pago ${index + 1}:`, {
+        id: pago.id,
+        estado: pago.estado,
+        amountReceived: pago.amountReceived,
+        createdAt: pago.createdAt,
+        turnoId: pago.turno?.id,
+        servicioId: pago.turno?.servicio?.id,
+        usuarioId: pago.turno?.servicio?.usuario?.id,
+      });
+    });
+
+    res.json({
+      usuario: usuario ? { id: usuario.id, nombre: usuario.nombre } : null,
+      servicios: servicios.length,
+      turnos: turnos.length,
+      totalPagos: pagos.length,
+      pagosDelUsuario: pagosDelUsuario.length,
+      pagos: pagosDelUsuario.map((p) => ({
+        id: p.id,
+        estado: p.estado,
+        amountReceived: p.amountReceived,
+        createdAt: p.createdAt,
+      })),
+    });
+  } catch (error) {
+    console.error('Error en debug:', error);
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Error desconocido',
+    });
+  }
+}
+
+async function getEstadisticasByUser(req: Request, res: Response) {
+  try {
+    const usuarioId = req.params.usuarioId;
+
+    if (!usuarioId) {
+      return res.status(400).json({
+        message: 'ID de usuario requerido',
+      });
+    }
+
+    console.log(
+      `=== DEBUG: Obteniendo estadísticas para usuario ${usuarioId} ===`
+    );
+
+    // Obtener fechas para filtros de mes actual
+    const ahora = new Date();
+    const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+
+    // Ingresos del mes actual
+    const pagosMes = await em.find(
+      Pago,
+      {
+        estado: 'succeeded' as const,
+        createdAt: { $gte: inicioMes },
+        turno: {
+          servicio: {
+            usuario: { id: Number(usuarioId) },
+          },
+        },
+      },
+      {
+        populate: ['turno.servicio.usuario'],
+      }
+    );
+
+    const ingresosMes = pagosMes.reduce(
+      (total, pago) => total + (pago.amountReceived || 0),
+      0
+    );
+    const clientesMes = pagosMes.length;
+
+    // Ingresos TOTALES (todos los pagos exitosos, sin filtro de fecha)
+    const pagosTotales = await em.find(
+      Pago,
+      {
+        estado: 'succeeded' as const,
+        turno: {
+          servicio: {
+            usuario: { id: Number(usuarioId) },
+          },
+        },
+      },
+      {
+        populate: ['turno.servicio.usuario'],
+      }
+    );
+
+    const ingresosTotales = pagosTotales.reduce(
+      (total, pago) => total + (pago.amountReceived || 0),
+      0
+    );
+    const clientesTotales = pagosTotales.length;
+
+    // Convertir de centavos a pesos y asegurar que siempre sean números válidos
+    const estadisticas = {
+      ingresosMes: Number((ingresosMes / 100).toFixed(2)) || 0,
+      ingresosAnio: Number((ingresosTotales / 100).toFixed(2)) || 0, // Ahora son totales
+      clientesMes: clientesMes || 0,
+      clientesAnio: clientesTotales || 0, // Ahora son totales
+    };
+
+    console.log(`Estadísticas calculadas:`, estadisticas);
+
+    res.status(200).json({
+      message: 'Estadísticas obtenidas exitosamente',
+      data: estadisticas,
+    });
+  } catch (error) {
+    console.error('Error al obtener estadísticas:', error);
+    res.status(500).json({
+      message: 'Error interno del servidor',
+      error: error instanceof Error ? error.message : 'Error desconocido',
+    });
+  }
+  async function getEstadisticasByUser(req: Request, res: Response) {
+    try {
+      const usuarioId = req.params.usuarioId;
+
+      if (!usuarioId) {
+        return res.status(400).json({
+          message: 'ID de usuario requerido',
+        });
+      }
+
+      console.log(
+        `=== DEBUG: Obteniendo estadísticas para usuario ${usuarioId} ===`
+      );
+
+      // Obtener fechas para filtros de mes actual
+      const ahora = new Date();
+      const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+
+      // Ingresos del mes actual
+      const pagosMes = await em.find(
+        Pago,
+        {
+          estado: 'succeeded' as const,
+          createdAt: { $gte: inicioMes },
+          turno: {
+            servicio: {
+              usuario: { id: Number(usuarioId) },
+            },
+          },
+        },
+        {
+          populate: ['turno.servicio.usuario'],
+        }
+      );
+
+      const ingresosMes = pagosMes.reduce(
+        (total, pago) => total + (pago.amountReceived || 0),
+        0
+      );
+      const clientesMes = pagosMes.length;
+
+      // Ingresos TOTALES (todos los pagos exitosos, sin filtro de fecha)
+      const pagosTotales = await em.find(
+        Pago,
+        {
+          estado: 'succeeded' as const,
+          turno: {
+            servicio: {
+              usuario: { id: Number(usuarioId) },
+            },
+          },
+        },
+        {
+          populate: ['turno.servicio.usuario'],
+        }
+      );
+
+      const ingresosTotales = pagosTotales.reduce(
+        (total, pago) => total + (pago.amountReceived || 0),
+        0
+      );
+      const clientesTotales = pagosTotales.length;
+
+      // Convertir de centavos a pesos y asegurar que siempre sean números válidos
+      const estadisticas = {
+        ingresosMes: Number((ingresosMes / 100).toFixed(2)) || 0,
+        ingresosAnio: Number((ingresosTotales / 100).toFixed(2)) || 0, // Ahora son totales
+        clientesMes: clientesMes || 0,
+        clientesAnio: clientesTotales || 0, // Ahora son totales
+      };
+
+      console.log(`Estadísticas calculadas:`, estadisticas);
+
+      res.status(200).json({
+        message: 'Estadísticas obtenidas exitosamente',
+        data: estadisticas,
+      });
+    } catch (error) {
+      console.error('Error al obtener estadísticas:', error);
+      res.status(500).json({
+        message: 'Error interno del servidor',
+        error: error instanceof Error ? error.message : 'Error desconocido',
+      });
+    }
+  }
+}
+
 export {
   findall,
   findone,
@@ -289,8 +517,9 @@ export {
   findByTurno,
   findBySeller,
   updatePagoSplit,
+  getEstadisticasByUser,
+  debugPagosByUser,
   add,
   update,
   remove,
-  sanitizePagoInput,
 };

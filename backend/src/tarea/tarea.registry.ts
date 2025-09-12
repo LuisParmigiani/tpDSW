@@ -1,68 +1,66 @@
 import { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 import {
-  horarioSchema,
-  errorResponseSchema,
-  createHorarioValidation,
-  updateHorarioValidation,
-  deleteHorarioValidation,
+  createTareaValidation,
+  updateTareaValidation,
+  tareaBaseSchema,
+  tareaBaseSchemaWithTipoServicioId,
   idParamValidation,
-  idUserParamValidation,
-  getHorarioValidation,
-  horarioBaseSchema,
-} from './horario.schemas.js';
+  deleteTareaValidation,
+  getTareaValidation,
+  errorResponseSchema,
+} from './tarea.schemas.js';
 import { z } from 'zod';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 
 // Extender Zod con OpenAPI
 extendZodWithOpenApi(z);
 
-// Crear el horarioRegistry
-export const horarioRegistry = new OpenAPIRegistry();
+// Crear el tareaRegistry
+export const tareaRegistry = new OpenAPIRegistry();
 
-// ===================================================================================================================
-// ========================================== horarioRegistry =========================================
-// ===================================================================================================================
-horarioRegistry.register('Horario', horarioSchema);
-horarioRegistry.register('ErrorResponse', errorResponseSchema);
-horarioRegistry.register('CreateHorario', createHorarioValidation);
-horarioRegistry.register('UpdateHorario', updateHorarioValidation);
-horarioRegistry.register('DeleteHorario', deleteHorarioValidation);
+// Registrar esquemas
+tareaRegistry.register('CreateTarea', createTareaValidation);
+tareaRegistry.register('UpdateTarea', updateTareaValidation);
+tareaRegistry.register('DeleteTarea', deleteTareaValidation);
+tareaRegistry.register('Tarea', getTareaValidation);
+tareaRegistry.register('IdParam', idParamValidation);
+tareaRegistry.register('ErrorResponse', errorResponseSchema);
 
 // ==================== POST METHODS ====================
 
-// POST /api/horario
-horarioRegistry.registerPath({
+// POST /api/tarea
+tareaRegistry.registerPath({
   method: 'post',
-  path: '/api/horario',
-  description: 'Crear un nuevo horario para un usuario determinado',
-  summary: 'Crear horario',
-  tags: ['Horarios'],
+  path: '/api/tarea',
+  description: 'Crear una nueva tarea',
+  summary: 'Crear tarea',
+  tags: ['Tareas'],
   request: {
     body: {
-      description: 'Datos del horario a crear',
+      description: 'Datos de la tarea a crear',
       content: {
         'application/json': {
-          schema: horarioBaseSchema,
+          schema: tareaBaseSchemaWithTipoServicioId,
         },
       },
     },
   },
   responses: {
     201: {
-      description: 'Horario creado exitosamente',
+      description: 'Tarea creada exitosamente',
       content: {
         'application/json': {
           schema: z.object({
             message: z
               .string()
-              .openapi({ example: 'Horario creado exitosamente' }),
-            data: createHorarioValidation,
+              .openapi({ example: 'Tarea creada exitosamente' }),
+            data: createTareaValidation,
           }),
         },
       },
     },
     400: {
-      description: 'Error de validación',
+      description: 'Solicitud incorrecta',
       content: {
         'application/json': {
           schema: errorResponseSchema,
@@ -82,27 +80,30 @@ horarioRegistry.registerPath({
 
 // ==================== GET METHODS ====================
 
-// GET /api/horario/{id}
-horarioRegistry.registerPath({
+// GET /api/tarea/{id}
+tareaRegistry.registerPath({
   method: 'get',
-  path: '/api/horario/',
-  description: 'Obtener todos los horarios',
-  summary: 'Obtener horarios',
-  tags: ['Horarios'],
+  path: '/api/tarea/{id}',
+  description: 'Obtener una tarea por ID',
+  summary: 'Obtener tarea',
+  tags: ['Tareas'],
+  request: {
+    params: idParamValidation,
+  },
   responses: {
     200: {
-      description: 'Horario encontrado',
+      description: 'Tarea encontrada',
       content: {
         'application/json': {
           schema: z.object({
-            message: z.string().openapi({ example: 'Horario encontrado' }),
-            data: getHorarioValidation,
+            message: z.string().openapi({ example: 'Tarea encontrada' }),
+            data: getTareaValidation,
           }),
         },
       },
     },
     404: {
-      description: 'Horario no encontrado',
+      description: 'Tarea no encontrada',
       content: {
         'application/json': {
           schema: errorResponseSchema,
@@ -119,28 +120,26 @@ horarioRegistry.registerPath({
     },
   },
 });
-
-// GET /api/horario/{usuario}
-horarioRegistry.registerPath({
+tareaRegistry.registerPath({
   method: 'get',
-  path: '/api/horario/{usuario}',
-  description: 'Obtener horarios por ID de usuario',
-  summary: 'Obtener horarios por usuario',
-  tags: ['Horarios'],
-  request: {
-    params: idUserParamValidation, // Cambiado a usuarioParamValidation
-  },
+  path: '/api/tarea/',
+  description: 'Obtener utodas las tareas',
+  summary: 'Obtener tareas',
+  tags: ['Tareas'],
   responses: {
     200: {
-      description: 'Horarios encontrados',
+      description: 'Tarea encontrada',
       content: {
         'application/json': {
-          schema: horarioSchema,
+          schema: z.object({
+            message: z.string().openapi({ example: 'Tarea encontrada' }),
+            data: getTareaValidation,
+          }),
         },
       },
     },
     404: {
-      description: 'Usuario no encontrado',
+      description: 'Tarea no encontrada',
       content: {
         'application/json': {
           schema: errorResponseSchema,
@@ -160,40 +159,40 @@ horarioRegistry.registerPath({
 
 // ==================== PUT METHODS ====================
 
-// PUT /api/horario/{id}
-horarioRegistry.registerPath({
+// PUT /api/tarea/{id}
+tareaRegistry.registerPath({
   method: 'put',
-  path: '/api/horario/{id}',
-  description: 'Actualizar un horario existente',
-  summary: 'Actualizar horario',
-  tags: ['Horarios'],
+  path: '/api/tarea/{id}',
+  description: 'Actualizar una tarea existente',
+  summary: 'Actualizar tarea',
+  tags: ['Tareas'],
   request: {
     params: idParamValidation,
     body: {
-      description: 'Datos del horario a actualizar',
+      description: 'Datos de la tarea a actualizar',
       content: {
         'application/json': {
-          schema: idParamValidation,
+          schema: updateTareaValidation,
         },
       },
     },
   },
   responses: {
     200: {
-      description: 'Horario actualizado exitosamente',
+      description: 'Tarea actualizada exitosamente',
       content: {
         'application/json': {
           schema: z.object({
             message: z
               .string()
-              .openapi({ example: 'Horario actualizado exitosamente' }),
-            data: updateHorarioValidation,
+              .openapi({ example: 'Tarea actualizada exitosamente' }),
+            data: updateTareaValidation,
           }),
         },
       },
     },
     404: {
-      description: 'Horario no encontrado',
+      description: 'Tarea no encontrada',
       content: {
         'application/json': {
           schema: errorResponseSchema,
@@ -213,32 +212,32 @@ horarioRegistry.registerPath({
 
 // ==================== DELETE METHODS ====================
 
-// DELETE /api/horario/{id}
-horarioRegistry.registerPath({
+// DELETE /api/tarea/{id}
+tareaRegistry.registerPath({
   method: 'delete',
-  path: '/api/horario/{id}',
-  description: 'Eliminar un horario por ID',
-  summary: 'Eliminar horario',
-  tags: ['Horarios'],
+  path: '/api/tarea/{id}',
+  description: 'Eliminar una tarea por ID',
+  summary: 'Eliminar tarea',
+  tags: ['Tareas'],
   request: {
     params: idParamValidation,
   },
   responses: {
     200: {
-      description: 'Horario eliminado exitosamente',
+      description: 'Tarea eliminada exitosamente',
       content: {
         'application/json': {
           schema: z.object({
             message: z
               .string()
-              .openapi({ example: 'Horario eliminado exitosamente' }),
-            data: deleteHorarioValidation,
+              .openapi({ example: 'Tarea eliminada exitosamente' }),
+            data: deleteTareaValidation,
           }),
         },
       },
     },
     404: {
-      description: 'Horario no encontrado',
+      description: 'Tarea no encontrada',
       content: {
         'application/json': {
           schema: errorResponseSchema,

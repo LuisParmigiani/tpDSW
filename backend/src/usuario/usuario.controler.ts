@@ -270,6 +270,34 @@ async function add(req: Request, res: Response) {
     } else {
       userData.estado = 'inactivo';
     }
+    // Chequeo que no exista usuario con atributos que sean unicos
+    const mailExists = await em.findOne(Usuario, { mail: userData.mail });
+    if (mailExists) {
+      return res.status(409).json({
+        error: 'EMAIL_ALREADY_EXISTS',
+        message: 'El mail ya está registrado por otro usuario',
+      });
+    }
+
+    const numDocExists = await em.findOne(Usuario, {
+      numeroDoc: userData.numeroDoc,
+    });
+    if (numDocExists) {
+      return res.status(409).json({
+        error: 'NUMDOC_ALREADY_EXISTS',
+        message: 'El número de documento ya está registrado por otro usuario',
+      });
+    }
+
+    const telExists = await em.findOne(Usuario, {
+      telefono: userData.telefono,
+    });
+    if (telExists) {
+      return res.status(409).json({
+        error: 'PHONE_ALREADY_EXISTS',
+        message: 'El telefono ya está registrado por otro usuario',
+      });
+    }
 
     const newUser = em.create(Usuario, userData);
     await em.flush();

@@ -14,4 +14,6 @@ export const serviciosApi = {
     api.post('/servicio/upsert', data),
   deleteByUserAndTask: (usuarioId: number, tareaId: number) => 
     api.delete(`/servicio/user/${usuarioId}/task/${tareaId}`),
+  deactivateByUserAndTask: (usuarioId: number, tareaId: number) => 
+    api.patch(`/servicio/user/${usuarioId}/task/${tareaId}/deactivate`),
 };

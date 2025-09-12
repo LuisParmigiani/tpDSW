@@ -26,8 +26,6 @@ export class Tarea extends BaseEntity {
     cascade: [Cascade.ALL],
   })
   servicios = new Collection<Servicio>(this);
-  @ManyToOne(() => TipoServicio, {
-    nullable: false,
-  })
-  tipoServicio!: Rel<TipoServicio>;
+  @ManyToOne(() => TipoServicio, { nullable: false })
+  tipoServicio!: Rel<TipoServicio>; // Relación con TipoServicio
 }
