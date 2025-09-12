@@ -653,8 +653,9 @@ async function uploadProfileImage(req: Request, res: Response) {
 
     // Delete old photo if exists
     if (
-      user.foto !=
-      'https://backend-patient-morning-1303.fly.dev/uploads/profiles/default-avatar.webp'
+      user.foto &&
+      user.foto !==
+        'https://backend-patient-morning-1303.fly.dev/uploads/profiles/default-avatar.webp'
     ) {
       const relativePath = user.foto.includes('/uploads/')
         ? user.foto.substring(user.foto.indexOf('/uploads/'))
