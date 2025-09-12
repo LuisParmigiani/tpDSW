@@ -4,68 +4,78 @@ import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 // Extend Zod with OpenAPI functionality
 extendZodWithOpenApi(z);
 
-// Base servicio schema
+// Base servicio schema matching your entity
 export const servicioBaseSchema = z.object({
-  descripcionServicio: z
-    .preprocess((val) => {
-      if (val === '' || val === null) return undefined;
-      return val;
-    }, z.string().min(10, 'La descripción del servicio debe tener al menos 10 caracteres').max(500, 'La descripción del servicio no puede exceder los 500 caracteres').optional())
-    .describe('Descripción detallada del servicio')
-    .openapi({
-      example: 'Servicio completo de plomería residencial',
-    }),
-
-  precio: z
-    .number()
-    .positive('El precio debe ser un número positivo')
-    .max(999999.99, 'El precio no puede exceder $999,999.99')
-    .describe('Precio del servicio en pesos argentinos')
-    .openapi({
-      example: 2500.0,
-    }),
-
   estado: z
-    .enum(['activo', 'inactivo', 'suspendido'], {
-      message: 'El estado debe ser "activo", "inactivo" o "suspendido"',
-    })
-    .default('activo')
+    .enum(['activo', 'inactivo'])
     .describe('Estado del servicio')
     .openapi({
       example: 'activo',
     }),
-
-  // Foreign key references
+  precio: z
+    .number()
+    .positive('El precio debe ser un número positivo')
+    .describe('Precio del servicio')
+    .openapi({
+      example: 1500,
+    }),
   tarea: z
     .number()
-    .int('El ID de la tarea debe ser un número entero')
-    .positive('El ID de la tarea debe ser positivo')
+    .int()
+    .positive('El ID de la tarea debe ser un número entero positivo')
     .describe('ID de la tarea asociada al servicio')
     .openapi({
       example: 1,
     }),
-
   usuario: z
     .number()
-    .int('El ID del usuario debe ser un número entero')
-    .positive('El ID del usuario debe ser positivo')
-    .describe('ID del usuario que ofrece el servicio')
+    .int()
+    .positive('El ID del usuario debe ser un número entero positivo')
+    .nullable()
+    .optional()
+    .describe('ID del usuario asociado al servicio (opcional)')
     .openapi({
-      example: 1,
+      example: 2,
     }),
 });
 
 // Create servicio schema
 export const createServicioSchema = servicioBaseSchema.extend({
-  // All fields are required for creation
+  estado: servicioBaseSchema.shape.estado.default('activo'),
   precio: servicioBaseSchema.shape.precio,
-  estado: servicioBaseSchema.shape.estado,
   tarea: servicioBaseSchema.shape.tarea,
   usuario: servicioBaseSchema.shape.usuario,
 });
 
 // Update servicio schema (partial for PUT requests)
 export const updateServicioSchema = servicioBaseSchema.partial();
+
+// Upsert schema for upsertByUserAndTask endpoint
+export const upsertServicioSchema = z.object({
+  tareaId: z
+    .number()
+    .int()
+    .positive('El ID de la tarea debe ser un número entero positivo')
+    .describe('ID de la tarea')
+    .openapi({
+      example: 1,
+    }),
+  usuarioId: z
+    .number()
+    .int()
+    .positive('El ID del usuario debe ser un número entero positivo')
+    .describe('ID del usuario')
+    .openapi({
+      example: 2,
+    }),
+  precio: z
+    .number()
+    .positive('El precio debe ser un número positivo')
+    .describe('Precio del servicio')
+    .openapi({
+      example: 2500,
+    }),
+});
 
 // Tarea info schema for responses
 export const tareaInfoSchema = z.object({
@@ -114,8 +124,24 @@ export const usuarioInfoSchema = z.object({
     .openapi({
       example: 'Plomería Pérez',
     }),
-  telefono: z.string().describe('Teléfono del usuario').openapi({
+  telefono: z.string().optional().describe('Teléfono del usuario').openapi({
     example: '+54 11 1234-5678',
+  }),
+});
+
+// Turno info schema for responses
+export const turnoInfoSchema = z.object({
+  id: z.number().describe('ID del turno').openapi({
+    example: 1,
+  }),
+  fechaTurno: z.string().describe('Fecha del turno').openapi({
+    example: '2024-03-15',
+  }),
+  horaTurno: z.string().describe('Hora del turno').openapi({
+    example: '14:30',
+  }),
+  estado: z.string().describe('Estado del turno').openapi({
+    example: 'confirmado',
   }),
 });
 
@@ -124,18 +150,11 @@ export const servicioResponseSchema = z.object({
   id: z.number().describe('ID único del servicio').openapi({
     example: 1,
   }),
-  descripcionServicio: z
-    .string()
-    .nullable()
-    .describe('Descripción del servicio')
-    .openapi({
-      example: 'Servicio completo de plomería residencial',
-    }),
-  precio: z.number().describe('Precio del servicio').openapi({
-    example: 2500.0,
-  }),
   estado: z.string().describe('Estado del servicio').openapi({
     example: 'activo',
+  }),
+  precio: z.number().describe('Precio del servicio').openapi({
+    example: 1500,
   }),
 });
 
@@ -144,29 +163,28 @@ export const servicioCompleteResponseSchema = z.object({
   id: z.number().describe('ID único del servicio').openapi({
     example: 1,
   }),
-  descripcionServicio: z
-    .string()
-    .nullable()
-    .describe('Descripción del servicio')
-    .openapi({
-      example: 'Servicio completo de plomería residencial',
-    }),
-  precio: z.number().describe('Precio del servicio').openapi({
-    example: 2500.0,
-  }),
   estado: z.string().describe('Estado del servicio').openapi({
     example: 'activo',
   }),
+  precio: z.number().describe('Precio del servicio').openapi({
+    example: 1500,
+  }),
   tarea: tareaInfoSchema.describe('Información de la tarea asociada'),
-  usuario: usuarioInfoSchema.describe(
-    'Información del usuario que ofrece el servicio'
-  ),
+  usuario: usuarioInfoSchema
+    .nullable()
+    .describe(
+      'Información del usuario que ofrece el servicio (puede ser null)'
+    ),
+  turnos: z
+    .array(turnoInfoSchema)
+    .optional()
+    .describe('Turnos asociados al servicio'),
 });
 
 // Find all servicios response
 export const findAllServiciosResponseSchema = z.object({
   message: z.string().describe('Mensaje de respuesta').openapi({
-    example: 'found all Servicios',
+    example: 'found all services',
   }),
   data: z
     .array(servicioCompleteResponseSchema)
@@ -176,11 +194,24 @@ export const findAllServiciosResponseSchema = z.object({
 // Find servicios by usuario response
 export const findServiciosByUsuarioResponseSchema = z.object({
   message: z.string().describe('Mensaje de respuesta').openapi({
-    example: 'found servicios for usuario',
+    example: 'Servicios encontrados',
   }),
   data: z
     .array(servicioCompleteResponseSchema)
     .describe('Lista de servicios del usuario especificado'),
+});
+
+// Upsert response schema
+export const upsertServicioResponseSchema = z.object({
+  message: z.string().describe('Mensaje de respuesta').openapi({
+    example: 'Servicio creado',
+  }),
+  data: servicioCompleteResponseSchema.describe(
+    'Servicio creado o actualizado'
+  ),
+  action: z.enum(['created', 'updated']).describe('Acción realizada').openapi({
+    example: 'created',
+  }),
 });
 
 // Error response schema
@@ -201,34 +232,6 @@ export const errorResponseSchema = z.object({
     )
     .optional()
     .describe('Detalles de errores de validación'),
-});
-
-export const upsertServicioSchema = createServicioSchema.extend({
-  // precio and usuario are required, tarea is optional for upsert
-  usuario: servicioBaseSchema.shape.usuario,
-  precio: servicioBaseSchema.shape.precio,
-  tarea: servicioBaseSchema.shape.tarea.optional(),
-});
-
-export const upsertServicioResponseSchema = z.object({
-  message: z.string().describe('Mensaje de respuesta').openapi({
-    example: 'Servicio creado o actualizado',
-  }),
-  data: servicioCompleteResponseSchema.describe(
-    'Datos del servicio creado o actualizado'
-  ),
-  action: z.enum(['created', 'updated']).describe('Acción realizada').openapi({
-    example: 'created',
-  }),
-});
-
-export const userTaskParamsSchema = z.object({
-  usuarioId: z.string().describe('ID del usuario').openapi({
-    example: '1',
-  }),
-  tareaId: z.string().describe('ID de la tarea').openapi({
-    example: '1',
-  }),
 });
 
 // Success message schema
@@ -259,10 +262,27 @@ export const usuarioIdParamSchema = z.object({
     }),
 });
 
+export const userTaskParamsSchema = z.object({
+  usuarioId: z
+    .string()
+    .regex(/^\d+$/, 'Usuario ID debe ser un número válido')
+    .describe('ID numérico del usuario')
+    .openapi({
+      example: '1',
+    }),
+  tareaId: z
+    .string()
+    .regex(/^\d+$/, 'Tarea ID debe ser un número válido')
+    .describe('ID numérico de la tarea')
+    .openapi({
+      example: '1',
+    }),
+});
+
 // Query parameters for filtering
 export const servicioQuerySchema = z.object({
   estado: z
-    .enum(['activo', 'inactivo', 'suspendido'])
+    .enum(['activo', 'inactivo'])
     .optional()
     .describe('Filtrar por estado del servicio')
     .openapi({
@@ -298,8 +318,8 @@ export const servicioQuerySchema = z.object({
 // Validation schemas for middleware
 export const createServicioValidation = createServicioSchema;
 export const updateServicioValidation = updateServicioSchema;
+export const upsertServicioValidation = upsertServicioSchema;
 export const idParamValidation = idParamSchema;
 export const usuarioIdParamValidation = usuarioIdParamSchema;
-export const servicioQueryValidation = servicioQuerySchema;
 export const userTaskParamsValidation = userTaskParamsSchema;
-export const upsertServicioValidation = upsertServicioSchema;
+export const servicioQueryValidation = servicioQuerySchema;

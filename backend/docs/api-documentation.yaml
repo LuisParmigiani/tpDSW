@@ -185,12 +185,12 @@ components:
           type: string
           nullable: true
           description: Nombre de fantasía
-          example: Plomería Pérez
+          example: Plomerín
         descripcion:
           type: string
           nullable: true
           description: Descripción
-          example: Plomero con experiencia
+          example: Servicio de plomería con experiencia
       required:
         - id
         - mail
@@ -1607,6 +1607,707 @@ components:
         - horaDesde
         - horaHasta
         - usuario
+    CreateServicio:
+      type: object
+      properties:
+        estado:
+          type: string
+          enum:
+            - activo
+            - inactivo
+          default: activo
+          description: Estado del servicio
+          example: activo
+        precio:
+          type: number
+          minimum: 0
+          exclusiveMinimum: true
+          description: Precio del servicio
+          example: 1500
+        tarea:
+          type: integer
+          minimum: 0
+          exclusiveMinimum: true
+          description: ID de la tarea asociada al servicio
+          example: 1
+        usuario:
+          type: integer
+          nullable: true
+          minimum: 0
+          exclusiveMinimum: true
+          description: ID del usuario asociado al servicio (opcional)
+          example: 2
+      required:
+        - precio
+        - tarea
+    UpdateServicio:
+      type: object
+      properties:
+        estado:
+          type: string
+          enum:
+            - activo
+            - inactivo
+          description: Estado del servicio
+          example: activo
+        precio:
+          type: number
+          minimum: 0
+          exclusiveMinimum: true
+          description: Precio del servicio
+          example: 1500
+        tarea:
+          type: integer
+          minimum: 0
+          exclusiveMinimum: true
+          description: ID de la tarea asociada al servicio
+          example: 1
+        usuario:
+          type: integer
+          nullable: true
+          minimum: 0
+          exclusiveMinimum: true
+          description: ID del usuario asociado al servicio (opcional)
+          example: 2
+    UpsertServicio:
+      type: object
+      properties:
+        tareaId:
+          type: integer
+          minimum: 0
+          exclusiveMinimum: true
+          description: ID de la tarea
+          example: 1
+        usuarioId:
+          type: integer
+          minimum: 0
+          exclusiveMinimum: true
+          description: ID del usuario
+          example: 2
+        precio:
+          type: number
+          minimum: 0
+          exclusiveMinimum: true
+          description: Precio del servicio
+          example: 2500
+      required:
+        - tareaId
+        - usuarioId
+        - precio
+    ServicioResponse:
+      type: object
+      properties:
+        id:
+          type: number
+          description: ID único del servicio
+          example: 1
+        estado:
+          type: string
+          description: Estado del servicio
+          example: activo
+        precio:
+          type: number
+          description: Precio del servicio
+          example: 1500
+      required:
+        - id
+        - estado
+        - precio
+    ServicioCompleteResponse:
+      type: object
+      properties:
+        id:
+          type: number
+          description: ID único del servicio
+          example: 1
+        estado:
+          type: string
+          description: Estado del servicio
+          example: activo
+        precio:
+          type: number
+          description: Precio del servicio
+          example: 1500
+        tarea:
+          type: object
+          properties:
+            id:
+              type: number
+              description: ID de la tarea
+              example: 1
+            nombreTarea:
+              type: string
+              description: Nombre de la tarea
+              example: Reparación de canillas
+            descripcionTarea:
+              type: string
+              description: Descripción de la tarea
+              example: Arreglo y mantenimiento de grifería
+            duracionTarea:
+              type: number
+              description: Duración estimada de la tarea en minutos
+              example: 60
+            tipoServicio:
+              type: object
+              properties:
+                id:
+                  type: number
+                nombreTipo:
+                  type: string
+                descripcionTipo:
+                  type: string
+              required:
+                - id
+                - nombreTipo
+                - descripcionTipo
+              description: Tipo de servicio asociado a la tarea
+          required:
+            - id
+            - nombreTarea
+            - descripcionTarea
+            - duracionTarea
+            - tipoServicio
+          description: Información de la tarea asociada
+        usuario:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: number
+              description: ID del usuario
+              example: 1
+            nombre:
+              type: string
+              description: Nombre del usuario
+              example: Juan
+            apellido:
+              type: string
+              description: Apellido del usuario
+              example: Pérez
+            mail:
+              type: string
+              description: Email del usuario
+              example: juan.perez@gmail.com
+            nombreFantasia:
+              type: string
+              nullable: true
+              description: Nombre de fantasía del prestatario
+              example: Plomería Pérez
+            telefono:
+              type: string
+              description: Teléfono del usuario
+              example: +54 11 1234-5678
+          required:
+            - id
+            - nombre
+            - apellido
+            - mail
+            - nombreFantasia
+          description: Información del usuario que ofrece el servicio (puede ser null)
+        turnos:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: number
+                description: ID del turno
+                example: 1
+              fechaTurno:
+                type: string
+                description: Fecha del turno
+                example: 2024-03-15
+              horaTurno:
+                type: string
+                description: Hora del turno
+                example: 14:30
+              estado:
+                type: string
+                description: Estado del turno
+                example: confirmado
+            required:
+              - id
+              - fechaTurno
+              - horaTurno
+              - estado
+          description: Turnos asociados al servicio
+      required:
+        - id
+        - estado
+        - precio
+        - tarea
+        - usuario
+    FindAllServiciosResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Mensaje de respuesta
+          example: found all services
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: number
+                description: ID único del servicio
+                example: 1
+              estado:
+                type: string
+                description: Estado del servicio
+                example: activo
+              precio:
+                type: number
+                description: Precio del servicio
+                example: 1500
+              tarea:
+                type: object
+                properties:
+                  id:
+                    type: number
+                    description: ID de la tarea
+                    example: 1
+                  nombreTarea:
+                    type: string
+                    description: Nombre de la tarea
+                    example: Reparación de canillas
+                  descripcionTarea:
+                    type: string
+                    description: Descripción de la tarea
+                    example: Arreglo y mantenimiento de grifería
+                  duracionTarea:
+                    type: number
+                    description: Duración estimada de la tarea en minutos
+                    example: 60
+                  tipoServicio:
+                    type: object
+                    properties:
+                      id:
+                        type: number
+                      nombreTipo:
+                        type: string
+                      descripcionTipo:
+                        type: string
+                    required:
+                      - id
+                      - nombreTipo
+                      - descripcionTipo
+                    description: Tipo de servicio asociado a la tarea
+                required:
+                  - id
+                  - nombreTarea
+                  - descripcionTarea
+                  - duracionTarea
+                  - tipoServicio
+                description: Información de la tarea asociada
+              usuario:
+                type: object
+                nullable: true
+                properties:
+                  id:
+                    type: number
+                    description: ID del usuario
+                    example: 1
+                  nombre:
+                    type: string
+                    description: Nombre del usuario
+                    example: Juan
+                  apellido:
+                    type: string
+                    description: Apellido del usuario
+                    example: Pérez
+                  mail:
+                    type: string
+                    description: Email del usuario
+                    example: juan.perez@gmail.com
+                  nombreFantasia:
+                    type: string
+                    nullable: true
+                    description: Nombre de fantasía del prestatario
+                    example: Plomería Pérez
+                  telefono:
+                    type: string
+                    description: Teléfono del usuario
+                    example: +54 11 1234-5678
+                required:
+                  - id
+                  - nombre
+                  - apellido
+                  - mail
+                  - nombreFantasia
+                description: Información del usuario que ofrece el servicio (puede ser null)
+              turnos:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                      description: ID del turno
+                      example: 1
+                    fechaTurno:
+                      type: string
+                      description: Fecha del turno
+                      example: 2024-03-15
+                    horaTurno:
+                      type: string
+                      description: Hora del turno
+                      example: 14:30
+                    estado:
+                      type: string
+                      description: Estado del turno
+                      example: confirmado
+                  required:
+                    - id
+                    - fechaTurno
+                    - horaTurno
+                    - estado
+                description: Turnos asociados al servicio
+            required:
+              - id
+              - estado
+              - precio
+              - tarea
+              - usuario
+          description: Lista completa de servicios con sus relaciones
+      required:
+        - message
+        - data
+    FindServiciosByUsuarioResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Mensaje de respuesta
+          example: Servicios encontrados
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: number
+                description: ID único del servicio
+                example: 1
+              estado:
+                type: string
+                description: Estado del servicio
+                example: activo
+              precio:
+                type: number
+                description: Precio del servicio
+                example: 1500
+              tarea:
+                type: object
+                properties:
+                  id:
+                    type: number
+                    description: ID de la tarea
+                    example: 1
+                  nombreTarea:
+                    type: string
+                    description: Nombre de la tarea
+                    example: Reparación de canillas
+                  descripcionTarea:
+                    type: string
+                    description: Descripción de la tarea
+                    example: Arreglo y mantenimiento de grifería
+                  duracionTarea:
+                    type: number
+                    description: Duración estimada de la tarea en minutos
+                    example: 60
+                  tipoServicio:
+                    type: object
+                    properties:
+                      id:
+                        type: number
+                      nombreTipo:
+                        type: string
+                      descripcionTipo:
+                        type: string
+                    required:
+                      - id
+                      - nombreTipo
+                      - descripcionTipo
+                    description: Tipo de servicio asociado a la tarea
+                required:
+                  - id
+                  - nombreTarea
+                  - descripcionTarea
+                  - duracionTarea
+                  - tipoServicio
+                description: Información de la tarea asociada
+              usuario:
+                type: object
+                nullable: true
+                properties:
+                  id:
+                    type: number
+                    description: ID del usuario
+                    example: 1
+                  nombre:
+                    type: string
+                    description: Nombre del usuario
+                    example: Juan
+                  apellido:
+                    type: string
+                    description: Apellido del usuario
+                    example: Pérez
+                  mail:
+                    type: string
+                    description: Email del usuario
+                    example: juan.perez@gmail.com
+                  nombreFantasia:
+                    type: string
+                    nullable: true
+                    description: Nombre de fantasía del prestatario
+                    example: Plomería Pérez
+                  telefono:
+                    type: string
+                    description: Teléfono del usuario
+                    example: +54 11 1234-5678
+                required:
+                  - id
+                  - nombre
+                  - apellido
+                  - mail
+                  - nombreFantasia
+                description: Información del usuario que ofrece el servicio (puede ser null)
+              turnos:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                      description: ID del turno
+                      example: 1
+                    fechaTurno:
+                      type: string
+                      description: Fecha del turno
+                      example: 2024-03-15
+                    horaTurno:
+                      type: string
+                      description: Hora del turno
+                      example: 14:30
+                    estado:
+                      type: string
+                      description: Estado del turno
+                      example: confirmado
+                  required:
+                    - id
+                    - fechaTurno
+                    - horaTurno
+                    - estado
+                description: Turnos asociados al servicio
+            required:
+              - id
+              - estado
+              - precio
+              - tarea
+              - usuario
+          description: Lista de servicios del usuario especificado
+      required:
+        - message
+        - data
+    UpsertServicioResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Mensaje de respuesta
+          example: Servicio creado
+        data:
+          type: object
+          properties:
+            id:
+              type: number
+              description: ID único del servicio
+              example: 1
+            estado:
+              type: string
+              description: Estado del servicio
+              example: activo
+            precio:
+              type: number
+              description: Precio del servicio
+              example: 1500
+            tarea:
+              type: object
+              properties:
+                id:
+                  type: number
+                  description: ID de la tarea
+                  example: 1
+                nombreTarea:
+                  type: string
+                  description: Nombre de la tarea
+                  example: Reparación de canillas
+                descripcionTarea:
+                  type: string
+                  description: Descripción de la tarea
+                  example: Arreglo y mantenimiento de grifería
+                duracionTarea:
+                  type: number
+                  description: Duración estimada de la tarea en minutos
+                  example: 60
+                tipoServicio:
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                    nombreTipo:
+                      type: string
+                    descripcionTipo:
+                      type: string
+                  required:
+                    - id
+                    - nombreTipo
+                    - descripcionTipo
+                  description: Tipo de servicio asociado a la tarea
+              required:
+                - id
+                - nombreTarea
+                - descripcionTarea
+                - duracionTarea
+                - tipoServicio
+              description: Información de la tarea asociada
+            usuario:
+              type: object
+              nullable: true
+              properties:
+                id:
+                  type: number
+                  description: ID del usuario
+                  example: 1
+                nombre:
+                  type: string
+                  description: Nombre del usuario
+                  example: Juan
+                apellido:
+                  type: string
+                  description: Apellido del usuario
+                  example: Pérez
+                mail:
+                  type: string
+                  description: Email del usuario
+                  example: juan.perez@gmail.com
+                nombreFantasia:
+                  type: string
+                  nullable: true
+                  description: Nombre de fantasía del prestatario
+                  example: Plomería Pérez
+                telefono:
+                  type: string
+                  description: Teléfono del usuario
+                  example: +54 11 1234-5678
+              required:
+                - id
+                - nombre
+                - apellido
+                - mail
+                - nombreFantasia
+              description: Información del usuario que ofrece el servicio (puede ser null)
+            turnos:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: number
+                    description: ID del turno
+                    example: 1
+                  fechaTurno:
+                    type: string
+                    description: Fecha del turno
+                    example: 2024-03-15
+                  horaTurno:
+                    type: string
+                    description: Hora del turno
+                    example: 14:30
+                  estado:
+                    type: string
+                    description: Estado del turno
+                    example: confirmado
+                required:
+                  - id
+                  - fechaTurno
+                  - horaTurno
+                  - estado
+              description: Turnos asociados al servicio
+          required:
+            - id
+            - estado
+            - precio
+            - tarea
+            - usuario
+          description: Servicio creado o actualizado
+        action:
+          type: string
+          enum:
+            - created
+            - updated
+          description: Acción realizada
+          example: created
+      required:
+        - message
+        - data
+        - action
+    UsuarioIdParam:
+      type: object
+      properties:
+        usuarioId:
+          type: string
+          pattern: ^\d+$
+          description: ID numérico del usuario
+          example: "1"
+      required:
+        - usuarioId
+    UserTaskParams:
+      type: object
+      properties:
+        usuarioId:
+          type: string
+          pattern: ^\d+$
+          description: ID numérico del usuario
+          example: "1"
+        tareaId:
+          type: string
+          pattern: ^\d+$
+          description: ID numérico de la tarea
+          example: "1"
+      required:
+        - usuarioId
+        - tareaId
+    ServicioQuery:
+      type: object
+      properties:
+        estado:
+          type: string
+          enum:
+            - activo
+            - inactivo
+          description: Filtrar por estado del servicio
+          example: activo
+        precioMin:
+          type: number
+          minimum: 0
+          exclusiveMinimum: true
+          description: Precio mínimo para filtrar
+          example: 1000
+        precioMax:
+          type: number
+          minimum: 0
+          exclusiveMinimum: true
+          description: Precio máximo para filtrar
+          example: 5000
+        tareaId:
+          type: integer
+          minimum: 0
+          exclusiveMinimum: true
+          description: Filtrar por ID de tarea específica
+          example: 1
   parameters: {}
 paths:
   /api/usuario:
@@ -1764,12 +2465,12 @@ paths:
                         type: string
                         nullable: true
                         description: Nombre de fantasía
-                        example: Plomería Pérez
+                        example: Plomerín
                       descripcion:
                         type: string
                         nullable: true
                         description: Descripción
-                        example: Plomero con experiencia
+                        example: Servicio de plomería con experiencia
                     required:
                       - id
                       - mail
@@ -2744,12 +3445,12 @@ paths:
                         type: string
                         nullable: true
                         description: Nombre de fantasía
-                        example: Plomería Pérez
+                        example: Plomerín
                       descripcion:
                         type: string
                         nullable: true
                         description: Descripción
-                        example: Plomero con experiencia
+                        example: Servicio de plomería con experiencia
                     required:
                       - id
                       - mail
@@ -2950,12 +3651,12 @@ paths:
                         type: string
                         nullable: true
                         description: Nombre de fantasía
-                        example: Plomería Pérez
+                        example: Plomerín
                       descripcion:
                         type: string
                         nullable: true
                         description: Descripción
-                        example: Plomero con experiencia
+                        example: Servicio de plomería con experiencia
                     required:
                       - id
                       - mail
@@ -3891,12 +4592,12 @@ paths:
                         type: string
                         nullable: true
                         description: Nombre de fantasía
-                        example: Plomería Pérez
+                        example: Plomerín
                       descripcion:
                         type: string
                         nullable: true
                         description: Descripción
-                        example: Plomero con experiencia
+                        example: Servicio de plomería con experiencia
                     required:
                       - id
                       - mail
@@ -4052,12 +4753,12 @@ paths:
                         type: string
                         nullable: true
                         description: Nombre de fantasía
-                        example: Plomería Pérez
+                        example: Plomerín
                       descripcion:
                         type: string
                         nullable: true
                         description: Descripción
-                        example: Plomero con experiencia
+                        example: Servicio de plomería con experiencia
                     required:
                       - id
                       - mail
@@ -6174,3 +6875,1798 @@ paths:
                   - message
                 title: Error
                 description: Esquema para representar un error
+  /api/servicio:
+    post:
+      description: Crear un nuevo servicio
+      summary: Crear servicio
+      tags:
+        - Servicios
+      requestBody:
+        description: Datos del servicio a crear
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                estado:
+                  type: string
+                  enum:
+                    - activo
+                    - inactivo
+                  default: activo
+                  description: Estado del servicio
+                  example: activo
+                precio:
+                  type: number
+                  minimum: 0
+                  exclusiveMinimum: true
+                  description: Precio del servicio
+                  example: 1500
+                tarea:
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  description: ID de la tarea asociada al servicio
+                  example: 1
+                usuario:
+                  type: integer
+                  nullable: true
+                  minimum: 0
+                  exclusiveMinimum: true
+                  description: ID del usuario asociado al servicio (opcional)
+                  example: 2
+              required:
+                - precio
+                - tarea
+      responses:
+        "201":
+          description: Servicio creado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: created service
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: number
+                        description: ID único del servicio
+                        example: 1
+                      estado:
+                        type: string
+                        description: Estado del servicio
+                        example: activo
+                      precio:
+                        type: number
+                        description: Precio del servicio
+                        example: 1500
+                    required:
+                      - id
+                      - estado
+                      - precio
+                required:
+                  - message
+                  - data
+        "400":
+          description: Error de validación
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Validation failed
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: precio
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: El precio debe ser un número positivo
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Validation failed
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: precio
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: El precio debe ser un número positivo
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+    get:
+      description: Obtener todos los servicios con sus relaciones
+      summary: Listar todos los servicios
+      tags:
+        - Servicios
+      parameters:
+        - schema:
+            type: string
+            enum:
+              - activo
+              - inactivo
+            description: Filtrar por estado del servicio
+            example: activo
+          required: false
+          description: Filtrar por estado del servicio
+          name: estado
+          in: query
+        - schema:
+            type: number
+            minimum: 0
+            exclusiveMinimum: true
+            description: Precio mínimo para filtrar
+            example: 1000
+          required: false
+          description: Precio mínimo para filtrar
+          name: precioMin
+          in: query
+        - schema:
+            type: number
+            minimum: 0
+            exclusiveMinimum: true
+            description: Precio máximo para filtrar
+            example: 5000
+          required: false
+          description: Precio máximo para filtrar
+          name: precioMax
+          in: query
+        - schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            description: Filtrar por ID de tarea específica
+            example: 1
+          required: false
+          description: Filtrar por ID de tarea específica
+          name: tareaId
+          in: query
+      responses:
+        "200":
+          description: Lista de servicios obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de respuesta
+                    example: found all services
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: number
+                          description: ID único del servicio
+                          example: 1
+                        estado:
+                          type: string
+                          description: Estado del servicio
+                          example: activo
+                        precio:
+                          type: number
+                          description: Precio del servicio
+                          example: 1500
+                        tarea:
+                          type: object
+                          properties:
+                            id:
+                              type: number
+                              description: ID de la tarea
+                              example: 1
+                            nombreTarea:
+                              type: string
+                              description: Nombre de la tarea
+                              example: Reparación de canillas
+                            descripcionTarea:
+                              type: string
+                              description: Descripción de la tarea
+                              example: Arreglo y mantenimiento de grifería
+                            duracionTarea:
+                              type: number
+                              description: Duración estimada de la tarea en minutos
+                              example: 60
+                            tipoServicio:
+                              type: object
+                              properties:
+                                id:
+                                  type: number
+                                nombreTipo:
+                                  type: string
+                                descripcionTipo:
+                                  type: string
+                              required:
+                                - id
+                                - nombreTipo
+                                - descripcionTipo
+                              description: Tipo de servicio asociado a la tarea
+                          required:
+                            - id
+                            - nombreTarea
+                            - descripcionTarea
+                            - duracionTarea
+                            - tipoServicio
+                          description: Información de la tarea asociada
+                        usuario:
+                          type: object
+                          nullable: true
+                          properties:
+                            id:
+                              type: number
+                              description: ID del usuario
+                              example: 1
+                            nombre:
+                              type: string
+                              description: Nombre del usuario
+                              example: Juan
+                            apellido:
+                              type: string
+                              description: Apellido del usuario
+                              example: Pérez
+                            mail:
+                              type: string
+                              description: Email del usuario
+                              example: juan.perez@gmail.com
+                            nombreFantasia:
+                              type: string
+                              nullable: true
+                              description: Nombre de fantasía del prestatario
+                              example: Plomería Pérez
+                            telefono:
+                              type: string
+                              description: Teléfono del usuario
+                              example: +54 11 1234-5678
+                          required:
+                            - id
+                            - nombre
+                            - apellido
+                            - mail
+                            - nombreFantasia
+                          description: Información del usuario que ofrece el servicio (puede ser null)
+                        turnos:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: number
+                                description: ID del turno
+                                example: 1
+                              fechaTurno:
+                                type: string
+                                description: Fecha del turno
+                                example: 2024-03-15
+                              horaTurno:
+                                type: string
+                                description: Hora del turno
+                                example: 14:30
+                              estado:
+                                type: string
+                                description: Estado del turno
+                                example: confirmado
+                            required:
+                              - id
+                              - fechaTurno
+                              - horaTurno
+                              - estado
+                          description: Turnos asociados al servicio
+                      required:
+                        - id
+                        - estado
+                        - precio
+                        - tarea
+                        - usuario
+                    description: Lista completa de servicios con sus relaciones
+                required:
+                  - message
+                  - data
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Validation failed
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: precio
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: El precio debe ser un número positivo
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+  /api/servicio/upsert:
+    post:
+      description: Crear o actualizar servicio por usuario y tarea
+      summary: Crear o actualizar servicio
+      tags:
+        - Servicios
+      requestBody:
+        description: Datos para crear o actualizar el servicio
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tareaId:
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  description: ID de la tarea
+                  example: 1
+                usuarioId:
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  description: ID del usuario
+                  example: 2
+                precio:
+                  type: number
+                  minimum: 0
+                  exclusiveMinimum: true
+                  description: Precio del servicio
+                  example: 2500
+              required:
+                - tareaId
+                - usuarioId
+                - precio
+      responses:
+        "200":
+          description: Servicio actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de respuesta
+                    example: Servicio creado
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: number
+                        description: ID único del servicio
+                        example: 1
+                      estado:
+                        type: string
+                        description: Estado del servicio
+                        example: activo
+                      precio:
+                        type: number
+                        description: Precio del servicio
+                        example: 1500
+                      tarea:
+                        type: object
+                        properties:
+                          id:
+                            type: number
+                            description: ID de la tarea
+                            example: 1
+                          nombreTarea:
+                            type: string
+                            description: Nombre de la tarea
+                            example: Reparación de canillas
+                          descripcionTarea:
+                            type: string
+                            description: Descripción de la tarea
+                            example: Arreglo y mantenimiento de grifería
+                          duracionTarea:
+                            type: number
+                            description: Duración estimada de la tarea en minutos
+                            example: 60
+                          tipoServicio:
+                            type: object
+                            properties:
+                              id:
+                                type: number
+                              nombreTipo:
+                                type: string
+                              descripcionTipo:
+                                type: string
+                            required:
+                              - id
+                              - nombreTipo
+                              - descripcionTipo
+                            description: Tipo de servicio asociado a la tarea
+                        required:
+                          - id
+                          - nombreTarea
+                          - descripcionTarea
+                          - duracionTarea
+                          - tipoServicio
+                        description: Información de la tarea asociada
+                      usuario:
+                        type: object
+                        nullable: true
+                        properties:
+                          id:
+                            type: number
+                            description: ID del usuario
+                            example: 1
+                          nombre:
+                            type: string
+                            description: Nombre del usuario
+                            example: Juan
+                          apellido:
+                            type: string
+                            description: Apellido del usuario
+                            example: Pérez
+                          mail:
+                            type: string
+                            description: Email del usuario
+                            example: juan.perez@gmail.com
+                          nombreFantasia:
+                            type: string
+                            nullable: true
+                            description: Nombre de fantasía del prestatario
+                            example: Plomería Pérez
+                          telefono:
+                            type: string
+                            description: Teléfono del usuario
+                            example: +54 11 1234-5678
+                        required:
+                          - id
+                          - nombre
+                          - apellido
+                          - mail
+                          - nombreFantasia
+                        description: Información del usuario que ofrece el servicio (puede ser null)
+                      turnos:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: number
+                              description: ID del turno
+                              example: 1
+                            fechaTurno:
+                              type: string
+                              description: Fecha del turno
+                              example: 2024-03-15
+                            horaTurno:
+                              type: string
+                              description: Hora del turno
+                              example: 14:30
+                            estado:
+                              type: string
+                              description: Estado del turno
+                              example: confirmado
+                          required:
+                            - id
+                            - fechaTurno
+                            - horaTurno
+                            - estado
+                        description: Turnos asociados al servicio
+                    required:
+                      - id
+                      - estado
+                      - precio
+                      - tarea
+                      - usuario
+                    description: Servicio creado o actualizado
+                  action:
+                    type: string
+                    enum:
+                      - created
+                      - updated
+                    description: Acción realizada
+                    example: created
+                required:
+                  - message
+                  - data
+                  - action
+        "201":
+          description: Servicio creado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de respuesta
+                    example: Servicio creado
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: number
+                        description: ID único del servicio
+                        example: 1
+                      estado:
+                        type: string
+                        description: Estado del servicio
+                        example: activo
+                      precio:
+                        type: number
+                        description: Precio del servicio
+                        example: 1500
+                      tarea:
+                        type: object
+                        properties:
+                          id:
+                            type: number
+                            description: ID de la tarea
+                            example: 1
+                          nombreTarea:
+                            type: string
+                            description: Nombre de la tarea
+                            example: Reparación de canillas
+                          descripcionTarea:
+                            type: string
+                            description: Descripción de la tarea
+                            example: Arreglo y mantenimiento de grifería
+                          duracionTarea:
+                            type: number
+                            description: Duración estimada de la tarea en minutos
+                            example: 60
+                          tipoServicio:
+                            type: object
+                            properties:
+                              id:
+                                type: number
+                              nombreTipo:
+                                type: string
+                              descripcionTipo:
+                                type: string
+                            required:
+                              - id
+                              - nombreTipo
+                              - descripcionTipo
+                            description: Tipo de servicio asociado a la tarea
+                        required:
+                          - id
+                          - nombreTarea
+                          - descripcionTarea
+                          - duracionTarea
+                          - tipoServicio
+                        description: Información de la tarea asociada
+                      usuario:
+                        type: object
+                        nullable: true
+                        properties:
+                          id:
+                            type: number
+                            description: ID del usuario
+                            example: 1
+                          nombre:
+                            type: string
+                            description: Nombre del usuario
+                            example: Juan
+                          apellido:
+                            type: string
+                            description: Apellido del usuario
+                            example: Pérez
+                          mail:
+                            type: string
+                            description: Email del usuario
+                            example: juan.perez@gmail.com
+                          nombreFantasia:
+                            type: string
+                            nullable: true
+                            description: Nombre de fantasía del prestatario
+                            example: Plomería Pérez
+                          telefono:
+                            type: string
+                            description: Teléfono del usuario
+                            example: +54 11 1234-5678
+                        required:
+                          - id
+                          - nombre
+                          - apellido
+                          - mail
+                          - nombreFantasia
+                        description: Información del usuario que ofrece el servicio (puede ser null)
+                      turnos:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: number
+                              description: ID del turno
+                              example: 1
+                            fechaTurno:
+                              type: string
+                              description: Fecha del turno
+                              example: 2024-03-15
+                            horaTurno:
+                              type: string
+                              description: Hora del turno
+                              example: 14:30
+                            estado:
+                              type: string
+                              description: Estado del turno
+                              example: confirmado
+                          required:
+                            - id
+                            - fechaTurno
+                            - horaTurno
+                            - estado
+                        description: Turnos asociados al servicio
+                    required:
+                      - id
+                      - estado
+                      - precio
+                      - tarea
+                      - usuario
+                    description: Servicio creado o actualizado
+                  action:
+                    type: string
+                    enum:
+                      - created
+                      - updated
+                    description: Acción realizada
+                    example: created
+                required:
+                  - message
+                  - data
+                  - action
+        "400":
+          description: Error de validación - tareaId, usuarioId y precio (>0) son requeridos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: tareaId, usuarioId y precio (>0) son requeridos
+                required:
+                  - message
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Validation failed
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: precio
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: El precio debe ser un número positivo
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+  /api/servicio/{id}:
+    get:
+      description: Obtener un servicio específico por ID con sus relaciones
+      summary: Obtener servicio por ID
+      tags:
+        - Servicios
+      parameters:
+        - schema:
+            type: string
+            pattern: ^\d+$
+            description: ID numérico del servicio
+            example: "1"
+          required: true
+          description: ID numérico del servicio
+          name: id
+          in: path
+      responses:
+        "200":
+          description: Servicio encontrado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: found one service
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: number
+                        description: ID único del servicio
+                        example: 1
+                      estado:
+                        type: string
+                        description: Estado del servicio
+                        example: activo
+                      precio:
+                        type: number
+                        description: Precio del servicio
+                        example: 1500
+                      tarea:
+                        type: object
+                        properties:
+                          id:
+                            type: number
+                            description: ID de la tarea
+                            example: 1
+                          nombreTarea:
+                            type: string
+                            description: Nombre de la tarea
+                            example: Reparación de canillas
+                          descripcionTarea:
+                            type: string
+                            description: Descripción de la tarea
+                            example: Arreglo y mantenimiento de grifería
+                          duracionTarea:
+                            type: number
+                            description: Duración estimada de la tarea en minutos
+                            example: 60
+                          tipoServicio:
+                            type: object
+                            properties:
+                              id:
+                                type: number
+                              nombreTipo:
+                                type: string
+                              descripcionTipo:
+                                type: string
+                            required:
+                              - id
+                              - nombreTipo
+                              - descripcionTipo
+                            description: Tipo de servicio asociado a la tarea
+                        required:
+                          - id
+                          - nombreTarea
+                          - descripcionTarea
+                          - duracionTarea
+                          - tipoServicio
+                        description: Información de la tarea asociada
+                      usuario:
+                        type: object
+                        nullable: true
+                        properties:
+                          id:
+                            type: number
+                            description: ID del usuario
+                            example: 1
+                          nombre:
+                            type: string
+                            description: Nombre del usuario
+                            example: Juan
+                          apellido:
+                            type: string
+                            description: Apellido del usuario
+                            example: Pérez
+                          mail:
+                            type: string
+                            description: Email del usuario
+                            example: juan.perez@gmail.com
+                          nombreFantasia:
+                            type: string
+                            nullable: true
+                            description: Nombre de fantasía del prestatario
+                            example: Plomería Pérez
+                          telefono:
+                            type: string
+                            description: Teléfono del usuario
+                            example: +54 11 1234-5678
+                        required:
+                          - id
+                          - nombre
+                          - apellido
+                          - mail
+                          - nombreFantasia
+                        description: Información del usuario que ofrece el servicio (puede ser null)
+                      turnos:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: number
+                              description: ID del turno
+                              example: 1
+                            fechaTurno:
+                              type: string
+                              description: Fecha del turno
+                              example: 2024-03-15
+                            horaTurno:
+                              type: string
+                              description: Hora del turno
+                              example: 14:30
+                            estado:
+                              type: string
+                              description: Estado del turno
+                              example: confirmado
+                          required:
+                            - id
+                            - fechaTurno
+                            - horaTurno
+                            - estado
+                        description: Turnos asociados al servicio
+                    required:
+                      - id
+                      - estado
+                      - precio
+                      - tarea
+                      - usuario
+                required:
+                  - message
+                  - data
+        "404":
+          description: Servicio no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Validation failed
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: precio
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: El precio debe ser un número positivo
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Validation failed
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: precio
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: El precio debe ser un número positivo
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+    put:
+      description: Actualizar información de un servicio
+      summary: Actualizar servicio
+      tags:
+        - Servicios
+      parameters:
+        - schema:
+            type: string
+            pattern: ^\d+$
+            description: ID numérico del servicio
+            example: "1"
+          required: true
+          description: ID numérico del servicio
+          name: id
+          in: path
+      requestBody:
+        description: Datos del servicio a actualizar
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                estado:
+                  type: string
+                  enum:
+                    - activo
+                    - inactivo
+                  description: Estado del servicio
+                  example: activo
+                precio:
+                  type: number
+                  minimum: 0
+                  exclusiveMinimum: true
+                  description: Precio del servicio
+                  example: 1500
+                tarea:
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  description: ID de la tarea asociada al servicio
+                  example: 1
+                usuario:
+                  type: integer
+                  nullable: true
+                  minimum: 0
+                  exclusiveMinimum: true
+                  description: ID del usuario asociado al servicio (opcional)
+                  example: 2
+      responses:
+        "200":
+          description: Servicio actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: updated service
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: number
+                        description: ID único del servicio
+                        example: 1
+                      estado:
+                        type: string
+                        description: Estado del servicio
+                        example: activo
+                      precio:
+                        type: number
+                        description: Precio del servicio
+                        example: 1500
+                    required:
+                      - id
+                      - estado
+                      - precio
+                required:
+                  - message
+                  - data
+        "400":
+          description: Error de validación
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Validation failed
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: precio
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: El precio debe ser un número positivo
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+        "404":
+          description: Servicio no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Validation failed
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: precio
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: El precio debe ser un número positivo
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Validation failed
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: precio
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: El precio debe ser un número positivo
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+    patch:
+      description: Actualizar parcialmente información de un servicio
+      summary: Actualizar servicio parcialmente
+      tags:
+        - Servicios
+      parameters:
+        - schema:
+            type: string
+            pattern: ^\d+$
+            description: ID numérico del servicio
+            example: "1"
+          required: true
+          description: ID numérico del servicio
+          name: id
+          in: path
+      requestBody:
+        description: Datos del servicio a actualizar parcialmente
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                estado:
+                  type: string
+                  enum:
+                    - activo
+                    - inactivo
+                  description: Estado del servicio
+                  example: activo
+                precio:
+                  type: number
+                  minimum: 0
+                  exclusiveMinimum: true
+                  description: Precio del servicio
+                  example: 1500
+                tarea:
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  description: ID de la tarea asociada al servicio
+                  example: 1
+                usuario:
+                  type: integer
+                  nullable: true
+                  minimum: 0
+                  exclusiveMinimum: true
+                  description: ID del usuario asociado al servicio (opcional)
+                  example: 2
+      responses:
+        "200":
+          description: Servicio actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: updated service
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: number
+                        description: ID único del servicio
+                        example: 1
+                      estado:
+                        type: string
+                        description: Estado del servicio
+                        example: activo
+                      precio:
+                        type: number
+                        description: Precio del servicio
+                        example: 1500
+                    required:
+                      - id
+                      - estado
+                      - precio
+                required:
+                  - message
+                  - data
+        "400":
+          description: Error de validación
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Validation failed
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: precio
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: El precio debe ser un número positivo
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+        "404":
+          description: Servicio no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Validation failed
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: precio
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: El precio debe ser un número positivo
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Validation failed
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: precio
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: El precio debe ser un número positivo
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+    delete:
+      description: Eliminar un servicio
+      summary: Eliminar servicio
+      tags:
+        - Servicios
+      parameters:
+        - schema:
+            type: string
+            pattern: ^\d+$
+            description: ID numérico del servicio
+            example: "1"
+          required: true
+          description: ID numérico del servicio
+          name: id
+          in: path
+      responses:
+        "200":
+          description: Servicio eliminado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: removed service
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: number
+                        description: ID único del servicio
+                        example: 1
+                      estado:
+                        type: string
+                        description: Estado del servicio
+                        example: activo
+                      precio:
+                        type: number
+                        description: Precio del servicio
+                        example: 1500
+                    required:
+                      - id
+                      - estado
+                      - precio
+                required:
+                  - message
+                  - data
+        "404":
+          description: Servicio no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Validation failed
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: precio
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: El precio debe ser un número positivo
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Validation failed
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: precio
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: El precio debe ser un número positivo
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+  /api/servicio/user/{usuarioId}:
+    get:
+      description: Obtener todos los servicios de un usuario específico
+      summary: Obtener servicios por usuario
+      tags:
+        - Servicios
+      parameters:
+        - schema:
+            type: string
+            pattern: ^\d+$
+            description: ID numérico del usuario
+            example: "1"
+          required: true
+          description: ID numérico del usuario
+          name: usuarioId
+          in: path
+      responses:
+        "200":
+          description: Servicios del usuario encontrados exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de respuesta
+                    example: Servicios encontrados
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: number
+                          description: ID único del servicio
+                          example: 1
+                        estado:
+                          type: string
+                          description: Estado del servicio
+                          example: activo
+                        precio:
+                          type: number
+                          description: Precio del servicio
+                          example: 1500
+                        tarea:
+                          type: object
+                          properties:
+                            id:
+                              type: number
+                              description: ID de la tarea
+                              example: 1
+                            nombreTarea:
+                              type: string
+                              description: Nombre de la tarea
+                              example: Reparación de canillas
+                            descripcionTarea:
+                              type: string
+                              description: Descripción de la tarea
+                              example: Arreglo y mantenimiento de grifería
+                            duracionTarea:
+                              type: number
+                              description: Duración estimada de la tarea en minutos
+                              example: 60
+                            tipoServicio:
+                              type: object
+                              properties:
+                                id:
+                                  type: number
+                                nombreTipo:
+                                  type: string
+                                descripcionTipo:
+                                  type: string
+                              required:
+                                - id
+                                - nombreTipo
+                                - descripcionTipo
+                              description: Tipo de servicio asociado a la tarea
+                          required:
+                            - id
+                            - nombreTarea
+                            - descripcionTarea
+                            - duracionTarea
+                            - tipoServicio
+                          description: Información de la tarea asociada
+                        usuario:
+                          type: object
+                          nullable: true
+                          properties:
+                            id:
+                              type: number
+                              description: ID del usuario
+                              example: 1
+                            nombre:
+                              type: string
+                              description: Nombre del usuario
+                              example: Juan
+                            apellido:
+                              type: string
+                              description: Apellido del usuario
+                              example: Pérez
+                            mail:
+                              type: string
+                              description: Email del usuario
+                              example: juan.perez@gmail.com
+                            nombreFantasia:
+                              type: string
+                              nullable: true
+                              description: Nombre de fantasía del prestatario
+                              example: Plomería Pérez
+                            telefono:
+                              type: string
+                              description: Teléfono del usuario
+                              example: +54 11 1234-5678
+                          required:
+                            - id
+                            - nombre
+                            - apellido
+                            - mail
+                            - nombreFantasia
+                          description: Información del usuario que ofrece el servicio (puede ser null)
+                        turnos:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: number
+                                description: ID del turno
+                                example: 1
+                              fechaTurno:
+                                type: string
+                                description: Fecha del turno
+                                example: 2024-03-15
+                              horaTurno:
+                                type: string
+                                description: Hora del turno
+                                example: 14:30
+                              estado:
+                                type: string
+                                description: Estado del turno
+                                example: confirmado
+                            required:
+                              - id
+                              - fechaTurno
+                              - horaTurno
+                              - estado
+                          description: Turnos asociados al servicio
+                      required:
+                        - id
+                        - estado
+                        - precio
+                        - tarea
+                        - usuario
+                    description: Lista de servicios del usuario especificado
+                required:
+                  - message
+                  - data
+        "400":
+          description: usuarioId es requerido
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: usuarioId es requerido
+                required:
+                  - message
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Validation failed
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: precio
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: El precio debe ser un número positivo
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+  /api/servicio/user/{usuarioId}/task/{tareaId}/deactivate:
+    patch:
+      description: Desactivar servicio por usuario y tarea (cambiar estado a inactivo)
+      summary: Desactivar servicio
+      tags:
+        - Servicios
+      parameters:
+        - schema:
+            type: string
+            pattern: ^\d+$
+            description: ID numérico del usuario
+            example: "1"
+          required: true
+          description: ID numérico del usuario
+          name: usuarioId
+          in: path
+        - schema:
+            type: string
+            pattern: ^\d+$
+            description: ID numérico de la tarea
+            example: "1"
+          required: true
+          description: ID numérico de la tarea
+          name: tareaId
+          in: path
+      responses:
+        "200":
+          description: Servicio desactivado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Servicio desactivado exitosamente
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: number
+                        description: ID único del servicio
+                        example: 1
+                      estado:
+                        type: string
+                        description: Estado del servicio
+                        example: activo
+                      precio:
+                        type: number
+                        description: Precio del servicio
+                        example: 1500
+                    required:
+                      - id
+                      - estado
+                      - precio
+                required:
+                  - message
+                  - data
+        "400":
+          description: tareaId y usuarioId son requeridos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: tareaId y usuarioId son requeridos
+                required:
+                  - message
+        "404":
+          description: Servicio no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Servicio no encontrado
+                required:
+                  - message
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Validation failed
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: precio
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: El precio debe ser un número positivo
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+  /api/servicio/user/{usuarioId}/task/{tareaId}:
+    delete:
+      description: Eliminar servicio por usuario y tarea
+      summary: Eliminar servicio por usuario y tarea
+      tags:
+        - Servicios
+      parameters:
+        - schema:
+            type: string
+            pattern: ^\d+$
+            description: ID numérico del usuario
+            example: "1"
+          required: true
+          description: ID numérico del usuario
+          name: usuarioId
+          in: path
+        - schema:
+            type: string
+            pattern: ^\d+$
+            description: ID numérico de la tarea
+            example: "1"
+          required: true
+          description: ID numérico de la tarea
+          name: tareaId
+          in: path
+      responses:
+        "200":
+          description: Servicio eliminado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Servicio eliminado exitosamente
+                required:
+                  - message
+        "400":
+          description: tareaId y usuarioId son requeridos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: tareaId y usuarioId son requeridos
+                required:
+                  - message
+        "404":
+          description: Servicio no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Servicio no encontrado
+                required:
+                  - message
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Validation failed
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: precio
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: El precio debe ser un número positivo
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
