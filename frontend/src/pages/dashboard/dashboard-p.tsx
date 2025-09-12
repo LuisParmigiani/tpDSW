@@ -32,7 +32,7 @@ function Dashboard() {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
 
-      // Cerrar menú móvil si se cambia a desktop
+      
       if (!mobile && showMobileNav) {
         setShowMobileNav(false);
       }
@@ -42,7 +42,7 @@ function Dashboard() {
     return () => window.removeEventListener('resize', handleResize);
   }, [showMobileNav]);
 
-  //Me traigo la info del prestador
+  //carga mientras authloading sea true o usuario no este autenticado
   if (authLoading || !usuario) {
     return (
       <div className="flex justify-center items-center h-screen text-2xl font-semibold text-gray-600">
@@ -51,6 +51,7 @@ function Dashboard() {
     );
   }
 
+  // los items de la dashnav
   const customMenuItems: MenuItem[] = [
     {
       id: 'perfil',
