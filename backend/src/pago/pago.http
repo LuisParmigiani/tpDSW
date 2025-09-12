@@ -20,10 +20,10 @@ Content-Type: application/json
   "updatedAt": "2025-09-11T13:55:00.000Z"
 }
 ### Obtener todos los pagos
-GET http://localhost:3000/api/pago
+GET http://localhost:3000/api/pago/estadisticas/81
 
 ### Obtener un pago por ID
-GET http://localhost:3000/api/pago/6
+GET http://localhost:3000/api/pago
 
 ### Actualizar un pago existente
 PUT http://localhost:3000/api/pago/3

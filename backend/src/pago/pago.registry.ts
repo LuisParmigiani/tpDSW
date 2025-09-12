@@ -10,6 +10,7 @@ import {
   validacionIdSchema,
   updatePagoValidationSchema,
   baseSchemaWithTurnoId,
+  idUserParamValidation,
 } from './pago.schemas.js';
 
 // Extender Zod con OpenAPI
@@ -89,6 +90,46 @@ pagoRegistry.registerPath({
   tags: ['Pagos'],
   request: {
     params: validacionIdSchema,
+  },
+  responses: {
+    200: {
+      description: 'Pago encontrado',
+      content: {
+        'application/json': {
+          schema: z.object({
+            message: z.string().openapi({ example: 'Pago encontrado' }),
+            data: getPagoSchema,
+          }),
+        },
+      },
+    },
+    404: {
+      description: 'Pago no encontrado',
+      content: {
+        'application/json': {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+    500: {
+      description: 'Error interno del servidor',
+      content: {
+        'application/json': {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+  },
+});
+
+pagoRegistry.registerPath({
+  method: 'get',
+  path: '/api/estadisticas/{usuarioId}',
+  description: 'Obtener los pagos por ID de usuario',
+  summary: 'Obtener pagos por usuario',
+  tags: ['Pagos'],
+  request: {
+    params: idUserParamValidation,
   },
   responses: {
     200: {

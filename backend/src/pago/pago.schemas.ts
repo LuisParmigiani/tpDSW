@@ -241,3 +241,11 @@ export const idParamValidation = z.object({
     .describe('ID del recurso')
     .openapi({ example: '123' }),
 });
+
+export const idUserParamValidation = z.object({
+  usuarioId: z
+    .string()
+    .regex(/^\d+$/, 'El ID del usuario debe ser un número válido')
+    .describe('ID del usuario')
+    .openapi({ example: '123' }),
+});

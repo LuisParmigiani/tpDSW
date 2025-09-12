@@ -20,7 +20,7 @@ export class UsuarioSeeder extends Seeder {
           .int({ min: 10000000, max: 50000000 })
           .toString(),
         foto: 'https://backend-patient-morning-1303.fly.dev/uploads/profiles/default-avatar.webp',
-        telefono: faker.phone.number(),
+        telefono: '+1' + faker.phone.number(),
         nombre: faker.person.firstName(),
         apellido: faker.person.lastName(),
         direccion: faker.location.streetAddress(),
@@ -35,7 +35,7 @@ export class UsuarioSeeder extends Seeder {
       tipoDoc: 'DNI',
       numeroDoc: faker.number.int({ min: 10000000, max: 50000000 }).toString(),
       foto: 'https://backend-patient-morning-1303.fly.dev/uploads/profiles/default-avatar.webp',
-      telefono: faker.phone.number(),
+      telefono: '+1' + faker.phone.number(),
       nombre: faker.person.firstName(),
       apellido: faker.person.lastName(),
       direccion: faker.location.streetAddress(),
@@ -48,7 +48,7 @@ export class UsuarioSeeder extends Seeder {
       tipoDoc: 'DNI',
       numeroDoc: faker.number.int({ min: 10000000, max: 50000000 }).toString(),
       foto: 'https://backend-patient-morning-1303.fly.dev/uploads/profiles/default-avatar.webp',
-      telefono: faker.phone.number(),
+      telefono: '+1' + faker.phone.number(),
       nombre: 'Carlos',
       apellido: 'Herrera',
       direccion: faker.location.streetAddress(),
@@ -63,12 +63,12 @@ export class UsuarioSeeder extends Seeder {
         nombre: faker.person.firstName(),
         apellido: faker.person.lastName(),
         mail: faker.internet.email(),
-        telefono: faker.phone.number(),
+        telefono: '+1' + faker.phone.number(),
         contrasena:
           '$2b$10$0E9iYMk1AvFZNbpfu0yroOGq2/X8NzjWQjQv4cGAiS0dJsaRCh9oG',
         tipoDoc: 'CUIT',
         direccion: faker.location.streetAddress(),
-        stripeAccountId: 'acct_1N3b2YFz2b2YFz2b' + i,
+        stripeAccountId: 'acct_1S6XGYCuyV9w7dLC' + i,
 
         numeroDoc: faker.number
           .int({ min: 20000000000, max: 30000000000 })
@@ -86,7 +86,7 @@ export class UsuarioSeeder extends Seeder {
         nombre: faker.person.firstName(),
         apellido: faker.person.lastName(),
         mail: faker.internet.email(),
-        telefono: faker.phone.number(),
+        telefono: '+1' + faker.phone.number(),
         contrasena:
           '$2b$10$0E9iYMk1AvFZNbpfu0yroOGq2/X8NzjWQjQv4cGAiS0dJsaRCh9oG',
         tipoDoc: 'CUIT',
