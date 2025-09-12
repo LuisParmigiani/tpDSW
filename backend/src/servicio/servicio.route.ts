@@ -1,6 +1,20 @@
 import { Router } from 'express';
 import {
-  sanitizeServicioInput,
+  validateBody,
+  validateParams,
+  validateQuery,
+  authenticateToken,
+} from '../utils/apiMiddleware.js';
+import {
+  createServicioValidation,
+  updateServicioValidation,
+  upsertServicioValidation,
+  idParamValidation,
+  usuarioIdParamValidation,
+  userTaskParamsValidation,
+  servicioQueryValidation,
+} from './servicio.schemas.js';
+import {
   findall,
   findone,
   add,
@@ -14,15 +28,53 @@ import {
 
 export const servicioRouter = Router();
 
-servicioRouter.get('/', findall);
-servicioRouter.get('/:id', findone);
-servicioRouter.post('/', sanitizeServicioInput, add);
-servicioRouter.put('/:id', sanitizeServicioInput, update);
-servicioRouter.patch('/:id', sanitizeServicioInput, update);
-servicioRouter.delete('/:id', remove);
+// ==================== POST ROUTES ====================
+servicioRouter.post('/', validateBody(createServicioValidation), add);
 
-// Nuevas rutas específicas
-servicioRouter.get('/user/:usuarioId', getByUser);
-servicioRouter.post('/upsert', upsertByUserAndTask);
-servicioRouter.delete('/user/:usuarioId/task/:tareaId', deleteByUserAndTask);
-servicioRouter.patch('/user/:usuarioId/task/:tareaId/deactivate', deactivateByUserAndTask);
+servicioRouter.post(
+  '/upsert',
+  validateBody(upsertServicioValidation),
+  upsertByUserAndTask
+);
+
+// ==================== GET ROUTES ====================
+servicioRouter.get('/', validateQuery(servicioQueryValidation), findall);
+
+servicioRouter.get('/:id', validateParams(idParamValidation), findone);
+
+servicioRouter.get(
+  '/user/:usuarioId',
+  validateParams(usuarioIdParamValidation),
+  getByUser
+);
+
+// ==================== PUT ROUTES ====================
+servicioRouter.put(
+  '/:id',
+  validateParams(idParamValidation),
+  validateBody(updateServicioValidation),
+  update
+);
+
+// ==================== PATCH ROUTES ====================
+servicioRouter.patch(
+  '/:id',
+  validateParams(idParamValidation),
+  validateBody(updateServicioValidation),
+  update
+);
+
+servicioRouter.patch(
+  '/user/:usuarioId/task/:tareaId/deactivate',
+  validateParams(userTaskParamsValidation),
+  deactivateByUserAndTask
+);
+
+// ==================== DELETE ROUTES ====================
+servicioRouter.delete('/:id', validateParams(idParamValidation), remove);
+
+servicioRouter.delete(
+  '/user/:usuarioId/task/:tareaId',
+  validateParams(userTaskParamsValidation),
+  deleteByUserAndTask
+);
