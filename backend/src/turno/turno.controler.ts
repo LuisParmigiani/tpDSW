@@ -5,11 +5,14 @@ import {
   moderateContent,
   type ModerationResult,
 } from '../shared/services/openai.service.js';
+import send from 'send';
+import { sendEmail } from '../mail/mail.js';
 
 interface AuthRequest extends Request {
   user?: {
     id: string;
     rol: string;
+    email: string;
   };
 }
 const em = orm.em;
@@ -75,6 +78,13 @@ async function addWithCookie(req: AuthRequest, res: Response) {
     sanitizedInput.usuario = id; // Asignar el ID del usuario autenticado
     const newTurn = em.create(Turno, sanitizedInput);
     await em.persistAndFlush(newTurn);
+
+    sendEmail(
+      req.user.email,
+      'Nuevo Turno Creado',
+      `Se ha creado un nuevo turno para el servicio ${newTurn.servicio.tarea.nombreTarea}. El dia ${newTurn.fechaHora}.`
+    );
+
     res
       .status(201)
       .json({ message: 'Turn created successfully', data: newTurn });
@@ -101,6 +111,10 @@ async function update(req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id);
     const sanitizedInput = req.body.sanitizeTurnoInput;
+    const onlyEstadoChanged =
+      Object.keys(sanitizedInput).length === 1 &&
+      sanitizedInput.estado !== undefined;
+
     const turn = await em.findOne(
       Turno,
       {
@@ -147,6 +161,14 @@ async function update(req: Request, res: Response) {
     // Update the turn if moderation passed or no comment provided
     em.assign(turn, sanitizedInput);
     await em.persistAndFlush(turn);
+
+    if (onlyEstadoChanged) {
+      sendEmail(
+        turn.usuario.mail,
+        'Turno Actualizado',
+        `El estado de tu turno para el servicio ${turn.servicio.tarea.nombreTarea} del dia ${turn.fechaHora} ha sido actualizado a ${sanitizedInput.estado}.`
+      );
+    }
     res.status(200).json({ message: 'Turn updated successfully', data: turn });
   } catch (error: any) {
     res.status(500).json({ message: error.message });
