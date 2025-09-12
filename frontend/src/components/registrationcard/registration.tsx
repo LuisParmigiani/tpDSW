@@ -31,11 +31,7 @@ export const usuarioSchema = z.object({
     .regex(/^[0-9]+$/, 'El teléfono debe contener solo números'),
   apellido: z.string().min(1, 'El apellido es obligatorio'),
   direccion: z.string().min(1, 'La dirección es obligatoria'),
-  foto: z
-    .string()
-    .url('La foto debe ser una URL válida')
-    .optional()
-    .or(z.literal('')),
+  foto: z.string().url('Debe seleccionar una foto'),
   nombreFantasia: z.string().optional().or(z.literal('')),
   descripcion: z.string().optional().or(z.literal('')),
 });
@@ -314,7 +310,9 @@ function RegisCard() {
             </p>
             <select
               value={tipoUsuario}
-              onChange={(e) => setearTipoUsuario(e.target.value as 'usuario' | 'prestatario')}
+              onChange={(e) =>
+                setearTipoUsuario(e.target.value as 'usuario' | 'prestatario')
+              }
               className="mb-4 p-2 rounded bg-white text-black border border-gray-400"
             >
               <option value="usuario">Cliente</option>
