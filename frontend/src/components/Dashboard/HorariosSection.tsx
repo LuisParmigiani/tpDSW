@@ -3,6 +3,7 @@ import DashboardSection from '../DashboardSection/DashboardSection';
 import useAuth from '../../cookie/useAuth';
 import { Alert, AlertTitle, AlertDescription } from '../Alerts/Alerts';
 import StripeCreate from '../Stripe/stripe';
+import { horariosApi }  from '../../services/horariosApi';
 
 interface HorarioDia {
   dia: string;
@@ -61,6 +62,48 @@ function HorariosSection() {
     verificarConexionStripe();
   }, [usuario, authLoading]);
 
+  // Cargar horarios existentes si está conectado a Stripe
+  useEffect(() => {
+    const cargarHorarios = async () => {
+      if (!conectadoStripe) return;
+      if (!usuario || !usuario.id) return;
+      try {
+        setLoading(true);
+        const response = await horariosApi.getByUsuarioId(usuario.id);
+        const horariosDb = response.data?.data || [];
+        const DIAS_SEMANA = [
+          'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'
+        ];
+        const nuevosHorarios: HorarioDia[] = DIAS_SEMANA.map((dia, idx) => {
+          const db = horariosDb.find((h: any) => h.diaSemana === idx);
+          if (db) {
+            const activo = !(db.horaDesde === '00:00:00' && db.horaHasta === '00:00:00');
+            return {
+              dia,
+              horaDesde: db.horaDesde?.slice(0,5) || '09:00',
+              horaHasta: db.horaHasta?.slice(0,5) || '17:00',
+              activo
+            };
+          } else {
+            return {
+              dia,
+              horaDesde: '09:00',
+              horaHasta: '17:00',
+              activo: false
+            };
+          }
+        });
+        setHorarios(nuevosHorarios);
+        setLoading(false);
+      } catch (err) {
+        console.error('Error cargando horarios:', err);
+        setError('Error al cargar los horarios');
+        setLoading(false);
+      }
+    };
+    cargarHorarios();
+  }, [conectadoStripe, usuario]);
+
   // Función para manejar cambios en los horarios
   const handleHorarioChange = (index: number, campo: keyof HorarioDia, valor: string | boolean) => {
     setHorarios(prev => prev.map((horario, i) => 
@@ -78,7 +121,7 @@ function HorariosSection() {
     return null;
   };
 
-  // Función para guardar horarios (sin backend)
+  // Función para guardar horarios
   const guardarHorarios = async () => {
     if (!usuario) {
       setAlertType('danger');
@@ -86,7 +129,6 @@ function HorariosSection() {
       setShowAlert(true);
       return;
     }
-
     const errorValidacion = validarHorarios();
     if (errorValidacion) {
       setAlertType('danger');
@@ -94,18 +136,24 @@ function HorariosSection() {
       setShowAlert(true);
       return;
     }
-
     setGuardando(true);
     try {
-      // Aquí iría la llamada al backend
-      // await horariosApi.updateBatchByUsuarioId(usuario.id, horariosPayload);
+      // Mapear a formato backend
+      const horariosPayload = horarios.map((h, idx) => ({
+        diaSemana: idx,
+        horaDesde: h.activo ? (h.horaDesde.length === 5 ? h.horaDesde + ':00' : h.horaDesde) : '00:00:00',
+        horaHasta: h.activo ? (h.horaHasta.length === 5 ? h.horaHasta + ':00' : h.horaHasta) : '00:00:00',
+        usuario: usuario.id,
+      }));
+      await horariosApi.updateBatchByUsuarioId(usuario.id, horariosPayload);
       setAlertType('success');
-      setAlertMessage('✅ Horarios guardados (simulado, sin backend)');
+      setAlertMessage('✅ Horarios guardados exitosamente');
       setShowAlert(true);
-    } catch (error) {
+    } catch (err) {
       setAlertType('danger');
       setAlertMessage('❌ Error al guardar los horarios. Intenta nuevamente.');
       setShowAlert(true);
+      console.log(err);
     } finally {
       setGuardando(false);
     }

@@ -62,4 +62,51 @@ async function remove(req: Request, res: Response) {
   }
 }
 
-export { findAll, findManyByUser, add, update, remove };
+// Batch update de horarios para un usuario
+async function updateBatchByUser(req: Request, res: Response) {
+  try {
+    const usuarioId = Number.parseInt(req.params.usuarioId);
+    if (isNaN(usuarioId)) {
+      return res.status(400).json({ message: 'ID de usuario inválido' });
+    }
+    const horariosInput = req.body;
+    if (!Array.isArray(horariosInput)) {
+      return res.status(400).json({ message: 'El body debe ser un array de horarios' });
+    }
+    // Validar y procesar cada horario
+    for (const h of horariosInput) {
+      if (typeof h.diaSemana !== 'number' || typeof h.horaDesde !== 'string' || typeof h.horaHasta !== 'string') {
+        return res.status(400).json({ message: 'Formato de horario inválido' });
+      }
+      if (!(h.horaDesde === '00:00:00' && h.horaHasta === '00:00:00')) {
+        if (h.horaDesde >= h.horaHasta) {
+          return res.status(400).json({ message: `La hora desde debe ser menor que la hora hasta para el día ${h.diaSemana}` });
+        }
+      }
+    }
+    // Obtener todos los horarios actuales del usuario
+    const horariosActuales = await em.find(Horario, { usuario: usuarioId });
+    // Actualizar o crear cada horario
+    for (const h of horariosInput) {
+      let horario = horariosActuales.find(ha => ha.diaSemana === h.diaSemana);
+      if (horario) {
+        horario.horaDesde = h.horaDesde;
+        horario.horaHasta = h.horaHasta;
+      } else {
+        horario = em.create(Horario, {
+          usuario: usuarioId,
+          diaSemana: h.diaSemana,
+          horaDesde: h.horaDesde,
+          horaHasta: h.horaHasta
+        });
+      }
+    }
+    await em.flush();
+    const horariosFinales = await em.find(Horario, { usuario: usuarioId });
+    res.status(200).json({ message: 'Horarios actualizados', data: horariosFinales });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
+export { findAll, findManyByUser, add, update, remove, updateBatchByUser };
