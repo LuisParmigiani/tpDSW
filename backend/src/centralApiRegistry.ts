@@ -81,15 +81,6 @@ async function generateOpenApiDocument() {
         description: 'Operaciones para el manejo de Zonas',
       },
       {
-        name: 'Reservas',
-        description: 'Operaciones para el manejo de Reservas',
-      },
-      {
-        name: 'Autenticación',
-        description:
-          'Operaciones relacionadas con la autenticación y autorización de usuarios',
-      },
-      {
         name: 'Horarios',
         description: 'Operaciones para el manejo de Horarios',
       },
@@ -100,6 +91,11 @@ async function generateOpenApiDocument() {
       {
         name: 'TipoServicio',
         description: 'Operaciones para el manejo de Tipos de Servicio',
+      },
+      {
+        name: 'Autenticación',
+        description:
+          'Operaciones relacionadas con la autenticación y autorización de usuarios',
       },
     ],
   });

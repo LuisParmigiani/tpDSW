@@ -42,14 +42,6 @@
       "description": "Operaciones para el manejo de Zonas"
     },
     {
-      "name": "Reservas",
-      "description": "Operaciones para el manejo de Reservas"
-    },
-    {
-      "name": "Autenticación",
-      "description": "Operaciones relacionadas con la autenticación y autorización de usuarios"
-    },
-    {
       "name": "Horarios",
       "description": "Operaciones para el manejo de Horarios"
     },
@@ -60,6 +52,10 @@
     {
       "name": "TipoServicio",
       "description": "Operaciones para el manejo de Tipos de Servicio"
+    },
+    {
+      "name": "Autenticación",
+      "description": "Operaciones relacionadas con la autenticación y autorización de usuarios"
     }
   ],
   "components": {
@@ -1871,8 +1867,8 @@
           "usuario",
           "id"
         ],
-        "title": "CrearHorario",
-        "description": "Esquema para crear un nuevo horario"
+        "description": "Esquema para crear un nuevo horario",
+        "title": "CrearHorario"
       },
       "UpdateHorario": {
         "type": "object",
@@ -2029,8 +2025,8 @@
             "example": 1
           }
         },
-        "title": "ActualizarHorario",
-        "description": "Esquema para actualizar un horario existente"
+        "description": "Esquema para actualizar un horario existente",
+        "title": "ActualizarHorario"
       },
       "DeleteHorario": {
         "type": "object",
@@ -2191,9 +2187,11 @@
           "diaSemana",
           "horaDesde",
           "horaHasta",
-<<<<<<< HEAD
-          "usuario"
-        ]
+          "usuario",
+          "id"
+        ],
+        "description": "Esquema para eliminar un horario",
+        "title": "BorrarHorario"
       },
       "CreateServicio": {
         "type": "object",
@@ -2347,345 +2345,10 @@
             "example": 1500
           },
           "tarea": {
-=======
-          "usuario",
-          "id"
-        ],
-        "title": "BorrarHorario",
-        "description": "Esquema para eliminar un horario"
-      },
-      "Pago": {
-        "type": "object",
-        "properties": {
-          "paymentIntentId": {
-            "type": "string",
-            "minLength": 1,
-            "description": "ID del pago en Stripe",
-            "example": "pi_1JXXXXXX"
-          },
-          "amount": {
-            "type": "number",
-            "minimum": 350,
-            "description": "Monto del pago en centavos",
-            "example": 1000
-          },
-          "currency": {
-            "type": "string",
-            "minLength": 3,
-            "maxLength": 3,
-            "description": "Moneda del pago en formato ISO (ej: usd, ars)",
-            "example": "usd"
-          },
-          "estado": {
-            "type": "string",
-            "enum": [
-              "requires_payment_method",
-              "requires_confirmation",
-              "requires_action",
-              "processing",
-              "succeeded",
-              "requires_capture",
-              "canceled"
-            ],
-            "description": "Estado del pago en Stripe",
-            "example": "succeeded"
-          },
-          "sellerStripeId": {
-            "type": "string",
-            "minLength": 1,
-            "description": "ID del vendedor de la cuenta de Stripe",
-            "example": "acct_1JXXXXXX"
-          },
-          "amountReceived": {
-            "type": "number",
-            "minimum": 0,
-            "description": "Monto recibido por el vendedor en centavos",
-            "example": 950
-          },
-          "applicationFeeAmount": {
-            "type": "number",
-            "minimum": 0,
-            "description": "Comisión de la plataforma en centavos",
-            "example": 50
-          },
-          "transferId": {
-            "type": "string",
-            "description": "ID de la transferencia a la cuenta del vendedor en Stripe",
-            "example": "tr_1JXXXXXX"
-          },
-          "buyerEmail": {
-            "type": "string",
-            "format": "email",
-            "description": "Correo electrónico del comprador",
-            "example": "buyer@example.com"
-          },
-          "metadata": {
-            "type": "object",
-            "additionalProperties": {
-              "nullable": true
-            },
-            "description": "Datos adicionales como productId, orderId",
-            "example": {
-              "productId": "prod_123",
-              "orderId": "ord_456"
-            }
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Fecha de creación del pago en formato ISO",
-            "example": "2023-10-01T12:34:56Z"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Fecha de última actualización del pago en formato ISO",
-            "example": "2023-10-01T12:34:56Z"
-          },
-          "id": {
-            "type": "number",
-            "description": "ID del turno",
-            "example": 1
-          },
-          "turno": {
-            "type": "integer",
-            "minimum": 0,
-            "exclusiveMinimum": true,
-            "description": "ID del turno asociado al pago",
-            "example": 15
-          }
-        },
-        "required": [
-          "paymentIntentId",
-          "amount",
-          "currency",
-          "estado",
-          "sellerStripeId",
-          "amountReceived",
-          "createdAt",
-          "updatedAt",
-          "id",
-          "turno"
-        ],
-        "title": "CreatePago",
-        "description": "Esquema para crear un nuevo pago"
-      },
-      "CreatePago": {
-        "type": "object",
-        "properties": {
-          "paymentIntentId": {
-            "type": "string",
-            "minLength": 1,
-            "description": "ID del pago en Stripe",
-            "example": "pi_1JXXXXXX"
-          },
-          "amount": {
-            "type": "number",
-            "minimum": 350,
-            "description": "Monto del pago en centavos",
-            "example": 1000
-          },
-          "currency": {
-            "type": "string",
-            "minLength": 3,
-            "maxLength": 3,
-            "description": "Moneda del pago en formato ISO (ej: usd, ars)",
-            "example": "usd"
-          },
-          "estado": {
-            "type": "string",
-            "enum": [
-              "requires_payment_method",
-              "requires_confirmation",
-              "requires_action",
-              "processing",
-              "succeeded",
-              "requires_capture",
-              "canceled"
-            ],
-            "description": "Estado del pago en Stripe",
-            "example": "succeeded"
-          },
-          "sellerStripeId": {
-            "type": "string",
-            "minLength": 1,
-            "description": "ID del vendedor de la cuenta de Stripe",
-            "example": "acct_1JXXXXXX"
-          },
-          "amountReceived": {
-            "type": "number",
-            "minimum": 0,
-            "description": "Monto recibido por el vendedor en centavos",
-            "example": 950
-          },
-          "applicationFeeAmount": {
-            "type": "number",
-            "minimum": 0,
-            "description": "Comisión de la plataforma en centavos",
-            "example": 50
-          },
-          "transferId": {
-            "type": "string",
-            "description": "ID de la transferencia a la cuenta del vendedor en Stripe",
-            "example": "tr_1JXXXXXX"
-          },
-          "buyerEmail": {
-            "type": "string",
-            "format": "email",
-            "description": "Correo electrónico del comprador",
-            "example": "buyer@example.com"
-          },
-          "metadata": {
-            "type": "object",
-            "additionalProperties": {
-              "nullable": true
-            },
-            "description": "Datos adicionales como productId, orderId",
-            "example": {
-              "productId": "prod_123",
-              "orderId": "ord_456"
-            }
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Fecha de creación del pago en formato ISO",
-            "example": "2023-10-01T12:34:56Z"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Fecha de última actualización del pago en formato ISO",
-            "example": "2023-10-01T12:34:56Z"
-          },
-          "id": {
-            "type": "number",
-            "description": "ID del turno",
-            "example": 1
-          },
-          "turno": {
-            "type": "integer",
-            "minimum": 0,
-            "exclusiveMinimum": true,
-            "description": "ID del turno asociado al pago",
-            "example": 15
-          }
-        },
-        "required": [
-          "paymentIntentId",
-          "amount",
-          "currency",
-          "estado",
-          "sellerStripeId",
-          "amountReceived",
-          "createdAt",
-          "updatedAt",
-          "id",
-          "turno"
-        ],
-        "title": "CreatePago",
-        "description": "Esquema para crear un nuevo pago"
-      },
-      "GetPago": {
-        "type": "object",
-        "properties": {
-          "paymentIntentId": {
-            "type": "string",
-            "minLength": 1,
-            "description": "ID del pago en Stripe",
-            "example": "pi_1JXXXXXX"
-          },
-          "amount": {
-            "type": "number",
-            "minimum": 350,
-            "description": "Monto del pago en centavos",
-            "example": 1000
-          },
-          "currency": {
-            "type": "string",
-            "minLength": 3,
-            "maxLength": 3,
-            "description": "Moneda del pago en formato ISO (ej: usd, ars)",
-            "example": "usd"
-          },
-          "estado": {
-            "type": "string",
-            "enum": [
-              "requires_payment_method",
-              "requires_confirmation",
-              "requires_action",
-              "processing",
-              "succeeded",
-              "requires_capture",
-              "canceled"
-            ],
-            "description": "Estado del pago en Stripe",
-            "example": "succeeded"
-          },
-          "sellerStripeId": {
-            "type": "string",
-            "minLength": 1,
-            "description": "ID del vendedor de la cuenta de Stripe",
-            "example": "acct_1JXXXXXX"
-          },
-          "amountReceived": {
-            "type": "number",
-            "minimum": 0,
-            "description": "Monto recibido por el vendedor en centavos",
-            "example": 950
-          },
-          "applicationFeeAmount": {
-            "type": "number",
-            "minimum": 0,
-            "description": "Comisión de la plataforma en centavos",
-            "example": 50
-          },
-          "transferId": {
-            "type": "string",
-            "description": "ID de la transferencia a la cuenta del vendedor en Stripe",
-            "example": "tr_1JXXXXXX"
-          },
-          "buyerEmail": {
-            "type": "string",
-            "format": "email",
-            "description": "Correo electrónico del comprador",
-            "example": "buyer@example.com"
-          },
-          "metadata": {
-            "type": "object",
-            "additionalProperties": {
-              "nullable": true
-            },
-            "description": "Datos adicionales como productId, orderId",
-            "example": {
-              "productId": "prod_123",
-              "orderId": "ord_456"
-            }
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Fecha de creación del pago en formato ISO",
-            "example": "2023-10-01T12:34:56Z"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Fecha de última actualización del pago en formato ISO",
-            "example": "2023-10-01T12:34:56Z"
-          },
-          "id": {
-            "type": "number",
-            "description": "ID del turno",
-            "example": 1
-          },
-          "turno": {
->>>>>>> pagoApi
             "type": "object",
             "properties": {
               "id": {
                 "type": "number",
-<<<<<<< HEAD
                 "description": "ID de la tarea",
                 "example": 1
               },
@@ -3337,42 +3000,10 @@
                   ]
                 },
                 "description": "Turnos asociados al servicio"
-=======
-                "description": "ID del turno",
-                "example": 1
-              },
-              "fechaTurno": {
-                "type": "string",
-                "description": "Fecha del turno",
-                "example": "2024-03-15"
-              },
-              "horaTurno": {
-                "type": "string",
-                "description": "Hora del turno",
-                "example": "14:30"
-              },
-              "estado": {
-                "type": "string",
-                "description": "Estado del turno",
-                "example": "confirmado"
-              },
-              "calificacion": {
-                "type": "number",
-                "nullable": true,
-                "description": "Calificación del turno (1-5)",
-                "example": 4.5
-              },
-              "comentario": {
-                "type": "string",
-                "nullable": true,
-                "description": "Comentario del cliente",
-                "example": "Excelente servicio"
->>>>>>> pagoApi
               }
             },
             "required": [
               "id",
-<<<<<<< HEAD
               "estado",
               "precio",
               "tarea",
@@ -3465,7 +3096,370 @@
             "example": 1
           }
         }
-=======
+      },
+      "Pago": {
+        "type": "object",
+        "properties": {
+          "paymentIntentId": {
+            "type": "string",
+            "minLength": 1,
+            "description": "ID del pago en Stripe",
+            "example": "pi_1JXXXXXX"
+          },
+          "amount": {
+            "type": "number",
+            "minimum": 350,
+            "description": "Monto del pago en centavos",
+            "example": 1000
+          },
+          "currency": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 3,
+            "description": "Moneda del pago en formato ISO (ej: usd, ars)",
+            "example": "usd"
+          },
+          "estado": {
+            "type": "string",
+            "enum": [
+              "requires_payment_method",
+              "requires_confirmation",
+              "requires_action",
+              "processing",
+              "succeeded",
+              "requires_capture",
+              "canceled"
+            ],
+            "description": "Estado del pago en Stripe",
+            "example": "succeeded"
+          },
+          "sellerStripeId": {
+            "type": "string",
+            "minLength": 1,
+            "description": "ID del vendedor de la cuenta de Stripe",
+            "example": "acct_1JXXXXXX"
+          },
+          "amountReceived": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Monto recibido por el vendedor en centavos",
+            "example": 950
+          },
+          "applicationFeeAmount": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Comisión de la plataforma en centavos",
+            "example": 50
+          },
+          "transferId": {
+            "type": "string",
+            "description": "ID de la transferencia a la cuenta del vendedor en Stripe",
+            "example": "tr_1JXXXXXX"
+          },
+          "buyerEmail": {
+            "type": "string",
+            "format": "email",
+            "description": "Correo electrónico del comprador",
+            "example": "buyer@example.com"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {
+              "nullable": true
+            },
+            "description": "Datos adicionales como productId, orderId",
+            "example": {
+              "productId": "prod_123",
+              "orderId": "ord_456"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Fecha de creación del pago en formato ISO",
+            "example": "2023-10-01T12:34:56Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Fecha de última actualización del pago en formato ISO",
+            "example": "2023-10-01T12:34:56Z"
+          },
+          "id": {
+            "type": "number",
+            "description": "ID del turno",
+            "example": 1
+          },
+          "turno": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "description": "ID del turno asociado al pago",
+            "example": 15
+          }
+        },
+        "required": [
+          "paymentIntentId",
+          "amount",
+          "currency",
+          "estado",
+          "sellerStripeId",
+          "amountReceived",
+          "createdAt",
+          "updatedAt",
+          "id",
+          "turno"
+        ],
+        "description": "Esquema para crear un nuevo pago",
+        "title": "CreatePago"
+      },
+      "CreatePago": {
+        "type": "object",
+        "properties": {
+          "paymentIntentId": {
+            "type": "string",
+            "minLength": 1,
+            "description": "ID del pago en Stripe",
+            "example": "pi_1JXXXXXX"
+          },
+          "amount": {
+            "type": "number",
+            "minimum": 350,
+            "description": "Monto del pago en centavos",
+            "example": 1000
+          },
+          "currency": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 3,
+            "description": "Moneda del pago en formato ISO (ej: usd, ars)",
+            "example": "usd"
+          },
+          "estado": {
+            "type": "string",
+            "enum": [
+              "requires_payment_method",
+              "requires_confirmation",
+              "requires_action",
+              "processing",
+              "succeeded",
+              "requires_capture",
+              "canceled"
+            ],
+            "description": "Estado del pago en Stripe",
+            "example": "succeeded"
+          },
+          "sellerStripeId": {
+            "type": "string",
+            "minLength": 1,
+            "description": "ID del vendedor de la cuenta de Stripe",
+            "example": "acct_1JXXXXXX"
+          },
+          "amountReceived": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Monto recibido por el vendedor en centavos",
+            "example": 950
+          },
+          "applicationFeeAmount": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Comisión de la plataforma en centavos",
+            "example": 50
+          },
+          "transferId": {
+            "type": "string",
+            "description": "ID de la transferencia a la cuenta del vendedor en Stripe",
+            "example": "tr_1JXXXXXX"
+          },
+          "buyerEmail": {
+            "type": "string",
+            "format": "email",
+            "description": "Correo electrónico del comprador",
+            "example": "buyer@example.com"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {
+              "nullable": true
+            },
+            "description": "Datos adicionales como productId, orderId",
+            "example": {
+              "productId": "prod_123",
+              "orderId": "ord_456"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Fecha de creación del pago en formato ISO",
+            "example": "2023-10-01T12:34:56Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Fecha de última actualización del pago en formato ISO",
+            "example": "2023-10-01T12:34:56Z"
+          },
+          "id": {
+            "type": "number",
+            "description": "ID del turno",
+            "example": 1
+          },
+          "turno": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "description": "ID del turno asociado al pago",
+            "example": 15
+          }
+        },
+        "required": [
+          "paymentIntentId",
+          "amount",
+          "currency",
+          "estado",
+          "sellerStripeId",
+          "amountReceived",
+          "createdAt",
+          "updatedAt",
+          "id",
+          "turno"
+        ],
+        "description": "Esquema para crear un nuevo pago",
+        "title": "CreatePago"
+      },
+      "GetPago": {
+        "type": "object",
+        "properties": {
+          "paymentIntentId": {
+            "type": "string",
+            "minLength": 1,
+            "description": "ID del pago en Stripe",
+            "example": "pi_1JXXXXXX"
+          },
+          "amount": {
+            "type": "number",
+            "minimum": 350,
+            "description": "Monto del pago en centavos",
+            "example": 1000
+          },
+          "currency": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 3,
+            "description": "Moneda del pago en formato ISO (ej: usd, ars)",
+            "example": "usd"
+          },
+          "estado": {
+            "type": "string",
+            "enum": [
+              "requires_payment_method",
+              "requires_confirmation",
+              "requires_action",
+              "processing",
+              "succeeded",
+              "requires_capture",
+              "canceled"
+            ],
+            "description": "Estado del pago en Stripe",
+            "example": "succeeded"
+          },
+          "sellerStripeId": {
+            "type": "string",
+            "minLength": 1,
+            "description": "ID del vendedor de la cuenta de Stripe",
+            "example": "acct_1JXXXXXX"
+          },
+          "amountReceived": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Monto recibido por el vendedor en centavos",
+            "example": 950
+          },
+          "applicationFeeAmount": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Comisión de la plataforma en centavos",
+            "example": 50
+          },
+          "transferId": {
+            "type": "string",
+            "description": "ID de la transferencia a la cuenta del vendedor en Stripe",
+            "example": "tr_1JXXXXXX"
+          },
+          "buyerEmail": {
+            "type": "string",
+            "format": "email",
+            "description": "Correo electrónico del comprador",
+            "example": "buyer@example.com"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {
+              "nullable": true
+            },
+            "description": "Datos adicionales como productId, orderId",
+            "example": {
+              "productId": "prod_123",
+              "orderId": "ord_456"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Fecha de creación del pago en formato ISO",
+            "example": "2023-10-01T12:34:56Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Fecha de última actualización del pago en formato ISO",
+            "example": "2023-10-01T12:34:56Z"
+          },
+          "id": {
+            "type": "number",
+            "description": "ID del turno",
+            "example": 1
+          },
+          "turno": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number",
+                "description": "ID del turno",
+                "example": 1
+              },
+              "fechaTurno": {
+                "type": "string",
+                "description": "Fecha del turno",
+                "example": "2024-03-15"
+              },
+              "horaTurno": {
+                "type": "string",
+                "description": "Hora del turno",
+                "example": "14:30"
+              },
+              "estado": {
+                "type": "string",
+                "description": "Estado del turno",
+                "example": "confirmado"
+              },
+              "calificacion": {
+                "type": "number",
+                "nullable": true,
+                "description": "Calificación del turno (1-5)",
+                "example": 4.5
+              },
+              "comentario": {
+                "type": "string",
+                "nullable": true,
+                "description": "Comentario del cliente",
+                "example": "Excelente servicio"
+              }
+            },
+            "required": [
+              "id",
               "fechaTurno",
               "horaTurno",
               "estado",
@@ -3486,8 +3480,8 @@
           "id",
           "turno"
         ],
-        "title": "GetPago",
-        "description": "Esquema para obtener un pago existente"
+        "description": "Esquema para obtener un pago existente",
+        "title": "GetPago"
       },
       "DeletePago": {
         "type": "object",
@@ -3640,8 +3634,8 @@
           "id",
           "turno"
         ],
-        "title": "DeletePago",
-        "description": "Esquema para eliminar un pago existente"
+        "description": "Esquema para eliminar un pago existente",
+        "title": "DeletePago"
       },
       "UpdatePago": {
         "type": "object",
@@ -3782,8 +3776,8 @@
             ]
           }
         },
-        "title": "UpdatePago",
-        "description": "Esquema para actualizar un pago existente"
+        "description": "Esquema para actualizar un pago existente",
+        "title": "UpdatePago"
       },
       "CreateTarea": {
         "type": "object",
@@ -3821,8 +3815,8 @@
           "duracionTarea",
           "tipoServicio"
         ],
-        "title": "CreateTarea",
-        "description": "Esquema para crear una nueva tarea"
+        "description": "Esquema para crear una nueva tarea",
+        "title": "CreateTarea"
       },
       "UpdateTarea": {
         "type": "object",
@@ -3873,8 +3867,8 @@
             ]
           }
         },
-        "title": "UpdateTarea",
-        "description": "Esquema para actualizar una tarea existente"
+        "description": "Esquema para actualizar una tarea existente",
+        "title": "UpdateTarea"
       },
       "DeleteTarea": {
         "type": "object",
@@ -3925,8 +3919,8 @@
             ]
           }
         },
-        "title": "DeleteTarea",
-        "description": "Esquema para eliminar una tarea existente"
+        "description": "Esquema para eliminar una tarea existente",
+        "title": "DeleteTarea"
       },
       "Tarea": {
         "type": "object",
@@ -3977,8 +3971,8 @@
             ]
           }
         },
-        "title": "DeleteTarea",
-        "description": "Esquema para eliminar una tarea existente"
+        "description": "Esquema para eliminar una tarea existente",
+        "title": "DeleteTarea"
       },
       "CreateTipoServicio": {
         "type": "object",
@@ -4166,8 +4160,8 @@
           "nombreTipo",
           "descripcionTipo"
         ],
-        "title": "CreateTipoServicio",
-        "description": "Esquema para crear un nuevo tipo de servicio"
+        "description": "Esquema para crear un nuevo tipo de servicio",
+        "title": "CreateTipoServicio"
       },
       "UpdateTipoServicio": {
         "type": "object",
@@ -4351,8 +4345,8 @@
             }
           }
         },
-        "title": "UpdateTipoServicio",
-        "description": "Esquema para actualizar un tipo de servicio"
+        "description": "Esquema para actualizar un tipo de servicio",
+        "title": "UpdateTipoServicio"
       },
       "DeleteTipoServicio": {
         "type": "object",
@@ -4544,8 +4538,8 @@
           "nombreTipo",
           "descripcionTipo"
         ],
-        "title": "DeleteTipoServicio",
-        "description": "Esquema para eliminar un tipo de servicio"
+        "description": "Esquema para eliminar un tipo de servicio",
+        "title": "DeleteTipoServicio"
       },
       "GetTipoServicio": {
         "type": "object",
@@ -4737,9 +4731,8 @@
           "nombreTipo",
           "descripcionTipo"
         ],
-        "title": "GetTipoServicio",
-        "description": "Esquema para obtener un tipo de servicio"
->>>>>>> pagoApi
+        "description": "Esquema para obtener un tipo de servicio",
+        "title": "GetTipoServicio"
       }
     },
     "parameters": {}
@@ -4973,7 +4966,7 @@
               }
             }
           },
-          "400": {
+          "409": {
             "description": "Error de validación",
             "content": {
               "application/json": {
@@ -10009,8 +10002,8 @@
                         "usuario",
                         "id"
                       ],
-                      "title": "CrearHorario",
-                      "description": "Esquema para crear un nuevo horario"
+                      "description": "Esquema para crear un nuevo horario",
+                      "title": "CrearHorario"
                     }
                   },
                   "required": [
@@ -10060,8 +10053,8 @@
                   "required": [
                     "message"
                   ],
-                  "title": "Error",
-                  "description": "Esquema para representar un error"
+                  "description": "Esquema para representar un error",
+                  "title": "Error"
                 }
               }
             }
@@ -10105,8 +10098,8 @@
                   "required": [
                     "message"
                   ],
-                  "title": "Error",
-                  "description": "Esquema para representar un error"
+                  "description": "Esquema para representar un error",
+                  "title": "Error"
                 }
               }
             }
@@ -10295,8 +10288,8 @@
                         "usuario",
                         "id"
                       ],
-                      "title": "GetHorario",
-                      "description": "Esquema para obtener un horario"
+                      "description": "Esquema para obtener un horario",
+                      "title": "GetHorario"
                     }
                   },
                   "required": [
@@ -10346,8 +10339,8 @@
                   "required": [
                     "message"
                   ],
-                  "title": "Error",
-                  "description": "Esquema para representar un error"
+                  "description": "Esquema para representar un error",
+                  "title": "Error"
                 }
               }
             }
@@ -10391,8 +10384,8 @@
                   "required": [
                     "message"
                   ],
-                  "title": "Error",
-                  "description": "Esquema para representar un error"
+                  "description": "Esquema para representar un error",
+                  "title": "Error"
                 }
               }
             }
@@ -10505,8 +10498,8 @@
                   "required": [
                     "message"
                   ],
-                  "title": "Error",
-                  "description": "Esquema para representar un error"
+                  "description": "Esquema para representar un error",
+                  "title": "Error"
                 }
               }
             }
@@ -10550,8 +10543,8 @@
                   "required": [
                     "message"
                   ],
-                  "title": "Error",
-                  "description": "Esquema para representar un error"
+                  "description": "Esquema para representar un error",
+                  "title": "Error"
                 }
               }
             }
@@ -10769,8 +10762,8 @@
                           "example": 1
                         }
                       },
-                      "title": "ActualizarHorario",
-                      "description": "Esquema para actualizar un horario existente"
+                      "description": "Esquema para actualizar un horario existente",
+                      "title": "ActualizarHorario"
                     }
                   },
                   "required": [
@@ -10820,8 +10813,8 @@
                   "required": [
                     "message"
                   ],
-                  "title": "Error",
-                  "description": "Esquema para representar un error"
+                  "description": "Esquema para representar un error",
+                  "title": "Error"
                 }
               }
             }
@@ -10865,8 +10858,8 @@
                   "required": [
                     "message"
                   ],
-                  "title": "Error",
-                  "description": "Esquema para representar un error"
+                  "description": "Esquema para representar un error",
+                  "title": "Error"
                 }
               }
             }
@@ -11067,8 +11060,8 @@
                         "usuario",
                         "id"
                       ],
-                      "title": "BorrarHorario",
-                      "description": "Esquema para eliminar un horario"
+                      "description": "Esquema para eliminar un horario",
+                      "title": "BorrarHorario"
                     }
                   },
                   "required": [
@@ -11118,8 +11111,8 @@
                   "required": [
                     "message"
                   ],
-                  "title": "Error",
-                  "description": "Esquema para representar un error"
+                  "description": "Esquema para representar un error",
+                  "title": "Error"
                 }
               }
             }
@@ -11163,8 +11156,8 @@
                   "required": [
                     "message"
                   ],
-                  "title": "Error",
-                  "description": "Esquema para representar un error"
+                  "description": "Esquema para representar un error",
+                  "title": "Error"
                 }
               }
             }
@@ -11172,7 +11165,6 @@
         }
       }
     },
-<<<<<<< HEAD
     "/api/servicio": {
       "post": {
         "description": "Crear un nuevo servicio",
@@ -11182,23 +11174,11 @@
         ],
         "requestBody": {
           "description": "Datos del servicio a crear",
-=======
-    "/api/pago": {
-      "post": {
-        "description": "Crear un nuevo pago",
-        "summary": "Crear pago",
-        "tags": [
-          "Pagos"
-        ],
-        "requestBody": {
-          "description": "Datos del pago a crear",
->>>>>>> pagoApi
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
-<<<<<<< HEAD
                   "estado": {
                     "type": "string",
                     "enum": [
@@ -11235,111 +11215,6 @@
                 "required": [
                   "precio",
                   "tarea"
-=======
-                  "paymentIntentId": {
-                    "type": "string",
-                    "minLength": 1,
-                    "description": "ID del pago en Stripe",
-                    "example": "pi_1JXXXXXX"
-                  },
-                  "amount": {
-                    "type": "number",
-                    "minimum": 350,
-                    "description": "Monto del pago en centavos",
-                    "example": 1000
-                  },
-                  "currency": {
-                    "type": "string",
-                    "minLength": 3,
-                    "maxLength": 3,
-                    "description": "Moneda del pago en formato ISO (ej: usd, ars)",
-                    "example": "usd"
-                  },
-                  "estado": {
-                    "type": "string",
-                    "enum": [
-                      "requires_payment_method",
-                      "requires_confirmation",
-                      "requires_action",
-                      "processing",
-                      "succeeded",
-                      "requires_capture",
-                      "canceled"
-                    ],
-                    "description": "Estado del pago en Stripe",
-                    "example": "succeeded"
-                  },
-                  "sellerStripeId": {
-                    "type": "string",
-                    "minLength": 1,
-                    "description": "ID del vendedor de la cuenta de Stripe",
-                    "example": "acct_1JXXXXXX"
-                  },
-                  "amountReceived": {
-                    "type": "number",
-                    "minimum": 0,
-                    "description": "Monto recibido por el vendedor en centavos",
-                    "example": 950
-                  },
-                  "applicationFeeAmount": {
-                    "type": "number",
-                    "minimum": 0,
-                    "description": "Comisión de la plataforma en centavos",
-                    "example": 50
-                  },
-                  "transferId": {
-                    "type": "string",
-                    "description": "ID de la transferencia a la cuenta del vendedor en Stripe",
-                    "example": "tr_1JXXXXXX"
-                  },
-                  "buyerEmail": {
-                    "type": "string",
-                    "format": "email",
-                    "description": "Correo electrónico del comprador",
-                    "example": "buyer@example.com"
-                  },
-                  "metadata": {
-                    "type": "object",
-                    "additionalProperties": {
-                      "nullable": true
-                    },
-                    "description": "Datos adicionales como productId, orderId",
-                    "example": {
-                      "productId": "prod_123",
-                      "orderId": "ord_456"
-                    }
-                  },
-                  "createdAt": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "Fecha de creación del pago en formato ISO",
-                    "example": "2023-10-01T12:34:56Z"
-                  },
-                  "updatedAt": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "Fecha de última actualización del pago en formato ISO",
-                    "example": "2023-10-01T12:34:56Z"
-                  },
-                  "turno": {
-                    "type": "integer",
-                    "minimum": 0,
-                    "exclusiveMinimum": true,
-                    "description": "ID del turno asociado al pago",
-                    "example": 15
-                  }
-                },
-                "required": [
-                  "paymentIntentId",
-                  "amount",
-                  "currency",
-                  "estado",
-                  "sellerStripeId",
-                  "amountReceived",
-                  "createdAt",
-                  "updatedAt",
-                  "turno"
->>>>>>> pagoApi
                 ]
               }
             }
@@ -11347,11 +11222,7 @@
         },
         "responses": {
           "201": {
-<<<<<<< HEAD
             "description": "Servicio creado exitosamente",
-=======
-            "description": "Pago creado exitosamente",
->>>>>>> pagoApi
             "content": {
               "application/json": {
                 "schema": {
@@ -11359,16 +11230,11 @@
                   "properties": {
                     "message": {
                       "type": "string",
-<<<<<<< HEAD
                       "example": "created service"
-=======
-                      "example": "Pago creado exitosamente"
->>>>>>> pagoApi
                     },
                     "data": {
                       "type": "object",
                       "properties": {
-<<<<<<< HEAD
                         "id": {
                           "type": "number",
                           "description": "ID único del servicio",
@@ -11390,120 +11256,6 @@
                         "estado",
                         "precio"
                       ]
-=======
-                        "paymentIntentId": {
-                          "type": "string",
-                          "minLength": 1,
-                          "description": "ID del pago en Stripe",
-                          "example": "pi_1JXXXXXX"
-                        },
-                        "amount": {
-                          "type": "number",
-                          "minimum": 350,
-                          "description": "Monto del pago en centavos",
-                          "example": 1000
-                        },
-                        "currency": {
-                          "type": "string",
-                          "minLength": 3,
-                          "maxLength": 3,
-                          "description": "Moneda del pago en formato ISO (ej: usd, ars)",
-                          "example": "usd"
-                        },
-                        "estado": {
-                          "type": "string",
-                          "enum": [
-                            "requires_payment_method",
-                            "requires_confirmation",
-                            "requires_action",
-                            "processing",
-                            "succeeded",
-                            "requires_capture",
-                            "canceled"
-                          ],
-                          "description": "Estado del pago en Stripe",
-                          "example": "succeeded"
-                        },
-                        "sellerStripeId": {
-                          "type": "string",
-                          "minLength": 1,
-                          "description": "ID del vendedor de la cuenta de Stripe",
-                          "example": "acct_1JXXXXXX"
-                        },
-                        "amountReceived": {
-                          "type": "number",
-                          "minimum": 0,
-                          "description": "Monto recibido por el vendedor en centavos",
-                          "example": 950
-                        },
-                        "applicationFeeAmount": {
-                          "type": "number",
-                          "minimum": 0,
-                          "description": "Comisión de la plataforma en centavos",
-                          "example": 50
-                        },
-                        "transferId": {
-                          "type": "string",
-                          "description": "ID de la transferencia a la cuenta del vendedor en Stripe",
-                          "example": "tr_1JXXXXXX"
-                        },
-                        "buyerEmail": {
-                          "type": "string",
-                          "format": "email",
-                          "description": "Correo electrónico del comprador",
-                          "example": "buyer@example.com"
-                        },
-                        "metadata": {
-                          "type": "object",
-                          "additionalProperties": {
-                            "nullable": true
-                          },
-                          "description": "Datos adicionales como productId, orderId",
-                          "example": {
-                            "productId": "prod_123",
-                            "orderId": "ord_456"
-                          }
-                        },
-                        "createdAt": {
-                          "type": "string",
-                          "format": "date-time",
-                          "description": "Fecha de creación del pago en formato ISO",
-                          "example": "2023-10-01T12:34:56Z"
-                        },
-                        "updatedAt": {
-                          "type": "string",
-                          "format": "date-time",
-                          "description": "Fecha de última actualización del pago en formato ISO",
-                          "example": "2023-10-01T12:34:56Z"
-                        },
-                        "id": {
-                          "type": "number",
-                          "description": "ID del turno",
-                          "example": 1
-                        },
-                        "turno": {
-                          "type": "integer",
-                          "minimum": 0,
-                          "exclusiveMinimum": true,
-                          "description": "ID del turno asociado al pago",
-                          "example": 15
-                        }
-                      },
-                      "required": [
-                        "paymentIntentId",
-                        "amount",
-                        "currency",
-                        "estado",
-                        "sellerStripeId",
-                        "amountReceived",
-                        "createdAt",
-                        "updatedAt",
-                        "id",
-                        "turno"
-                      ],
-                      "title": "CreatePago",
-                      "description": "Esquema para crear un nuevo pago"
->>>>>>> pagoApi
                     }
                   },
                   "required": [
@@ -11524,7 +11276,6 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-<<<<<<< HEAD
                       "example": "Validation failed"
                     },
                     "errors": {
@@ -11841,34 +11592,11 @@
                         ]
                       },
                       "description": "Lista completa de servicios con sus relaciones"
-=======
-                      "example": "Ocurrió un error inesperado"
-                    },
-                    "statusCode": {
-                      "type": "number",
-                      "description": "Código de estado HTTP",
-                      "example": 500
-                    },
-                    "details": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      },
-                      "description": "Detalles adicionales del error",
-                      "example": [
-                        "Detalle 1",
-                        "Detalle 2"
-                      ]
->>>>>>> pagoApi
                     }
                   },
                   "required": [
                     "message",
-<<<<<<< HEAD
                     "data"
-=======
-                    "statusCode"
->>>>>>> pagoApi
                   ]
                 }
               }
@@ -11884,7 +11612,6 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-<<<<<<< HEAD
                       "example": "Validation failed"
                     },
                     "errors": {
@@ -11913,30 +11640,6 @@
                   },
                   "required": [
                     "message"
-=======
-                      "example": "Ocurrió un error inesperado"
-                    },
-                    "statusCode": {
-                      "type": "number",
-                      "description": "Código de estado HTTP",
-                      "example": 500
-                    },
-                    "details": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      },
-                      "description": "Detalles adicionales del error",
-                      "example": [
-                        "Detalle 1",
-                        "Detalle 2"
-                      ]
-                    }
-                  },
-                  "required": [
-                    "message",
-                    "statusCode"
->>>>>>> pagoApi
                   ]
                 }
               }
@@ -11945,7 +11648,6 @@
         }
       }
     },
-<<<<<<< HEAD
     "/api/servicio/upsert": {
       "post": {
         "description": "Crear o actualizar servicio por usuario y tarea",
@@ -12447,44 +12149,24 @@
         "summary": "Obtener servicio por ID",
         "tags": [
           "Servicios"
-=======
-    "/api/pago/{id}": {
-      "get": {
-        "description": "Obtener un pago por ID",
-        "summary": "Obtener pago",
-        "tags": [
-          "Pagos"
->>>>>>> pagoApi
         ],
         "parameters": [
           {
             "schema": {
               "type": "string",
               "pattern": "^\\d+$",
-<<<<<<< HEAD
               "description": "ID numérico del servicio",
               "example": "1"
             },
             "required": true,
             "description": "ID numérico del servicio",
-=======
-              "description": "ID del recurso",
-              "example": "123"
-            },
-            "required": true,
-            "description": "ID del recurso",
->>>>>>> pagoApi
             "name": "id",
             "in": "path"
           }
         ],
         "responses": {
           "200": {
-<<<<<<< HEAD
             "description": "Servicio encontrado exitosamente",
-=======
-            "description": "Pago encontrado",
->>>>>>> pagoApi
             "content": {
               "application/json": {
                 "schema": {
@@ -12492,16 +12174,11 @@
                   "properties": {
                     "message": {
                       "type": "string",
-<<<<<<< HEAD
                       "example": "found one service"
-=======
-                      "example": "Pago encontrado"
->>>>>>> pagoApi
                     },
                     "data": {
                       "type": "object",
                       "properties": {
-<<<<<<< HEAD
                         "id": {
                           "type": "number",
                           "description": "ID único del servicio",
@@ -12604,7 +12281,1737 @@
                               "type": "string",
                               "description": "Teléfono del usuario",
                               "example": "+54 11 1234-5678"
-=======
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "nombre",
+                            "apellido",
+                            "mail",
+                            "nombreFantasia"
+                          ],
+                          "description": "Información del usuario que ofrece el servicio (puede ser null)"
+                        },
+                        "turnos": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "number",
+                                "description": "ID del turno",
+                                "example": 1
+                              },
+                              "fechaTurno": {
+                                "type": "string",
+                                "description": "Fecha del turno",
+                                "example": "2024-03-15"
+                              },
+                              "horaTurno": {
+                                "type": "string",
+                                "description": "Hora del turno",
+                                "example": "14:30"
+                              },
+                              "estado": {
+                                "type": "string",
+                                "description": "Estado del turno",
+                                "example": "confirmado"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "fechaTurno",
+                              "horaTurno",
+                              "estado"
+                            ]
+                          },
+                          "description": "Turnos asociados al servicio"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "estado",
+                        "precio",
+                        "tarea",
+                        "usuario"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Servicio no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "precio"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "El precio debe ser un número positivo"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "precio"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "El precio debe ser un número positivo"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "Actualizar información de un servicio",
+        "summary": "Actualizar servicio",
+        "tags": [
+          "Servicios"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "description": "ID numérico del servicio",
+              "example": "1"
+            },
+            "required": true,
+            "description": "ID numérico del servicio",
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "description": "Datos del servicio a actualizar",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "estado": {
+                    "type": "string",
+                    "enum": [
+                      "activo",
+                      "inactivo"
+                    ],
+                    "description": "Estado del servicio",
+                    "example": "activo"
+                  },
+                  "precio": {
+                    "type": "number",
+                    "minimum": 0,
+                    "exclusiveMinimum": true,
+                    "description": "Precio del servicio",
+                    "example": 1500
+                  },
+                  "tarea": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true,
+                    "description": "ID de la tarea asociada al servicio",
+                    "example": 1
+                  },
+                  "usuario": {
+                    "type": "integer",
+                    "nullable": true,
+                    "minimum": 0,
+                    "exclusiveMinimum": true,
+                    "description": "ID del usuario asociado al servicio (opcional)",
+                    "example": 2
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Servicio actualizado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "updated service"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "number",
+                          "description": "ID único del servicio",
+                          "example": 1
+                        },
+                        "estado": {
+                          "type": "string",
+                          "description": "Estado del servicio",
+                          "example": "activo"
+                        },
+                        "precio": {
+                          "type": "number",
+                          "description": "Precio del servicio",
+                          "example": 1500
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "estado",
+                        "precio"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "precio"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "El precio debe ser un número positivo"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Servicio no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "precio"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "El precio debe ser un número positivo"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "precio"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "El precio debe ser un número positivo"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "description": "Actualizar parcialmente información de un servicio",
+        "summary": "Actualizar servicio parcialmente",
+        "tags": [
+          "Servicios"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "description": "ID numérico del servicio",
+              "example": "1"
+            },
+            "required": true,
+            "description": "ID numérico del servicio",
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "description": "Datos del servicio a actualizar parcialmente",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "estado": {
+                    "type": "string",
+                    "enum": [
+                      "activo",
+                      "inactivo"
+                    ],
+                    "description": "Estado del servicio",
+                    "example": "activo"
+                  },
+                  "precio": {
+                    "type": "number",
+                    "minimum": 0,
+                    "exclusiveMinimum": true,
+                    "description": "Precio del servicio",
+                    "example": 1500
+                  },
+                  "tarea": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true,
+                    "description": "ID de la tarea asociada al servicio",
+                    "example": 1
+                  },
+                  "usuario": {
+                    "type": "integer",
+                    "nullable": true,
+                    "minimum": 0,
+                    "exclusiveMinimum": true,
+                    "description": "ID del usuario asociado al servicio (opcional)",
+                    "example": 2
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Servicio actualizado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "updated service"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "number",
+                          "description": "ID único del servicio",
+                          "example": 1
+                        },
+                        "estado": {
+                          "type": "string",
+                          "description": "Estado del servicio",
+                          "example": "activo"
+                        },
+                        "precio": {
+                          "type": "number",
+                          "description": "Precio del servicio",
+                          "example": 1500
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "estado",
+                        "precio"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "precio"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "El precio debe ser un número positivo"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Servicio no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "precio"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "El precio debe ser un número positivo"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "precio"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "El precio debe ser un número positivo"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Eliminar un servicio",
+        "summary": "Eliminar servicio",
+        "tags": [
+          "Servicios"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "description": "ID numérico del servicio",
+              "example": "1"
+            },
+            "required": true,
+            "description": "ID numérico del servicio",
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Servicio eliminado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "removed service"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "number",
+                          "description": "ID único del servicio",
+                          "example": 1
+                        },
+                        "estado": {
+                          "type": "string",
+                          "description": "Estado del servicio",
+                          "example": "activo"
+                        },
+                        "precio": {
+                          "type": "number",
+                          "description": "Precio del servicio",
+                          "example": 1500
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "estado",
+                        "precio"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Servicio no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "precio"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "El precio debe ser un número positivo"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "precio"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "El precio debe ser un número positivo"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/servicio/user/{usuarioId}": {
+      "get": {
+        "description": "Obtener todos los servicios de un usuario específico",
+        "summary": "Obtener servicios por usuario",
+        "tags": [
+          "Servicios"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "description": "ID numérico del usuario",
+              "example": "1"
+            },
+            "required": true,
+            "description": "ID numérico del usuario",
+            "name": "usuarioId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Servicios del usuario encontrados exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de respuesta",
+                      "example": "Servicios encontrados"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "number",
+                            "description": "ID único del servicio",
+                            "example": 1
+                          },
+                          "estado": {
+                            "type": "string",
+                            "description": "Estado del servicio",
+                            "example": "activo"
+                          },
+                          "precio": {
+                            "type": "number",
+                            "description": "Precio del servicio",
+                            "example": 1500
+                          },
+                          "tarea": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "number",
+                                "description": "ID de la tarea",
+                                "example": 1
+                              },
+                              "nombreTarea": {
+                                "type": "string",
+                                "description": "Nombre de la tarea",
+                                "example": "Reparación de canillas"
+                              },
+                              "descripcionTarea": {
+                                "type": "string",
+                                "description": "Descripción de la tarea",
+                                "example": "Arreglo y mantenimiento de grifería"
+                              },
+                              "duracionTarea": {
+                                "type": "number",
+                                "description": "Duración estimada de la tarea en minutos",
+                                "example": 60
+                              },
+                              "tipoServicio": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "number"
+                                  },
+                                  "nombreTipo": {
+                                    "type": "string"
+                                  },
+                                  "descripcionTipo": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "nombreTipo",
+                                  "descripcionTipo"
+                                ],
+                                "description": "Tipo de servicio asociado a la tarea"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "nombreTarea",
+                              "descripcionTarea",
+                              "duracionTarea",
+                              "tipoServicio"
+                            ],
+                            "description": "Información de la tarea asociada"
+                          },
+                          "usuario": {
+                            "type": "object",
+                            "nullable": true,
+                            "properties": {
+                              "id": {
+                                "type": "number",
+                                "description": "ID del usuario",
+                                "example": 1
+                              },
+                              "nombre": {
+                                "type": "string",
+                                "description": "Nombre del usuario",
+                                "example": "Juan"
+                              },
+                              "apellido": {
+                                "type": "string",
+                                "description": "Apellido del usuario",
+                                "example": "Pérez"
+                              },
+                              "mail": {
+                                "type": "string",
+                                "description": "Email del usuario",
+                                "example": "juan.perez@gmail.com"
+                              },
+                              "nombreFantasia": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Nombre de fantasía del prestatario",
+                                "example": "Plomería Pérez"
+                              },
+                              "telefono": {
+                                "type": "string",
+                                "description": "Teléfono del usuario",
+                                "example": "+54 11 1234-5678"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "nombre",
+                              "apellido",
+                              "mail",
+                              "nombreFantasia"
+                            ],
+                            "description": "Información del usuario que ofrece el servicio (puede ser null)"
+                          },
+                          "turnos": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number",
+                                  "description": "ID del turno",
+                                  "example": 1
+                                },
+                                "fechaTurno": {
+                                  "type": "string",
+                                  "description": "Fecha del turno",
+                                  "example": "2024-03-15"
+                                },
+                                "horaTurno": {
+                                  "type": "string",
+                                  "description": "Hora del turno",
+                                  "example": "14:30"
+                                },
+                                "estado": {
+                                  "type": "string",
+                                  "description": "Estado del turno",
+                                  "example": "confirmado"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "fechaTurno",
+                                "horaTurno",
+                                "estado"
+                              ]
+                            },
+                            "description": "Turnos asociados al servicio"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "estado",
+                          "precio",
+                          "tarea",
+                          "usuario"
+                        ]
+                      },
+                      "description": "Lista de servicios del usuario especificado"
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "usuarioId es requerido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "usuarioId es requerido"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "precio"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "El precio debe ser un número positivo"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/servicio/user/{usuarioId}/task/{tareaId}/deactivate": {
+      "patch": {
+        "description": "Desactivar servicio por usuario y tarea (cambiar estado a inactivo)",
+        "summary": "Desactivar servicio",
+        "tags": [
+          "Servicios"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "description": "ID numérico del usuario",
+              "example": "1"
+            },
+            "required": true,
+            "description": "ID numérico del usuario",
+            "name": "usuarioId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "description": "ID numérico de la tarea",
+              "example": "1"
+            },
+            "required": true,
+            "description": "ID numérico de la tarea",
+            "name": "tareaId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Servicio desactivado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Servicio desactivado exitosamente"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "number",
+                          "description": "ID único del servicio",
+                          "example": 1
+                        },
+                        "estado": {
+                          "type": "string",
+                          "description": "Estado del servicio",
+                          "example": "activo"
+                        },
+                        "precio": {
+                          "type": "number",
+                          "description": "Precio del servicio",
+                          "example": 1500
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "estado",
+                        "precio"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "tareaId y usuarioId son requeridos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "tareaId y usuarioId son requeridos"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Servicio no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Servicio no encontrado"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "precio"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "El precio debe ser un número positivo"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/servicio/user/{usuarioId}/task/{tareaId}": {
+      "delete": {
+        "description": "Eliminar servicio por usuario y tarea",
+        "summary": "Eliminar servicio por usuario y tarea",
+        "tags": [
+          "Servicios"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "description": "ID numérico del usuario",
+              "example": "1"
+            },
+            "required": true,
+            "description": "ID numérico del usuario",
+            "name": "usuarioId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "description": "ID numérico de la tarea",
+              "example": "1"
+            },
+            "required": true,
+            "description": "ID numérico de la tarea",
+            "name": "tareaId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Servicio eliminado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Servicio eliminado exitosamente"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "tareaId y usuarioId son requeridos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "tareaId y usuarioId son requeridos"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Servicio no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Servicio no encontrado"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "precio"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "El precio debe ser un número positivo"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pago": {
+      "post": {
+        "description": "Crear un nuevo pago",
+        "summary": "Crear pago",
+        "tags": [
+          "Pagos"
+        ],
+        "requestBody": {
+          "description": "Datos del pago a crear",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "paymentIntentId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "ID del pago en Stripe",
+                    "example": "pi_1JXXXXXX"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "minimum": 350,
+                    "description": "Monto del pago en centavos",
+                    "example": 1000
+                  },
+                  "currency": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 3,
+                    "description": "Moneda del pago en formato ISO (ej: usd, ars)",
+                    "example": "usd"
+                  },
+                  "estado": {
+                    "type": "string",
+                    "enum": [
+                      "requires_payment_method",
+                      "requires_confirmation",
+                      "requires_action",
+                      "processing",
+                      "succeeded",
+                      "requires_capture",
+                      "canceled"
+                    ],
+                    "description": "Estado del pago en Stripe",
+                    "example": "succeeded"
+                  },
+                  "sellerStripeId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "ID del vendedor de la cuenta de Stripe",
+                    "example": "acct_1JXXXXXX"
+                  },
+                  "amountReceived": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "Monto recibido por el vendedor en centavos",
+                    "example": 950
+                  },
+                  "applicationFeeAmount": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "Comisión de la plataforma en centavos",
+                    "example": 50
+                  },
+                  "transferId": {
+                    "type": "string",
+                    "description": "ID de la transferencia a la cuenta del vendedor en Stripe",
+                    "example": "tr_1JXXXXXX"
+                  },
+                  "buyerEmail": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Correo electrónico del comprador",
+                    "example": "buyer@example.com"
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "nullable": true
+                    },
+                    "description": "Datos adicionales como productId, orderId",
+                    "example": {
+                      "productId": "prod_123",
+                      "orderId": "ord_456"
+                    }
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Fecha de creación del pago en formato ISO",
+                    "example": "2023-10-01T12:34:56Z"
+                  },
+                  "updatedAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Fecha de última actualización del pago en formato ISO",
+                    "example": "2023-10-01T12:34:56Z"
+                  },
+                  "turno": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true,
+                    "description": "ID del turno asociado al pago",
+                    "example": 15
+                  }
+                },
+                "required": [
+                  "paymentIntentId",
+                  "amount",
+                  "currency",
+                  "estado",
+                  "sellerStripeId",
+                  "amountReceived",
+                  "createdAt",
+                  "updatedAt",
+                  "turno"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Pago creado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Pago creado exitosamente"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "paymentIntentId": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "ID del pago en Stripe",
+                          "example": "pi_1JXXXXXX"
+                        },
+                        "amount": {
+                          "type": "number",
+                          "minimum": 350,
+                          "description": "Monto del pago en centavos",
+                          "example": 1000
+                        },
+                        "currency": {
+                          "type": "string",
+                          "minLength": 3,
+                          "maxLength": 3,
+                          "description": "Moneda del pago en formato ISO (ej: usd, ars)",
+                          "example": "usd"
+                        },
+                        "estado": {
+                          "type": "string",
+                          "enum": [
+                            "requires_payment_method",
+                            "requires_confirmation",
+                            "requires_action",
+                            "processing",
+                            "succeeded",
+                            "requires_capture",
+                            "canceled"
+                          ],
+                          "description": "Estado del pago en Stripe",
+                          "example": "succeeded"
+                        },
+                        "sellerStripeId": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "ID del vendedor de la cuenta de Stripe",
+                          "example": "acct_1JXXXXXX"
+                        },
+                        "amountReceived": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Monto recibido por el vendedor en centavos",
+                          "example": 950
+                        },
+                        "applicationFeeAmount": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Comisión de la plataforma en centavos",
+                          "example": 50
+                        },
+                        "transferId": {
+                          "type": "string",
+                          "description": "ID de la transferencia a la cuenta del vendedor en Stripe",
+                          "example": "tr_1JXXXXXX"
+                        },
+                        "buyerEmail": {
+                          "type": "string",
+                          "format": "email",
+                          "description": "Correo electrónico del comprador",
+                          "example": "buyer@example.com"
+                        },
+                        "metadata": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "nullable": true
+                          },
+                          "description": "Datos adicionales como productId, orderId",
+                          "example": {
+                            "productId": "prod_123",
+                            "orderId": "ord_456"
+                          }
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Fecha de creación del pago en formato ISO",
+                          "example": "2023-10-01T12:34:56Z"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Fecha de última actualización del pago en formato ISO",
+                          "example": "2023-10-01T12:34:56Z"
+                        },
+                        "id": {
+                          "type": "number",
+                          "description": "ID del turno",
+                          "example": 1
+                        },
+                        "turno": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "exclusiveMinimum": true,
+                          "description": "ID del turno asociado al pago",
+                          "example": 15
+                        }
+                      },
+                      "required": [
+                        "paymentIntentId",
+                        "amount",
+                        "currency",
+                        "estado",
+                        "sellerStripeId",
+                        "amountReceived",
+                        "createdAt",
+                        "updatedAt",
+                        "id",
+                        "turno"
+                      ],
+                      "description": "Esquema para crear un nuevo pago",
+                      "title": "CreatePago"
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Ocurrió un error inesperado"
+                    },
+                    "statusCode": {
+                      "type": "number",
+                      "description": "Código de estado HTTP",
+                      "example": 500
+                    },
+                    "details": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Detalles adicionales del error",
+                      "example": [
+                        "Detalle 1",
+                        "Detalle 2"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "statusCode"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Ocurrió un error inesperado"
+                    },
+                    "statusCode": {
+                      "type": "number",
+                      "description": "Código de estado HTTP",
+                      "example": 500
+                    },
+                    "details": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Detalles adicionales del error",
+                      "example": [
+                        "Detalle 1",
+                        "Detalle 2"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "statusCode"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pago/{id}": {
+      "get": {
+        "description": "Obtener un pago por ID",
+        "summary": "Obtener pago",
+        "tags": [
+          "Pagos"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "description": "ID del recurso",
+              "example": "123"
+            },
+            "required": true,
+            "description": "ID del recurso",
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pago encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Pago encontrado"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
                         "paymentIntentId": {
                           "type": "string",
                           "minLength": 1,
@@ -12729,63 +14136,10 @@
                               "nullable": true,
                               "description": "Comentario del cliente",
                               "example": "Excelente servicio"
->>>>>>> pagoApi
                             }
                           },
                           "required": [
                             "id",
-<<<<<<< HEAD
-                            "nombre",
-                            "apellido",
-                            "mail",
-                            "nombreFantasia"
-                          ],
-                          "description": "Información del usuario que ofrece el servicio (puede ser null)"
-                        },
-                        "turnos": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "number",
-                                "description": "ID del turno",
-                                "example": 1
-                              },
-                              "fechaTurno": {
-                                "type": "string",
-                                "description": "Fecha del turno",
-                                "example": "2024-03-15"
-                              },
-                              "horaTurno": {
-                                "type": "string",
-                                "description": "Hora del turno",
-                                "example": "14:30"
-                              },
-                              "estado": {
-                                "type": "string",
-                                "description": "Estado del turno",
-                                "example": "confirmado"
-                              }
-                            },
-                            "required": [
-                              "id",
-                              "fechaTurno",
-                              "horaTurno",
-                              "estado"
-                            ]
-                          },
-                          "description": "Turnos asociados al servicio"
-                        }
-                      },
-                      "required": [
-                        "id",
-                        "estado",
-                        "precio",
-                        "tarea",
-                        "usuario"
-                      ]
-=======
                             "fechaTurno",
                             "horaTurno",
                             "estado",
@@ -12806,9 +14160,8 @@
                         "id",
                         "turno"
                       ],
-                      "title": "GetPago",
-                      "description": "Esquema para obtener un pago existente"
->>>>>>> pagoApi
+                      "description": "Esquema para obtener un pago existente",
+                      "title": "GetPago"
                     }
                   },
                   "required": [
@@ -12820,11 +14173,7 @@
             }
           },
           "404": {
-<<<<<<< HEAD
-            "description": "Servicio no encontrado",
-=======
             "description": "Pago no encontrado",
->>>>>>> pagoApi
             "content": {
               "application/json": {
                 "schema": {
@@ -12833,9 +14182,6 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-<<<<<<< HEAD
-                      "example": "Validation failed"
-=======
                       "example": "Ocurrió un error inesperado"
                     },
                     "statusCode": {
@@ -13065,8 +14411,8 @@
                     ]
                   }
                 },
-                "title": "UpdatePago",
-                "description": "Esquema para actualizar un pago existente"
+                "description": "Esquema para actualizar un pago existente",
+                "title": "UpdatePago"
               }
             }
           }
@@ -13222,8 +14568,8 @@
                           ]
                         }
                       },
-                      "title": "UpdatePago",
-                      "description": "Esquema para actualizar un pago existente"
+                      "description": "Esquema para actualizar un pago existente",
+                      "title": "UpdatePago"
                     }
                   },
                   "required": [
@@ -13493,8 +14839,281 @@
                         "id",
                         "turno"
                       ],
-                      "title": "DeletePago",
-                      "description": "Esquema para eliminar un pago existente"
+                      "description": "Esquema para eliminar un pago existente",
+                      "title": "DeletePago"
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Pago no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Ocurrió un error inesperado"
+                    },
+                    "statusCode": {
+                      "type": "number",
+                      "description": "Código de estado HTTP",
+                      "example": 500
+                    },
+                    "details": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Detalles adicionales del error",
+                      "example": [
+                        "Detalle 1",
+                        "Detalle 2"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "statusCode"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Ocurrió un error inesperado"
+                    },
+                    "statusCode": {
+                      "type": "number",
+                      "description": "Código de estado HTTP",
+                      "example": 500
+                    },
+                    "details": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Detalles adicionales del error",
+                      "example": [
+                        "Detalle 1",
+                        "Detalle 2"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "statusCode"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/estadisticas/{usuarioId}": {
+      "get": {
+        "description": "Obtener los pagos por ID de usuario",
+        "summary": "Obtener pagos por usuario",
+        "tags": [
+          "Pagos"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "description": "ID del usuario",
+              "example": "123"
+            },
+            "required": true,
+            "description": "ID del usuario",
+            "name": "usuarioId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pago encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Pago encontrado"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "paymentIntentId": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "ID del pago en Stripe",
+                          "example": "pi_1JXXXXXX"
+                        },
+                        "amount": {
+                          "type": "number",
+                          "minimum": 350,
+                          "description": "Monto del pago en centavos",
+                          "example": 1000
+                        },
+                        "currency": {
+                          "type": "string",
+                          "minLength": 3,
+                          "maxLength": 3,
+                          "description": "Moneda del pago en formato ISO (ej: usd, ars)",
+                          "example": "usd"
+                        },
+                        "estado": {
+                          "type": "string",
+                          "enum": [
+                            "requires_payment_method",
+                            "requires_confirmation",
+                            "requires_action",
+                            "processing",
+                            "succeeded",
+                            "requires_capture",
+                            "canceled"
+                          ],
+                          "description": "Estado del pago en Stripe",
+                          "example": "succeeded"
+                        },
+                        "sellerStripeId": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "ID del vendedor de la cuenta de Stripe",
+                          "example": "acct_1JXXXXXX"
+                        },
+                        "amountReceived": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Monto recibido por el vendedor en centavos",
+                          "example": 950
+                        },
+                        "applicationFeeAmount": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Comisión de la plataforma en centavos",
+                          "example": 50
+                        },
+                        "transferId": {
+                          "type": "string",
+                          "description": "ID de la transferencia a la cuenta del vendedor en Stripe",
+                          "example": "tr_1JXXXXXX"
+                        },
+                        "buyerEmail": {
+                          "type": "string",
+                          "format": "email",
+                          "description": "Correo electrónico del comprador",
+                          "example": "buyer@example.com"
+                        },
+                        "metadata": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "nullable": true
+                          },
+                          "description": "Datos adicionales como productId, orderId",
+                          "example": {
+                            "productId": "prod_123",
+                            "orderId": "ord_456"
+                          }
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Fecha de creación del pago en formato ISO",
+                          "example": "2023-10-01T12:34:56Z"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Fecha de última actualización del pago en formato ISO",
+                          "example": "2023-10-01T12:34:56Z"
+                        },
+                        "id": {
+                          "type": "number",
+                          "description": "ID del turno",
+                          "example": 1
+                        },
+                        "turno": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "number",
+                              "description": "ID del turno",
+                              "example": 1
+                            },
+                            "fechaTurno": {
+                              "type": "string",
+                              "description": "Fecha del turno",
+                              "example": "2024-03-15"
+                            },
+                            "horaTurno": {
+                              "type": "string",
+                              "description": "Hora del turno",
+                              "example": "14:30"
+                            },
+                            "estado": {
+                              "type": "string",
+                              "description": "Estado del turno",
+                              "example": "confirmado"
+                            },
+                            "calificacion": {
+                              "type": "number",
+                              "nullable": true,
+                              "description": "Calificación del turno (1-5)",
+                              "example": 4.5
+                            },
+                            "comentario": {
+                              "type": "string",
+                              "nullable": true,
+                              "description": "Comentario del cliente",
+                              "example": "Excelente servicio"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "fechaTurno",
+                            "horaTurno",
+                            "estado",
+                            "calificacion",
+                            "comentario"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "paymentIntentId",
+                        "amount",
+                        "currency",
+                        "estado",
+                        "sellerStripeId",
+                        "amountReceived",
+                        "createdAt",
+                        "updatedAt",
+                        "id",
+                        "turno"
+                      ],
+                      "description": "Esquema para obtener un pago existente",
+                      "title": "GetPago"
                     }
                   },
                   "required": [
@@ -13752,8 +15371,8 @@
                         "id",
                         "turno"
                       ],
-                      "title": "GetPago",
-                      "description": "Esquema para obtener un pago existente"
+                      "description": "Esquema para obtener un pago existente",
+                      "title": "GetPago"
                     }
                   },
                   "required": [
@@ -13940,8 +15559,8 @@
                         "duracionTarea",
                         "tipoServicio"
                       ],
-                      "title": "CreateTarea",
-                      "description": "Esquema para crear una nueva tarea"
+                      "description": "Esquema para crear una nueva tarea",
+                      "title": "CreateTarea"
                     }
                   },
                   "required": [
@@ -13963,7 +15582,6 @@
                       "type": "string",
                       "description": "Mensaje de error",
                       "example": "horario no encontrado"
->>>>>>> pagoApi
                     },
                     "errors": {
                       "type": "array",
@@ -13973,20 +15591,12 @@
                           "field": {
                             "type": "string",
                             "description": "Campo que falló",
-<<<<<<< HEAD
-                            "example": "precio"
-=======
                             "example": "id"
->>>>>>> pagoApi
                           },
                           "message": {
                             "type": "string",
                             "description": "Mensaje de error",
-<<<<<<< HEAD
-                            "example": "El precio debe ser un número positivo"
-=======
                             "example": "ID inválido"
->>>>>>> pagoApi
                           }
                         },
                         "required": [
@@ -14014,11 +15624,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-<<<<<<< HEAD
-                      "example": "Validation failed"
-=======
                       "example": "horario no encontrado"
->>>>>>> pagoApi
                     },
                     "errors": {
                       "type": "array",
@@ -14028,18 +15634,11 @@
                           "field": {
                             "type": "string",
                             "description": "Campo que falló",
-<<<<<<< HEAD
-                            "example": "precio"
-=======
                             "example": "id"
->>>>>>> pagoApi
                           },
                           "message": {
                             "type": "string",
                             "description": "Mensaje de error",
-<<<<<<< HEAD
-                            "example": "El precio debe ser un número positivo"
-=======
                             "example": "ID inválido"
                           }
                         },
@@ -14143,8 +15742,8 @@
                           ]
                         }
                       },
-                      "title": "DeleteTarea",
-                      "description": "Esquema para eliminar una tarea existente"
+                      "description": "Esquema para eliminar una tarea existente",
+                      "title": "DeleteTarea"
                     }
                   },
                   "required": [
@@ -14224,7 +15823,6 @@
                             "type": "string",
                             "description": "Mensaje de error",
                             "example": "ID inválido"
->>>>>>> pagoApi
                           }
                         },
                         "required": [
@@ -14245,85 +15843,32 @@
         }
       },
       "put": {
-<<<<<<< HEAD
-        "description": "Actualizar información de un servicio",
-        "summary": "Actualizar servicio",
-        "tags": [
-          "Servicios"
-=======
         "description": "Actualizar una tarea existente",
         "summary": "Actualizar tarea",
         "tags": [
           "Tareas"
->>>>>>> pagoApi
         ],
         "parameters": [
           {
             "schema": {
               "type": "string",
               "pattern": "^\\d+$",
-<<<<<<< HEAD
-              "description": "ID numérico del servicio",
-              "example": "1"
-            },
-            "required": true,
-            "description": "ID numérico del servicio",
-=======
               "description": "ID del recurso",
               "example": "1"
             },
             "required": true,
             "description": "ID del recurso",
->>>>>>> pagoApi
             "name": "id",
             "in": "path"
           }
         ],
         "requestBody": {
-<<<<<<< HEAD
-          "description": "Datos del servicio a actualizar",
-=======
           "description": "Datos de la tarea a actualizar",
->>>>>>> pagoApi
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
-<<<<<<< HEAD
-                  "estado": {
-                    "type": "string",
-                    "enum": [
-                      "activo",
-                      "inactivo"
-                    ],
-                    "description": "Estado del servicio",
-                    "example": "activo"
-                  },
-                  "precio": {
-                    "type": "number",
-                    "minimum": 0,
-                    "exclusiveMinimum": true,
-                    "description": "Precio del servicio",
-                    "example": 1500
-                  },
-                  "tarea": {
-                    "type": "integer",
-                    "minimum": 0,
-                    "exclusiveMinimum": true,
-                    "description": "ID de la tarea asociada al servicio",
-                    "example": 1
-                  },
-                  "usuario": {
-                    "type": "integer",
-                    "nullable": true,
-                    "minimum": 0,
-                    "exclusiveMinimum": true,
-                    "description": "ID del usuario asociado al servicio (opcional)",
-                    "example": 2
-                  }
-                }
-=======
                   "nombreTarea": {
                     "type": "string",
                     "minLength": 2,
@@ -14370,20 +15915,15 @@
                     ]
                   }
                 },
-                "title": "UpdateTarea",
-                "description": "Esquema para actualizar una tarea existente"
->>>>>>> pagoApi
+                "description": "Esquema para actualizar una tarea existente",
+                "title": "UpdateTarea"
               }
             }
           }
         },
         "responses": {
           "200": {
-<<<<<<< HEAD
-            "description": "Servicio actualizado exitosamente",
-=======
             "description": "Tarea actualizada exitosamente",
->>>>>>> pagoApi
             "content": {
               "application/json": {
                 "schema": {
@@ -14391,38 +15931,11 @@
                   "properties": {
                     "message": {
                       "type": "string",
-<<<<<<< HEAD
-                      "example": "updated service"
-=======
                       "example": "Tarea actualizada exitosamente"
->>>>>>> pagoApi
                     },
                     "data": {
                       "type": "object",
                       "properties": {
-<<<<<<< HEAD
-                        "id": {
-                          "type": "number",
-                          "description": "ID único del servicio",
-                          "example": 1
-                        },
-                        "estado": {
-                          "type": "string",
-                          "description": "Estado del servicio",
-                          "example": "activo"
-                        },
-                        "precio": {
-                          "type": "number",
-                          "description": "Precio del servicio",
-                          "example": 1500
-                        }
-                      },
-                      "required": [
-                        "id",
-                        "estado",
-                        "precio"
-                      ]
-=======
                         "nombreTarea": {
                           "type": "string",
                           "minLength": 2,
@@ -14469,9 +15982,8 @@
                           ]
                         }
                       },
-                      "title": "UpdateTarea",
-                      "description": "Esquema para actualizar una tarea existente"
->>>>>>> pagoApi
+                      "description": "Esquema para actualizar una tarea existente",
+                      "title": "UpdateTarea"
                     }
                   },
                   "required": [
@@ -14482,56 +15994,8 @@
               }
             }
           },
-<<<<<<< HEAD
-          "400": {
-            "description": "Error de validación",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "description": "Mensaje de error",
-                      "example": "Validation failed"
-                    },
-                    "errors": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "field": {
-                            "type": "string",
-                            "description": "Campo que falló",
-                            "example": "precio"
-                          },
-                          "message": {
-                            "type": "string",
-                            "description": "Mensaje de error",
-                            "example": "El precio debe ser un número positivo"
-                          }
-                        },
-                        "required": [
-                          "field",
-                          "message"
-                        ]
-                      },
-                      "description": "Detalles de errores de validación"
-                    }
-                  },
-                  "required": [
-                    "message"
-                  ]
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Servicio no encontrado",
-=======
           "404": {
             "description": "Tarea no encontrada",
->>>>>>> pagoApi
             "content": {
               "application/json": {
                 "schema": {
@@ -14540,11 +16004,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-<<<<<<< HEAD
-                      "example": "Validation failed"
-=======
                       "example": "horario no encontrado"
->>>>>>> pagoApi
                     },
                     "errors": {
                       "type": "array",
@@ -14554,20 +16014,12 @@
                           "field": {
                             "type": "string",
                             "description": "Campo que falló",
-<<<<<<< HEAD
-                            "example": "precio"
-=======
                             "example": "id"
->>>>>>> pagoApi
                           },
                           "message": {
                             "type": "string",
                             "description": "Mensaje de error",
-<<<<<<< HEAD
-                            "example": "El precio debe ser un número positivo"
-=======
                             "example": "ID inválido"
->>>>>>> pagoApi
                           }
                         },
                         "required": [
@@ -14595,11 +16047,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-<<<<<<< HEAD
-                      "example": "Validation failed"
-=======
                       "example": "horario no encontrado"
->>>>>>> pagoApi
                     },
                     "errors": {
                       "type": "array",
@@ -14609,260 +16057,12 @@
                           "field": {
                             "type": "string",
                             "description": "Campo que falló",
-<<<<<<< HEAD
-                            "example": "precio"
-=======
                             "example": "id"
->>>>>>> pagoApi
                           },
                           "message": {
                             "type": "string",
                             "description": "Mensaje de error",
-<<<<<<< HEAD
-                            "example": "El precio debe ser un número positivo"
-                          }
-                        },
-                        "required": [
-                          "field",
-                          "message"
-                        ]
-                      },
-                      "description": "Detalles de errores de validación"
-                    }
-                  },
-                  "required": [
-                    "message"
-                  ]
-                }
-              }
-            }
-          }
-        }
-      },
-      "patch": {
-        "description": "Actualizar parcialmente información de un servicio",
-        "summary": "Actualizar servicio parcialmente",
-        "tags": [
-          "Servicios"
-        ],
-        "parameters": [
-          {
-            "schema": {
-              "type": "string",
-              "pattern": "^\\d+$",
-              "description": "ID numérico del servicio",
-              "example": "1"
-            },
-            "required": true,
-            "description": "ID numérico del servicio",
-            "name": "id",
-            "in": "path"
-          }
-        ],
-        "requestBody": {
-          "description": "Datos del servicio a actualizar parcialmente",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "estado": {
-                    "type": "string",
-                    "enum": [
-                      "activo",
-                      "inactivo"
-                    ],
-                    "description": "Estado del servicio",
-                    "example": "activo"
-                  },
-                  "precio": {
-                    "type": "number",
-                    "minimum": 0,
-                    "exclusiveMinimum": true,
-                    "description": "Precio del servicio",
-                    "example": 1500
-                  },
-                  "tarea": {
-                    "type": "integer",
-                    "minimum": 0,
-                    "exclusiveMinimum": true,
-                    "description": "ID de la tarea asociada al servicio",
-                    "example": 1
-                  },
-                  "usuario": {
-                    "type": "integer",
-                    "nullable": true,
-                    "minimum": 0,
-                    "exclusiveMinimum": true,
-                    "description": "ID del usuario asociado al servicio (opcional)",
-                    "example": 2
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Servicio actualizado exitosamente",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "updated service"
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "number",
-                          "description": "ID único del servicio",
-                          "example": 1
-                        },
-                        "estado": {
-                          "type": "string",
-                          "description": "Estado del servicio",
-                          "example": "activo"
-                        },
-                        "precio": {
-                          "type": "number",
-                          "description": "Precio del servicio",
-                          "example": 1500
-                        }
-                      },
-                      "required": [
-                        "id",
-                        "estado",
-                        "precio"
-                      ]
-                    }
-                  },
-                  "required": [
-                    "message",
-                    "data"
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Error de validación",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "description": "Mensaje de error",
-                      "example": "Validation failed"
-                    },
-                    "errors": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "field": {
-                            "type": "string",
-                            "description": "Campo que falló",
-                            "example": "precio"
-                          },
-                          "message": {
-                            "type": "string",
-                            "description": "Mensaje de error",
-                            "example": "El precio debe ser un número positivo"
-                          }
-                        },
-                        "required": [
-                          "field",
-                          "message"
-                        ]
-                      },
-                      "description": "Detalles de errores de validación"
-                    }
-                  },
-                  "required": [
-                    "message"
-                  ]
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Servicio no encontrado",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "description": "Mensaje de error",
-                      "example": "Validation failed"
-                    },
-                    "errors": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "field": {
-                            "type": "string",
-                            "description": "Campo que falló",
-                            "example": "precio"
-                          },
-                          "message": {
-                            "type": "string",
-                            "description": "Mensaje de error",
-                            "example": "El precio debe ser un número positivo"
-                          }
-                        },
-                        "required": [
-                          "field",
-                          "message"
-                        ]
-                      },
-                      "description": "Detalles de errores de validación"
-                    }
-                  },
-                  "required": [
-                    "message"
-                  ]
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Error interno del servidor",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "description": "Mensaje de error",
-                      "example": "Validation failed"
-                    },
-                    "errors": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "field": {
-                            "type": "string",
-                            "description": "Campo que falló",
-                            "example": "precio"
-                          },
-                          "message": {
-                            "type": "string",
-                            "description": "Mensaje de error",
-                            "example": "El precio debe ser un número positivo"
-=======
                             "example": "ID inválido"
->>>>>>> pagoApi
                           }
                         },
                         "required": [
@@ -14883,47 +16083,28 @@
         }
       },
       "delete": {
-<<<<<<< HEAD
-        "description": "Eliminar un servicio",
-        "summary": "Eliminar servicio",
-        "tags": [
-          "Servicios"
-=======
         "description": "Eliminar una tarea por ID",
         "summary": "Eliminar tarea",
         "tags": [
           "Tareas"
->>>>>>> pagoApi
         ],
         "parameters": [
           {
             "schema": {
               "type": "string",
               "pattern": "^\\d+$",
-<<<<<<< HEAD
-              "description": "ID numérico del servicio",
-              "example": "1"
-            },
-            "required": true,
-            "description": "ID numérico del servicio",
-=======
               "description": "ID del recurso",
               "example": "1"
             },
             "required": true,
             "description": "ID del recurso",
->>>>>>> pagoApi
             "name": "id",
             "in": "path"
           }
         ],
         "responses": {
           "200": {
-<<<<<<< HEAD
-            "description": "Servicio eliminado exitosamente",
-=======
             "description": "Tarea eliminada exitosamente",
->>>>>>> pagoApi
             "content": {
               "application/json": {
                 "schema": {
@@ -14931,38 +16112,11 @@
                   "properties": {
                     "message": {
                       "type": "string",
-<<<<<<< HEAD
-                      "example": "removed service"
-=======
                       "example": "Tarea eliminada exitosamente"
->>>>>>> pagoApi
                     },
                     "data": {
                       "type": "object",
                       "properties": {
-<<<<<<< HEAD
-                        "id": {
-                          "type": "number",
-                          "description": "ID único del servicio",
-                          "example": 1
-                        },
-                        "estado": {
-                          "type": "string",
-                          "description": "Estado del servicio",
-                          "example": "activo"
-                        },
-                        "precio": {
-                          "type": "number",
-                          "description": "Precio del servicio",
-                          "example": 1500
-                        }
-                      },
-                      "required": [
-                        "id",
-                        "estado",
-                        "precio"
-                      ]
-=======
                         "nombreTarea": {
                           "type": "string",
                           "minLength": 2,
@@ -15009,9 +16163,8 @@
                           ]
                         }
                       },
-                      "title": "DeleteTarea",
-                      "description": "Esquema para eliminar una tarea existente"
->>>>>>> pagoApi
+                      "description": "Esquema para eliminar una tarea existente",
+                      "title": "DeleteTarea"
                     }
                   },
                   "required": [
@@ -15023,11 +16176,7 @@
             }
           },
           "404": {
-<<<<<<< HEAD
-            "description": "Servicio no encontrado",
-=======
             "description": "Tarea no encontrada",
->>>>>>> pagoApi
             "content": {
               "application/json": {
                 "schema": {
@@ -15036,11 +16185,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-<<<<<<< HEAD
-                      "example": "Validation failed"
-=======
                       "example": "horario no encontrado"
->>>>>>> pagoApi
                     },
                     "errors": {
                       "type": "array",
@@ -15050,20 +16195,12 @@
                           "field": {
                             "type": "string",
                             "description": "Campo que falló",
-<<<<<<< HEAD
-                            "example": "precio"
-=======
                             "example": "id"
->>>>>>> pagoApi
                           },
                           "message": {
                             "type": "string",
                             "description": "Mensaje de error",
-<<<<<<< HEAD
-                            "example": "El precio debe ser un número positivo"
-=======
                             "example": "ID inválido"
->>>>>>> pagoApi
                           }
                         },
                         "required": [
@@ -15091,11 +16228,7 @@
                     "message": {
                       "type": "string",
                       "description": "Mensaje de error",
-<<<<<<< HEAD
-                      "example": "Validation failed"
-=======
                       "example": "horario no encontrado"
->>>>>>> pagoApi
                     },
                     "errors": {
                       "type": "array",
@@ -15105,20 +16238,12 @@
                           "field": {
                             "type": "string",
                             "description": "Campo que falló",
-<<<<<<< HEAD
-                            "example": "precio"
-=======
                             "example": "id"
->>>>>>> pagoApi
                           },
                           "message": {
                             "type": "string",
                             "description": "Mensaje de error",
-<<<<<<< HEAD
-                            "example": "El precio debe ser un número positivo"
-=======
                             "example": "ID inválido"
->>>>>>> pagoApi
                           }
                         },
                         "required": [
@@ -15139,32 +16264,6 @@
         }
       }
     },
-<<<<<<< HEAD
-    "/api/servicio/user/{usuarioId}": {
-      "get": {
-        "description": "Obtener todos los servicios de un usuario específico",
-        "summary": "Obtener servicios por usuario",
-        "tags": [
-          "Servicios"
-        ],
-        "parameters": [
-          {
-            "schema": {
-              "type": "string",
-              "pattern": "^\\d+$",
-              "description": "ID numérico del usuario",
-              "example": "1"
-            },
-            "required": true,
-            "description": "ID numérico del usuario",
-            "name": "usuarioId",
-            "in": "path"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Servicios del usuario encontrados exitosamente",
-=======
     "/api/tarea/": {
       "get": {
         "description": "Obtener utodas las tareas",
@@ -15175,7 +16274,6 @@
         "responses": {
           "200": {
             "description": "Tarea encontrada",
->>>>>>> pagoApi
             "content": {
               "application/json": {
                 "schema": {
@@ -15183,12 +16281,6 @@
                   "properties": {
                     "message": {
                       "type": "string",
-<<<<<<< HEAD
-                      "description": "Mensaje de respuesta",
-                      "example": "Servicios encontrados"
-                    },
-                    "data": {
-=======
                       "example": "Tarea encontrada"
                     },
                     "data": {
@@ -15240,8 +16332,8 @@
                           ]
                         }
                       },
-                      "title": "DeleteTarea",
-                      "description": "Esquema para eliminar una tarea existente"
+                      "description": "Esquema para eliminar una tarea existente",
+                      "title": "DeleteTarea"
                     }
                   },
                   "required": [
@@ -15431,160 +16523,11 @@
                       "maxLength": 200
                     },
                     "usuarios": {
->>>>>>> pagoApi
                       "type": "array",
                       "items": {
                         "type": "object",
                         "properties": {
                           "id": {
-<<<<<<< HEAD
-                            "type": "number",
-                            "description": "ID único del servicio",
-                            "example": 1
-                          },
-                          "estado": {
-                            "type": "string",
-                            "description": "Estado del servicio",
-                            "example": "activo"
-                          },
-                          "precio": {
-                            "type": "number",
-                            "description": "Precio del servicio",
-                            "example": 1500
-                          },
-                          "tarea": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "number",
-                                "description": "ID de la tarea",
-                                "example": 1
-                              },
-                              "nombreTarea": {
-                                "type": "string",
-                                "description": "Nombre de la tarea",
-                                "example": "Reparación de canillas"
-                              },
-                              "descripcionTarea": {
-                                "type": "string",
-                                "description": "Descripción de la tarea",
-                                "example": "Arreglo y mantenimiento de grifería"
-                              },
-                              "duracionTarea": {
-                                "type": "number",
-                                "description": "Duración estimada de la tarea en minutos",
-                                "example": 60
-                              },
-                              "tipoServicio": {
-                                "type": "object",
-                                "properties": {
-                                  "id": {
-                                    "type": "number"
-                                  },
-                                  "nombreTipo": {
-                                    "type": "string"
-                                  },
-                                  "descripcionTipo": {
-                                    "type": "string"
-                                  }
-                                },
-                                "required": [
-                                  "id",
-                                  "nombreTipo",
-                                  "descripcionTipo"
-                                ],
-                                "description": "Tipo de servicio asociado a la tarea"
-                              }
-                            },
-                            "required": [
-                              "id",
-                              "nombreTarea",
-                              "descripcionTarea",
-                              "duracionTarea",
-                              "tipoServicio"
-                            ],
-                            "description": "Información de la tarea asociada"
-                          },
-                          "usuario": {
-                            "type": "object",
-                            "nullable": true,
-                            "properties": {
-                              "id": {
-                                "type": "number",
-                                "description": "ID del usuario",
-                                "example": 1
-                              },
-                              "nombre": {
-                                "type": "string",
-                                "description": "Nombre del usuario",
-                                "example": "Juan"
-                              },
-                              "apellido": {
-                                "type": "string",
-                                "description": "Apellido del usuario",
-                                "example": "Pérez"
-                              },
-                              "mail": {
-                                "type": "string",
-                                "description": "Email del usuario",
-                                "example": "juan.perez@gmail.com"
-                              },
-                              "nombreFantasia": {
-                                "type": "string",
-                                "nullable": true,
-                                "description": "Nombre de fantasía del prestatario",
-                                "example": "Plomería Pérez"
-                              },
-                              "telefono": {
-                                "type": "string",
-                                "description": "Teléfono del usuario",
-                                "example": "+54 11 1234-5678"
-                              }
-                            },
-                            "required": [
-                              "id",
-                              "nombre",
-                              "apellido",
-                              "mail",
-                              "nombreFantasia"
-                            ],
-                            "description": "Información del usuario que ofrece el servicio (puede ser null)"
-                          },
-                          "turnos": {
-                            "type": "array",
-                            "items": {
-                              "type": "object",
-                              "properties": {
-                                "id": {
-                                  "type": "number",
-                                  "description": "ID del turno",
-                                  "example": 1
-                                },
-                                "fechaTurno": {
-                                  "type": "string",
-                                  "description": "Fecha del turno",
-                                  "example": "2024-03-15"
-                                },
-                                "horaTurno": {
-                                  "type": "string",
-                                  "description": "Hora del turno",
-                                  "example": "14:30"
-                                },
-                                "estado": {
-                                  "type": "string",
-                                  "description": "Estado del turno",
-                                  "example": "confirmado"
-                                }
-                              },
-                              "required": [
-                                "id",
-                                "fechaTurno",
-                                "horaTurno",
-                                "estado"
-                              ]
-                            },
-                            "description": "Turnos asociados al servicio"
-=======
                             "type": "integer",
                             "minimum": 0,
                             "exclusiveMinimum": true,
@@ -15693,26 +16636,10 @@
                             ],
                             "description": "Descripción del prestatario",
                             "example": "Ofrecemos servicios de plomería y electricidad."
->>>>>>> pagoApi
                           }
                         },
                         "required": [
                           "id",
-<<<<<<< HEAD
-                          "estado",
-                          "precio",
-                          "tarea",
-                          "usuario"
-                        ]
-                      },
-                      "description": "Lista de servicios del usuario especificado"
-                    }
-                  },
-                  "required": [
-                    "message",
-                    "data"
-                  ]
-=======
                           "nombre",
                           "apellido",
                           "mail",
@@ -15768,79 +16695,27 @@
                     "nombreTipo",
                     "descripcionTipo"
                   ],
-                  "title": "CreateTipoServicio",
-                  "description": "Esquema para crear un nuevo tipo de servicio"
->>>>>>> pagoApi
+                  "description": "Esquema para crear un nuevo tipo de servicio",
+                  "title": "CreateTipoServicio"
                 }
               }
             }
           },
           "400": {
-<<<<<<< HEAD
-            "description": "usuarioId es requerido",
-=======
             "description": "Error de validación",
->>>>>>> pagoApi
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "message": {
-<<<<<<< HEAD
-                      "type": "string",
-                      "example": "usuarioId es requerido"
-                    }
-                  },
-                  "required": [
-                    "message"
-                  ]
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Error interno del servidor",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "description": "Mensaje de error",
-                      "example": "Validation failed"
-=======
                       "type": "string"
->>>>>>> pagoApi
                     },
                     "errors": {
                       "type": "array",
                       "items": {
-<<<<<<< HEAD
-                        "type": "object",
-                        "properties": {
-                          "field": {
-                            "type": "string",
-                            "description": "Campo que falló",
-                            "example": "precio"
-                          },
-                          "message": {
-                            "type": "string",
-                            "description": "Mensaje de error",
-                            "example": "El precio debe ser un número positivo"
-                          }
-                        },
-                        "required": [
-                          "field",
-                          "message"
-                        ]
-                      },
-                      "description": "Detalles de errores de validación"
-=======
                         "type": "string"
                       }
->>>>>>> pagoApi
                     }
                   },
                   "required": [
@@ -15853,70 +16728,6 @@
         }
       }
     },
-<<<<<<< HEAD
-    "/api/servicio/user/{usuarioId}/task/{tareaId}/deactivate": {
-      "patch": {
-        "description": "Desactivar servicio por usuario y tarea (cambiar estado a inactivo)",
-        "summary": "Desactivar servicio",
-        "tags": [
-          "Servicios"
-        ],
-        "parameters": [
-          {
-            "schema": {
-              "type": "string",
-              "pattern": "^\\d+$",
-              "description": "ID numérico del usuario",
-              "example": "1"
-            },
-            "required": true,
-            "description": "ID numérico del usuario",
-            "name": "usuarioId",
-            "in": "path"
-          },
-          {
-            "schema": {
-              "type": "string",
-              "pattern": "^\\d+$",
-              "description": "ID numérico de la tarea",
-              "example": "1"
-            },
-            "required": true,
-            "description": "ID numérico de la tarea",
-            "name": "tareaId",
-            "in": "path"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Servicio desactivado exitosamente",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Servicio desactivado exitosamente"
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "number",
-                          "description": "ID único del servicio",
-                          "example": 1
-                        },
-                        "estado": {
-                          "type": "string",
-                          "description": "Estado del servicio",
-                          "example": "activo"
-                        },
-                        "precio": {
-                          "type": "number",
-                          "description": "Precio del servicio",
-                          "example": 1500
-=======
     "/serviceTypes/{id}": {
       "put": {
         "description": "Actualizar un tipo de servicio existente",
@@ -16066,22 +16877,10 @@
                           ],
                           "description": "Descripción del prestatario",
                           "example": "Ofrecemos servicios de plomería y electricidad."
->>>>>>> pagoApi
                         }
                       },
                       "required": [
                         "id",
-<<<<<<< HEAD
-                        "estado",
-                        "precio"
-                      ]
-                    }
-                  },
-                  "required": [
-                    "message",
-                    "data"
-                  ]
-=======
                         "nombre",
                         "apellido",
                         "mail",
@@ -16133,8 +16932,8 @@
                     }
                   }
                 },
-                "title": "UpdateTipoServicio",
-                "description": "Esquema para actualizar un tipo de servicio"
+                "description": "Esquema para actualizar un tipo de servicio",
+                "title": "UpdateTipoServicio"
               }
             }
           }
@@ -16326,29 +17125,20 @@
                       }
                     }
                   },
-                  "title": "UpdateTipoServicio",
-                  "description": "Esquema para actualizar un tipo de servicio"
->>>>>>> pagoApi
+                  "description": "Esquema para actualizar un tipo de servicio",
+                  "title": "UpdateTipoServicio"
                 }
               }
             }
           },
           "400": {
-<<<<<<< HEAD
-            "description": "tareaId y usuarioId son requeridos",
-=======
             "description": "Error de validación",
->>>>>>> pagoApi
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "message": {
-<<<<<<< HEAD
-                      "type": "string",
-                      "example": "tareaId y usuarioId son requeridos"
-=======
                       "type": "string"
                     },
                     "errors": {
@@ -16356,7 +17146,6 @@
                       "items": {
                         "type": "string"
                       }
->>>>>>> pagoApi
                     }
                   },
                   "required": [
@@ -16365,11 +17154,6 @@
                 }
               }
             }
-<<<<<<< HEAD
-          },
-          "404": {
-            "description": "Servicio no encontrado",
-=======
           }
         }
       },
@@ -16632,75 +17416,27 @@
                     "nombreTipo",
                     "descripcionTipo"
                   ],
-                  "title": "GetTipoServicio",
-                  "description": "Esquema para obtener un tipo de servicio"
+                  "description": "Esquema para obtener un tipo de servicio",
+                  "title": "GetTipoServicio"
                 }
               }
             }
           },
           "404": {
             "description": "Tipo de servicio no encontrado",
->>>>>>> pagoApi
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "message": {
-<<<<<<< HEAD
-                      "type": "string",
-                      "example": "Servicio no encontrado"
-                    }
-                  },
-                  "required": [
-                    "message"
-                  ]
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Error interno del servidor",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "description": "Mensaje de error",
-                      "example": "Validation failed"
-=======
                       "type": "string"
->>>>>>> pagoApi
                     },
                     "errors": {
                       "type": "array",
                       "items": {
-<<<<<<< HEAD
-                        "type": "object",
-                        "properties": {
-                          "field": {
-                            "type": "string",
-                            "description": "Campo que falló",
-                            "example": "precio"
-                          },
-                          "message": {
-                            "type": "string",
-                            "description": "Mensaje de error",
-                            "example": "El precio debe ser un número positivo"
-                          }
-                        },
-                        "required": [
-                          "field",
-                          "message"
-                        ]
-                      },
-                      "description": "Detalles de errores de validación"
-=======
                         "type": "string"
                       }
->>>>>>> pagoApi
                     }
                   },
                   "required": [
@@ -16713,39 +17449,6 @@
         }
       }
     },
-<<<<<<< HEAD
-    "/api/servicio/user/{usuarioId}/task/{tareaId}": {
-      "delete": {
-        "description": "Eliminar servicio por usuario y tarea",
-        "summary": "Eliminar servicio por usuario y tarea",
-        "tags": [
-          "Servicios"
-        ],
-        "parameters": [
-          {
-            "schema": {
-              "type": "string",
-              "pattern": "^\\d+$",
-              "description": "ID numérico del usuario",
-              "example": "1"
-            },
-            "required": true,
-            "description": "ID numérico del usuario",
-            "name": "usuarioId",
-            "in": "path"
-          },
-          {
-            "schema": {
-              "type": "string",
-              "pattern": "^\\d+$",
-              "description": "ID numérico de la tarea",
-              "example": "1"
-            },
-            "required": true,
-            "description": "ID numérico de la tarea",
-            "name": "tareaId",
-            "in": "path"
-=======
     "/serviceTypes/": {
       "get": {
         "description": "Obtener todos los tipos de servicio",
@@ -16762,50 +17465,16 @@
             "schema": {
               "type": "integer"
             }
->>>>>>> pagoApi
           }
         ],
         "responses": {
           "200": {
-<<<<<<< HEAD
-            "description": "Servicio eliminado exitosamente",
-=======
             "description": "Tipo de servicio obtenido exitosamente",
->>>>>>> pagoApi
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-<<<<<<< HEAD
-                    "message": {
-                      "type": "string",
-                      "example": "Servicio eliminado exitosamente"
-                    }
-                  },
-                  "required": [
-                    "message"
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "tareaId y usuarioId son requeridos",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "tareaId y usuarioId son requeridos"
-                    }
-                  },
-                  "required": [
-                    "message"
-                  ]
-=======
                     "nombreTipo": {
                       "type": "string",
                       "minLength": 2,
@@ -16993,76 +17662,25 @@
                     "nombreTipo",
                     "descripcionTipo"
                   ],
-                  "title": "GetTipoServicio",
-                  "description": "Esquema para obtener un tipo de servicio"
->>>>>>> pagoApi
+                  "description": "Esquema para obtener un tipo de servicio",
+                  "title": "GetTipoServicio"
                 }
               }
             }
           },
           "404": {
-<<<<<<< HEAD
-            "description": "Servicio no encontrado",
-=======
             "description": "Tipo de servicio no encontrado",
->>>>>>> pagoApi
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "message": {
-<<<<<<< HEAD
-                      "type": "string",
-                      "example": "Servicio no encontrado"
-                    }
-                  },
-                  "required": [
-                    "message"
-                  ]
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Error interno del servidor",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "description": "Mensaje de error",
-                      "example": "Validation failed"
-=======
                       "type": "string"
->>>>>>> pagoApi
                     },
                     "errors": {
                       "type": "array",
                       "items": {
-<<<<<<< HEAD
-                        "type": "object",
-                        "properties": {
-                          "field": {
-                            "type": "string",
-                            "description": "Campo que falló",
-                            "example": "precio"
-                          },
-                          "message": {
-                            "type": "string",
-                            "description": "Mensaje de error",
-                            "example": "El precio debe ser un número positivo"
-                          }
-                        },
-                        "required": [
-                          "field",
-                          "message"
-                        ]
-                      },
-                      "description": "Detalles de errores de validación"
-=======
                         "type": "string"
                       }
                     }
@@ -17290,8 +17908,8 @@
                     "nombreTipo",
                     "descripcionTipo"
                   ],
-                  "title": "GetTipoServicio",
-                  "description": "Esquema para obtener un tipo de servicio"
+                  "description": "Esquema para obtener un tipo de servicio",
+                  "title": "GetTipoServicio"
                 }
               }
             }
@@ -17311,7 +17929,6 @@
                       "items": {
                         "type": "string"
                       }
->>>>>>> pagoApi
                     }
                   },
                   "required": [
