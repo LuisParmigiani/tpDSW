@@ -68,6 +68,8 @@ export class UsuarioSeeder extends Seeder {
           '$2b$10$0E9iYMk1AvFZNbpfu0yroOGq2/X8NzjWQjQv4cGAiS0dJsaRCh9oG',
         tipoDoc: 'CUIT',
         direccion: faker.location.streetAddress(),
+        stripeAccountId: 'acct_1N3b2YFz2b2YFz2b' + i,
+
         numeroDoc: faker.number
           .int({ min: 20000000000, max: 30000000000 })
           .toString(),

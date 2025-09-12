@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { Horario } from './horario.entity.js';
 
 import { orm } from '../shared/db/orm.js';
@@ -15,6 +15,7 @@ async function findAll(req: Request, res: Response) {
 
 async function findManyByUser(req: Request, res: Response) {
   try {
+    console.log('Valor de req.params.usuario:', req.params.usuario); // Depuración
     const userId = Number.parseInt(req.params.usuario);
     // Check if userId is valid
     if (isNaN(userId)) {
@@ -23,13 +24,13 @@ async function findManyByUser(req: Request, res: Response) {
     const horario = await em.find(Horario, { usuario: userId });
     res.status(200).json({ message: 'horario encontrado', data: horario });
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: 'Error 500', error: error.message });
   }
 }
 
 async function add(req: Request, res: Response) {
   try {
-    const newHorario = em.create(Horario, req.body.sanitizeHorarioInput);
+    const newHorario = em.create(Horario, req.body); // Cambiado de req.body.sanitizeHorarioInput a req.body
     await em.flush();
     res.status(201).json({ message: 'Nuevo horario creado', data: newHorario });
   } catch (error: any) {
@@ -40,7 +41,7 @@ async function update(req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id);
     const updateHorario = await em.findOneOrFail(Horario, { id });
-    em.assign(updateHorario, req.body.sanitizeHorarioInput);
+    em.assign(updateHorario, req.body); // Asigna los datos enviados en el cuerpo
     await em.flush();
     res
       .status(200)

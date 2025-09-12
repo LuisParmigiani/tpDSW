@@ -7,38 +7,12 @@ import { orm } from '../shared/db/orm.js';
 
 const em = orm.em;
 
-function sanitizePagoInput(req: Request, res: Response, next: NextFunction) {
-  req.body.sanitizePagoInput = {
-    paymentIntentId: req.body.paymentIntentId,
-    amount: req.body.amount,
-    currency: req.body.currency,
-    status: req.body.status,
-    sellerStripeId: req.body.sellerStripeId,
-    amountReceived: req.body.amountReceived,
-    applicationFeeAmount: req.body.applicationFeeAmount,
-    transferId: req.body.transferId,
-    buyerEmail: req.body.buyerEmail,
-    metadata: req.body.metadata,
-    paymentMethodType: req.body.paymentMethodType,
-    description: req.body.description,
-    createdAt: req.body.createdAt,
-    updatedAt: req.body.updatedAt,
-    turno: req.body.turno,
-  };
-  Object.keys(req.body.sanitizePagoInput).forEach((key) => {
-    if (req.body.sanitizePagoInput[key] === undefined) {
-      delete req.body.sanitizePagoInput[key];
-    }
-  });
-  next();
-}
-
 async function findall(req: Request, res: Response) {
   try {
     const { status, limit = 50, offset = 0 } = req.query;
     const whereConditions: any = {};
     if (status) {
-      whereConditions.status = status;
+      whereConditions.estado = status; // Cambiado de "status" a "estado"
     }
     const [pagos, total] = await em.findAndCount(Pago, whereConditions, {
       populate: ['turno'],
@@ -228,17 +202,25 @@ async function updatePagoSplit(
 
 async function add(req: Request, res: Response) {
   try {
-    const sanitizedInput = req.body.sanitizePagoInput;
-    // Validaciones básicas
-    if (!sanitizedInput.paymentIntentId) {
-      return res.status(400).json({ error: 'Payment Intent ID es requerido' });
+    const input = req.body;
+
+    // Validar que el turno tiene fechaHora
+    if (!input.turno || !input.turno.fechaHora) {
+      return res.status(400).json({
+        message: 'Validation error',
+        errors: [
+          {
+            path: 'turno.fechaHora',
+            message:
+              'El campo fechaHora es obligatorio y debe ser un string válido',
+          },
+        ],
+      });
     }
-    if (!sanitizedInput.turno) {
-      return res.status(400).json({ error: 'Turno es requerido' });
-    }
+
     // Verificar si ya existe un pago con este Payment Intent ID
     const pagoExistente = await em.findOne(Pago, {
-      paymentIntentId: sanitizedInput.paymentIntentId,
+      paymentIntentId: input.paymentIntentId,
     });
     if (pagoExistente) {
       return res.status(409).json({
@@ -246,16 +228,17 @@ async function add(req: Request, res: Response) {
         pagoExistente: pagoExistente.id,
       });
     }
-    // Establecer valores por defecto
-    sanitizedInput.createdAt = sanitizedInput.createdAt || new Date();
-    sanitizedInput.updatedAt = new Date();
-    sanitizedInput.status = sanitizedInput.status || 'pending';
-    sanitizedInput.currency = sanitizedInput.currency || 'usd';
-    const newPago = em.create(Pago, sanitizedInput);
+
+    input.createdAt = input.createdAt || new Date();
+    input.updatedAt = new Date();
+    input.estado = input.estado || 'pending';
+    input.currency = input.currency || 'usd';
+
+    const newPago = em.create(Pago, input);
     await em.persistAndFlush(newPago);
+
     res.status(201).json({ message: 'Pago creado:', data: newPago });
   } catch (error: any) {
-    console.error('Error creando pago:', error);
     res.status(500).json({ error: error.message });
   }
 }
@@ -264,9 +247,8 @@ async function update(req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id);
     const pago = await em.findOneOrFail(Pago, { id });
-    // Actualizar fecha de actualización automáticamente
-    req.body.sanitizePagoInput.updatedAt = new Date();
-    em.assign(pago, req.body.sanitizePagoInput);
+    req.body.updatedAt = new Date(); // Actualiza automáticamente la fecha
+    em.assign(pago, req.body); // Cambiado de req.body.sanitizePagoInput a req.body
     await em.persistAndFlush(pago);
     res.status(200).json({ message: 'Pago actualizado:', data: pago });
   } catch (error) {
@@ -430,5 +412,4 @@ export {
   add,
   update,
   remove,
-  sanitizePagoInput,
 };

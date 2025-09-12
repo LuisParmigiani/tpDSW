@@ -1,10 +1,14 @@
 import { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 import {
+  horarioSchema,
+  errorResponseSchema,
   createHorarioValidation,
   updateHorarioValidation,
-  horarioSchema,
+  deleteHorarioValidation,
   idParamValidation,
-  errorResponseSchema,
+  idUserParamValidation,
+  getHorarioValidation,
+  horarioBaseSchema,
 } from './horario.schemas.js';
 import { z } from 'zod';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
@@ -15,11 +19,14 @@ extendZodWithOpenApi(z);
 // Crear el horarioRegistry
 export const horarioRegistry = new OpenAPIRegistry();
 
-// Registrar esquemas
+// ===================================================================================================================
+// ========================================== horarioRegistry =========================================
+// ===================================================================================================================
+horarioRegistry.register('Horario', horarioSchema);
+horarioRegistry.register('ErrorResponse', errorResponseSchema);
 horarioRegistry.register('CreateHorario', createHorarioValidation);
 horarioRegistry.register('UpdateHorario', updateHorarioValidation);
-horarioRegistry.register('Horario', horarioSchema);
-horarioRegistry.register('IdParam', idParamValidation);
+horarioRegistry.register('DeleteHorario', deleteHorarioValidation);
 
 // ==================== POST METHODS ====================
 
@@ -32,10 +39,10 @@ horarioRegistry.registerPath({
   tags: ['Horarios'],
   request: {
     body: {
-      description: 'Datos del horario a crear ',
+      description: 'Datos del horario a crear',
       content: {
         'application/json': {
-          schema: createHorarioValidation,
+          schema: horarioBaseSchema,
         },
       },
     },
@@ -49,7 +56,7 @@ horarioRegistry.registerPath({
             message: z
               .string()
               .openapi({ example: 'Horario creado exitosamente' }),
-            data: horarioSchema,
+            data: createHorarioValidation,
           }),
         },
       },
@@ -78,13 +85,10 @@ horarioRegistry.registerPath({
 // GET /api/horario/{id}
 horarioRegistry.registerPath({
   method: 'get',
-  path: '/api/horario/{id}',
-  description: 'Obtener un horario por ID',
-  summary: 'Obtener horario',
+  path: '/api/horario/',
+  description: 'Obtener todos los horarios',
+  summary: 'Obtener horarios',
   tags: ['Horarios'],
-  request: {
-    params: idParamValidation,
-  },
   responses: {
     200: {
       description: 'Horario encontrado',
@@ -92,13 +96,51 @@ horarioRegistry.registerPath({
         'application/json': {
           schema: z.object({
             message: z.string().openapi({ example: 'Horario encontrado' }),
-            data: horarioSchema,
+            data: getHorarioValidation,
           }),
         },
       },
     },
     404: {
       description: 'Horario no encontrado',
+      content: {
+        'application/json': {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+    500: {
+      description: 'Error interno del servidor',
+      content: {
+        'application/json': {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+  },
+});
+
+// GET /api/horario/{usuario}
+horarioRegistry.registerPath({
+  method: 'get',
+  path: '/api/horario/{usuario}',
+  description: 'Obtener horarios por ID de usuario',
+  summary: 'Obtener horarios por usuario',
+  tags: ['Horarios'],
+  request: {
+    params: idUserParamValidation, // Cambiado a usuarioParamValidation
+  },
+  responses: {
+    200: {
+      description: 'Horarios encontrados',
+      content: {
+        'application/json': {
+          schema: horarioSchema,
+        },
+      },
+    },
+    404: {
+      description: 'Usuario no encontrado',
       content: {
         'application/json': {
           schema: errorResponseSchema,
@@ -131,7 +173,7 @@ horarioRegistry.registerPath({
       description: 'Datos del horario a actualizar',
       content: {
         'application/json': {
-          schema: updateHorarioValidation,
+          schema: idParamValidation,
         },
       },
     },
@@ -145,7 +187,7 @@ horarioRegistry.registerPath({
             message: z
               .string()
               .openapi({ example: 'Horario actualizado exitosamente' }),
-            data: horarioSchema,
+            data: updateHorarioValidation,
           }),
         },
       },
@@ -190,6 +232,7 @@ horarioRegistry.registerPath({
             message: z
               .string()
               .openapi({ example: 'Horario eliminado exitosamente' }),
+            data: deleteHorarioValidation,
           }),
         },
       },

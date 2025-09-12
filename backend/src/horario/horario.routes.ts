@@ -7,17 +7,12 @@ import {
   remove,
 } from './horario.controler.js';
 import {
-  horarioSchema,
-  createHorarioValidation,
+  idUserParamValidation,
   idParamValidation,
   updateHorarioValidation,
+  horarioSchema,
 } from './horario.schemas.js';
-import {
-  validateBody,
-  validateParams,
-  validateQuery,
-  authenticateToken,
-} from '../utils/apiMiddleware.js';
+import { validateBody, validateParams } from '../utils/apiMiddleware.js';
 
 export const horarioRouter = Router();
 
@@ -26,12 +21,12 @@ horarioRouter.get('/', findAll);
 
 horarioRouter.get(
   '/:usuario',
-  validateParams(idParamValidation),
+  validateParams(idUserParamValidation),
   findManyByUser
 );
 
 // ==================== POST ROUTES ====================
-horarioRouter.post('/', validateBody(createHorarioValidation), add);
+horarioRouter.post('/', validateBody(horarioSchema), add);
 
 // ==================== PUT/PATCH ROUTES ====================
 horarioRouter.put(
