@@ -5,6 +5,7 @@ import {
   add,
   update,
   remove,
+  updateBatchByUser,
 } from './horario.controler.js';
 import {
   idUserParamValidation,
@@ -45,3 +46,9 @@ horarioRouter.patch(
 
 // ==================== DELETE ROUTES ====================
 horarioRouter.delete('/:id', validateParams(idParamValidation), remove);
+
+// ==================== PUT BATCH ROUTE ====================
+horarioRouter.put(
+  '/usuario/:usuarioId',
+  updateBatchByUser
+);
