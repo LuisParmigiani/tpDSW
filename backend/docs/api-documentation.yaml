@@ -28,6 +28,10 @@ tags:
     description: Operaciones relacionadas con la autenticación y autorización de usuarios
   - name: Horarios
     description: Operaciones para el manejo de Horarios
+  - name: Tareas
+    description: Operaciones para el manejo de Tareas
+  - name: TipoServicio
+    description: Operaciones para el manejo de Tipos de Servicio
 components:
   securitySchemes:
     bearerAuth:
@@ -185,12 +189,12 @@ components:
           type: string
           nullable: true
           description: Nombre de fantasía
-          example: Plomería Pérez
+          example: Plomerín
         descripcion:
           type: string
           nullable: true
           description: Descripción
-          example: Plomero con experiencia
+          example: Servicio de plomería con experiencia
       required:
         - id
         - mail
@@ -1269,6 +1273,36 @@ components:
       required:
         - message
         - data
+    Horario:
+      type: object
+      properties:
+        diaSemana:
+          type: integer
+          minimum: 0
+          maximum: 6
+          description: Día de la semana (0-6, donde 0 es Lunes y 6 es Domingo)
+          example: 0
+        horaDesde:
+          type: string
+          pattern: ^([0-1]\d|2[0-3]):([0-5]\d):([0-5]\d)$
+          description: Hora de inicio en formato HH:mm:ss
+          example: 08:00:00
+        horaHasta:
+          type: string
+          pattern: ^([0-1]\d|2[0-3]):([0-5]\d):([0-5]\d)$
+          description: Hora de fin en formato HH:mm:ss
+          example: 17:00:00
+        usuario:
+          type: integer
+          minimum: 0
+          exclusiveMinimum: true
+          description: ID del usuario asociado al horario
+          example: 1
+      required:
+        - diaSemana
+        - horaDesde
+        - horaHasta
+        - usuario
     CreateHorario:
       type: object
       properties:
@@ -1291,6 +1325,12 @@ components:
         usuario:
           type: object
           properties:
+            id:
+              type: integer
+              minimum: 0
+              exclusiveMinimum: true
+              description: ID del usuario
+              example: 1
             nombre:
               type: string
               minLength: 2
@@ -1370,6 +1410,7 @@ components:
               description: Descripción del prestatario
               example: Ofrecemos servicios de plomería y electricidad.
           required:
+            - id
             - nombre
             - apellido
             - mail
@@ -1377,11 +1418,18 @@ components:
             - numeroDoc
             - telefono
             - direccion
+        id:
+          type: integer
+          minimum: 0
+          exclusiveMinimum: true
+          description: ID del usuario
+          example: 1
       required:
         - diaSemana
         - horaDesde
         - horaHasta
         - usuario
+        - id
       title: CrearHorario
       description: Esquema para crear un nuevo horario
     UpdateHorario:
@@ -1406,6 +1454,12 @@ components:
         usuario:
           type: object
           properties:
+            id:
+              type: integer
+              minimum: 0
+              exclusiveMinimum: true
+              description: ID del usuario
+              example: 1
             nombre:
               type: string
               minLength: 2
@@ -1485,6 +1539,7 @@ components:
               description: Descripción del prestatario
               example: Ofrecemos servicios de plomería y electricidad.
           required:
+            - id
             - nombre
             - apellido
             - mail
@@ -1492,9 +1547,15 @@ components:
             - numeroDoc
             - telefono
             - direccion
+        id:
+          type: integer
+          minimum: 0
+          exclusiveMinimum: true
+          description: ID del usuario
+          example: 1
       title: ActualizarHorario
       description: Esquema para actualizar un horario existente
-    Horario:
+    DeleteHorario:
       type: object
       properties:
         diaSemana:
@@ -1516,6 +1577,12 @@ components:
         usuario:
           type: object
           properties:
+            id:
+              type: integer
+              minimum: 0
+              exclusiveMinimum: true
+              description: ID del usuario
+              example: 1
             nombre:
               type: string
               minLength: 2
@@ -1595,6 +1662,7 @@ components:
               description: Descripción del prestatario
               example: Ofrecemos servicios de plomería y electricidad.
           required:
+            - id
             - nombre
             - apellido
             - mail
@@ -1602,11 +1670,1315 @@ components:
             - numeroDoc
             - telefono
             - direccion
+        id:
+          type: integer
+          minimum: 0
+          exclusiveMinimum: true
+          description: ID del usuario
+          example: 1
       required:
         - diaSemana
         - horaDesde
         - horaHasta
         - usuario
+        - id
+      title: BorrarHorario
+      description: Esquema para eliminar un horario
+    Pago:
+      type: object
+      properties:
+        paymentIntentId:
+          type: string
+          minLength: 1
+          description: ID del pago en Stripe
+          example: pi_1JXXXXXX
+        amount:
+          type: number
+          minimum: 350
+          description: Monto del pago en centavos
+          example: 1000
+        currency:
+          type: string
+          minLength: 3
+          maxLength: 3
+          description: "Moneda del pago en formato ISO (ej: usd, ars)"
+          example: usd
+        estado:
+          type: string
+          enum:
+            - requires_payment_method
+            - requires_confirmation
+            - requires_action
+            - processing
+            - succeeded
+            - requires_capture
+            - canceled
+          description: Estado del pago en Stripe
+          example: succeeded
+        sellerStripeId:
+          type: string
+          minLength: 1
+          description: ID del vendedor de la cuenta de Stripe
+          example: acct_1JXXXXXX
+        amountReceived:
+          type: number
+          minimum: 0
+          description: Monto recibido por el vendedor en centavos
+          example: 950
+        applicationFeeAmount:
+          type: number
+          minimum: 0
+          description: Comisión de la plataforma en centavos
+          example: 50
+        transferId:
+          type: string
+          description: ID de la transferencia a la cuenta del vendedor en Stripe
+          example: tr_1JXXXXXX
+        buyerEmail:
+          type: string
+          format: email
+          description: Correo electrónico del comprador
+          example: buyer@example.com
+        metadata:
+          type: object
+          additionalProperties:
+            nullable: true
+          description: Datos adicionales como productId, orderId
+          example: &a1
+            productId: prod_123
+            orderId: ord_456
+        createdAt:
+          type: string
+          format: date-time
+          description: Fecha de creación del pago en formato ISO
+          example: 2023-10-01T12:34:56Z
+        updatedAt:
+          type: string
+          format: date-time
+          description: Fecha de última actualización del pago en formato ISO
+          example: 2023-10-01T12:34:56Z
+        id:
+          type: number
+          description: ID del turno
+          example: 1
+        turno:
+          type: integer
+          minimum: 0
+          exclusiveMinimum: true
+          description: ID del turno asociado al pago
+          example: 15
+      required:
+        - paymentIntentId
+        - amount
+        - currency
+        - estado
+        - sellerStripeId
+        - amountReceived
+        - createdAt
+        - updatedAt
+        - id
+        - turno
+      title: CreatePago
+      description: Esquema para crear un nuevo pago
+    CreatePago:
+      type: object
+      properties:
+        paymentIntentId:
+          type: string
+          minLength: 1
+          description: ID del pago en Stripe
+          example: pi_1JXXXXXX
+        amount:
+          type: number
+          minimum: 350
+          description: Monto del pago en centavos
+          example: 1000
+        currency:
+          type: string
+          minLength: 3
+          maxLength: 3
+          description: "Moneda del pago en formato ISO (ej: usd, ars)"
+          example: usd
+        estado:
+          type: string
+          enum:
+            - requires_payment_method
+            - requires_confirmation
+            - requires_action
+            - processing
+            - succeeded
+            - requires_capture
+            - canceled
+          description: Estado del pago en Stripe
+          example: succeeded
+        sellerStripeId:
+          type: string
+          minLength: 1
+          description: ID del vendedor de la cuenta de Stripe
+          example: acct_1JXXXXXX
+        amountReceived:
+          type: number
+          minimum: 0
+          description: Monto recibido por el vendedor en centavos
+          example: 950
+        applicationFeeAmount:
+          type: number
+          minimum: 0
+          description: Comisión de la plataforma en centavos
+          example: 50
+        transferId:
+          type: string
+          description: ID de la transferencia a la cuenta del vendedor en Stripe
+          example: tr_1JXXXXXX
+        buyerEmail:
+          type: string
+          format: email
+          description: Correo electrónico del comprador
+          example: buyer@example.com
+        metadata:
+          type: object
+          additionalProperties:
+            nullable: true
+          description: Datos adicionales como productId, orderId
+          example: *a1
+        createdAt:
+          type: string
+          format: date-time
+          description: Fecha de creación del pago en formato ISO
+          example: 2023-10-01T12:34:56Z
+        updatedAt:
+          type: string
+          format: date-time
+          description: Fecha de última actualización del pago en formato ISO
+          example: 2023-10-01T12:34:56Z
+        id:
+          type: number
+          description: ID del turno
+          example: 1
+        turno:
+          type: integer
+          minimum: 0
+          exclusiveMinimum: true
+          description: ID del turno asociado al pago
+          example: 15
+      required:
+        - paymentIntentId
+        - amount
+        - currency
+        - estado
+        - sellerStripeId
+        - amountReceived
+        - createdAt
+        - updatedAt
+        - id
+        - turno
+      title: CreatePago
+      description: Esquema para crear un nuevo pago
+    GetPago:
+      type: object
+      properties:
+        paymentIntentId:
+          type: string
+          minLength: 1
+          description: ID del pago en Stripe
+          example: pi_1JXXXXXX
+        amount:
+          type: number
+          minimum: 350
+          description: Monto del pago en centavos
+          example: 1000
+        currency:
+          type: string
+          minLength: 3
+          maxLength: 3
+          description: "Moneda del pago en formato ISO (ej: usd, ars)"
+          example: usd
+        estado:
+          type: string
+          enum:
+            - requires_payment_method
+            - requires_confirmation
+            - requires_action
+            - processing
+            - succeeded
+            - requires_capture
+            - canceled
+          description: Estado del pago en Stripe
+          example: succeeded
+        sellerStripeId:
+          type: string
+          minLength: 1
+          description: ID del vendedor de la cuenta de Stripe
+          example: acct_1JXXXXXX
+        amountReceived:
+          type: number
+          minimum: 0
+          description: Monto recibido por el vendedor en centavos
+          example: 950
+        applicationFeeAmount:
+          type: number
+          minimum: 0
+          description: Comisión de la plataforma en centavos
+          example: 50
+        transferId:
+          type: string
+          description: ID de la transferencia a la cuenta del vendedor en Stripe
+          example: tr_1JXXXXXX
+        buyerEmail:
+          type: string
+          format: email
+          description: Correo electrónico del comprador
+          example: buyer@example.com
+        metadata:
+          type: object
+          additionalProperties:
+            nullable: true
+          description: Datos adicionales como productId, orderId
+          example: *a1
+        createdAt:
+          type: string
+          format: date-time
+          description: Fecha de creación del pago en formato ISO
+          example: 2023-10-01T12:34:56Z
+        updatedAt:
+          type: string
+          format: date-time
+          description: Fecha de última actualización del pago en formato ISO
+          example: 2023-10-01T12:34:56Z
+        id:
+          type: number
+          description: ID del turno
+          example: 1
+        turno:
+          type: object
+          properties:
+            id:
+              type: number
+              description: ID del turno
+              example: 1
+            fechaTurno:
+              type: string
+              description: Fecha del turno
+              example: 2024-03-15
+            horaTurno:
+              type: string
+              description: Hora del turno
+              example: 14:30
+            estado:
+              type: string
+              description: Estado del turno
+              example: confirmado
+            calificacion:
+              type: number
+              nullable: true
+              description: Calificación del turno (1-5)
+              example: 4.5
+            comentario:
+              type: string
+              nullable: true
+              description: Comentario del cliente
+              example: Excelente servicio
+          required:
+            - id
+            - fechaTurno
+            - horaTurno
+            - estado
+            - calificacion
+            - comentario
+      required:
+        - paymentIntentId
+        - amount
+        - currency
+        - estado
+        - sellerStripeId
+        - amountReceived
+        - createdAt
+        - updatedAt
+        - id
+        - turno
+      title: GetPago
+      description: Esquema para obtener un pago existente
+    DeletePago:
+      type: object
+      properties:
+        paymentIntentId:
+          type: string
+          minLength: 1
+          description: ID del pago en Stripe
+          example: pi_1JXXXXXX
+        amount:
+          type: number
+          minimum: 350
+          description: Monto del pago en centavos
+          example: 1000
+        currency:
+          type: string
+          minLength: 3
+          maxLength: 3
+          description: "Moneda del pago en formato ISO (ej: usd, ars)"
+          example: usd
+        estado:
+          type: string
+          enum:
+            - requires_payment_method
+            - requires_confirmation
+            - requires_action
+            - processing
+            - succeeded
+            - requires_capture
+            - canceled
+          description: Estado del pago en Stripe
+          example: succeeded
+        sellerStripeId:
+          type: string
+          minLength: 1
+          description: ID del vendedor de la cuenta de Stripe
+          example: acct_1JXXXXXX
+        amountReceived:
+          type: number
+          minimum: 0
+          description: Monto recibido por el vendedor en centavos
+          example: 950
+        applicationFeeAmount:
+          type: number
+          minimum: 0
+          description: Comisión de la plataforma en centavos
+          example: 50
+        transferId:
+          type: string
+          description: ID de la transferencia a la cuenta del vendedor en Stripe
+          example: tr_1JXXXXXX
+        buyerEmail:
+          type: string
+          format: email
+          description: Correo electrónico del comprador
+          example: buyer@example.com
+        metadata:
+          type: object
+          additionalProperties:
+            nullable: true
+          description: Datos adicionales como productId, orderId
+          example: *a1
+        createdAt:
+          type: string
+          format: date-time
+          description: Fecha de creación del pago en formato ISO
+          example: 2023-10-01T12:34:56Z
+        updatedAt:
+          type: string
+          format: date-time
+          description: Fecha de última actualización del pago en formato ISO
+          example: 2023-10-01T12:34:56Z
+        id:
+          type: number
+          description: ID del turno
+          example: 1
+        turno:
+          type: object
+          properties:
+            id:
+              type: number
+              description: ID del turno
+              example: 1
+            fechaTurno:
+              type: string
+              description: Fecha del turno
+              example: 2024-03-15
+            horaTurno:
+              type: string
+              description: Hora del turno
+              example: 14:30
+            estado:
+              type: string
+              description: Estado del turno
+              example: confirmado
+            calificacion:
+              type: number
+              nullable: true
+              description: Calificación del turno (1-5)
+              example: 4.5
+            comentario:
+              type: string
+              nullable: true
+              description: Comentario del cliente
+              example: Excelente servicio
+          required:
+            - id
+            - fechaTurno
+            - horaTurno
+            - estado
+            - calificacion
+            - comentario
+      required:
+        - paymentIntentId
+        - amount
+        - currency
+        - estado
+        - sellerStripeId
+        - amountReceived
+        - createdAt
+        - updatedAt
+        - id
+        - turno
+      title: DeletePago
+      description: Esquema para eliminar un pago existente
+    UpdatePago:
+      type: object
+      properties:
+        paymentIntentId:
+          type: string
+          minLength: 1
+          description: ID del pago en Stripe
+          example: pi_1JXXXXXX
+        amount:
+          type: number
+          minimum: 350
+          description: Monto del pago en centavos
+          example: 1000
+        currency:
+          type: string
+          minLength: 3
+          maxLength: 3
+          description: "Moneda del pago en formato ISO (ej: usd, ars)"
+          example: usd
+        estado:
+          type: string
+          enum:
+            - requires_payment_method
+            - requires_confirmation
+            - requires_action
+            - processing
+            - succeeded
+            - requires_capture
+            - canceled
+          description: Estado del pago en Stripe
+          example: succeeded
+        sellerStripeId:
+          type: string
+          minLength: 1
+          description: ID del vendedor de la cuenta de Stripe
+          example: acct_1JXXXXXX
+        amountReceived:
+          type: number
+          minimum: 0
+          description: Monto recibido por el vendedor en centavos
+          example: 950
+        applicationFeeAmount:
+          type: number
+          minimum: 0
+          description: Comisión de la plataforma en centavos
+          example: 50
+        transferId:
+          type: string
+          description: ID de la transferencia a la cuenta del vendedor en Stripe
+          example: tr_1JXXXXXX
+        buyerEmail:
+          type: string
+          format: email
+          description: Correo electrónico del comprador
+          example: buyer@example.com
+        metadata:
+          type: object
+          additionalProperties:
+            nullable: true
+          description: Datos adicionales como productId, orderId
+          example: *a1
+        createdAt:
+          type: string
+          format: date-time
+          description: Fecha de creación del pago en formato ISO
+          example: 2023-10-01T12:34:56Z
+        updatedAt:
+          type: string
+          format: date-time
+          description: Fecha de última actualización del pago en formato ISO
+          example: 2023-10-01T12:34:56Z
+        id:
+          type: number
+          description: ID del turno
+          example: 1
+        turno:
+          type: object
+          properties:
+            id:
+              type: number
+              description: ID del turno
+              example: 1
+            fechaTurno:
+              type: string
+              description: Fecha del turno
+              example: 2024-03-15
+            horaTurno:
+              type: string
+              description: Hora del turno
+              example: 14:30
+            estado:
+              type: string
+              description: Estado del turno
+              example: confirmado
+            calificacion:
+              type: number
+              nullable: true
+              description: Calificación del turno (1-5)
+              example: 4.5
+            comentario:
+              type: string
+              nullable: true
+              description: Comentario del cliente
+              example: Excelente servicio
+          required:
+            - id
+            - fechaTurno
+            - horaTurno
+            - estado
+            - calificacion
+            - comentario
+      title: UpdatePago
+      description: Esquema para actualizar un pago existente
+    CreateTarea:
+      type: object
+      properties:
+        nombreTarea:
+          type: string
+          minLength: 2
+          maxLength: 100
+          description: Nombre de la tarea
+          example: Reparación de grifería
+        descripcionTarea:
+          type: string
+          maxLength: 500
+          description: Descripción de la tarea
+          example: Reparación y mantenimiento de grifería en el hogar
+        duracionTarea:
+          type: number
+          minimum: 0
+          exclusiveMinimum: true
+          description: Duración de la tarea en minutos
+          example: 60
+        tipoServicio:
+          type: integer
+          minimum: 0
+          exclusiveMinimum: true
+          description: ID del tipo de servicio
+          example: 1
+      required:
+        - nombreTarea
+        - duracionTarea
+        - tipoServicio
+      title: CreateTarea
+      description: Esquema para crear una nueva tarea
+    UpdateTarea:
+      type: object
+      properties:
+        nombreTarea:
+          type: string
+          minLength: 2
+          maxLength: 100
+          description: Nombre de la tarea
+          example: Reparación de grifería
+        descripcionTarea:
+          type: string
+          maxLength: 500
+          description: Descripción de la tarea
+          example: Reparación y mantenimiento de grifería en el hogar
+        duracionTarea:
+          type: number
+          minimum: 0
+          exclusiveMinimum: true
+          description: Duración de la tarea en minutos
+          example: 60
+        tipoServicio:
+          type: object
+          properties:
+            id:
+              type: number
+              description: ID del tipo de servicio
+              example: 1
+            nombreTipo:
+              type: string
+              description: Nombre del tipo de servicio
+              example: Plomería
+            descripcionTipo:
+              type: string
+              description: Descripción del tipo de servicio
+              example: Servicios de plomería profesional
+          required:
+            - id
+            - nombreTipo
+            - descripcionTipo
+      title: UpdateTarea
+      description: Esquema para actualizar una tarea existente
+    DeleteTarea:
+      type: object
+      properties:
+        nombreTarea:
+          type: string
+          minLength: 2
+          maxLength: 100
+          description: Nombre de la tarea
+          example: Reparación de grifería
+        descripcionTarea:
+          type: string
+          maxLength: 500
+          description: Descripción de la tarea
+          example: Reparación y mantenimiento de grifería en el hogar
+        duracionTarea:
+          type: number
+          minimum: 0
+          exclusiveMinimum: true
+          description: Duración de la tarea en minutos
+          example: 60
+        tipoServicio:
+          type: object
+          properties:
+            id:
+              type: number
+              description: ID del tipo de servicio
+              example: 1
+            nombreTipo:
+              type: string
+              description: Nombre del tipo de servicio
+              example: Plomería
+            descripcionTipo:
+              type: string
+              description: Descripción del tipo de servicio
+              example: Servicios de plomería profesional
+          required:
+            - id
+            - nombreTipo
+            - descripcionTipo
+      title: DeleteTarea
+      description: Esquema para eliminar una tarea existente
+    Tarea:
+      type: object
+      properties:
+        nombreTarea:
+          type: string
+          minLength: 2
+          maxLength: 100
+          description: Nombre de la tarea
+          example: Reparación de grifería
+        descripcionTarea:
+          type: string
+          maxLength: 500
+          description: Descripción de la tarea
+          example: Reparación y mantenimiento de grifería en el hogar
+        duracionTarea:
+          type: number
+          minimum: 0
+          exclusiveMinimum: true
+          description: Duración de la tarea en minutos
+          example: 60
+        tipoServicio:
+          type: object
+          properties:
+            id:
+              type: number
+              description: ID del tipo de servicio
+              example: 1
+            nombreTipo:
+              type: string
+              description: Nombre del tipo de servicio
+              example: Plomería
+            descripcionTipo:
+              type: string
+              description: Descripción del tipo de servicio
+              example: Servicios de plomería profesional
+          required:
+            - id
+            - nombreTipo
+            - descripcionTipo
+      title: DeleteTarea
+      description: Esquema para eliminar una tarea existente
+    CreateTipoServicio:
+      type: object
+      properties:
+        nombreTipo:
+          type: string
+          minLength: 2
+          maxLength: 50
+        descripcionTipo:
+          type: string
+          minLength: 5
+          maxLength: 200
+        usuarios:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                minimum: 0
+                exclusiveMinimum: true
+                description: ID del usuario
+                example: 1
+              nombre:
+                type: string
+                minLength: 2
+                maxLength: 50
+                pattern: ^[a-zA-ZÀ-ÿ\s]+$
+                description: Nombre del usuario
+                example: Juan
+              apellido:
+                type: string
+                minLength: 2
+                maxLength: 50
+                pattern: ^[a-zA-ZÀ-ÿ\s]+$
+                description: Apellido del usuario
+                example: Pérez
+              mail:
+                type: string
+                maxLength: 100
+                format: email
+                description: Correo electrónico del usuario
+                example: juan.perez@gmail.com
+              tipoDoc:
+                type: string
+                enum:
+                  - DNI
+                  - CUIT
+                  - CUIL
+                description: Tipo de documento
+                example: DNI
+              numeroDoc:
+                type: string
+                minLength: 7
+                maxLength: 13
+                pattern: ^[0-9\-]+$
+                description: Número de documento
+                example: "12345678"
+              telefono:
+                type: string
+                pattern: ^[+]?[0-9\s\-()]{8,20}$
+                description: Número de teléfono
+                example: +54 11 1234-5678
+              direccion:
+                type: string
+                minLength: 5
+                maxLength: 200
+                description: Dirección del usuario
+                example: Av. Corrientes 1234
+              foto:
+                type: string
+                maxLength: 200
+                format: uri
+                description: URL de la foto de perfil del usuario
+                example: http://example.com/foto.jpg
+              estado:
+                type: string
+                enum:
+                  - activo
+                  - inactivo
+                default: activo
+                description: Estado del usuario
+                example: activo
+              nombreFantasia:
+                anyOf:
+                  - type: string
+                    minLength: 2
+                    maxLength: 30
+                  - type: string
+                    enum:
+                      - ""
+                description: Nombre de fantasía del prestatario
+                example: Servicios SRL
+              descripcion:
+                anyOf:
+                  - type: string
+                  - type: string
+                    enum:
+                      - ""
+                description: Descripción del prestatario
+                example: Ofrecemos servicios de plomería y electricidad.
+            required:
+              - id
+              - nombre
+              - apellido
+              - mail
+              - tipoDoc
+              - numeroDoc
+              - telefono
+              - direccion
+        tareas:
+          type: array
+          items:
+            type: object
+            properties:
+              nombreTarea:
+                type: string
+                minLength: 2
+                maxLength: 100
+                description: Nombre de la tarea
+                example: Reparación de grifería
+              descripcionTarea:
+                type: string
+                maxLength: 500
+                description: Descripción de la tarea
+                example: Reparación y mantenimiento de grifería en el hogar
+              duracionTarea:
+                type: number
+                minimum: 0
+                exclusiveMinimum: true
+                description: Duración de la tarea en minutos
+                example: 60
+              tipoServicio:
+                type: integer
+                minimum: 0
+                exclusiveMinimum: true
+                description: ID del tipo de servicio asociado a la tarea
+                example: 1
+            required:
+              - nombreTarea
+              - duracionTarea
+              - tipoServicio
+      required:
+        - nombreTipo
+        - descripcionTipo
+      title: CreateTipoServicio
+      description: Esquema para crear un nuevo tipo de servicio
+    UpdateTipoServicio:
+      type: object
+      properties:
+        nombreTipo:
+          type: string
+          minLength: 2
+          maxLength: 50
+        descripcionTipo:
+          type: string
+          minLength: 5
+          maxLength: 200
+        usuarios:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                minimum: 0
+                exclusiveMinimum: true
+                description: ID del usuario
+                example: 1
+              nombre:
+                type: string
+                minLength: 2
+                maxLength: 50
+                pattern: ^[a-zA-ZÀ-ÿ\s]+$
+                description: Nombre del usuario
+                example: Juan
+              apellido:
+                type: string
+                minLength: 2
+                maxLength: 50
+                pattern: ^[a-zA-ZÀ-ÿ\s]+$
+                description: Apellido del usuario
+                example: Pérez
+              mail:
+                type: string
+                maxLength: 100
+                format: email
+                description: Correo electrónico del usuario
+                example: juan.perez@gmail.com
+              tipoDoc:
+                type: string
+                enum:
+                  - DNI
+                  - CUIT
+                  - CUIL
+                description: Tipo de documento
+                example: DNI
+              numeroDoc:
+                type: string
+                minLength: 7
+                maxLength: 13
+                pattern: ^[0-9\-]+$
+                description: Número de documento
+                example: "12345678"
+              telefono:
+                type: string
+                pattern: ^[+]?[0-9\s\-()]{8,20}$
+                description: Número de teléfono
+                example: +54 11 1234-5678
+              direccion:
+                type: string
+                minLength: 5
+                maxLength: 200
+                description: Dirección del usuario
+                example: Av. Corrientes 1234
+              foto:
+                type: string
+                maxLength: 200
+                format: uri
+                description: URL de la foto de perfil del usuario
+                example: http://example.com/foto.jpg
+              estado:
+                type: string
+                enum:
+                  - activo
+                  - inactivo
+                default: activo
+                description: Estado del usuario
+                example: activo
+              nombreFantasia:
+                anyOf:
+                  - type: string
+                    minLength: 2
+                    maxLength: 30
+                  - type: string
+                    enum:
+                      - ""
+                description: Nombre de fantasía del prestatario
+                example: Servicios SRL
+              descripcion:
+                anyOf:
+                  - type: string
+                  - type: string
+                    enum:
+                      - ""
+                description: Descripción del prestatario
+                example: Ofrecemos servicios de plomería y electricidad.
+            required:
+              - id
+              - nombre
+              - apellido
+              - mail
+              - tipoDoc
+              - numeroDoc
+              - telefono
+              - direccion
+        tareas:
+          type: array
+          items:
+            type: object
+            properties:
+              nombreTarea:
+                type: string
+                minLength: 2
+                maxLength: 100
+                description: Nombre de la tarea
+                example: Reparación de grifería
+              descripcionTarea:
+                type: string
+                maxLength: 500
+                description: Descripción de la tarea
+                example: Reparación y mantenimiento de grifería en el hogar
+              duracionTarea:
+                type: number
+                minimum: 0
+                exclusiveMinimum: true
+                description: Duración de la tarea en minutos
+                example: 60
+              tipoServicio:
+                type: integer
+                minimum: 0
+                exclusiveMinimum: true
+                description: ID del tipo de servicio asociado a la tarea
+                example: 1
+            required:
+              - nombreTarea
+              - duracionTarea
+              - tipoServicio
+      title: UpdateTipoServicio
+      description: Esquema para actualizar un tipo de servicio
+    DeleteTipoServicio:
+      type: object
+      properties:
+        nombreTipo:
+          type: string
+          minLength: 2
+          maxLength: 50
+          description: Nombre del tipo de servicio
+          example: Plomería
+        descripcionTipo:
+          type: string
+          minLength: 5
+          maxLength: 200
+          description: Descripción del tipo de servicio
+          example: Servicios de plomería profesional
+        usuarios:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                minimum: 0
+                exclusiveMinimum: true
+                description: ID del usuario
+                example: 1
+              nombre:
+                type: string
+                minLength: 2
+                maxLength: 50
+                pattern: ^[a-zA-ZÀ-ÿ\s]+$
+                description: Nombre del usuario
+                example: Juan
+              apellido:
+                type: string
+                minLength: 2
+                maxLength: 50
+                pattern: ^[a-zA-ZÀ-ÿ\s]+$
+                description: Apellido del usuario
+                example: Pérez
+              mail:
+                type: string
+                maxLength: 100
+                format: email
+                description: Correo electrónico del usuario
+                example: juan.perez@gmail.com
+              tipoDoc:
+                type: string
+                enum:
+                  - DNI
+                  - CUIT
+                  - CUIL
+                description: Tipo de documento
+                example: DNI
+              numeroDoc:
+                type: string
+                minLength: 7
+                maxLength: 13
+                pattern: ^[0-9\-]+$
+                description: Número de documento
+                example: "12345678"
+              telefono:
+                type: string
+                pattern: ^[+]?[0-9\s\-()]{8,20}$
+                description: Número de teléfono
+                example: +54 11 1234-5678
+              direccion:
+                type: string
+                minLength: 5
+                maxLength: 200
+                description: Dirección del usuario
+                example: Av. Corrientes 1234
+              foto:
+                type: string
+                maxLength: 200
+                format: uri
+                description: URL de la foto de perfil del usuario
+                example: http://example.com/foto.jpg
+              estado:
+                type: string
+                enum:
+                  - activo
+                  - inactivo
+                default: activo
+                description: Estado del usuario
+                example: activo
+              nombreFantasia:
+                anyOf:
+                  - type: string
+                    minLength: 2
+                    maxLength: 30
+                  - type: string
+                    enum:
+                      - ""
+                description: Nombre de fantasía del prestatario
+                example: Servicios SRL
+              descripcion:
+                anyOf:
+                  - type: string
+                  - type: string
+                    enum:
+                      - ""
+                description: Descripción del prestatario
+                example: Ofrecemos servicios de plomería y electricidad.
+            required:
+              - id
+              - nombre
+              - apellido
+              - mail
+              - tipoDoc
+              - numeroDoc
+              - telefono
+              - direccion
+        tareas:
+          type: array
+          items:
+            type: object
+            properties:
+              nombreTarea:
+                type: string
+                minLength: 2
+                maxLength: 100
+                description: Nombre de la tarea
+                example: Reparación de grifería
+              descripcionTarea:
+                type: string
+                maxLength: 500
+                description: Descripción de la tarea
+                example: Reparación y mantenimiento de grifería en el hogar
+              duracionTarea:
+                type: number
+                minimum: 0
+                exclusiveMinimum: true
+                description: Duración de la tarea en minutos
+                example: 60
+              tipoServicio:
+                type: integer
+                minimum: 0
+                exclusiveMinimum: true
+                description: ID del tipo de servicio asociado a la tarea
+                example: 1
+            required:
+              - nombreTarea
+              - duracionTarea
+              - tipoServicio
+      required:
+        - nombreTipo
+        - descripcionTipo
+      title: DeleteTipoServicio
+      description: Esquema para eliminar un tipo de servicio
+    GetTipoServicio:
+      type: object
+      properties:
+        nombreTipo:
+          type: string
+          minLength: 2
+          maxLength: 50
+          description: Nombre del tipo de servicio
+          example: Plomería
+        descripcionTipo:
+          type: string
+          minLength: 5
+          maxLength: 200
+          description: Descripción del tipo de servicio
+          example: Servicios de plomería profesional
+        usuarios:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                minimum: 0
+                exclusiveMinimum: true
+                description: ID del usuario
+                example: 1
+              nombre:
+                type: string
+                minLength: 2
+                maxLength: 50
+                pattern: ^[a-zA-ZÀ-ÿ\s]+$
+                description: Nombre del usuario
+                example: Juan
+              apellido:
+                type: string
+                minLength: 2
+                maxLength: 50
+                pattern: ^[a-zA-ZÀ-ÿ\s]+$
+                description: Apellido del usuario
+                example: Pérez
+              mail:
+                type: string
+                maxLength: 100
+                format: email
+                description: Correo electrónico del usuario
+                example: juan.perez@gmail.com
+              tipoDoc:
+                type: string
+                enum:
+                  - DNI
+                  - CUIT
+                  - CUIL
+                description: Tipo de documento
+                example: DNI
+              numeroDoc:
+                type: string
+                minLength: 7
+                maxLength: 13
+                pattern: ^[0-9\-]+$
+                description: Número de documento
+                example: "12345678"
+              telefono:
+                type: string
+                pattern: ^[+]?[0-9\s\-()]{8,20}$
+                description: Número de teléfono
+                example: +54 11 1234-5678
+              direccion:
+                type: string
+                minLength: 5
+                maxLength: 200
+                description: Dirección del usuario
+                example: Av. Corrientes 1234
+              foto:
+                type: string
+                maxLength: 200
+                format: uri
+                description: URL de la foto de perfil del usuario
+                example: http://example.com/foto.jpg
+              estado:
+                type: string
+                enum:
+                  - activo
+                  - inactivo
+                default: activo
+                description: Estado del usuario
+                example: activo
+              nombreFantasia:
+                anyOf:
+                  - type: string
+                    minLength: 2
+                    maxLength: 30
+                  - type: string
+                    enum:
+                      - ""
+                description: Nombre de fantasía del prestatario
+                example: Servicios SRL
+              descripcion:
+                anyOf:
+                  - type: string
+                  - type: string
+                    enum:
+                      - ""
+                description: Descripción del prestatario
+                example: Ofrecemos servicios de plomería y electricidad.
+            required:
+              - id
+              - nombre
+              - apellido
+              - mail
+              - tipoDoc
+              - numeroDoc
+              - telefono
+              - direccion
+        tareas:
+          type: array
+          items:
+            type: object
+            properties:
+              nombreTarea:
+                type: string
+                minLength: 2
+                maxLength: 100
+                description: Nombre de la tarea
+                example: Reparación de grifería
+              descripcionTarea:
+                type: string
+                maxLength: 500
+                description: Descripción de la tarea
+                example: Reparación y mantenimiento de grifería en el hogar
+              duracionTarea:
+                type: number
+                minimum: 0
+                exclusiveMinimum: true
+                description: Duración de la tarea en minutos
+                example: 60
+              tipoServicio:
+                type: integer
+                minimum: 0
+                exclusiveMinimum: true
+                description: ID del tipo de servicio asociado a la tarea
+                example: 1
+            required:
+              - nombreTarea
+              - duracionTarea
+              - tipoServicio
+      required:
+        - nombreTipo
+        - descripcionTipo
+      title: GetTipoServicio
+      description: Esquema para obtener un tipo de servicio
   parameters: {}
 paths:
   /api/usuario:
@@ -1764,12 +3136,12 @@ paths:
                         type: string
                         nullable: true
                         description: Nombre de fantasía
-                        example: Plomería Pérez
+                        example: Plomerín
                       descripcion:
                         type: string
                         nullable: true
                         description: Descripción
-                        example: Plomero con experiencia
+                        example: Servicio de plomería con experiencia
                     required:
                       - id
                       - mail
@@ -2744,12 +4116,12 @@ paths:
                         type: string
                         nullable: true
                         description: Nombre de fantasía
-                        example: Plomería Pérez
+                        example: Plomerín
                       descripcion:
                         type: string
                         nullable: true
                         description: Descripción
-                        example: Plomero con experiencia
+                        example: Servicio de plomería con experiencia
                     required:
                       - id
                       - mail
@@ -2950,12 +4322,12 @@ paths:
                         type: string
                         nullable: true
                         description: Nombre de fantasía
-                        example: Plomería Pérez
+                        example: Plomerín
                       descripcion:
                         type: string
                         nullable: true
                         description: Descripción
-                        example: Plomero con experiencia
+                        example: Servicio de plomería con experiencia
                     required:
                       - id
                       - mail
@@ -3891,12 +5263,12 @@ paths:
                         type: string
                         nullable: true
                         description: Nombre de fantasía
-                        example: Plomería Pérez
+                        example: Plomerín
                       descripcion:
                         type: string
                         nullable: true
                         description: Descripción
-                        example: Plomero con experiencia
+                        example: Servicio de plomería con experiencia
                     required:
                       - id
                       - mail
@@ -4052,12 +5424,12 @@ paths:
                         type: string
                         nullable: true
                         description: Nombre de fantasía
-                        example: Plomería Pérez
+                        example: Plomerín
                       descripcion:
                         type: string
                         nullable: true
                         description: Descripción
-                        example: Plomero con experiencia
+                        example: Servicio de plomería con experiencia
                     required:
                       - id
                       - mail
@@ -5255,7 +6627,7 @@ paths:
       tags:
         - Horarios
       requestBody:
-        description: "Datos del horario a crear "
+        description: Datos del horario a crear
         content:
           application/json:
             schema:
@@ -5277,102 +6649,10 @@ paths:
                   pattern: ^([0-1]\d|2[0-3]):([0-5]\d):([0-5]\d)$
                   description: Hora de fin en formato HH:mm:ss
                   example: 17:00:00
-                usuario:
-                  type: object
-                  properties:
-                    nombre:
-                      type: string
-                      minLength: 2
-                      maxLength: 50
-                      pattern: ^[a-zA-ZÀ-ÿ\s]+$
-                      description: Nombre del usuario
-                      example: Juan
-                    apellido:
-                      type: string
-                      minLength: 2
-                      maxLength: 50
-                      pattern: ^[a-zA-ZÀ-ÿ\s]+$
-                      description: Apellido del usuario
-                      example: Pérez
-                    mail:
-                      type: string
-                      maxLength: 100
-                      format: email
-                      description: Correo electrónico del usuario
-                      example: juan.perez@gmail.com
-                    tipoDoc:
-                      type: string
-                      enum:
-                        - DNI
-                        - CUIT
-                        - CUIL
-                      description: Tipo de documento
-                      example: DNI
-                    numeroDoc:
-                      type: string
-                      minLength: 7
-                      maxLength: 13
-                      pattern: ^[0-9\-]+$
-                      description: Número de documento
-                      example: "12345678"
-                    telefono:
-                      type: string
-                      pattern: ^[+]?[0-9\s\-()]{8,20}$
-                      description: Número de teléfono
-                      example: +54 11 1234-5678
-                    direccion:
-                      type: string
-                      minLength: 5
-                      maxLength: 200
-                      description: Dirección del usuario
-                      example: Av. Corrientes 1234
-                    foto:
-                      type: string
-                      maxLength: 200
-                      format: uri
-                      description: URL de la foto de perfil del usuario
-                      example: http://example.com/foto.jpg
-                    estado:
-                      type: string
-                      enum:
-                        - activo
-                        - inactivo
-                      default: activo
-                      description: Estado del usuario
-                      example: activo
-                    nombreFantasia:
-                      anyOf:
-                        - type: string
-                          minLength: 2
-                          maxLength: 30
-                        - type: string
-                          enum:
-                            - ""
-                      description: Nombre de fantasía del prestatario
-                      example: Servicios SRL
-                    descripcion:
-                      anyOf:
-                        - type: string
-                        - type: string
-                          enum:
-                            - ""
-                      description: Descripción del prestatario
-                      example: Ofrecemos servicios de plomería y electricidad.
-                  required:
-                    - nombre
-                    - apellido
-                    - mail
-                    - tipoDoc
-                    - numeroDoc
-                    - telefono
-                    - direccion
               required:
                 - diaSemana
                 - horaDesde
                 - horaHasta
-                - usuario
-              title: CrearHorario
-              description: Esquema para crear un nuevo horario
       responses:
         "201":
           description: Horario creado exitosamente
@@ -5406,6 +6686,12 @@ paths:
                       usuario:
                         type: object
                         properties:
+                          id:
+                            type: integer
+                            minimum: 0
+                            exclusiveMinimum: true
+                            description: ID del usuario
+                            example: 1
                           nombre:
                             type: string
                             minLength: 2
@@ -5485,6 +6771,7 @@ paths:
                             description: Descripción del prestatario
                             example: Ofrecemos servicios de plomería y electricidad.
                         required:
+                          - id
                           - nombre
                           - apellido
                           - mail
@@ -5492,11 +6779,20 @@ paths:
                           - numeroDoc
                           - telefono
                           - direccion
+                      id:
+                        type: integer
+                        minimum: 0
+                        exclusiveMinimum: true
+                        description: ID del usuario
+                        example: 1
                     required:
                       - diaSemana
                       - horaDesde
                       - horaHasta
                       - usuario
+                      - id
+                    title: CrearHorario
+                    description: Esquema para crear un nuevo horario
                 required:
                   - message
                   - data
@@ -5564,19 +6860,12 @@ paths:
                   - message
                 title: Error
                 description: Esquema para representar un error
-  /api/horario/{id}:
+  /api/horario/:
     get:
-      description: Obtener un horario por ID
-      summary: Obtener horario
+      description: Obtener todos los horarios
+      summary: Obtener horarios
       tags:
         - Horarios
-      parameters:
-        - schema:
-            type: string
-            pattern: ^\d+$
-          required: true
-          name: id
-          in: path
       responses:
         "200":
           description: Horario encontrado
@@ -5610,6 +6899,12 @@ paths:
                       usuario:
                         type: object
                         properties:
+                          id:
+                            type: integer
+                            minimum: 0
+                            exclusiveMinimum: true
+                            description: ID del usuario
+                            example: 1
                           nombre:
                             type: string
                             minLength: 2
@@ -5689,6 +6984,7 @@ paths:
                             description: Descripción del prestatario
                             example: Ofrecemos servicios de plomería y electricidad.
                         required:
+                          - id
                           - nombre
                           - apellido
                           - mail
@@ -5696,11 +6992,20 @@ paths:
                           - numeroDoc
                           - telefono
                           - direccion
+                      id:
+                        type: integer
+                        minimum: 0
+                        exclusiveMinimum: true
+                        description: ID del usuario
+                        example: 1
                     required:
                       - diaSemana
                       - horaDesde
                       - horaHasta
                       - usuario
+                      - id
+                    title: GetHorario
+                    description: Esquema para obtener un horario
                 required:
                   - message
                   - data
@@ -5768,6 +7073,122 @@ paths:
                   - message
                 title: Error
                 description: Esquema para representar un error
+  /api/horario/{usuario}:
+    get:
+      description: Obtener horarios por ID de usuario
+      summary: Obtener horarios por usuario
+      tags:
+        - Horarios
+      parameters:
+        - schema:
+            type: string
+            pattern: ^\d+$
+            description: ID del usuario
+            example: "1"
+          required: true
+          description: ID del usuario
+          name: usuario
+          in: path
+      responses:
+        "200":
+          description: Horarios encontrados
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  diaSemana:
+                    type: integer
+                    minimum: 0
+                    maximum: 6
+                    description: Día de la semana (0-6, donde 0 es Lunes y 6 es Domingo)
+                    example: 0
+                  horaDesde:
+                    type: string
+                    pattern: ^([0-1]\d|2[0-3]):([0-5]\d):([0-5]\d)$
+                    description: Hora de inicio en formato HH:mm:ss
+                    example: 08:00:00
+                  horaHasta:
+                    type: string
+                    pattern: ^([0-1]\d|2[0-3]):([0-5]\d):([0-5]\d)$
+                    description: Hora de fin en formato HH:mm:ss
+                    example: 17:00:00
+                  usuario:
+                    type: integer
+                    minimum: 0
+                    exclusiveMinimum: true
+                    description: ID del usuario asociado al horario
+                    example: 1
+                required:
+                  - diaSemana
+                  - horaDesde
+                  - horaHasta
+                  - usuario
+        "404":
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: El horario no fue encontrado
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: id
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: id inválido
+                      required:
+                        - field
+                        - message
+                    description: Lista de errores de validación
+                required:
+                  - message
+                title: Error
+                description: Esquema para representar un error
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: El horario no fue encontrado
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: id
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: id inválido
+                      required:
+                        - field
+                        - message
+                    description: Lista de errores de validación
+                required:
+                  - message
+                title: Error
+                description: Esquema para representar un error
+  /api/horario/{id}:
     put:
       description: Actualizar un horario existente
       summary: Actualizar horario
@@ -5777,7 +7198,10 @@ paths:
         - schema:
             type: string
             pattern: ^\d+$
+            description: ID del recurso
+            example: "1"
           required: true
+          description: ID del recurso
           name: id
           in: path
       requestBody:
@@ -5787,113 +7211,14 @@ paths:
             schema:
               type: object
               properties:
-                diaSemana:
-                  type: integer
-                  minimum: 0
-                  maximum: 6
-                  description: Día de la semana (0-6, donde 0 es Lunes y 6 es Domingo)
-                  example: 0
-                horaDesde:
+                id:
                   type: string
-                  pattern: ^([0-1]\d|2[0-3]):([0-5]\d):([0-5]\d)$
-                  description: Hora de inicio en formato HH:mm:ss
-                  example: 08:00:00
-                horaHasta:
-                  type: string
-                  pattern: ^([0-1]\d|2[0-3]):([0-5]\d):([0-5]\d)$
-                  description: Hora de fin en formato HH:mm:ss
-                  example: 17:00:00
-                usuario:
-                  type: object
-                  properties:
-                    nombre:
-                      type: string
-                      minLength: 2
-                      maxLength: 50
-                      pattern: ^[a-zA-ZÀ-ÿ\s]+$
-                      description: Nombre del usuario
-                      example: Juan
-                    apellido:
-                      type: string
-                      minLength: 2
-                      maxLength: 50
-                      pattern: ^[a-zA-ZÀ-ÿ\s]+$
-                      description: Apellido del usuario
-                      example: Pérez
-                    mail:
-                      type: string
-                      maxLength: 100
-                      format: email
-                      description: Correo electrónico del usuario
-                      example: juan.perez@gmail.com
-                    tipoDoc:
-                      type: string
-                      enum:
-                        - DNI
-                        - CUIT
-                        - CUIL
-                      description: Tipo de documento
-                      example: DNI
-                    numeroDoc:
-                      type: string
-                      minLength: 7
-                      maxLength: 13
-                      pattern: ^[0-9\-]+$
-                      description: Número de documento
-                      example: "12345678"
-                    telefono:
-                      type: string
-                      pattern: ^[+]?[0-9\s\-()]{8,20}$
-                      description: Número de teléfono
-                      example: +54 11 1234-5678
-                    direccion:
-                      type: string
-                      minLength: 5
-                      maxLength: 200
-                      description: Dirección del usuario
-                      example: Av. Corrientes 1234
-                    foto:
-                      type: string
-                      maxLength: 200
-                      format: uri
-                      description: URL de la foto de perfil del usuario
-                      example: http://example.com/foto.jpg
-                    estado:
-                      type: string
-                      enum:
-                        - activo
-                        - inactivo
-                      default: activo
-                      description: Estado del usuario
-                      example: activo
-                    nombreFantasia:
-                      anyOf:
-                        - type: string
-                          minLength: 2
-                          maxLength: 30
-                        - type: string
-                          enum:
-                            - ""
-                      description: Nombre de fantasía del prestatario
-                      example: Servicios SRL
-                    descripcion:
-                      anyOf:
-                        - type: string
-                        - type: string
-                          enum:
-                            - ""
-                      description: Descripción del prestatario
-                      example: Ofrecemos servicios de plomería y electricidad.
-                  required:
-                    - nombre
-                    - apellido
-                    - mail
-                    - tipoDoc
-                    - numeroDoc
-                    - telefono
-                    - direccion
-              title: ActualizarHorario
-              description: Esquema para actualizar un horario existente
+                  pattern: ^\d+$
+                  description: ID del recurso
+                  example: "1"
+              required:
+                - id
+              description: Esquema para validar el parámetro ID
       responses:
         "200":
           description: Horario actualizado exitosamente
@@ -5927,6 +7252,12 @@ paths:
                       usuario:
                         type: object
                         properties:
+                          id:
+                            type: integer
+                            minimum: 0
+                            exclusiveMinimum: true
+                            description: ID del usuario
+                            example: 1
                           nombre:
                             type: string
                             minLength: 2
@@ -6006,6 +7337,7 @@ paths:
                             description: Descripción del prestatario
                             example: Ofrecemos servicios de plomería y electricidad.
                         required:
+                          - id
                           - nombre
                           - apellido
                           - mail
@@ -6013,11 +7345,14 @@ paths:
                           - numeroDoc
                           - telefono
                           - direccion
-                    required:
-                      - diaSemana
-                      - horaDesde
-                      - horaHasta
-                      - usuario
+                      id:
+                        type: integer
+                        minimum: 0
+                        exclusiveMinimum: true
+                        description: ID del usuario
+                        example: 1
+                    title: ActualizarHorario
+                    description: Esquema para actualizar un horario existente
                 required:
                   - message
                   - data
@@ -6094,7 +7429,10 @@ paths:
         - schema:
             type: string
             pattern: ^\d+$
+            description: ID del recurso
+            example: "1"
           required: true
+          description: ID del recurso
           name: id
           in: path
       responses:
@@ -6108,8 +7446,138 @@ paths:
                   message:
                     type: string
                     example: Horario eliminado exitosamente
+                  data:
+                    type: object
+                    properties:
+                      diaSemana:
+                        type: integer
+                        minimum: 0
+                        maximum: 6
+                        description: Día de la semana (0-6, donde 0 es Lunes y 6 es Domingo)
+                        example: 0
+                      horaDesde:
+                        type: string
+                        pattern: ^([0-1]\d|2[0-3]):([0-5]\d):([0-5]\d)$
+                        description: Hora de inicio en formato HH:mm:ss
+                        example: 08:00:00
+                      horaHasta:
+                        type: string
+                        pattern: ^([0-1]\d|2[0-3]):([0-5]\d):([0-5]\d)$
+                        description: Hora de fin en formato HH:mm:ss
+                        example: 17:00:00
+                      usuario:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            minimum: 0
+                            exclusiveMinimum: true
+                            description: ID del usuario
+                            example: 1
+                          nombre:
+                            type: string
+                            minLength: 2
+                            maxLength: 50
+                            pattern: ^[a-zA-ZÀ-ÿ\s]+$
+                            description: Nombre del usuario
+                            example: Juan
+                          apellido:
+                            type: string
+                            minLength: 2
+                            maxLength: 50
+                            pattern: ^[a-zA-ZÀ-ÿ\s]+$
+                            description: Apellido del usuario
+                            example: Pérez
+                          mail:
+                            type: string
+                            maxLength: 100
+                            format: email
+                            description: Correo electrónico del usuario
+                            example: juan.perez@gmail.com
+                          tipoDoc:
+                            type: string
+                            enum:
+                              - DNI
+                              - CUIT
+                              - CUIL
+                            description: Tipo de documento
+                            example: DNI
+                          numeroDoc:
+                            type: string
+                            minLength: 7
+                            maxLength: 13
+                            pattern: ^[0-9\-]+$
+                            description: Número de documento
+                            example: "12345678"
+                          telefono:
+                            type: string
+                            pattern: ^[+]?[0-9\s\-()]{8,20}$
+                            description: Número de teléfono
+                            example: +54 11 1234-5678
+                          direccion:
+                            type: string
+                            minLength: 5
+                            maxLength: 200
+                            description: Dirección del usuario
+                            example: Av. Corrientes 1234
+                          foto:
+                            type: string
+                            maxLength: 200
+                            format: uri
+                            description: URL de la foto de perfil del usuario
+                            example: http://example.com/foto.jpg
+                          estado:
+                            type: string
+                            enum:
+                              - activo
+                              - inactivo
+                            default: activo
+                            description: Estado del usuario
+                            example: activo
+                          nombreFantasia:
+                            anyOf:
+                              - type: string
+                                minLength: 2
+                                maxLength: 30
+                              - type: string
+                                enum:
+                                  - ""
+                            description: Nombre de fantasía del prestatario
+                            example: Servicios SRL
+                          descripcion:
+                            anyOf:
+                              - type: string
+                              - type: string
+                                enum:
+                                  - ""
+                            description: Descripción del prestatario
+                            example: Ofrecemos servicios de plomería y electricidad.
+                        required:
+                          - id
+                          - nombre
+                          - apellido
+                          - mail
+                          - tipoDoc
+                          - numeroDoc
+                          - telefono
+                          - direccion
+                      id:
+                        type: integer
+                        minimum: 0
+                        exclusiveMinimum: true
+                        description: ID del usuario
+                        example: 1
+                    required:
+                      - diaSemana
+                      - horaDesde
+                      - horaHasta
+                      - usuario
+                      - id
+                    title: BorrarHorario
+                    description: Esquema para eliminar un horario
                 required:
                   - message
+                  - data
         "404":
           description: Horario no encontrado
           content:
@@ -6174,3 +7642,2982 @@ paths:
                   - message
                 title: Error
                 description: Esquema para representar un error
+  /api/pago:
+    post:
+      description: Crear un nuevo pago
+      summary: Crear pago
+      tags:
+        - Pagos
+      requestBody:
+        description: Datos del pago a crear
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                paymentIntentId:
+                  type: string
+                  minLength: 1
+                  description: ID del pago en Stripe
+                  example: pi_1JXXXXXX
+                amount:
+                  type: number
+                  minimum: 350
+                  description: Monto del pago en centavos
+                  example: 1000
+                currency:
+                  type: string
+                  minLength: 3
+                  maxLength: 3
+                  description: "Moneda del pago en formato ISO (ej: usd, ars)"
+                  example: usd
+                estado:
+                  type: string
+                  enum:
+                    - requires_payment_method
+                    - requires_confirmation
+                    - requires_action
+                    - processing
+                    - succeeded
+                    - requires_capture
+                    - canceled
+                  description: Estado del pago en Stripe
+                  example: succeeded
+                sellerStripeId:
+                  type: string
+                  minLength: 1
+                  description: ID del vendedor de la cuenta de Stripe
+                  example: acct_1JXXXXXX
+                amountReceived:
+                  type: number
+                  minimum: 0
+                  description: Monto recibido por el vendedor en centavos
+                  example: 950
+                applicationFeeAmount:
+                  type: number
+                  minimum: 0
+                  description: Comisión de la plataforma en centavos
+                  example: 50
+                transferId:
+                  type: string
+                  description: ID de la transferencia a la cuenta del vendedor en Stripe
+                  example: tr_1JXXXXXX
+                buyerEmail:
+                  type: string
+                  format: email
+                  description: Correo electrónico del comprador
+                  example: buyer@example.com
+                metadata:
+                  type: object
+                  additionalProperties:
+                    nullable: true
+                  description: Datos adicionales como productId, orderId
+                  example: *a1
+                createdAt:
+                  type: string
+                  format: date-time
+                  description: Fecha de creación del pago en formato ISO
+                  example: 2023-10-01T12:34:56Z
+                updatedAt:
+                  type: string
+                  format: date-time
+                  description: Fecha de última actualización del pago en formato ISO
+                  example: 2023-10-01T12:34:56Z
+                turno:
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  description: ID del turno asociado al pago
+                  example: 15
+              required:
+                - paymentIntentId
+                - amount
+                - currency
+                - estado
+                - sellerStripeId
+                - amountReceived
+                - createdAt
+                - updatedAt
+                - turno
+      responses:
+        "201":
+          description: Pago creado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Pago creado exitosamente
+                  data:
+                    type: object
+                    properties:
+                      paymentIntentId:
+                        type: string
+                        minLength: 1
+                        description: ID del pago en Stripe
+                        example: pi_1JXXXXXX
+                      amount:
+                        type: number
+                        minimum: 350
+                        description: Monto del pago en centavos
+                        example: 1000
+                      currency:
+                        type: string
+                        minLength: 3
+                        maxLength: 3
+                        description: "Moneda del pago en formato ISO (ej: usd, ars)"
+                        example: usd
+                      estado:
+                        type: string
+                        enum:
+                          - requires_payment_method
+                          - requires_confirmation
+                          - requires_action
+                          - processing
+                          - succeeded
+                          - requires_capture
+                          - canceled
+                        description: Estado del pago en Stripe
+                        example: succeeded
+                      sellerStripeId:
+                        type: string
+                        minLength: 1
+                        description: ID del vendedor de la cuenta de Stripe
+                        example: acct_1JXXXXXX
+                      amountReceived:
+                        type: number
+                        minimum: 0
+                        description: Monto recibido por el vendedor en centavos
+                        example: 950
+                      applicationFeeAmount:
+                        type: number
+                        minimum: 0
+                        description: Comisión de la plataforma en centavos
+                        example: 50
+                      transferId:
+                        type: string
+                        description: ID de la transferencia a la cuenta del vendedor en Stripe
+                        example: tr_1JXXXXXX
+                      buyerEmail:
+                        type: string
+                        format: email
+                        description: Correo electrónico del comprador
+                        example: buyer@example.com
+                      metadata:
+                        type: object
+                        additionalProperties:
+                          nullable: true
+                        description: Datos adicionales como productId, orderId
+                        example: *a1
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: Fecha de creación del pago en formato ISO
+                        example: 2023-10-01T12:34:56Z
+                      updatedAt:
+                        type: string
+                        format: date-time
+                        description: Fecha de última actualización del pago en formato ISO
+                        example: 2023-10-01T12:34:56Z
+                      id:
+                        type: number
+                        description: ID del turno
+                        example: 1
+                      turno:
+                        type: integer
+                        minimum: 0
+                        exclusiveMinimum: true
+                        description: ID del turno asociado al pago
+                        example: 15
+                    required:
+                      - paymentIntentId
+                      - amount
+                      - currency
+                      - estado
+                      - sellerStripeId
+                      - amountReceived
+                      - createdAt
+                      - updatedAt
+                      - id
+                      - turno
+                    title: CreatePago
+                    description: Esquema para crear un nuevo pago
+                required:
+                  - message
+                  - data
+        "400":
+          description: Error de validación
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Ocurrió un error inesperado
+                  statusCode:
+                    type: number
+                    description: Código de estado HTTP
+                    example: 500
+                  details:
+                    type: array
+                    items:
+                      type: string
+                    description: Detalles adicionales del error
+                    example: &a2
+                      - Detalle 1
+                      - Detalle 2
+                required:
+                  - message
+                  - statusCode
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Ocurrió un error inesperado
+                  statusCode:
+                    type: number
+                    description: Código de estado HTTP
+                    example: 500
+                  details:
+                    type: array
+                    items:
+                      type: string
+                    description: Detalles adicionales del error
+                    example: *a2
+                required:
+                  - message
+                  - statusCode
+  /api/pago/{id}:
+    get:
+      description: Obtener un pago por ID
+      summary: Obtener pago
+      tags:
+        - Pagos
+      parameters:
+        - schema:
+            type: string
+            pattern: ^\d+$
+            description: ID del recurso
+            example: "123"
+          required: true
+          description: ID del recurso
+          name: id
+          in: path
+      responses:
+        "200":
+          description: Pago encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Pago encontrado
+                  data:
+                    type: object
+                    properties:
+                      paymentIntentId:
+                        type: string
+                        minLength: 1
+                        description: ID del pago en Stripe
+                        example: pi_1JXXXXXX
+                      amount:
+                        type: number
+                        minimum: 350
+                        description: Monto del pago en centavos
+                        example: 1000
+                      currency:
+                        type: string
+                        minLength: 3
+                        maxLength: 3
+                        description: "Moneda del pago en formato ISO (ej: usd, ars)"
+                        example: usd
+                      estado:
+                        type: string
+                        enum:
+                          - requires_payment_method
+                          - requires_confirmation
+                          - requires_action
+                          - processing
+                          - succeeded
+                          - requires_capture
+                          - canceled
+                        description: Estado del pago en Stripe
+                        example: succeeded
+                      sellerStripeId:
+                        type: string
+                        minLength: 1
+                        description: ID del vendedor de la cuenta de Stripe
+                        example: acct_1JXXXXXX
+                      amountReceived:
+                        type: number
+                        minimum: 0
+                        description: Monto recibido por el vendedor en centavos
+                        example: 950
+                      applicationFeeAmount:
+                        type: number
+                        minimum: 0
+                        description: Comisión de la plataforma en centavos
+                        example: 50
+                      transferId:
+                        type: string
+                        description: ID de la transferencia a la cuenta del vendedor en Stripe
+                        example: tr_1JXXXXXX
+                      buyerEmail:
+                        type: string
+                        format: email
+                        description: Correo electrónico del comprador
+                        example: buyer@example.com
+                      metadata:
+                        type: object
+                        additionalProperties:
+                          nullable: true
+                        description: Datos adicionales como productId, orderId
+                        example: *a1
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: Fecha de creación del pago en formato ISO
+                        example: 2023-10-01T12:34:56Z
+                      updatedAt:
+                        type: string
+                        format: date-time
+                        description: Fecha de última actualización del pago en formato ISO
+                        example: 2023-10-01T12:34:56Z
+                      id:
+                        type: number
+                        description: ID del turno
+                        example: 1
+                      turno:
+                        type: object
+                        properties:
+                          id:
+                            type: number
+                            description: ID del turno
+                            example: 1
+                          fechaTurno:
+                            type: string
+                            description: Fecha del turno
+                            example: 2024-03-15
+                          horaTurno:
+                            type: string
+                            description: Hora del turno
+                            example: 14:30
+                          estado:
+                            type: string
+                            description: Estado del turno
+                            example: confirmado
+                          calificacion:
+                            type: number
+                            nullable: true
+                            description: Calificación del turno (1-5)
+                            example: 4.5
+                          comentario:
+                            type: string
+                            nullable: true
+                            description: Comentario del cliente
+                            example: Excelente servicio
+                        required:
+                          - id
+                          - fechaTurno
+                          - horaTurno
+                          - estado
+                          - calificacion
+                          - comentario
+                    required:
+                      - paymentIntentId
+                      - amount
+                      - currency
+                      - estado
+                      - sellerStripeId
+                      - amountReceived
+                      - createdAt
+                      - updatedAt
+                      - id
+                      - turno
+                    title: GetPago
+                    description: Esquema para obtener un pago existente
+                required:
+                  - message
+                  - data
+        "404":
+          description: Pago no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Ocurrió un error inesperado
+                  statusCode:
+                    type: number
+                    description: Código de estado HTTP
+                    example: 500
+                  details:
+                    type: array
+                    items:
+                      type: string
+                    description: Detalles adicionales del error
+                    example: *a2
+                required:
+                  - message
+                  - statusCode
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Ocurrió un error inesperado
+                  statusCode:
+                    type: number
+                    description: Código de estado HTTP
+                    example: 500
+                  details:
+                    type: array
+                    items:
+                      type: string
+                    description: Detalles adicionales del error
+                    example: *a2
+                required:
+                  - message
+                  - statusCode
+    put:
+      description: Actualizar un pago existente
+      summary: Actualizar pago
+      tags:
+        - Pagos
+      parameters:
+        - schema:
+            type: string
+            pattern: ^\d+$
+            description: ID del recurso
+            example: "123"
+          required: true
+          description: ID del recurso
+          name: id
+          in: path
+      requestBody:
+        description: Datos del pago a actualizar
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                paymentIntentId:
+                  type: string
+                  minLength: 1
+                  description: ID del pago en Stripe
+                  example: pi_1JXXXXXX
+                amount:
+                  type: number
+                  minimum: 350
+                  description: Monto del pago en centavos
+                  example: 1000
+                currency:
+                  type: string
+                  minLength: 3
+                  maxLength: 3
+                  description: "Moneda del pago en formato ISO (ej: usd, ars)"
+                  example: usd
+                estado:
+                  type: string
+                  enum:
+                    - requires_payment_method
+                    - requires_confirmation
+                    - requires_action
+                    - processing
+                    - succeeded
+                    - requires_capture
+                    - canceled
+                  description: Estado del pago en Stripe
+                  example: succeeded
+                sellerStripeId:
+                  type: string
+                  minLength: 1
+                  description: ID del vendedor de la cuenta de Stripe
+                  example: acct_1JXXXXXX
+                amountReceived:
+                  type: number
+                  minimum: 0
+                  description: Monto recibido por el vendedor en centavos
+                  example: 950
+                applicationFeeAmount:
+                  type: number
+                  minimum: 0
+                  description: Comisión de la plataforma en centavos
+                  example: 50
+                transferId:
+                  type: string
+                  description: ID de la transferencia a la cuenta del vendedor en Stripe
+                  example: tr_1JXXXXXX
+                buyerEmail:
+                  type: string
+                  format: email
+                  description: Correo electrónico del comprador
+                  example: buyer@example.com
+                metadata:
+                  type: object
+                  additionalProperties:
+                    nullable: true
+                  description: Datos adicionales como productId, orderId
+                  example: *a1
+                createdAt:
+                  type: string
+                  format: date-time
+                  description: Fecha de creación del pago en formato ISO
+                  example: 2023-10-01T12:34:56Z
+                updatedAt:
+                  type: string
+                  format: date-time
+                  description: Fecha de última actualización del pago en formato ISO
+                  example: 2023-10-01T12:34:56Z
+                id:
+                  type: number
+                  description: ID del turno
+                  example: 1
+                turno:
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                      description: ID del turno
+                      example: 1
+                    fechaTurno:
+                      type: string
+                      description: Fecha del turno
+                      example: 2024-03-15
+                    horaTurno:
+                      type: string
+                      description: Hora del turno
+                      example: 14:30
+                    estado:
+                      type: string
+                      description: Estado del turno
+                      example: confirmado
+                    calificacion:
+                      type: number
+                      nullable: true
+                      description: Calificación del turno (1-5)
+                      example: 4.5
+                    comentario:
+                      type: string
+                      nullable: true
+                      description: Comentario del cliente
+                      example: Excelente servicio
+                  required:
+                    - id
+                    - fechaTurno
+                    - horaTurno
+                    - estado
+                    - calificacion
+                    - comentario
+              title: UpdatePago
+              description: Esquema para actualizar un pago existente
+      responses:
+        "200":
+          description: Pago actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Pago actualizado exitosamente
+                  data:
+                    type: object
+                    properties:
+                      paymentIntentId:
+                        type: string
+                        minLength: 1
+                        description: ID del pago en Stripe
+                        example: pi_1JXXXXXX
+                      amount:
+                        type: number
+                        minimum: 350
+                        description: Monto del pago en centavos
+                        example: 1000
+                      currency:
+                        type: string
+                        minLength: 3
+                        maxLength: 3
+                        description: "Moneda del pago en formato ISO (ej: usd, ars)"
+                        example: usd
+                      estado:
+                        type: string
+                        enum:
+                          - requires_payment_method
+                          - requires_confirmation
+                          - requires_action
+                          - processing
+                          - succeeded
+                          - requires_capture
+                          - canceled
+                        description: Estado del pago en Stripe
+                        example: succeeded
+                      sellerStripeId:
+                        type: string
+                        minLength: 1
+                        description: ID del vendedor de la cuenta de Stripe
+                        example: acct_1JXXXXXX
+                      amountReceived:
+                        type: number
+                        minimum: 0
+                        description: Monto recibido por el vendedor en centavos
+                        example: 950
+                      applicationFeeAmount:
+                        type: number
+                        minimum: 0
+                        description: Comisión de la plataforma en centavos
+                        example: 50
+                      transferId:
+                        type: string
+                        description: ID de la transferencia a la cuenta del vendedor en Stripe
+                        example: tr_1JXXXXXX
+                      buyerEmail:
+                        type: string
+                        format: email
+                        description: Correo electrónico del comprador
+                        example: buyer@example.com
+                      metadata:
+                        type: object
+                        additionalProperties:
+                          nullable: true
+                        description: Datos adicionales como productId, orderId
+                        example: *a1
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: Fecha de creación del pago en formato ISO
+                        example: 2023-10-01T12:34:56Z
+                      updatedAt:
+                        type: string
+                        format: date-time
+                        description: Fecha de última actualización del pago en formato ISO
+                        example: 2023-10-01T12:34:56Z
+                      id:
+                        type: number
+                        description: ID del turno
+                        example: 1
+                      turno:
+                        type: object
+                        properties:
+                          id:
+                            type: number
+                            description: ID del turno
+                            example: 1
+                          fechaTurno:
+                            type: string
+                            description: Fecha del turno
+                            example: 2024-03-15
+                          horaTurno:
+                            type: string
+                            description: Hora del turno
+                            example: 14:30
+                          estado:
+                            type: string
+                            description: Estado del turno
+                            example: confirmado
+                          calificacion:
+                            type: number
+                            nullable: true
+                            description: Calificación del turno (1-5)
+                            example: 4.5
+                          comentario:
+                            type: string
+                            nullable: true
+                            description: Comentario del cliente
+                            example: Excelente servicio
+                        required:
+                          - id
+                          - fechaTurno
+                          - horaTurno
+                          - estado
+                          - calificacion
+                          - comentario
+                    title: UpdatePago
+                    description: Esquema para actualizar un pago existente
+                required:
+                  - message
+                  - data
+        "404":
+          description: Pago no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Ocurrió un error inesperado
+                  statusCode:
+                    type: number
+                    description: Código de estado HTTP
+                    example: 500
+                  details:
+                    type: array
+                    items:
+                      type: string
+                    description: Detalles adicionales del error
+                    example: *a2
+                required:
+                  - message
+                  - statusCode
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Ocurrió un error inesperado
+                  statusCode:
+                    type: number
+                    description: Código de estado HTTP
+                    example: 500
+                  details:
+                    type: array
+                    items:
+                      type: string
+                    description: Detalles adicionales del error
+                    example: *a2
+                required:
+                  - message
+                  - statusCode
+    delete:
+      description: Eliminar un pago por ID
+      summary: Eliminar pago
+      tags:
+        - Pagos
+      parameters:
+        - schema:
+            type: string
+            pattern: ^\d+$
+            description: ID del recurso
+            example: "123"
+          required: true
+          description: ID del recurso
+          name: id
+          in: path
+      responses:
+        "200":
+          description: Pago eliminado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Pago eliminado exitosamente
+                  data:
+                    type: object
+                    properties:
+                      paymentIntentId:
+                        type: string
+                        minLength: 1
+                        description: ID del pago en Stripe
+                        example: pi_1JXXXXXX
+                      amount:
+                        type: number
+                        minimum: 350
+                        description: Monto del pago en centavos
+                        example: 1000
+                      currency:
+                        type: string
+                        minLength: 3
+                        maxLength: 3
+                        description: "Moneda del pago en formato ISO (ej: usd, ars)"
+                        example: usd
+                      estado:
+                        type: string
+                        enum:
+                          - requires_payment_method
+                          - requires_confirmation
+                          - requires_action
+                          - processing
+                          - succeeded
+                          - requires_capture
+                          - canceled
+                        description: Estado del pago en Stripe
+                        example: succeeded
+                      sellerStripeId:
+                        type: string
+                        minLength: 1
+                        description: ID del vendedor de la cuenta de Stripe
+                        example: acct_1JXXXXXX
+                      amountReceived:
+                        type: number
+                        minimum: 0
+                        description: Monto recibido por el vendedor en centavos
+                        example: 950
+                      applicationFeeAmount:
+                        type: number
+                        minimum: 0
+                        description: Comisión de la plataforma en centavos
+                        example: 50
+                      transferId:
+                        type: string
+                        description: ID de la transferencia a la cuenta del vendedor en Stripe
+                        example: tr_1JXXXXXX
+                      buyerEmail:
+                        type: string
+                        format: email
+                        description: Correo electrónico del comprador
+                        example: buyer@example.com
+                      metadata:
+                        type: object
+                        additionalProperties:
+                          nullable: true
+                        description: Datos adicionales como productId, orderId
+                        example: *a1
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: Fecha de creación del pago en formato ISO
+                        example: 2023-10-01T12:34:56Z
+                      updatedAt:
+                        type: string
+                        format: date-time
+                        description: Fecha de última actualización del pago en formato ISO
+                        example: 2023-10-01T12:34:56Z
+                      id:
+                        type: number
+                        description: ID del turno
+                        example: 1
+                      turno:
+                        type: object
+                        properties:
+                          id:
+                            type: number
+                            description: ID del turno
+                            example: 1
+                          fechaTurno:
+                            type: string
+                            description: Fecha del turno
+                            example: 2024-03-15
+                          horaTurno:
+                            type: string
+                            description: Hora del turno
+                            example: 14:30
+                          estado:
+                            type: string
+                            description: Estado del turno
+                            example: confirmado
+                          calificacion:
+                            type: number
+                            nullable: true
+                            description: Calificación del turno (1-5)
+                            example: 4.5
+                          comentario:
+                            type: string
+                            nullable: true
+                            description: Comentario del cliente
+                            example: Excelente servicio
+                        required:
+                          - id
+                          - fechaTurno
+                          - horaTurno
+                          - estado
+                          - calificacion
+                          - comentario
+                    required:
+                      - paymentIntentId
+                      - amount
+                      - currency
+                      - estado
+                      - sellerStripeId
+                      - amountReceived
+                      - createdAt
+                      - updatedAt
+                      - id
+                      - turno
+                    title: DeletePago
+                    description: Esquema para eliminar un pago existente
+                required:
+                  - message
+                  - data
+        "404":
+          description: Pago no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Ocurrió un error inesperado
+                  statusCode:
+                    type: number
+                    description: Código de estado HTTP
+                    example: 500
+                  details:
+                    type: array
+                    items:
+                      type: string
+                    description: Detalles adicionales del error
+                    example: *a2
+                required:
+                  - message
+                  - statusCode
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Ocurrió un error inesperado
+                  statusCode:
+                    type: number
+                    description: Código de estado HTTP
+                    example: 500
+                  details:
+                    type: array
+                    items:
+                      type: string
+                    description: Detalles adicionales del error
+                    example: *a2
+                required:
+                  - message
+                  - statusCode
+  /api/pago/:
+    get:
+      description: Obtener todos los pagos
+      summary: Obtener pagos
+      tags:
+        - Pagos
+      responses:
+        "200":
+          description: Pago encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Pago encontrado
+                  data:
+                    type: object
+                    properties:
+                      paymentIntentId:
+                        type: string
+                        minLength: 1
+                        description: ID del pago en Stripe
+                        example: pi_1JXXXXXX
+                      amount:
+                        type: number
+                        minimum: 350
+                        description: Monto del pago en centavos
+                        example: 1000
+                      currency:
+                        type: string
+                        minLength: 3
+                        maxLength: 3
+                        description: "Moneda del pago en formato ISO (ej: usd, ars)"
+                        example: usd
+                      estado:
+                        type: string
+                        enum:
+                          - requires_payment_method
+                          - requires_confirmation
+                          - requires_action
+                          - processing
+                          - succeeded
+                          - requires_capture
+                          - canceled
+                        description: Estado del pago en Stripe
+                        example: succeeded
+                      sellerStripeId:
+                        type: string
+                        minLength: 1
+                        description: ID del vendedor de la cuenta de Stripe
+                        example: acct_1JXXXXXX
+                      amountReceived:
+                        type: number
+                        minimum: 0
+                        description: Monto recibido por el vendedor en centavos
+                        example: 950
+                      applicationFeeAmount:
+                        type: number
+                        minimum: 0
+                        description: Comisión de la plataforma en centavos
+                        example: 50
+                      transferId:
+                        type: string
+                        description: ID de la transferencia a la cuenta del vendedor en Stripe
+                        example: tr_1JXXXXXX
+                      buyerEmail:
+                        type: string
+                        format: email
+                        description: Correo electrónico del comprador
+                        example: buyer@example.com
+                      metadata:
+                        type: object
+                        additionalProperties:
+                          nullable: true
+                        description: Datos adicionales como productId, orderId
+                        example: *a1
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: Fecha de creación del pago en formato ISO
+                        example: 2023-10-01T12:34:56Z
+                      updatedAt:
+                        type: string
+                        format: date-time
+                        description: Fecha de última actualización del pago en formato ISO
+                        example: 2023-10-01T12:34:56Z
+                      id:
+                        type: number
+                        description: ID del turno
+                        example: 1
+                      turno:
+                        type: object
+                        properties:
+                          id:
+                            type: number
+                            description: ID del turno
+                            example: 1
+                          fechaTurno:
+                            type: string
+                            description: Fecha del turno
+                            example: 2024-03-15
+                          horaTurno:
+                            type: string
+                            description: Hora del turno
+                            example: 14:30
+                          estado:
+                            type: string
+                            description: Estado del turno
+                            example: confirmado
+                          calificacion:
+                            type: number
+                            nullable: true
+                            description: Calificación del turno (1-5)
+                            example: 4.5
+                          comentario:
+                            type: string
+                            nullable: true
+                            description: Comentario del cliente
+                            example: Excelente servicio
+                        required:
+                          - id
+                          - fechaTurno
+                          - horaTurno
+                          - estado
+                          - calificacion
+                          - comentario
+                    required:
+                      - paymentIntentId
+                      - amount
+                      - currency
+                      - estado
+                      - sellerStripeId
+                      - amountReceived
+                      - createdAt
+                      - updatedAt
+                      - id
+                      - turno
+                    title: GetPago
+                    description: Esquema para obtener un pago existente
+                required:
+                  - message
+                  - data
+        "404":
+          description: Pago no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Ocurrió un error inesperado
+                  statusCode:
+                    type: number
+                    description: Código de estado HTTP
+                    example: 500
+                  details:
+                    type: array
+                    items:
+                      type: string
+                    description: Detalles adicionales del error
+                    example: *a2
+                required:
+                  - message
+                  - statusCode
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: Ocurrió un error inesperado
+                  statusCode:
+                    type: number
+                    description: Código de estado HTTP
+                    example: 500
+                  details:
+                    type: array
+                    items:
+                      type: string
+                    description: Detalles adicionales del error
+                    example: *a2
+                required:
+                  - message
+                  - statusCode
+  /api/tarea:
+    post:
+      description: Crear una nueva tarea
+      summary: Crear tarea
+      tags:
+        - Tareas
+      requestBody:
+        description: Datos de la tarea a crear
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombreTarea:
+                  type: string
+                  minLength: 2
+                  maxLength: 100
+                  description: Nombre de la tarea
+                  example: Reparación de grifería
+                descripcionTarea:
+                  type: string
+                  maxLength: 500
+                  description: Descripción de la tarea
+                  example: Reparación y mantenimiento de grifería en el hogar
+                duracionTarea:
+                  type: number
+                  minimum: 0
+                  exclusiveMinimum: true
+                  description: Duración de la tarea en minutos
+                  example: 60
+                tipoServicio:
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  description: ID del tipo de servicio
+                  example: 1
+              required:
+                - nombreTarea
+                - duracionTarea
+                - tipoServicio
+      responses:
+        "201":
+          description: Tarea creada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Tarea creada exitosamente
+                  data:
+                    type: object
+                    properties:
+                      nombreTarea:
+                        type: string
+                        minLength: 2
+                        maxLength: 100
+                        description: Nombre de la tarea
+                        example: Reparación de grifería
+                      descripcionTarea:
+                        type: string
+                        maxLength: 500
+                        description: Descripción de la tarea
+                        example: Reparación y mantenimiento de grifería en el hogar
+                      duracionTarea:
+                        type: number
+                        minimum: 0
+                        exclusiveMinimum: true
+                        description: Duración de la tarea en minutos
+                        example: 60
+                      tipoServicio:
+                        type: integer
+                        minimum: 0
+                        exclusiveMinimum: true
+                        description: ID del tipo de servicio
+                        example: 1
+                    required:
+                      - nombreTarea
+                      - duracionTarea
+                      - tipoServicio
+                    title: CreateTarea
+                    description: Esquema para crear una nueva tarea
+                required:
+                  - message
+                  - data
+        "400":
+          description: Solicitud incorrecta
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: horario no encontrado
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: id
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: ID inválido
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: horario no encontrado
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: id
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: ID inválido
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+  /api/tarea/{id}:
+    get:
+      description: Obtener una tarea por ID
+      summary: Obtener tarea
+      tags:
+        - Tareas
+      parameters:
+        - schema:
+            type: string
+            pattern: ^\d+$
+            description: ID del recurso
+            example: "1"
+          required: true
+          description: ID del recurso
+          name: id
+          in: path
+      responses:
+        "200":
+          description: Tarea encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Tarea encontrada
+                  data:
+                    type: object
+                    properties:
+                      nombreTarea:
+                        type: string
+                        minLength: 2
+                        maxLength: 100
+                        description: Nombre de la tarea
+                        example: Reparación de grifería
+                      descripcionTarea:
+                        type: string
+                        maxLength: 500
+                        description: Descripción de la tarea
+                        example: Reparación y mantenimiento de grifería en el hogar
+                      duracionTarea:
+                        type: number
+                        minimum: 0
+                        exclusiveMinimum: true
+                        description: Duración de la tarea en minutos
+                        example: 60
+                      tipoServicio:
+                        type: object
+                        properties:
+                          id:
+                            type: number
+                            description: ID del tipo de servicio
+                            example: 1
+                          nombreTipo:
+                            type: string
+                            description: Nombre del tipo de servicio
+                            example: Plomería
+                          descripcionTipo:
+                            type: string
+                            description: Descripción del tipo de servicio
+                            example: Servicios de plomería profesional
+                        required:
+                          - id
+                          - nombreTipo
+                          - descripcionTipo
+                    title: DeleteTarea
+                    description: Esquema para eliminar una tarea existente
+                required:
+                  - message
+                  - data
+        "404":
+          description: Tarea no encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: horario no encontrado
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: id
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: ID inválido
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: horario no encontrado
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: id
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: ID inválido
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+    put:
+      description: Actualizar una tarea existente
+      summary: Actualizar tarea
+      tags:
+        - Tareas
+      parameters:
+        - schema:
+            type: string
+            pattern: ^\d+$
+            description: ID del recurso
+            example: "1"
+          required: true
+          description: ID del recurso
+          name: id
+          in: path
+      requestBody:
+        description: Datos de la tarea a actualizar
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombreTarea:
+                  type: string
+                  minLength: 2
+                  maxLength: 100
+                  description: Nombre de la tarea
+                  example: Reparación de grifería
+                descripcionTarea:
+                  type: string
+                  maxLength: 500
+                  description: Descripción de la tarea
+                  example: Reparación y mantenimiento de grifería en el hogar
+                duracionTarea:
+                  type: number
+                  minimum: 0
+                  exclusiveMinimum: true
+                  description: Duración de la tarea en minutos
+                  example: 60
+                tipoServicio:
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                      description: ID del tipo de servicio
+                      example: 1
+                    nombreTipo:
+                      type: string
+                      description: Nombre del tipo de servicio
+                      example: Plomería
+                    descripcionTipo:
+                      type: string
+                      description: Descripción del tipo de servicio
+                      example: Servicios de plomería profesional
+                  required:
+                    - id
+                    - nombreTipo
+                    - descripcionTipo
+              title: UpdateTarea
+              description: Esquema para actualizar una tarea existente
+      responses:
+        "200":
+          description: Tarea actualizada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Tarea actualizada exitosamente
+                  data:
+                    type: object
+                    properties:
+                      nombreTarea:
+                        type: string
+                        minLength: 2
+                        maxLength: 100
+                        description: Nombre de la tarea
+                        example: Reparación de grifería
+                      descripcionTarea:
+                        type: string
+                        maxLength: 500
+                        description: Descripción de la tarea
+                        example: Reparación y mantenimiento de grifería en el hogar
+                      duracionTarea:
+                        type: number
+                        minimum: 0
+                        exclusiveMinimum: true
+                        description: Duración de la tarea en minutos
+                        example: 60
+                      tipoServicio:
+                        type: object
+                        properties:
+                          id:
+                            type: number
+                            description: ID del tipo de servicio
+                            example: 1
+                          nombreTipo:
+                            type: string
+                            description: Nombre del tipo de servicio
+                            example: Plomería
+                          descripcionTipo:
+                            type: string
+                            description: Descripción del tipo de servicio
+                            example: Servicios de plomería profesional
+                        required:
+                          - id
+                          - nombreTipo
+                          - descripcionTipo
+                    title: UpdateTarea
+                    description: Esquema para actualizar una tarea existente
+                required:
+                  - message
+                  - data
+        "404":
+          description: Tarea no encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: horario no encontrado
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: id
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: ID inválido
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: horario no encontrado
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: id
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: ID inválido
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+    delete:
+      description: Eliminar una tarea por ID
+      summary: Eliminar tarea
+      tags:
+        - Tareas
+      parameters:
+        - schema:
+            type: string
+            pattern: ^\d+$
+            description: ID del recurso
+            example: "1"
+          required: true
+          description: ID del recurso
+          name: id
+          in: path
+      responses:
+        "200":
+          description: Tarea eliminada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Tarea eliminada exitosamente
+                  data:
+                    type: object
+                    properties:
+                      nombreTarea:
+                        type: string
+                        minLength: 2
+                        maxLength: 100
+                        description: Nombre de la tarea
+                        example: Reparación de grifería
+                      descripcionTarea:
+                        type: string
+                        maxLength: 500
+                        description: Descripción de la tarea
+                        example: Reparación y mantenimiento de grifería en el hogar
+                      duracionTarea:
+                        type: number
+                        minimum: 0
+                        exclusiveMinimum: true
+                        description: Duración de la tarea en minutos
+                        example: 60
+                      tipoServicio:
+                        type: object
+                        properties:
+                          id:
+                            type: number
+                            description: ID del tipo de servicio
+                            example: 1
+                          nombreTipo:
+                            type: string
+                            description: Nombre del tipo de servicio
+                            example: Plomería
+                          descripcionTipo:
+                            type: string
+                            description: Descripción del tipo de servicio
+                            example: Servicios de plomería profesional
+                        required:
+                          - id
+                          - nombreTipo
+                          - descripcionTipo
+                    title: DeleteTarea
+                    description: Esquema para eliminar una tarea existente
+                required:
+                  - message
+                  - data
+        "404":
+          description: Tarea no encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: horario no encontrado
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: id
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: ID inválido
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: horario no encontrado
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: id
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: ID inválido
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+  /api/tarea/:
+    get:
+      description: Obtener utodas las tareas
+      summary: Obtener tareas
+      tags:
+        - Tareas
+      responses:
+        "200":
+          description: Tarea encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Tarea encontrada
+                  data:
+                    type: object
+                    properties:
+                      nombreTarea:
+                        type: string
+                        minLength: 2
+                        maxLength: 100
+                        description: Nombre de la tarea
+                        example: Reparación de grifería
+                      descripcionTarea:
+                        type: string
+                        maxLength: 500
+                        description: Descripción de la tarea
+                        example: Reparación y mantenimiento de grifería en el hogar
+                      duracionTarea:
+                        type: number
+                        minimum: 0
+                        exclusiveMinimum: true
+                        description: Duración de la tarea en minutos
+                        example: 60
+                      tipoServicio:
+                        type: object
+                        properties:
+                          id:
+                            type: number
+                            description: ID del tipo de servicio
+                            example: 1
+                          nombreTipo:
+                            type: string
+                            description: Nombre del tipo de servicio
+                            example: Plomería
+                          descripcionTipo:
+                            type: string
+                            description: Descripción del tipo de servicio
+                            example: Servicios de plomería profesional
+                        required:
+                          - id
+                          - nombreTipo
+                          - descripcionTipo
+                    title: DeleteTarea
+                    description: Esquema para eliminar una tarea existente
+                required:
+                  - message
+                  - data
+        "404":
+          description: Tarea no encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: horario no encontrado
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: id
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: ID inválido
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+                    example: horario no encontrado
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                          description: Campo que falló
+                          example: id
+                        message:
+                          type: string
+                          description: Mensaje de error
+                          example: ID inválido
+                      required:
+                        - field
+                        - message
+                    description: Detalles de errores de validación
+                required:
+                  - message
+  /serviceTypes:
+    post:
+      description: Crear un nuevo tipo de servicio (con o sin tareas/usuarios)
+      summary: Crear tipo de servicio
+      tags:
+        - TipoServicio
+      requestBody:
+        description: Datos del tipo de servicio a crear
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombreTipo:
+                  type: string
+                  minLength: 2
+                  maxLength: 50
+                  description: Nombre del tipo de servicio
+                  example: Plomería
+                descripcionTipo:
+                  type: string
+                  minLength: 5
+                  maxLength: 200
+                  description: Descripción del tipo de servicio
+                  example: Servicios de plomería profesional
+                usuarios:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        minimum: 0
+                        exclusiveMinimum: true
+                    required:
+                      - id
+                tareas:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        minimum: 0
+                        exclusiveMinimum: true
+                    required:
+                      - id
+              required:
+                - nombreTipo
+                - descripcionTipo
+                - usuarios
+                - tareas
+      responses:
+        "201":
+          description: Tipo de servicio creado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  nombreTipo:
+                    type: string
+                    minLength: 2
+                    maxLength: 50
+                  descripcionTipo:
+                    type: string
+                    minLength: 5
+                    maxLength: 200
+                  usuarios:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          minimum: 0
+                          exclusiveMinimum: true
+                          description: ID del usuario
+                          example: 1
+                        nombre:
+                          type: string
+                          minLength: 2
+                          maxLength: 50
+                          pattern: ^[a-zA-ZÀ-ÿ\s]+$
+                          description: Nombre del usuario
+                          example: Juan
+                        apellido:
+                          type: string
+                          minLength: 2
+                          maxLength: 50
+                          pattern: ^[a-zA-ZÀ-ÿ\s]+$
+                          description: Apellido del usuario
+                          example: Pérez
+                        mail:
+                          type: string
+                          maxLength: 100
+                          format: email
+                          description: Correo electrónico del usuario
+                          example: juan.perez@gmail.com
+                        tipoDoc:
+                          type: string
+                          enum:
+                            - DNI
+                            - CUIT
+                            - CUIL
+                          description: Tipo de documento
+                          example: DNI
+                        numeroDoc:
+                          type: string
+                          minLength: 7
+                          maxLength: 13
+                          pattern: ^[0-9\-]+$
+                          description: Número de documento
+                          example: "12345678"
+                        telefono:
+                          type: string
+                          pattern: ^[+]?[0-9\s\-()]{8,20}$
+                          description: Número de teléfono
+                          example: +54 11 1234-5678
+                        direccion:
+                          type: string
+                          minLength: 5
+                          maxLength: 200
+                          description: Dirección del usuario
+                          example: Av. Corrientes 1234
+                        foto:
+                          type: string
+                          maxLength: 200
+                          format: uri
+                          description: URL de la foto de perfil del usuario
+                          example: http://example.com/foto.jpg
+                        estado:
+                          type: string
+                          enum:
+                            - activo
+                            - inactivo
+                          default: activo
+                          description: Estado del usuario
+                          example: activo
+                        nombreFantasia:
+                          anyOf:
+                            - type: string
+                              minLength: 2
+                              maxLength: 30
+                            - type: string
+                              enum:
+                                - ""
+                          description: Nombre de fantasía del prestatario
+                          example: Servicios SRL
+                        descripcion:
+                          anyOf:
+                            - type: string
+                            - type: string
+                              enum:
+                                - ""
+                          description: Descripción del prestatario
+                          example: Ofrecemos servicios de plomería y electricidad.
+                      required:
+                        - id
+                        - nombre
+                        - apellido
+                        - mail
+                        - tipoDoc
+                        - numeroDoc
+                        - telefono
+                        - direccion
+                  tareas:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        nombreTarea:
+                          type: string
+                          minLength: 2
+                          maxLength: 100
+                          description: Nombre de la tarea
+                          example: Reparación de grifería
+                        descripcionTarea:
+                          type: string
+                          maxLength: 500
+                          description: Descripción de la tarea
+                          example: Reparación y mantenimiento de grifería en el hogar
+                        duracionTarea:
+                          type: number
+                          minimum: 0
+                          exclusiveMinimum: true
+                          description: Duración de la tarea en minutos
+                          example: 60
+                        tipoServicio:
+                          type: integer
+                          minimum: 0
+                          exclusiveMinimum: true
+                          description: ID del tipo de servicio asociado a la tarea
+                          example: 1
+                      required:
+                        - nombreTarea
+                        - duracionTarea
+                        - tipoServicio
+                required:
+                  - nombreTipo
+                  - descripcionTipo
+                title: CreateTipoServicio
+                description: Esquema para crear un nuevo tipo de servicio
+        "400":
+          description: Error de validación
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                required:
+                  - message
+  /serviceTypes/{id}:
+    put:
+      description: Actualizar un tipo de servicio existente
+      summary: Actualizar tipo de servicio
+      tags:
+        - TipoServicio
+      parameters:
+        - name: id
+          in: path
+          description: ID del tipo de servicio a actualizar
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Datos del tipo de servicio a actualizar
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombreTipo:
+                  type: string
+                  minLength: 2
+                  maxLength: 50
+                descripcionTipo:
+                  type: string
+                  minLength: 5
+                  maxLength: 200
+                usuarios:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        minimum: 0
+                        exclusiveMinimum: true
+                        description: ID del usuario
+                        example: 1
+                      nombre:
+                        type: string
+                        minLength: 2
+                        maxLength: 50
+                        pattern: ^[a-zA-ZÀ-ÿ\s]+$
+                        description: Nombre del usuario
+                        example: Juan
+                      apellido:
+                        type: string
+                        minLength: 2
+                        maxLength: 50
+                        pattern: ^[a-zA-ZÀ-ÿ\s]+$
+                        description: Apellido del usuario
+                        example: Pérez
+                      mail:
+                        type: string
+                        maxLength: 100
+                        format: email
+                        description: Correo electrónico del usuario
+                        example: juan.perez@gmail.com
+                      tipoDoc:
+                        type: string
+                        enum:
+                          - DNI
+                          - CUIT
+                          - CUIL
+                        description: Tipo de documento
+                        example: DNI
+                      numeroDoc:
+                        type: string
+                        minLength: 7
+                        maxLength: 13
+                        pattern: ^[0-9\-]+$
+                        description: Número de documento
+                        example: "12345678"
+                      telefono:
+                        type: string
+                        pattern: ^[+]?[0-9\s\-()]{8,20}$
+                        description: Número de teléfono
+                        example: +54 11 1234-5678
+                      direccion:
+                        type: string
+                        minLength: 5
+                        maxLength: 200
+                        description: Dirección del usuario
+                        example: Av. Corrientes 1234
+                      foto:
+                        type: string
+                        maxLength: 200
+                        format: uri
+                        description: URL de la foto de perfil del usuario
+                        example: http://example.com/foto.jpg
+                      estado:
+                        type: string
+                        enum:
+                          - activo
+                          - inactivo
+                        default: activo
+                        description: Estado del usuario
+                        example: activo
+                      nombreFantasia:
+                        anyOf:
+                          - type: string
+                            minLength: 2
+                            maxLength: 30
+                          - type: string
+                            enum:
+                              - ""
+                        description: Nombre de fantasía del prestatario
+                        example: Servicios SRL
+                      descripcion:
+                        anyOf:
+                          - type: string
+                          - type: string
+                            enum:
+                              - ""
+                        description: Descripción del prestatario
+                        example: Ofrecemos servicios de plomería y electricidad.
+                    required:
+                      - id
+                      - nombre
+                      - apellido
+                      - mail
+                      - tipoDoc
+                      - numeroDoc
+                      - telefono
+                      - direccion
+                tareas:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      nombreTarea:
+                        type: string
+                        minLength: 2
+                        maxLength: 100
+                        description: Nombre de la tarea
+                        example: Reparación de grifería
+                      descripcionTarea:
+                        type: string
+                        maxLength: 500
+                        description: Descripción de la tarea
+                        example: Reparación y mantenimiento de grifería en el hogar
+                      duracionTarea:
+                        type: number
+                        minimum: 0
+                        exclusiveMinimum: true
+                        description: Duración de la tarea en minutos
+                        example: 60
+                      tipoServicio:
+                        type: integer
+                        minimum: 0
+                        exclusiveMinimum: true
+                        description: ID del tipo de servicio asociado a la tarea
+                        example: 1
+                    required:
+                      - nombreTarea
+                      - duracionTarea
+                      - tipoServicio
+              title: UpdateTipoServicio
+              description: Esquema para actualizar un tipo de servicio
+      responses:
+        "200":
+          description: Tipo de servicio actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  nombreTipo:
+                    type: string
+                    minLength: 2
+                    maxLength: 50
+                  descripcionTipo:
+                    type: string
+                    minLength: 5
+                    maxLength: 200
+                  usuarios:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          minimum: 0
+                          exclusiveMinimum: true
+                          description: ID del usuario
+                          example: 1
+                        nombre:
+                          type: string
+                          minLength: 2
+                          maxLength: 50
+                          pattern: ^[a-zA-ZÀ-ÿ\s]+$
+                          description: Nombre del usuario
+                          example: Juan
+                        apellido:
+                          type: string
+                          minLength: 2
+                          maxLength: 50
+                          pattern: ^[a-zA-ZÀ-ÿ\s]+$
+                          description: Apellido del usuario
+                          example: Pérez
+                        mail:
+                          type: string
+                          maxLength: 100
+                          format: email
+                          description: Correo electrónico del usuario
+                          example: juan.perez@gmail.com
+                        tipoDoc:
+                          type: string
+                          enum:
+                            - DNI
+                            - CUIT
+                            - CUIL
+                          description: Tipo de documento
+                          example: DNI
+                        numeroDoc:
+                          type: string
+                          minLength: 7
+                          maxLength: 13
+                          pattern: ^[0-9\-]+$
+                          description: Número de documento
+                          example: "12345678"
+                        telefono:
+                          type: string
+                          pattern: ^[+]?[0-9\s\-()]{8,20}$
+                          description: Número de teléfono
+                          example: +54 11 1234-5678
+                        direccion:
+                          type: string
+                          minLength: 5
+                          maxLength: 200
+                          description: Dirección del usuario
+                          example: Av. Corrientes 1234
+                        foto:
+                          type: string
+                          maxLength: 200
+                          format: uri
+                          description: URL de la foto de perfil del usuario
+                          example: http://example.com/foto.jpg
+                        estado:
+                          type: string
+                          enum:
+                            - activo
+                            - inactivo
+                          default: activo
+                          description: Estado del usuario
+                          example: activo
+                        nombreFantasia:
+                          anyOf:
+                            - type: string
+                              minLength: 2
+                              maxLength: 30
+                            - type: string
+                              enum:
+                                - ""
+                          description: Nombre de fantasía del prestatario
+                          example: Servicios SRL
+                        descripcion:
+                          anyOf:
+                            - type: string
+                            - type: string
+                              enum:
+                                - ""
+                          description: Descripción del prestatario
+                          example: Ofrecemos servicios de plomería y electricidad.
+                      required:
+                        - id
+                        - nombre
+                        - apellido
+                        - mail
+                        - tipoDoc
+                        - numeroDoc
+                        - telefono
+                        - direccion
+                  tareas:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        nombreTarea:
+                          type: string
+                          minLength: 2
+                          maxLength: 100
+                          description: Nombre de la tarea
+                          example: Reparación de grifería
+                        descripcionTarea:
+                          type: string
+                          maxLength: 500
+                          description: Descripción de la tarea
+                          example: Reparación y mantenimiento de grifería en el hogar
+                        duracionTarea:
+                          type: number
+                          minimum: 0
+                          exclusiveMinimum: true
+                          description: Duración de la tarea en minutos
+                          example: 60
+                        tipoServicio:
+                          type: integer
+                          minimum: 0
+                          exclusiveMinimum: true
+                          description: ID del tipo de servicio asociado a la tarea
+                          example: 1
+                      required:
+                        - nombreTarea
+                        - duracionTarea
+                        - tipoServicio
+                title: UpdateTipoServicio
+                description: Esquema para actualizar un tipo de servicio
+        "400":
+          description: Error de validación
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                required:
+                  - message
+    delete:
+      description: Eliminar un tipo de servicio por ID
+      summary: Eliminar tipo de servicio
+      tags:
+        - TipoServicio
+      parameters:
+        - name: id
+          in: path
+          description: ID del tipo de servicio a eliminar
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Tipo de servicio eliminado exitosamente
+        "404":
+          description: Tipo de servicio no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                required:
+                  - message
+    get:
+      description: Obtener un tipo de servicio por ID
+      summary: Obtener tipo de servicio
+      tags:
+        - TipoServicio
+      parameters:
+        - name: id
+          in: path
+          description: ID del tipo de servicio a obtener
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Tipo de servicio obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  nombreTipo:
+                    type: string
+                    minLength: 2
+                    maxLength: 50
+                    description: Nombre del tipo de servicio
+                    example: Plomería
+                  descripcionTipo:
+                    type: string
+                    minLength: 5
+                    maxLength: 200
+                    description: Descripción del tipo de servicio
+                    example: Servicios de plomería profesional
+                  usuarios:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          minimum: 0
+                          exclusiveMinimum: true
+                          description: ID del usuario
+                          example: 1
+                        nombre:
+                          type: string
+                          minLength: 2
+                          maxLength: 50
+                          pattern: ^[a-zA-ZÀ-ÿ\s]+$
+                          description: Nombre del usuario
+                          example: Juan
+                        apellido:
+                          type: string
+                          minLength: 2
+                          maxLength: 50
+                          pattern: ^[a-zA-ZÀ-ÿ\s]+$
+                          description: Apellido del usuario
+                          example: Pérez
+                        mail:
+                          type: string
+                          maxLength: 100
+                          format: email
+                          description: Correo electrónico del usuario
+                          example: juan.perez@gmail.com
+                        tipoDoc:
+                          type: string
+                          enum:
+                            - DNI
+                            - CUIT
+                            - CUIL
+                          description: Tipo de documento
+                          example: DNI
+                        numeroDoc:
+                          type: string
+                          minLength: 7
+                          maxLength: 13
+                          pattern: ^[0-9\-]+$
+                          description: Número de documento
+                          example: "12345678"
+                        telefono:
+                          type: string
+                          pattern: ^[+]?[0-9\s\-()]{8,20}$
+                          description: Número de teléfono
+                          example: +54 11 1234-5678
+                        direccion:
+                          type: string
+                          minLength: 5
+                          maxLength: 200
+                          description: Dirección del usuario
+                          example: Av. Corrientes 1234
+                        foto:
+                          type: string
+                          maxLength: 200
+                          format: uri
+                          description: URL de la foto de perfil del usuario
+                          example: http://example.com/foto.jpg
+                        estado:
+                          type: string
+                          enum:
+                            - activo
+                            - inactivo
+                          default: activo
+                          description: Estado del usuario
+                          example: activo
+                        nombreFantasia:
+                          anyOf:
+                            - type: string
+                              minLength: 2
+                              maxLength: 30
+                            - type: string
+                              enum:
+                                - ""
+                          description: Nombre de fantasía del prestatario
+                          example: Servicios SRL
+                        descripcion:
+                          anyOf:
+                            - type: string
+                            - type: string
+                              enum:
+                                - ""
+                          description: Descripción del prestatario
+                          example: Ofrecemos servicios de plomería y electricidad.
+                      required:
+                        - id
+                        - nombre
+                        - apellido
+                        - mail
+                        - tipoDoc
+                        - numeroDoc
+                        - telefono
+                        - direccion
+                  tareas:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        nombreTarea:
+                          type: string
+                          minLength: 2
+                          maxLength: 100
+                          description: Nombre de la tarea
+                          example: Reparación de grifería
+                        descripcionTarea:
+                          type: string
+                          maxLength: 500
+                          description: Descripción de la tarea
+                          example: Reparación y mantenimiento de grifería en el hogar
+                        duracionTarea:
+                          type: number
+                          minimum: 0
+                          exclusiveMinimum: true
+                          description: Duración de la tarea en minutos
+                          example: 60
+                        tipoServicio:
+                          type: integer
+                          minimum: 0
+                          exclusiveMinimum: true
+                          description: ID del tipo de servicio asociado a la tarea
+                          example: 1
+                      required:
+                        - nombreTarea
+                        - duracionTarea
+                        - tipoServicio
+                required:
+                  - nombreTipo
+                  - descripcionTipo
+                title: GetTipoServicio
+                description: Esquema para obtener un tipo de servicio
+        "404":
+          description: Tipo de servicio no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                required:
+                  - message
+  /serviceTypes/:
+    get:
+      description: Obtener todos los tipos de servicio
+      summary: Obtener tipo de servicio
+      tags:
+        - TipoServicio
+      parameters:
+        - name: id
+          in: path
+          description: ID del tipo de servicio a obtener
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Tipo de servicio obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  nombreTipo:
+                    type: string
+                    minLength: 2
+                    maxLength: 50
+                    description: Nombre del tipo de servicio
+                    example: Plomería
+                  descripcionTipo:
+                    type: string
+                    minLength: 5
+                    maxLength: 200
+                    description: Descripción del tipo de servicio
+                    example: Servicios de plomería profesional
+                  usuarios:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          minimum: 0
+                          exclusiveMinimum: true
+                          description: ID del usuario
+                          example: 1
+                        nombre:
+                          type: string
+                          minLength: 2
+                          maxLength: 50
+                          pattern: ^[a-zA-ZÀ-ÿ\s]+$
+                          description: Nombre del usuario
+                          example: Juan
+                        apellido:
+                          type: string
+                          minLength: 2
+                          maxLength: 50
+                          pattern: ^[a-zA-ZÀ-ÿ\s]+$
+                          description: Apellido del usuario
+                          example: Pérez
+                        mail:
+                          type: string
+                          maxLength: 100
+                          format: email
+                          description: Correo electrónico del usuario
+                          example: juan.perez@gmail.com
+                        tipoDoc:
+                          type: string
+                          enum:
+                            - DNI
+                            - CUIT
+                            - CUIL
+                          description: Tipo de documento
+                          example: DNI
+                        numeroDoc:
+                          type: string
+                          minLength: 7
+                          maxLength: 13
+                          pattern: ^[0-9\-]+$
+                          description: Número de documento
+                          example: "12345678"
+                        telefono:
+                          type: string
+                          pattern: ^[+]?[0-9\s\-()]{8,20}$
+                          description: Número de teléfono
+                          example: +54 11 1234-5678
+                        direccion:
+                          type: string
+                          minLength: 5
+                          maxLength: 200
+                          description: Dirección del usuario
+                          example: Av. Corrientes 1234
+                        foto:
+                          type: string
+                          maxLength: 200
+                          format: uri
+                          description: URL de la foto de perfil del usuario
+                          example: http://example.com/foto.jpg
+                        estado:
+                          type: string
+                          enum:
+                            - activo
+                            - inactivo
+                          default: activo
+                          description: Estado del usuario
+                          example: activo
+                        nombreFantasia:
+                          anyOf:
+                            - type: string
+                              minLength: 2
+                              maxLength: 30
+                            - type: string
+                              enum:
+                                - ""
+                          description: Nombre de fantasía del prestatario
+                          example: Servicios SRL
+                        descripcion:
+                          anyOf:
+                            - type: string
+                            - type: string
+                              enum:
+                                - ""
+                          description: Descripción del prestatario
+                          example: Ofrecemos servicios de plomería y electricidad.
+                      required:
+                        - id
+                        - nombre
+                        - apellido
+                        - mail
+                        - tipoDoc
+                        - numeroDoc
+                        - telefono
+                        - direccion
+                  tareas:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        nombreTarea:
+                          type: string
+                          minLength: 2
+                          maxLength: 100
+                          description: Nombre de la tarea
+                          example: Reparación de grifería
+                        descripcionTarea:
+                          type: string
+                          maxLength: 500
+                          description: Descripción de la tarea
+                          example: Reparación y mantenimiento de grifería en el hogar
+                        duracionTarea:
+                          type: number
+                          minimum: 0
+                          exclusiveMinimum: true
+                          description: Duración de la tarea en minutos
+                          example: 60
+                        tipoServicio:
+                          type: integer
+                          minimum: 0
+                          exclusiveMinimum: true
+                          description: ID del tipo de servicio asociado a la tarea
+                          example: 1
+                      required:
+                        - nombreTarea
+                        - duracionTarea
+                        - tipoServicio
+                required:
+                  - nombreTipo
+                  - descripcionTipo
+                title: GetTipoServicio
+                description: Esquema para obtener un tipo de servicio
+        "404":
+          description: Tipo de servicio no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                required:
+                  - message
+  /serviceTypes/with-tareas/:
+    get:
+      description: Obtener todos los tipos de servicio con tareas
+      summary: Obtener tipo de servicio
+      tags:
+        - TipoServicio
+      parameters:
+        - name: id
+          in: path
+          description: ID del tipo de servicio a obtener
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Tipo de servicio obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  nombreTipo:
+                    type: string
+                    minLength: 2
+                    maxLength: 50
+                    description: Nombre del tipo de servicio
+                    example: Plomería
+                  descripcionTipo:
+                    type: string
+                    minLength: 5
+                    maxLength: 200
+                    description: Descripción del tipo de servicio
+                    example: Servicios de plomería profesional
+                  usuarios:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          minimum: 0
+                          exclusiveMinimum: true
+                          description: ID del usuario
+                          example: 1
+                        nombre:
+                          type: string
+                          minLength: 2
+                          maxLength: 50
+                          pattern: ^[a-zA-ZÀ-ÿ\s]+$
+                          description: Nombre del usuario
+                          example: Juan
+                        apellido:
+                          type: string
+                          minLength: 2
+                          maxLength: 50
+                          pattern: ^[a-zA-ZÀ-ÿ\s]+$
+                          description: Apellido del usuario
+                          example: Pérez
+                        mail:
+                          type: string
+                          maxLength: 100
+                          format: email
+                          description: Correo electrónico del usuario
+                          example: juan.perez@gmail.com
+                        tipoDoc:
+                          type: string
+                          enum:
+                            - DNI
+                            - CUIT
+                            - CUIL
+                          description: Tipo de documento
+                          example: DNI
+                        numeroDoc:
+                          type: string
+                          minLength: 7
+                          maxLength: 13
+                          pattern: ^[0-9\-]+$
+                          description: Número de documento
+                          example: "12345678"
+                        telefono:
+                          type: string
+                          pattern: ^[+]?[0-9\s\-()]{8,20}$
+                          description: Número de teléfono
+                          example: +54 11 1234-5678
+                        direccion:
+                          type: string
+                          minLength: 5
+                          maxLength: 200
+                          description: Dirección del usuario
+                          example: Av. Corrientes 1234
+                        foto:
+                          type: string
+                          maxLength: 200
+                          format: uri
+                          description: URL de la foto de perfil del usuario
+                          example: http://example.com/foto.jpg
+                        estado:
+                          type: string
+                          enum:
+                            - activo
+                            - inactivo
+                          default: activo
+                          description: Estado del usuario
+                          example: activo
+                        nombreFantasia:
+                          anyOf:
+                            - type: string
+                              minLength: 2
+                              maxLength: 30
+                            - type: string
+                              enum:
+                                - ""
+                          description: Nombre de fantasía del prestatario
+                          example: Servicios SRL
+                        descripcion:
+                          anyOf:
+                            - type: string
+                            - type: string
+                              enum:
+                                - ""
+                          description: Descripción del prestatario
+                          example: Ofrecemos servicios de plomería y electricidad.
+                      required:
+                        - id
+                        - nombre
+                        - apellido
+                        - mail
+                        - tipoDoc
+                        - numeroDoc
+                        - telefono
+                        - direccion
+                  tareas:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        nombreTarea:
+                          type: string
+                          minLength: 2
+                          maxLength: 100
+                          description: Nombre de la tarea
+                          example: Reparación de grifería
+                        descripcionTarea:
+                          type: string
+                          maxLength: 500
+                          description: Descripción de la tarea
+                          example: Reparación y mantenimiento de grifería en el hogar
+                        duracionTarea:
+                          type: number
+                          minimum: 0
+                          exclusiveMinimum: true
+                          description: Duración de la tarea en minutos
+                          example: 60
+                        tipoServicio:
+                          type: integer
+                          minimum: 0
+                          exclusiveMinimum: true
+                          description: ID del tipo de servicio asociado a la tarea
+                          example: 1
+                      required:
+                        - nombreTarea
+                        - duracionTarea
+                        - tipoServicio
+                required:
+                  - nombreTipo
+                  - descripcionTipo
+                title: GetTipoServicio
+                description: Esquema para obtener un tipo de servicio
+        "404":
+          description: Tipo de servicio no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                required:
+                  - message

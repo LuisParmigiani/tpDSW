@@ -4,7 +4,10 @@ import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 // Extend Zod with OpenAPI functionality
 extendZodWithOpenApi(z);
 
-// ==================== CONSTANTES ====================
+// ===================================================================================================================
+// ========================================== Errores de horario =========================================
+// ===================================================================================================================
+
 const ERROR_MESSAGES = {
   diaSemana: {
     min: 'El día de la semana no puede ser menor que 0 (Lunes)',
@@ -17,9 +20,17 @@ const ERROR_MESSAGES = {
   usuario: 'El ID del usuario debe ser un número entero positivo',
   id: 'El ID debe ser un número entero positivo',
 };
+// ===================================================================================================================
+// ========================================== schema de usuario =========================================
+// ===================================================================================================================
 
-// ==================== SCHEMAS ====================
 export const usuarioSchema = z.object({
+  id: z
+    .number()
+    .int()
+    .positive()
+    .describe('ID del usuario')
+    .openapi({ example: 1 }),
   nombre: z
     .string()
     .min(1, 'El nombre es obligatorio')
@@ -128,8 +139,11 @@ export const usuarioSchema = z.object({
     }),
 });
 
-// Esquema para validar horarios
-const horarioBaseSchema = z.object({
+// ===================================================================================================================
+// ========================================== schema basico con horario =========================================
+// ===================================================================================================================
+
+export const horarioBaseSchema = z.object({
   diaSemana: z
     .number()
     .int()
@@ -155,34 +169,66 @@ const horarioBaseSchema = z.object({
     )
     .describe('Hora de fin en formato HH:mm:ss')
     .openapi({ example: '17:00:00' }),
+});
+// ===================================================================================================================
+// ========================================== schema de horario con id de usuario =========================================
+// ===================================================================================================================
 
+export const horarioSchema = horarioBaseSchema.extend({
+  usuario: z
+    .number()
+    .int()
+    .positive(ERROR_MESSAGES.usuario)
+    .describe('ID del usuario asociado al horario')
+    .openapi({ example: 1 }),
+});
+// ===================================================================================================================
+// ========================================== schema de horario con info de usuario =========================================
+// ===================================================================================================================
+
+export const horarioSchemaWithUser = horarioSchema.extend({
+  id: z
+    .number()
+    .int()
+    .positive()
+    .describe('ID del usuario')
+    .openapi({ example: 1 }),
   usuario: usuarioSchema,
 });
 
-export const horarioSchema = horarioBaseSchema.refine(
-  (data) => data.horaDesde < data.horaHasta,
-  {
-    message: ERROR_MESSAGES.hora.rango,
-    path: ['horaDesde', 'horaHasta'],
-  }
-);
+// ==============================================================================================================
+// ========================================== schema para validar el id =========================================
+// ==============================================================================================================
+export const idParamValidation = z
+  .object({
+    id: z
+      .string()
+      .regex(/^\d+$/, 'El ID debe ser un número entero positivo')
+      .describe('ID del recurso')
+      .openapi({ example: '1' }),
+  })
+  .required()
+  .describe('Esquema para validar el parámetro ID');
 
-// Esquema para crear un nuevo horario
-export const createHorarioValidation = horarioSchema.openapi({
-  title: 'CrearHorario',
-  description: 'Esquema para crear un nuevo horario',
-});
+// ===================================================================================================================
+// ===================================== schema de para validar el id de usuario =========================================
+// ===================================================================================================================
 
-// Esquema para validar el parámetro ID
-export const idParamValidation = z.object({
-  id: z.string().regex(/^\d+$/, ERROR_MESSAGES.id),
-});
+export const idUserParamValidation = z
+  .object({
+    usuario: z // Cambiar 'id' por 'usuario'
+      .string()
+      .regex(/^\d+$/, 'El ID del usuario debe ser un número entero positivo')
+      .describe('ID del usuario')
+      .openapi({ example: '1' }),
+  })
+  .required()
+  .describe('Esquema para validar el parámetro usuario');
 
-// Esquema para actualizar un horario existente
-export const updateHorarioValidation = horarioBaseSchema.partial().openapi({
-  title: 'ActualizarHorario',
-  description: 'Esquema para actualizar un horario existente',
-});
+// ===================================================================================================================
+// ========================================== schema de error =========================================
+// ===================================================================================================================
+
 export const errorResponseSchema = z
   .object({
     message: z
@@ -209,3 +255,39 @@ export const errorResponseSchema = z
     title: 'Error',
     description: 'Esquema para representar un error',
   });
+
+// ===================================================================================================================
+// ========================================== schema de actualizacion =========================================
+// ===================================================================================================================
+export const updateHorarioValidation = horarioSchemaWithUser
+  .partial() // Permite actualizar parcialmente los campos
+  .openapi({
+    title: 'ActualizarHorario',
+    description: 'Esquema para actualizar un horario existente',
+  });
+
+// ===================================================================================================================
+// ========================================== schema de para crear horario =========================================
+// ===================================================================================================================
+export const createHorarioValidation = horarioSchemaWithUser.openapi({
+  title: 'CrearHorario',
+  description: 'Esquema para crear un nuevo horario',
+});
+
+// ===================================================================================================================
+// ========================================== schema para borrar horario =========================================
+// ===================================================================================================================
+
+export const deleteHorarioValidation = horarioSchemaWithUser.openapi({
+  title: 'BorrarHorario',
+  description: 'Esquema para eliminar un horario',
+});
+
+// ===================================================================================================================
+// ========================================== schema para get horario =========================================
+// ===================================================================================================================
+
+export const getHorarioValidation = horarioSchemaWithUser.openapi({
+  title: 'GetHorario',
+  description: 'Esquema para obtener un horario',
+});

@@ -9,6 +9,10 @@ import { usuarioRegistry } from './usuario/usuario.registry.js';
 import { turnoRegistry } from './turno/turno.registry.js';
 import { zonaRegistry } from './zona/zona.registry.js';
 import { horarioRegistry } from './horario/horario.registry.js';
+import { pagoRegistry } from './pago/pago.registry.js'; // Asegúrate de importar el registro correcto
+import { tareaRegistry } from './tarea/tarea.registry.js'; // Agrega el registro de tareas
+import { tipoServicioRegistry } from './tipoServicio/tipoServicio.registory.js';
+
 async function generateOpenApiDocument() {
   const registry = new OpenAPIRegistry();
 
@@ -26,8 +30,9 @@ async function generateOpenApiDocument() {
     ...turnoRegistry.definitions, // Esquemas y definiciones de turno
     ...zonaRegistry.definitions,
     ...horarioRegistry.definitions,
-    // ...servicioRegistry.definitions, // Esquemas y definiciones del servicio
-    // ...reservaRegistry.definitions,
+    ...pagoRegistry.definitions, // Cambiado de pagoSchema.definitions a pagoRegistry.definitions
+    ...tareaRegistry.definitions, // Agrega las definiciones de tareas
+    ...tipoServicioRegistry.definitions, // Agrega las definiciones de tipo de servicio
   ];
 
   //Generador con todas las definiciones
@@ -85,6 +90,14 @@ async function generateOpenApiDocument() {
       {
         name: 'Horarios',
         description: 'Operaciones para el manejo de Horarios',
+      },
+      {
+        name: 'Tareas',
+        description: 'Operaciones para el manejo de Tareas',
+      },
+      {
+        name: 'TipoServicio',
+        description: 'Operaciones para el manejo de Tipos de Servicio',
       },
     ],
   });

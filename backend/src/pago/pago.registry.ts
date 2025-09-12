@@ -1,62 +1,60 @@
 import { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
-import {
-  horarioSchema,
-  errorResponseSchema,
-  createHorarioValidation,
-  updateHorarioValidation,
-  deleteHorarioValidation,
-  idParamValidation,
-  idUserParamValidation,
-  getHorarioValidation,
-  horarioBaseSchema,
-} from './horario.schemas.js';
 import { z } from 'zod';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
+import {
+  errorResponseSchema,
+  createPagoValidationSchema,
+  getPagoSchema,
+  deletePagoSchema,
+  pagoBaseSchema,
+  validacionIdSchema,
+  updatePagoValidationSchema,
+  baseSchemaWithTurnoId,
+} from './pago.schemas.js';
 
 // Extender Zod con OpenAPI
 extendZodWithOpenApi(z);
 
-// Crear el horarioRegistry
-export const horarioRegistry = new OpenAPIRegistry();
+// Crear el pagoRegistry
+export const pagoRegistry = new OpenAPIRegistry();
 
 // ===================================================================================================================
-// ========================================== horarioRegistry =========================================
+// ========================================== Registrar de Pago =========================================
 // ===================================================================================================================
-horarioRegistry.register('Horario', horarioSchema);
-horarioRegistry.register('ErrorResponse', errorResponseSchema);
-horarioRegistry.register('CreateHorario', createHorarioValidation);
-horarioRegistry.register('UpdateHorario', updateHorarioValidation);
-horarioRegistry.register('DeleteHorario', deleteHorarioValidation);
+pagoRegistry.register('Pago', createPagoValidationSchema);
+pagoRegistry.register('CreatePago', createPagoValidationSchema);
+pagoRegistry.register('GetPago', getPagoSchema);
+pagoRegistry.register('DeletePago', deletePagoSchema);
+pagoRegistry.register('UpdatePago', updatePagoValidationSchema);
+pagoRegistry.register('ErrorResponse', errorResponseSchema);
 
 // ==================== POST METHODS ====================
-
-// POST /api/horario
-horarioRegistry.registerPath({
+pagoRegistry.registerPath({
   method: 'post',
-  path: '/api/horario',
-  description: 'Crear un nuevo horario para un usuario determinado',
-  summary: 'Crear horario',
-  tags: ['Horarios'],
+  path: '/api/pago',
+  description: 'Crear un nuevo pago',
+  summary: 'Crear pago',
+  tags: ['Pagos'],
   request: {
     body: {
-      description: 'Datos del horario a crear',
+      description: 'Datos del pago a crear',
       content: {
         'application/json': {
-          schema: horarioBaseSchema,
+          schema: baseSchemaWithTurnoId,
         },
       },
     },
   },
   responses: {
     201: {
-      description: 'Horario creado exitosamente',
+      description: 'Pago creado exitosamente',
       content: {
         'application/json': {
           schema: z.object({
             message: z
               .string()
-              .openapi({ example: 'Horario creado exitosamente' }),
-            data: createHorarioValidation,
+              .openapi({ example: 'Pago creado exitosamente' }),
+            data: createPagoValidationSchema,
           }),
         },
       },
@@ -82,27 +80,30 @@ horarioRegistry.registerPath({
 
 // ==================== GET METHODS ====================
 
-// GET /api/horario/{id}
-horarioRegistry.registerPath({
+// GET /api/pago/{id}
+pagoRegistry.registerPath({
   method: 'get',
-  path: '/api/horario/',
-  description: 'Obtener todos los horarios',
-  summary: 'Obtener horarios',
-  tags: ['Horarios'],
+  path: '/api/pago/{id}',
+  description: 'Obtener un pago por ID',
+  summary: 'Obtener pago',
+  tags: ['Pagos'],
+  request: {
+    params: validacionIdSchema,
+  },
   responses: {
     200: {
-      description: 'Horario encontrado',
+      description: 'Pago encontrado',
       content: {
         'application/json': {
           schema: z.object({
-            message: z.string().openapi({ example: 'Horario encontrado' }),
-            data: getHorarioValidation,
+            message: z.string().openapi({ example: 'Pago encontrado' }),
+            data: getPagoSchema,
           }),
         },
       },
     },
     404: {
-      description: 'Horario no encontrado',
+      description: 'Pago no encontrado',
       content: {
         'application/json': {
           schema: errorResponseSchema,
@@ -120,27 +121,26 @@ horarioRegistry.registerPath({
   },
 });
 
-// GET /api/horario/{usuario}
-horarioRegistry.registerPath({
+pagoRegistry.registerPath({
   method: 'get',
-  path: '/api/horario/{usuario}',
-  description: 'Obtener horarios por ID de usuario',
-  summary: 'Obtener horarios por usuario',
-  tags: ['Horarios'],
-  request: {
-    params: idUserParamValidation, // Cambiado a usuarioParamValidation
-  },
+  path: '/api/pago/',
+  description: 'Obtener todos los pagos',
+  summary: 'Obtener pagos',
+  tags: ['Pagos'],
   responses: {
     200: {
-      description: 'Horarios encontrados',
+      description: 'Pago encontrado',
       content: {
         'application/json': {
-          schema: horarioSchema,
+          schema: z.object({
+            message: z.string().openapi({ example: 'Pago encontrado' }),
+            data: getPagoSchema,
+          }),
         },
       },
     },
     404: {
-      description: 'Usuario no encontrado',
+      description: 'Pago no encontrado',
       content: {
         'application/json': {
           schema: errorResponseSchema,
@@ -160,40 +160,40 @@ horarioRegistry.registerPath({
 
 // ==================== PUT METHODS ====================
 
-// PUT /api/horario/{id}
-horarioRegistry.registerPath({
+// PUT /api/pago/{id}
+pagoRegistry.registerPath({
   method: 'put',
-  path: '/api/horario/{id}',
-  description: 'Actualizar un horario existente',
-  summary: 'Actualizar horario',
-  tags: ['Horarios'],
+  path: '/api/pago/{id}',
+  description: 'Actualizar un pago existente',
+  summary: 'Actualizar pago',
+  tags: ['Pagos'],
   request: {
-    params: idParamValidation,
+    params: validacionIdSchema,
     body: {
-      description: 'Datos del horario a actualizar',
+      description: 'Datos del pago a actualizar',
       content: {
         'application/json': {
-          schema: idParamValidation,
+          schema: updatePagoValidationSchema, // Cambiar a updatePagoValidationSchema
         },
       },
     },
   },
   responses: {
     200: {
-      description: 'Horario actualizado exitosamente',
+      description: 'Pago actualizado exitosamente',
       content: {
         'application/json': {
           schema: z.object({
             message: z
               .string()
-              .openapi({ example: 'Horario actualizado exitosamente' }),
-            data: updateHorarioValidation,
+              .openapi({ example: 'Pago actualizado exitosamente' }),
+            data: updatePagoValidationSchema,
           }),
         },
       },
     },
     404: {
-      description: 'Horario no encontrado',
+      description: 'Pago no encontrado',
       content: {
         'application/json': {
           schema: errorResponseSchema,
@@ -213,32 +213,32 @@ horarioRegistry.registerPath({
 
 // ==================== DELETE METHODS ====================
 
-// DELETE /api/horario/{id}
-horarioRegistry.registerPath({
+// DELETE /api/pago/{id}
+pagoRegistry.registerPath({
   method: 'delete',
-  path: '/api/horario/{id}',
-  description: 'Eliminar un horario por ID',
-  summary: 'Eliminar horario',
-  tags: ['Horarios'],
+  path: '/api/pago/{id}',
+  description: 'Eliminar un pago por ID',
+  summary: 'Eliminar pago',
+  tags: ['Pagos'],
   request: {
-    params: idParamValidation,
+    params: validacionIdSchema,
   },
   responses: {
     200: {
-      description: 'Horario eliminado exitosamente',
+      description: 'Pago eliminado exitosamente',
       content: {
         'application/json': {
           schema: z.object({
             message: z
               .string()
-              .openapi({ example: 'Horario eliminado exitosamente' }),
-            data: deleteHorarioValidation,
+              .openapi({ example: 'Pago eliminado exitosamente' }),
+            data: deletePagoSchema,
           }),
         },
       },
     },
     404: {
-      description: 'Horario no encontrado',
+      description: 'Pago no encontrado',
       content: {
         'application/json': {
           schema: errorResponseSchema,
