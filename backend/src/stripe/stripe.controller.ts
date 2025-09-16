@@ -34,7 +34,7 @@ async function createAccount(req: AuthRequest, res: Response) {
         first_name: usuario.nombre,
         last_name: usuario.apellido,
         email: usuario.mail,
-        phone: usuario.telefono,
+        phone: `+11${usuario.telefono}`,
         dob: {
           day: 15,
           month: 5,

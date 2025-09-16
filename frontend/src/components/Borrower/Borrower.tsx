@@ -9,6 +9,7 @@ import PaginationControls from '../Pagination/PaginationControler';
 import NewTurnModal from '../Modal/NewTurnModal';
 import CustomSelect from './../Select/CustomSelect';
 import { Alert, AlertTitle, AlertDescription } from './../Alerts/Alerts';
+import { useProtectRoute } from '../../cookie/useProtectRoute.tsx';
 type Turno = {
   id: number;
   fechaHora: string;
@@ -96,6 +97,7 @@ function Borrower() {
     message: string;
   } | null>(null);
 
+  useProtectRoute(['notprestador']);
   // Se carga la informacion del prestatario
   useEffect(() => {
     const pres = async (id: number) => {

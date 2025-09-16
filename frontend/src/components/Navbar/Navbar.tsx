@@ -73,10 +73,6 @@ function Navbar() {
             url: '/servicios',
           },
           {
-            nombre: 'Dashboard',
-            url: '/dashboard',
-          },
-          {
             nombre: 'Sobre nosotros',
             url: '/about',
           },
