@@ -194,7 +194,7 @@ async function updatePagoSplit(
       sendEmail(
         nuevoPago.buyerEmail ?? '',
         'Pago recibido',
-        `Hemos recibido tu pago de $${(amountReceived / 100).toFixed(
+        `Hemos recibido tu pago de $${(paymentIntent.amount / 100).toFixed(
           2
         )} ${paymentIntent.currency.toUpperCase()}. Gracias por tu compra.`
       );

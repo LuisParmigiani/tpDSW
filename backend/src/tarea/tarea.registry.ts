@@ -120,26 +120,28 @@ tareaRegistry.registerPath({
     },
   },
 });
+
+// GET /api/tarea/
 tareaRegistry.registerPath({
   method: 'get',
   path: '/api/tarea/',
-  description: 'Obtener utodas las tareas',
+  description: 'Obtener todas las tareas',
   summary: 'Obtener tareas',
   tags: ['Tareas'],
   responses: {
     200: {
-      description: 'Tarea encontrada',
+      description: 'Lista de tareas obtenida exitosamente',
       content: {
         'application/json': {
           schema: z.object({
-            message: z.string().openapi({ example: 'Tarea encontrada' }),
-            data: getTareaValidation,
+            message: z.string().openapi({ example: 'Tareas encontradas' }),
+            data: z.array(getTareaValidation),
           }),
         },
       },
     },
     404: {
-      description: 'Tarea no encontrada',
+      description: 'Tareas no encontradas',
       content: {
         'application/json': {
           schema: errorResponseSchema,

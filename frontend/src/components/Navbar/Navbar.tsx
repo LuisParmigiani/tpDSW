@@ -140,7 +140,7 @@ function Navbar() {
                     />
                   </button>
                   {showUserMenu && (
-                    <div className="absolute top-16 right-4 bg-white border border-gray-300 rounded-md shadow-lg w-50">
+                    <div className="absolute top-16 right-4 bg-white border z-60 border-gray-300 rounded-md shadow-lg w-50">
                       <Link className="w-full text-black py-1.5" to="/perfil">
                         {' '}
                         Editar perfil{' '}

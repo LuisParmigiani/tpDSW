@@ -5,32 +5,17 @@ import {
   moderateContent,
   type ModerationResult,
 } from '../shared/services/openai.service.js';
+import send from 'send';
+import { sendEmail } from '../mail/mail.js';
 
 interface AuthRequest extends Request {
   user?: {
     id: string;
     rol: string;
+    email: string;
   };
 }
 const em = orm.em;
-function sanitizeTurnoInput(req: Request, res: Response, next: NextFunction) {
-  req.body.sanitizeTurnoInput = {
-    fechaHora: req.body.fechaHora,
-    estado: req.body.estado,
-    calificacion: req.body.calificacion,
-    comentario: req.body.comentario,
-    montoFinal: req.body.montoFinal,
-    fechaPago: req.body.fechaPago,
-    servicio: req.body.servicio,
-    usuario: req.body.usuario,
-  };
-  Object.keys(req.body.sanitizeTurnoInput).forEach((key) => {
-    if (req.body.sanitizeTurnoInput[key] === undefined) {
-      delete req.body.sanitizeTurnoInput[key];
-    }
-  });
-  next();
-}
 
 // Find all turns
 async function findall(req: Request, res: Response) {
@@ -70,27 +55,39 @@ async function addWithCookie(req: AuthRequest, res: Response) {
     if (!req.user) {
       return res.status(401).json({ message: 'User not authenticated' });
     }
+
     const id = req.user.id;
-    const sanitizedInput = req.body.sanitizeTurnoInput;
-    sanitizedInput.usuario = id; // Asignar el ID del usuario autenticado
-    const newTurn = em.create(Turno, sanitizedInput);
+    const input = req.body; // Datos validados por el esquema
+    input.usuario = id; // Asignar el ID del usuario autenticado
+    const newTurn = em.create(Turno, input);
     await em.persistAndFlush(newTurn);
+
+    sendEmail(
+      req.user.email,
+      'Nuevo Turno Creado',
+      `Se ha creado un nuevo turno para el servicio ${
+        newTurn.servicio?.tarea?.nombreTarea || ''
+      }. El día ${newTurn.fechaHora}.`
+    );
+
     res
       .status(201)
       .json({ message: 'Turn created successfully', data: newTurn });
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    console.error('Error al crear el turno:', error);
+    res
+      .status(500)
+      .json({ message: 'Entro al catch de nuevo turno: ' + error.message });
   }
 }
 
 async function add(req: Request, res: Response) {
   try {
-    const sanitizedInput = req.body.sanitizeTurnoInput;
-    const newTurn = em.create(Turno, sanitizedInput);
+    const newTurn = em.create(Turno, req.body);
     await em.persistAndFlush(newTurn);
     res
       .status(201)
-      .json({ message: 'Turn created successfully', data: newTurn });
+      .json({ message: 'Turno creado exitosamente', data: newTurn });
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
@@ -100,7 +97,10 @@ async function add(req: Request, res: Response) {
 async function update(req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id);
-    const sanitizedInput = req.body.sanitizeTurnoInput;
+    const input = req.body; // Datos validados por el esquema
+    const onlyEstadoChanged =
+      Object.keys(input).length === 1 && input.estado !== undefined;
+
     const turn = await em.findOne(
       Turno,
       {
@@ -114,13 +114,11 @@ async function update(req: Request, res: Response) {
     }
 
     // Check if there's a comment to moderate
-    if (sanitizedInput.comentario) {
-      console.log('🔍 Moderating comment:', sanitizedInput.comentario);
-      //Paso el comentario por la moderación de la API de OpenAI
-      const moderationResult = await moderateContent(sanitizedInput.comentario);
+    if (input.comentario) {
+      console.log('🔍 Moderating comment:', input.comentario);
+      const moderationResult = await moderateContent(input.comentario);
       console.log('📊 Moderation result:', moderationResult);
 
-      // Check if content was flagged (either by OpenAI or fallback)
       if (moderationResult.flagged) {
         const moderationType = moderationResult.fallback
           ? 'fallback keyword detection'
@@ -136,7 +134,6 @@ async function update(req: Request, res: Response) {
         });
       }
 
-      // Log if moderation service failed but content wasn't flagged
       if (moderationResult.error && !moderationResult.fallback) {
         console.log(
           '⚠️ OpenAI moderation service failed, but content passed fallback check'
@@ -145,8 +142,16 @@ async function update(req: Request, res: Response) {
     }
 
     // Update the turn if moderation passed or no comment provided
-    em.assign(turn, sanitizedInput);
+    em.assign(turn, input);
     await em.persistAndFlush(turn);
+
+    if (onlyEstadoChanged) {
+      sendEmail(
+        turn.usuario.mail,
+        'Turno Actualizado',
+        `El estado de tu turno para el servicio ${turn.servicio.tarea.nombreTarea} del dia ${turn.fechaHora} ha sido actualizado a ${input.estado}.`
+      );
+    }
     res.status(200).json({ message: 'Turn updated successfully', data: turn });
   } catch (error: any) {
     res.status(500).json({ message: error.message });
@@ -631,7 +636,6 @@ async function getTurnosByPrestadorId(req: Request, res: Response) {
 }
 
 export {
-  sanitizeTurnoInput,
   findall,
   findone,
   add,
