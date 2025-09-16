@@ -59,9 +59,7 @@ async function addWithCookie(req: AuthRequest, res: Response) {
     const id = req.user.id;
     const input = req.body; // Datos validados por el esquema
     input.usuario = id; // Asignar el ID del usuario autenticado
-
     const newTurn = em.create(Turno, input);
-
     await em.persistAndFlush(newTurn);
 
     sendEmail(
