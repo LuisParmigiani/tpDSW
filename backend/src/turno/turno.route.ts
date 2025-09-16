@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import {
-  sanitizeTurnoInput,
   findall,
   findone,
   add,
@@ -11,23 +10,58 @@ import {
   getTurnsPerDay,
   addWithCookie,
 } from './turno.controler.js';
-import { verifyToken } from '../shared/middleware/auth.middleware.js';
+import {
+  validateBody,
+  validateParams,
+  validateQuery,
+  authenticateToken,
+} from '../utils/apiMiddleware.js';
+import {
+  TurnoQuerySchema,
+  TurnoCreateSchema,
+  TurnoUpdateSchema,
+  TurnoIdSchema,
+} from './turno.schemas.js';
 export const turnoRouter = Router();
 
 turnoRouter.get('/', findall);
+
 turnoRouter.get(
   '/byUser/:cantItemsPerPage?/:currentPage?/:selectedValueShow?/:selectedValueOrder?',
-  verifyToken,
+  authenticateToken,
+  validateQuery(TurnoQuerySchema),
   getTurnosByUserId
 );
+
 turnoRouter.get(
   '/byPrestador/:id/:cantItemsPerPage?/:currentPage?/:selectedValueShow?/:selectedValueOrder?/:searchQuery?',
+  validateQuery(TurnoQuerySchema),
+  validateParams(TurnoIdSchema),
   getTurnosByPrestadorId
 );
-turnoRouter.get('/turnosPorDia/:id/:date', getTurnsPerDay);
-turnoRouter.get('/:id', findone);
-turnoRouter.post('/', sanitizeTurnoInput, add);
-turnoRouter.post('/cookie', sanitizeTurnoInput, verifyToken, addWithCookie);
-turnoRouter.put('/:id', sanitizeTurnoInput, update);
-turnoRouter.patch('/:id', sanitizeTurnoInput, update);
-turnoRouter.delete('/:id', remove);
+
+turnoRouter.get(
+  '/turnosPorDia/:id/:date',
+  validateParams(TurnoIdSchema),
+  getTurnsPerDay
+);
+
+turnoRouter.get('/:id', validateParams(TurnoIdSchema), findone);
+
+turnoRouter.post('/', validateBody(TurnoCreateSchema), add);
+
+turnoRouter.post(
+  '/cookie',
+  authenticateToken,
+  validateBody(TurnoCreateSchema),
+  addWithCookie
+);
+
+turnoRouter.patch(
+  '/:id',
+  validateParams(TurnoIdSchema),
+  validateBody(TurnoUpdateSchema),
+  update
+);
+
+turnoRouter.delete('/:id', validateParams(TurnoIdSchema), remove);
