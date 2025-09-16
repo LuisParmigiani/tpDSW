@@ -109,10 +109,15 @@ function NewTurnModal({
       errors.initialService = 'Servicio inicial no válido';
     }
 
-    // Validar tarea inicial
+    // Validar tarea inicial solo si el servicio inicial es válido
     if (
+      servicio &&
       Tarea &&
-      !prestatario.servicios.some((serv) => serv.tarea.nombreTarea === Tarea)
+      !prestatario.servicios.some(
+        (serv) =>
+          serv.tarea.nombreTarea === Tarea &&
+          serv.tarea.tipoServicio.nombreTipo === servicio
+      )
     ) {
       errors.initialTask = 'Tarea inicial no válida';
     }
@@ -274,14 +279,21 @@ function NewTurnModal({
   // Efecto para generar las opciones de tareas según el servicio seleccionado
   useEffect(() => {
     const newTareasOptions: Option[] = [];
+    const seenTasks = new Set(); // Conjunto para evitar duplicados
+
     prestatario.servicios.forEach((servicio) => {
-      if (servicio.tarea.tipoServicio.nombreTipo === selectedService) {
+      if (
+        servicio.tarea.tipoServicio.nombreTipo === selectedService &&
+        !seenTasks.has(servicio.tarea.nombreTarea) // Verificar si ya se agregó
+      ) {
         newTareasOptions.push({
           value: servicio.tarea.nombreTarea,
           label: servicio.tarea.nombreTarea,
         });
+        seenTasks.add(servicio.tarea.nombreTarea); // Marcar como agregado
       }
     });
+
     setTareasOptions(newTareasOptions);
   }, [selectedService, prestatario]);
 

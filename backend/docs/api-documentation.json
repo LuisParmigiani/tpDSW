@@ -1450,7 +1450,7 @@
           "id": {
             "type": "string",
             "description": "ID del turno",
-            "example": 1
+            "example": "1"
           }
         },
         "required": [
@@ -1579,7 +1579,7 @@
               "id": {
                 "type": "string",
                 "description": "ID del servicio",
-                "example": 1
+                "example": "1"
               },
               "estado": {
                 "type": "string",
@@ -8597,7 +8597,7 @@
                               "id": {
                                 "type": "string",
                                 "description": "ID del servicio",
-                                "example": 1
+                                "example": "1"
                               },
                               "estado": {
                                 "type": "string",
@@ -8963,7 +8963,7 @@
                             "id": {
                               "type": "string",
                               "description": "ID del servicio",
-                              "example": 1
+                              "example": "1"
                             },
                             "estado": {
                               "type": "string",
@@ -9184,7 +9184,7 @@
             "schema": {
               "type": "string",
               "description": "ID del turno",
-              "example": 1
+              "example": "1"
             },
             "required": true,
             "description": "ID del turno",
@@ -9287,7 +9287,7 @@
                             "id": {
                               "type": "string",
                               "description": "ID del servicio",
-                              "example": 1
+                              "example": "1"
                             },
                             "estado": {
                               "type": "string",
@@ -9549,7 +9549,7 @@
             "schema": {
               "type": "string",
               "description": "ID del turno",
-              "example": 1
+              "example": "1"
             },
             "required": true,
             "description": "ID del turno",
@@ -9710,7 +9710,7 @@
                             "id": {
                               "type": "string",
                               "description": "ID del servicio",
-                              "example": 1
+                              "example": "1"
                             },
                             "estado": {
                               "type": "string",
@@ -9972,7 +9972,7 @@
             "schema": {
               "type": "string",
               "description": "ID del turno",
-              "example": 1
+              "example": "1"
             },
             "required": true,
             "description": "ID del turno",
@@ -10068,7 +10068,7 @@
                         "id": {
                           "type": "string",
                           "description": "ID del servicio",
-                          "example": 1
+                          "example": "1"
                         },
                         "estado": {
                           "type": "string",
