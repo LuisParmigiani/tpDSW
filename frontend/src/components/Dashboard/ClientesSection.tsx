@@ -128,14 +128,14 @@ function ClientesSection() {
 			// Determinar filtro de estado para el backend
 			let backendFilterValue = '';
 			if (filtrosEstado.length === 1) {
-				// Si solo hay un filtro seleccionado, usar el filtro específico
+				
 				const estado = filtrosEstado[0].toLowerCase();
 				if (estado === 'pendiente') backendFilterValue = 'pendientes';
 				else if (estado === 'confirmado') backendFilterValue = 'confirmados';
 				else if (estado === 'cancelado') backendFilterValue = 'cancelados';
 				else if (estado === 'completado') backendFilterValue = 'completado';
 			} else if (filtrosEstado.length > 1) {
-				// Para múltiples filtros, enviamos los estados separados por coma
+				
 				backendFilterValue = 'multipleStates:' + filtrosEstado.map(e => e.toLowerCase()).join(',');
 			}
 			// Si no hay filtros, no aplicar filtro específico (mostrar todos)

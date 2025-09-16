@@ -68,7 +68,7 @@ function DashNav({ activeSection, setActiveSection, showMobileNav, setShowMobile
         {!(isMobile || isCollapsed) ? (
           <div className="flex items-center justify-between w-full">
             <h2 className="text-lg font-semibold text-gray-700 px-3">Dashboard</h2>
-            {/* Solo mostrar botón de colapsar en desktop */}
+            
             {!isMobile && (
               <button
                 onClick={() => setIsCollapsed(!isCollapsed)}
@@ -88,7 +88,7 @@ function DashNav({ activeSection, setActiveSection, showMobileNav, setShowMobile
           </div>
         ) : (
           <div className="flex justify-center h-full items-center">
-            {/* Botón hamburguesa para móvil */}
+            
             {isMobile && (
               <button
                 onClick={() => setShowMobileNav?.(true)}
@@ -105,7 +105,7 @@ function DashNav({ activeSection, setActiveSection, showMobileNav, setShowMobile
                 </svg>
               </button>
             )}
-            {/* Solo mostrar botón de expandir en desktop */}
+            
             {!isMobile && (
               <button
                 onClick={() => setIsCollapsed(!isCollapsed)}

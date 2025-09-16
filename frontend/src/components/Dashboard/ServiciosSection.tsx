@@ -11,13 +11,12 @@ import StripeConnection from '../StripeConnection/StripeConnection';
 
 // Función para convertir datos del API al formato del componente
 const convertirTipoServicioADisplay = (tipoServicio: unknown): TipoServicioData => {
-  console.log('Datos recibidos del backend:', tipoServicio);
+  
   
   const tipoObj = tipoServicio as {
     id: number;
     nombreTipo?: string;
     descripcionTipo?: string;
-    // Posibles variaciones del backend
     nombre?: string;
     descripcion?: string;
     name?: string;
@@ -34,55 +33,38 @@ const convertirTipoServicioADisplay = (tipoServicio: unknown): TipoServicioData 
     id: tipoObj.id,
     nombre: nombre,
     descripcion: descripcion,
-    activo: false // Por defecto todos inician inactivos
+    activo: false 
   };
-  
-  console.log('Datos convertidos:', resultado);
-  
   return resultado;
 };
 
 function ServiciosSection() {
-  const { usuario } = useAuth(); // Obtener usuario logueado
+  const { usuario } = useAuth(); 
   const [tiposServicio, setTiposServicio] = useState<TipoServicioData[]>([]);
   const [tareas, setTareas] = useState<Tarea[]>([]);
   const [tareasVisibles, setTareasVisibles] = useState<Tarea[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
-  // Estados para la funcionalidad de guardado
   const [showAlert, setShowAlert] = useState(false);
   const [alertType, setAlertType] = useState<'success' | 'danger'>('success');
   const [alertMessage, setAlertMessage] = useState('');
-  
-  // Estado para la paginación por tipo de servicio
-  const [tipoServicioActivo, setTipoServicioActivo] = useState<number | null>(null);
+  const [tipoServicioActivo, setTipoServicioActivo] = useState<number | null>(null); //estados para la paginacion
 
   // Cargar tipos de servicio desde la API
   const cargarTiposServicio = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      console.log('Iniciando carga de tipos de servicio...');
       const response = await tiposServicioApi.getAll();
-      
-      console.log('Respuesta completa del API:', response);
-      console.log('response.data:', response.data);
-      
+       // probar si es un array o esta indentado
       if (response.data && response.data.data) {
-        console.log('Datos a convertir:', response.data.data);
         const tiposConvertidos = response.data.data.map(convertirTipoServicioADisplay);
-        console.log('Tipos convertidos finales:', tiposConvertidos);
         setTiposServicio(tiposConvertidos);
       } else {
-        // Probar diferentes estructuras de respuesta
-        console.log('Probando estructura alternativa...');
         if (Array.isArray(response.data)) {
-          console.log('La respuesta es un array directo:', response.data);
           const tiposConvertidos = response.data.map(convertirTipoServicioADisplay);
           setTiposServicio(tiposConvertidos);
         } else {
-          console.error('Estructura de respuesta inesperada:', response);
           setError('Error al cargar los tipos de servicio');
         }
       }
@@ -97,27 +79,20 @@ function ServiciosSection() {
   // Cargar tareas desde la API
   const cargarTareas = useCallback(async () => {
     try {
-      console.log('Iniciando carga de tareas...');
       const response = await tareasApi.getAll();
-      
-      console.log('Respuesta completa del API de tareas:', response);
-      console.log('response.data:', response.data);
-      
       if (response.data && response.data.data) {
-        console.log('Datos de tareas a convertir:', response.data.data);
-        console.log('Muestra de las primeras 3 tareas sin procesar:', response.data.data.slice(0, 3));
-        
         const tareasConvertidas = response.data.data.map((tarea: {
           id: number;
           nombreTarea?: string;
           descripcionTarea?: string;
           duracionTarea?: number;
-          tipoServicio?: number | { id: number }; // Puede ser número directo o objeto
+          tipoServicio?: number | { id: number }; 
           tipoServicioId?: number;
           tipo_servicio_id?: number;
         }) => {
-          console.log('Procesando tarea:', tarea);
           // Si tipoServicio es un número, usarlo directamente; si es objeto, usar .id
+          //esto es medio codigo spageti pq andaba mal las respuestas ahora esta todo estandarizado lo tengo que cambiar
+          //si hay tiempo
           let tipoServicioId: number;
           if (typeof tarea.tipoServicio === 'number') {
             tipoServicioId = tarea.tipoServicio;
@@ -126,25 +101,18 @@ function ServiciosSection() {
           } else {
             tipoServicioId = tarea.tipoServicioId || tarea.tipo_servicio_id || 0;
           }
-          
-          console.log(`Tarea ID ${tarea.id}: tipoServicioId calculado = ${tipoServicioId}`);
-          
           return {
             id: tarea.id,
             descripcion: tarea.nombreTarea || tarea.descripcionTarea || `Tarea ${tarea.id}`,
             tipoServicioId: tipoServicioId,
-            seleccionada: false, // Por defecto no seleccionada
-            precio: 0, // Precio inicial
-            duracion: tarea.duracionTarea || 0 // Guardamos la duración también
+            seleccionada: false, 
+            precio: 0,
+            duracion: tarea.duracionTarea || 0
           };
         });
-        console.log('Tareas convertidas finales:', tareasConvertidas);
-        console.log('Muestra de las primeras 5 tareas convertidas:', tareasConvertidas.slice(0, 5));
+
         setTareas(tareasConvertidas);
       } else if (Array.isArray(response.data)) {
-        console.log('La respuesta de tareas es un array directo:', response.data);
-        console.log('Muestra de las primeras 3 tareas sin procesar:', response.data.slice(0, 3));
-        
         const tareasConvertidas = response.data.map((tarea: {
           id: number;
           nombreTarea?: string;
@@ -154,8 +122,9 @@ function ServiciosSection() {
           tipoServicioId?: number;
           tipo_servicio_id?: number;
         }) => {
-          console.log('Procesando tarea:', tarea);
+          
           // Si tipoServicio es un número, usarlo directamente; si es objeto, usar .id
+          //lo mismo aca
           let tipoServicioId: number;
           if (typeof tarea.tipoServicio === 'number') {
             tipoServicioId = tarea.tipoServicio;
@@ -214,23 +183,15 @@ function ServiciosSection() {
           const tipoServicioId = typeof servicio.tarea === 'object' ? servicio.tarea?.tipoServicio?.id : undefined;
           const precio = servicio.precio;
           const isActive = servicio.estado === 'activo';
-          
           if (tareaId && precio) {
             tareasConPrecios.set(tareaId, precio);
             tareasActivas.set(tareaId, isActive);
           }
-          
-          // Marcar tipos como activos si tienen cualquier servicio (activo o inactivo)
           if (tipoServicioId) {
             tiposConServicios.add(tipoServicioId);
           }
         });
-        
-        console.log('Tipos con servicios extraídos:', Array.from(tiposConServicios));
-        console.log('Tareas con precios:', Array.from(tareasConPrecios.entries()));
-        console.log('Tareas activas:', Array.from(tareasActivas.entries()));
-        
-        // Actualizar tipos de servicio (marcar como activos si tienen cualquier servicio)
+        //actualiza los tipos de servicio, tareas
         setTiposServicio(prev => 
           prev.map(tipo => ({
             ...tipo,
@@ -238,20 +199,18 @@ function ServiciosSection() {
           }))
         );
         
-        // Actualizar tareas (marcar como seleccionadas según su estado y establecer precios)
         setTareas(prev => 
           prev.map(tarea => ({
             ...tarea,
-            seleccionada: tareasActivas.get(tarea.id) || false, // true solo si está activa
+            seleccionada: tareasActivas.get(tarea.id) || false, 
             precio: tareasConPrecios.get(tarea.id) || 0
           }))
         );
         
-        console.log('Estados actualizados con servicios existentes');
       }
     } catch (err) {
       console.error('Error cargando servicios existentes:', err);
-      // No mostramos error, solo logueamos
+      
     }
   }, [usuario]);
 
@@ -260,7 +219,6 @@ function ServiciosSection() {
     const cargarDatosIniciales = async () => {
       await cargarTiposServicio();
       await cargarTareas();
-      // Cargar servicios existentes después de cargar tipos y tareas
       if (usuario) {
         await cargarServiciosExistentes();
       }

@@ -62,7 +62,7 @@ function HorariosSection() {
     verificarConexionStripe();
   }, [usuario, authLoading]);
 
-  // Cargar horarios existentes si está conectado a Stripe
+  // Cargar horarios existentes 
   useEffect(() => {
     const cargarHorarios = async () => {
       if (!conectadoStripe) return;
