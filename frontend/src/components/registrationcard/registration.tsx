@@ -6,6 +6,7 @@ import { cn } from '../../lib/utils.ts';
 import ProfilePicture from '../ProfilePic/ProfilePicture.tsx';
 import { Alert, AlertDescription, AlertTitle } from '../Alerts/Alerts.tsx';
 import { AxiosError } from 'axios';
+import { useProtectRoute } from '../../cookie/useProtectRoute.tsx';
 //Algunas validaciones no son necesarias pero las dejo para poder crear el objeto
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -44,7 +45,7 @@ function RegisCard() {
   const [uploading, setUploading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
-
+  useProtectRoute();
   //Clases de tailwind para sacar los spinners del input type number en formato desktop
   const sacarSpinners =
     'md:[appearance:textfield] md:[&::-webkit-outer-spin-button]:appearance-none md:[&::-webkit-inner-spin-button]:appearance-none md:[&::-webkit-outer-spin-button]:m-0 md:[&::-webkit-inner-spin-button]:m-0';

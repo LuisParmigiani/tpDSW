@@ -7,7 +7,7 @@ import { zonasApi } from '../../services/zonasApi';
 import { usuariosApi } from '../../services/usuariosApi';
 import PaginationControls from '../../components/Pagination/PaginationControler';
 import FilterSideBar from '../../components/Forms/FilterSideBar.tsx';
-
+import { useProtectRoute } from '../../cookie/useProtectRoute.tsx';
 // FIX 1: Complete Usuario type to match ServicioCard props
 type Usuario = {
   id: number;
@@ -62,6 +62,7 @@ type FormValues = {
   ordenarPor: string;
 };
 function FiltrosDeServicios() {
+  useProtectRoute(['notprestador']);
   // Get URL parameters
   const [searchParams] = useSearchParams();
   const servicioParam = searchParams.get('tipoServicio') || '';
