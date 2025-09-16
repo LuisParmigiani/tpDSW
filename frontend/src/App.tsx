@@ -11,7 +11,7 @@ import Servicios from './pages/about/Servicios';
 import Dashboard from './pages/dashboard/dashboard-p';
 import ChangePassword from './components/recoverycard/changepassword';
 import StripeCreate from './components/Stripe/stripe';
-
+import PerfilUsuario from './components/perfilUsuario/perfilUsuario';
 function App() {
   // Creación de la API DSP hay que llevarla a login
 
@@ -36,6 +36,7 @@ function App() {
           <Route path="/dashboard/:estado?" element={<Dashboard />} />
           <Route path="/changepassword" element={<ChangePassword />} />
           <Route path="/stripe/crear-cuenta" element={<StripeCreate />} />
+          <Route path="/perfil" element={<PerfilUsuario />} />
         </Routes>
       </Router>
     </>
