@@ -42,14 +42,6 @@
       "description": "Operaciones para el manejo de Zonas"
     },
     {
-      "name": "Reservas",
-      "description": "Operaciones para el manejo de Reservas"
-    },
-    {
-      "name": "Autenticación",
-      "description": "Operaciones relacionadas con la autenticación y autorización de usuarios"
-    },
-    {
       "name": "Horarios",
       "description": "Operaciones para el manejo de Horarios"
     },
@@ -60,6 +52,10 @@
     {
       "name": "TipoServicio",
       "description": "Operaciones para el manejo de Tipos de Servicio"
+    },
+    {
+      "name": "Autenticación",
+      "description": "Operaciones relacionadas con la autenticación y autorización de usuarios"
     }
   ],
   "components": {
@@ -1310,20 +1306,10 @@
       "Turno": {
         "type": "object",
         "properties": {
-          "fecha": {
+          "fechaHora": {
             "type": "string",
-            "description": "Fecha del turno",
-            "example": "2025-09-30"
-          },
-          "hora": {
-            "type": "string",
-            "description": "Hora del turno",
-            "example": "14:00"
-          },
-          "usuarioId": {
-            "type": "number",
-            "description": "ID del usuario",
-            "example": 2
+            "description": "Fecha y hora del turno",
+            "example": "2025-09-30T14:00:00Z"
           },
           "montoFinal": {
             "type": "number",
@@ -1353,9 +1339,7 @@
           }
         },
         "required": [
-          "fecha",
-          "hora",
-          "usuarioId",
+          "fechaHora",
           "montoFinal",
           "estado"
         ]
@@ -1363,20 +1347,10 @@
       "TurnoCreate": {
         "type": "object",
         "properties": {
-          "fecha": {
+          "fechaHora": {
             "type": "string",
-            "description": "Fecha del turno",
-            "example": "2025-09-30"
-          },
-          "hora": {
-            "type": "string",
-            "description": "Hora del turno",
-            "example": "14:00"
-          },
-          "usuarioId": {
-            "type": "number",
-            "description": "ID del usuario",
-            "example": 2
+            "description": "Fecha y hora del turno",
+            "example": "2025-09-30T14:00:00Z"
           },
           "montoFinal": {
             "type": "number",
@@ -1404,38 +1378,28 @@
             "description": "Comentario del turno",
             "example": "El servicio fue excelente y puntual."
           },
-          "tarea": {
-            "type": "number",
+          "servicio": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
             "description": "ID del servicio",
             "example": 1
           }
         },
         "required": [
-          "fecha",
-          "hora",
-          "usuarioId",
+          "fechaHora",
           "montoFinal",
           "estado",
-          "tarea"
+          "servicio"
         ]
       },
       "TurnoUpdate": {
         "type": "object",
         "properties": {
-          "fecha": {
+          "fechaHora": {
             "type": "string",
-            "description": "Fecha del turno",
-            "example": "2025-09-30"
-          },
-          "hora": {
-            "type": "string",
-            "description": "Hora del turno",
-            "example": "14:00"
-          },
-          "usuarioId": {
-            "type": "number",
-            "description": "ID del usuario",
-            "example": 2
+            "description": "Fecha y hora del turno",
+            "example": "2025-09-30T14:00:00Z"
           },
           "montoFinal": {
             "type": "number",
@@ -1463,7 +1427,12 @@
             "description": "Comentario del turno",
             "example": "El servicio fue excelente y puntual."
           },
-          "tarea": {
+          "usuarioId": {
+            "type": "number",
+            "description": "ID del usuario",
+            "example": 2
+          },
+          "servicio": {
             "type": "number",
             "description": "ID del servicio",
             "example": 1
@@ -1479,7 +1448,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "number",
+            "type": "string",
             "description": "ID del turno",
             "example": 1
           }
@@ -1530,20 +1499,10 @@
       "FullTurno": {
         "type": "object",
         "properties": {
-          "fecha": {
+          "fechaHora": {
             "type": "string",
-            "description": "Fecha del turno",
-            "example": "2025-09-30"
-          },
-          "hora": {
-            "type": "string",
-            "description": "Hora del turno",
-            "example": "14:00"
-          },
-          "usuarioId": {
-            "type": "number",
-            "description": "ID del usuario",
-            "example": 2
+            "description": "Fecha y hora del turno",
+            "example": "2025-09-30T14:00:00Z"
           },
           "montoFinal": {
             "type": "number",
@@ -1571,38 +1530,94 @@
             "description": "Comentario del turno",
             "example": "El servicio fue excelente y puntual."
           },
+          "usuarioid": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number",
+                "description": "ID del usuario",
+                "example": 1
+              },
+              "nombre": {
+                "type": "string",
+                "description": "Nombre del usuario",
+                "example": "Juan"
+              },
+              "apellido": {
+                "type": "string",
+                "description": "Apellido del usuario",
+                "example": "Pérez"
+              },
+              "mail": {
+                "type": "string",
+                "description": "Email del usuario",
+                "example": "juan.perez@gmail.com"
+              },
+              "nombreFantasia": {
+                "type": "string",
+                "nullable": true,
+                "description": "Nombre de fantasía del prestatario",
+                "example": "Plomería Pérez"
+              }
+            },
+            "required": [
+              "id",
+              "nombre",
+              "apellido",
+              "mail",
+              "nombreFantasia"
+            ]
+          },
           "id": {
             "type": "number",
             "description": "ID del turno",
             "example": 1
           },
-          "tarea": {
+          "servicio": {
             "type": "object",
             "properties": {
-              "nombreTarea": {
+              "id": {
                 "type": "string",
-                "minLength": 2,
-                "maxLength": 100,
-                "description": "Nombre de la tarea",
-                "example": "Reparación de grifería"
+                "description": "ID del servicio",
+                "example": 1
               },
-              "descripcionTarea": {
+              "estado": {
                 "type": "string",
-                "maxLength": 500,
-                "description": "Descripción de la tarea",
-                "example": "Reparación y mantenimiento de grifería en el hogar"
+                "enum": [
+                  "activo",
+                  "inactivo"
+                ],
+                "description": "Estado del servicio",
+                "example": "activo"
               },
-              "duracionTarea": {
+              "precio": {
                 "type": "number",
                 "minimum": 0,
                 "exclusiveMinimum": true,
-                "description": "Duración de la tarea en minutos",
-                "example": 60
+                "description": "Precio del servicio",
+                "example": 1500
+              },
+              "servicio": {
+                "type": "integer",
+                "minimum": 0,
+                "exclusiveMinimum": true,
+                "description": "ID de la servicio asociada al servicio",
+                "example": 1
+              },
+              "usuario": {
+                "type": "integer",
+                "nullable": true,
+                "minimum": 0,
+                "exclusiveMinimum": true,
+                "description": "ID del usuario asociado al servicio (opcional)",
+                "example": 2
               }
             },
             "required": [
-              "nombreTarea",
-              "duracionTarea"
+              "id",
+              "estado",
+              "precio",
+              "servicio"
             ]
           },
           "pago": {
@@ -1710,13 +1725,12 @@
           }
         },
         "required": [
-          "fecha",
-          "hora",
-          "usuarioId",
+          "fechaHora",
           "montoFinal",
           "estado",
+          "usuarioid",
           "id",
-          "tarea"
+          "servicio"
         ]
       },
       "CreateZona": {
@@ -8503,20 +8517,10 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "fecha": {
+                          "fechaHora": {
                             "type": "string",
-                            "description": "Fecha del turno",
-                            "example": "2025-09-30"
-                          },
-                          "hora": {
-                            "type": "string",
-                            "description": "Hora del turno",
-                            "example": "14:00"
-                          },
-                          "usuarioId": {
-                            "type": "number",
-                            "description": "ID del usuario",
-                            "example": 2
+                            "description": "Fecha y hora del turno",
+                            "example": "2025-09-30T14:00:00Z"
                           },
                           "montoFinal": {
                             "type": "number",
@@ -8544,38 +8548,94 @@
                             "description": "Comentario del turno",
                             "example": "El servicio fue excelente y puntual."
                           },
+                          "usuarioid": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "number",
+                                "description": "ID del usuario",
+                                "example": 1
+                              },
+                              "nombre": {
+                                "type": "string",
+                                "description": "Nombre del usuario",
+                                "example": "Juan"
+                              },
+                              "apellido": {
+                                "type": "string",
+                                "description": "Apellido del usuario",
+                                "example": "Pérez"
+                              },
+                              "mail": {
+                                "type": "string",
+                                "description": "Email del usuario",
+                                "example": "juan.perez@gmail.com"
+                              },
+                              "nombreFantasia": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Nombre de fantasía del prestatario",
+                                "example": "Plomería Pérez"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "nombre",
+                              "apellido",
+                              "mail",
+                              "nombreFantasia"
+                            ]
+                          },
                           "id": {
                             "type": "number",
                             "description": "ID del turno",
                             "example": 1
                           },
-                          "tarea": {
+                          "servicio": {
                             "type": "object",
                             "properties": {
-                              "nombreTarea": {
+                              "id": {
                                 "type": "string",
-                                "minLength": 2,
-                                "maxLength": 100,
-                                "description": "Nombre de la tarea",
-                                "example": "Reparación de grifería"
+                                "description": "ID del servicio",
+                                "example": 1
                               },
-                              "descripcionTarea": {
+                              "estado": {
                                 "type": "string",
-                                "maxLength": 500,
-                                "description": "Descripción de la tarea",
-                                "example": "Reparación y mantenimiento de grifería en el hogar"
+                                "enum": [
+                                  "activo",
+                                  "inactivo"
+                                ],
+                                "description": "Estado del servicio",
+                                "example": "activo"
                               },
-                              "duracionTarea": {
+                              "precio": {
                                 "type": "number",
                                 "minimum": 0,
                                 "exclusiveMinimum": true,
-                                "description": "Duración de la tarea en minutos",
-                                "example": 60
+                                "description": "Precio del servicio",
+                                "example": 1500
+                              },
+                              "servicio": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "exclusiveMinimum": true,
+                                "description": "ID de la servicio asociada al servicio",
+                                "example": 1
+                              },
+                              "usuario": {
+                                "type": "integer",
+                                "nullable": true,
+                                "minimum": 0,
+                                "exclusiveMinimum": true,
+                                "description": "ID del usuario asociado al servicio (opcional)",
+                                "example": 2
                               }
                             },
                             "required": [
-                              "nombreTarea",
-                              "duracionTarea"
+                              "id",
+                              "estado",
+                              "precio",
+                              "servicio"
                             ]
                           },
                           "pago": {
@@ -8683,13 +8743,12 @@
                           }
                         },
                         "required": [
-                          "fecha",
-                          "hora",
-                          "usuarioId",
+                          "fechaHora",
                           "montoFinal",
                           "estado",
+                          "usuarioid",
                           "id",
-                          "tarea"
+                          "servicio"
                         ]
                       }
                     }
@@ -8760,20 +8819,10 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "fecha": {
+                  "fechaHora": {
                     "type": "string",
-                    "description": "Fecha del turno",
-                    "example": "2025-09-30"
-                  },
-                  "hora": {
-                    "type": "string",
-                    "description": "Hora del turno",
-                    "example": "14:00"
-                  },
-                  "usuarioId": {
-                    "type": "number",
-                    "description": "ID del usuario",
-                    "example": 2
+                    "description": "Fecha y hora del turno",
+                    "example": "2025-09-30T14:00:00Z"
                   },
                   "montoFinal": {
                     "type": "number",
@@ -8801,19 +8850,19 @@
                     "description": "Comentario del turno",
                     "example": "El servicio fue excelente y puntual."
                   },
-                  "tarea": {
-                    "type": "number",
+                  "servicio": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true,
                     "description": "ID del servicio",
                     "example": 1
                   }
                 },
                 "required": [
-                  "fecha",
-                  "hora",
-                  "usuarioId",
+                  "fechaHora",
                   "montoFinal",
                   "estado",
-                  "tarea"
+                  "servicio"
                 ]
               }
             }
@@ -8834,20 +8883,10 @@
                     "data": {
                       "type": "object",
                       "properties": {
-                        "fecha": {
+                        "fechaHora": {
                           "type": "string",
-                          "description": "Fecha del turno",
-                          "example": "2025-09-30"
-                        },
-                        "hora": {
-                          "type": "string",
-                          "description": "Hora del turno",
-                          "example": "14:00"
-                        },
-                        "usuarioId": {
-                          "type": "number",
-                          "description": "ID del usuario",
-                          "example": 2
+                          "description": "Fecha y hora del turno",
+                          "example": "2025-09-30T14:00:00Z"
                         },
                         "montoFinal": {
                           "type": "number",
@@ -8875,38 +8914,94 @@
                           "description": "Comentario del turno",
                           "example": "El servicio fue excelente y puntual."
                         },
+                        "usuarioid": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "number",
+                              "description": "ID del usuario",
+                              "example": 1
+                            },
+                            "nombre": {
+                              "type": "string",
+                              "description": "Nombre del usuario",
+                              "example": "Juan"
+                            },
+                            "apellido": {
+                              "type": "string",
+                              "description": "Apellido del usuario",
+                              "example": "Pérez"
+                            },
+                            "mail": {
+                              "type": "string",
+                              "description": "Email del usuario",
+                              "example": "juan.perez@gmail.com"
+                            },
+                            "nombreFantasia": {
+                              "type": "string",
+                              "nullable": true,
+                              "description": "Nombre de fantasía del prestatario",
+                              "example": "Plomería Pérez"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "nombre",
+                            "apellido",
+                            "mail",
+                            "nombreFantasia"
+                          ]
+                        },
                         "id": {
                           "type": "number",
                           "description": "ID del turno",
                           "example": 1
                         },
-                        "tarea": {
+                        "servicio": {
                           "type": "object",
                           "properties": {
-                            "nombreTarea": {
+                            "id": {
                               "type": "string",
-                              "minLength": 2,
-                              "maxLength": 100,
-                              "description": "Nombre de la tarea",
-                              "example": "Reparación de grifería"
+                              "description": "ID del servicio",
+                              "example": 1
                             },
-                            "descripcionTarea": {
+                            "estado": {
                               "type": "string",
-                              "maxLength": 500,
-                              "description": "Descripción de la tarea",
-                              "example": "Reparación y mantenimiento de grifería en el hogar"
+                              "enum": [
+                                "activo",
+                                "inactivo"
+                              ],
+                              "description": "Estado del servicio",
+                              "example": "activo"
                             },
-                            "duracionTarea": {
+                            "precio": {
                               "type": "number",
                               "minimum": 0,
                               "exclusiveMinimum": true,
-                              "description": "Duración de la tarea en minutos",
-                              "example": 60
+                              "description": "Precio del servicio",
+                              "example": 1500
+                            },
+                            "servicio": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "exclusiveMinimum": true,
+                              "description": "ID de la servicio asociada al servicio",
+                              "example": 1
+                            },
+                            "usuario": {
+                              "type": "integer",
+                              "nullable": true,
+                              "minimum": 0,
+                              "exclusiveMinimum": true,
+                              "description": "ID del usuario asociado al servicio (opcional)",
+                              "example": 2
                             }
                           },
                           "required": [
-                            "nombreTarea",
-                            "duracionTarea"
+                            "id",
+                            "estado",
+                            "precio",
+                            "servicio"
                           ]
                         },
                         "pago": {
@@ -9014,13 +9109,12 @@
                         }
                       },
                       "required": [
-                        "fecha",
-                        "hora",
-                        "usuarioId",
+                        "fechaHora",
                         "montoFinal",
                         "estado",
+                        "usuarioid",
                         "id",
-                        "tarea"
+                        "servicio"
                       ]
                     }
                   },
@@ -9088,7 +9182,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "number",
+              "type": "string",
               "description": "ID del turno",
               "example": 1
             },
@@ -9113,20 +9207,10 @@
                     "data": {
                       "type": "object",
                       "properties": {
-                        "fecha": {
+                        "fechaHora": {
                           "type": "string",
-                          "description": "Fecha del turno",
-                          "example": "2025-09-30"
-                        },
-                        "hora": {
-                          "type": "string",
-                          "description": "Hora del turno",
-                          "example": "14:00"
-                        },
-                        "usuarioId": {
-                          "type": "number",
-                          "description": "ID del usuario",
-                          "example": 2
+                          "description": "Fecha y hora del turno",
+                          "example": "2025-09-30T14:00:00Z"
                         },
                         "montoFinal": {
                           "type": "number",
@@ -9154,38 +9238,94 @@
                           "description": "Comentario del turno",
                           "example": "El servicio fue excelente y puntual."
                         },
+                        "usuarioid": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "number",
+                              "description": "ID del usuario",
+                              "example": 1
+                            },
+                            "nombre": {
+                              "type": "string",
+                              "description": "Nombre del usuario",
+                              "example": "Juan"
+                            },
+                            "apellido": {
+                              "type": "string",
+                              "description": "Apellido del usuario",
+                              "example": "Pérez"
+                            },
+                            "mail": {
+                              "type": "string",
+                              "description": "Email del usuario",
+                              "example": "juan.perez@gmail.com"
+                            },
+                            "nombreFantasia": {
+                              "type": "string",
+                              "nullable": true,
+                              "description": "Nombre de fantasía del prestatario",
+                              "example": "Plomería Pérez"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "nombre",
+                            "apellido",
+                            "mail",
+                            "nombreFantasia"
+                          ]
+                        },
                         "id": {
                           "type": "number",
                           "description": "ID del turno",
                           "example": 1
                         },
-                        "tarea": {
+                        "servicio": {
                           "type": "object",
                           "properties": {
-                            "nombreTarea": {
+                            "id": {
                               "type": "string",
-                              "minLength": 2,
-                              "maxLength": 100,
-                              "description": "Nombre de la tarea",
-                              "example": "Reparación de grifería"
+                              "description": "ID del servicio",
+                              "example": 1
                             },
-                            "descripcionTarea": {
+                            "estado": {
                               "type": "string",
-                              "maxLength": 500,
-                              "description": "Descripción de la tarea",
-                              "example": "Reparación y mantenimiento de grifería en el hogar"
+                              "enum": [
+                                "activo",
+                                "inactivo"
+                              ],
+                              "description": "Estado del servicio",
+                              "example": "activo"
                             },
-                            "duracionTarea": {
+                            "precio": {
                               "type": "number",
                               "minimum": 0,
                               "exclusiveMinimum": true,
-                              "description": "Duración de la tarea en minutos",
-                              "example": 60
+                              "description": "Precio del servicio",
+                              "example": 1500
+                            },
+                            "servicio": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "exclusiveMinimum": true,
+                              "description": "ID de la servicio asociada al servicio",
+                              "example": 1
+                            },
+                            "usuario": {
+                              "type": "integer",
+                              "nullable": true,
+                              "minimum": 0,
+                              "exclusiveMinimum": true,
+                              "description": "ID del usuario asociado al servicio (opcional)",
+                              "example": 2
                             }
                           },
                           "required": [
-                            "nombreTarea",
-                            "duracionTarea"
+                            "id",
+                            "estado",
+                            "precio",
+                            "servicio"
                           ]
                         },
                         "pago": {
@@ -9293,13 +9433,12 @@
                         }
                       },
                       "required": [
-                        "fecha",
-                        "hora",
-                        "usuarioId",
+                        "fechaHora",
                         "montoFinal",
                         "estado",
+                        "usuarioid",
                         "id",
-                        "tarea"
+                        "servicio"
                       ]
                     }
                   },
@@ -9408,7 +9547,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "number",
+              "type": "string",
               "description": "ID del turno",
               "example": 1
             },
@@ -9425,20 +9564,10 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "fecha": {
+                  "fechaHora": {
                     "type": "string",
-                    "description": "Fecha del turno",
-                    "example": "2025-09-30"
-                  },
-                  "hora": {
-                    "type": "string",
-                    "description": "Hora del turno",
-                    "example": "14:00"
-                  },
-                  "usuarioId": {
-                    "type": "number",
-                    "description": "ID del usuario",
-                    "example": 2
+                    "description": "Fecha y hora del turno",
+                    "example": "2025-09-30T14:00:00Z"
                   },
                   "montoFinal": {
                     "type": "number",
@@ -9466,7 +9595,12 @@
                     "description": "Comentario del turno",
                     "example": "El servicio fue excelente y puntual."
                   },
-                  "tarea": {
+                  "usuarioId": {
+                    "type": "number",
+                    "description": "ID del usuario",
+                    "example": 2
+                  },
+                  "servicio": {
                     "type": "number",
                     "description": "ID del servicio",
                     "example": 1
@@ -9496,20 +9630,10 @@
                     "data": {
                       "type": "object",
                       "properties": {
-                        "fecha": {
+                        "fechaHora": {
                           "type": "string",
-                          "description": "Fecha del turno",
-                          "example": "2025-09-30"
-                        },
-                        "hora": {
-                          "type": "string",
-                          "description": "Hora del turno",
-                          "example": "14:00"
-                        },
-                        "usuarioId": {
-                          "type": "number",
-                          "description": "ID del usuario",
-                          "example": 2
+                          "description": "Fecha y hora del turno",
+                          "example": "2025-09-30T14:00:00Z"
                         },
                         "montoFinal": {
                           "type": "number",
@@ -9537,38 +9661,94 @@
                           "description": "Comentario del turno",
                           "example": "El servicio fue excelente y puntual."
                         },
+                        "usuarioid": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "number",
+                              "description": "ID del usuario",
+                              "example": 1
+                            },
+                            "nombre": {
+                              "type": "string",
+                              "description": "Nombre del usuario",
+                              "example": "Juan"
+                            },
+                            "apellido": {
+                              "type": "string",
+                              "description": "Apellido del usuario",
+                              "example": "Pérez"
+                            },
+                            "mail": {
+                              "type": "string",
+                              "description": "Email del usuario",
+                              "example": "juan.perez@gmail.com"
+                            },
+                            "nombreFantasia": {
+                              "type": "string",
+                              "nullable": true,
+                              "description": "Nombre de fantasía del prestatario",
+                              "example": "Plomería Pérez"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "nombre",
+                            "apellido",
+                            "mail",
+                            "nombreFantasia"
+                          ]
+                        },
                         "id": {
                           "type": "number",
                           "description": "ID del turno",
                           "example": 1
                         },
-                        "tarea": {
+                        "servicio": {
                           "type": "object",
                           "properties": {
-                            "nombreTarea": {
+                            "id": {
                               "type": "string",
-                              "minLength": 2,
-                              "maxLength": 100,
-                              "description": "Nombre de la tarea",
-                              "example": "Reparación de grifería"
+                              "description": "ID del servicio",
+                              "example": 1
                             },
-                            "descripcionTarea": {
+                            "estado": {
                               "type": "string",
-                              "maxLength": 500,
-                              "description": "Descripción de la tarea",
-                              "example": "Reparación y mantenimiento de grifería en el hogar"
+                              "enum": [
+                                "activo",
+                                "inactivo"
+                              ],
+                              "description": "Estado del servicio",
+                              "example": "activo"
                             },
-                            "duracionTarea": {
+                            "precio": {
                               "type": "number",
                               "minimum": 0,
                               "exclusiveMinimum": true,
-                              "description": "Duración de la tarea en minutos",
-                              "example": 60
+                              "description": "Precio del servicio",
+                              "example": 1500
+                            },
+                            "servicio": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "exclusiveMinimum": true,
+                              "description": "ID de la servicio asociada al servicio",
+                              "example": 1
+                            },
+                            "usuario": {
+                              "type": "integer",
+                              "nullable": true,
+                              "minimum": 0,
+                              "exclusiveMinimum": true,
+                              "description": "ID del usuario asociado al servicio (opcional)",
+                              "example": 2
                             }
                           },
                           "required": [
-                            "nombreTarea",
-                            "duracionTarea"
+                            "id",
+                            "estado",
+                            "precio",
+                            "servicio"
                           ]
                         },
                         "pago": {
@@ -9676,13 +9856,12 @@
                         }
                       },
                       "required": [
-                        "fecha",
-                        "hora",
-                        "usuarioId",
+                        "fechaHora",
                         "montoFinal",
                         "estado",
+                        "usuarioid",
                         "id",
-                        "tarea"
+                        "servicio"
                       ]
                     }
                   },
@@ -9791,7 +9970,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "number",
+              "type": "string",
               "description": "ID del turno",
               "example": 1
             },
@@ -9809,20 +9988,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "fecha": {
+                    "fechaHora": {
                       "type": "string",
-                      "description": "Fecha del turno",
-                      "example": "2025-09-30"
-                    },
-                    "hora": {
-                      "type": "string",
-                      "description": "Hora del turno",
-                      "example": "14:00"
-                    },
-                    "usuarioId": {
-                      "type": "number",
-                      "description": "ID del usuario",
-                      "example": 2
+                      "description": "Fecha y hora del turno",
+                      "example": "2025-09-30T14:00:00Z"
                     },
                     "montoFinal": {
                       "type": "number",
@@ -9850,38 +10019,94 @@
                       "description": "Comentario del turno",
                       "example": "El servicio fue excelente y puntual."
                     },
+                    "usuarioid": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "number",
+                          "description": "ID del usuario",
+                          "example": 1
+                        },
+                        "nombre": {
+                          "type": "string",
+                          "description": "Nombre del usuario",
+                          "example": "Juan"
+                        },
+                        "apellido": {
+                          "type": "string",
+                          "description": "Apellido del usuario",
+                          "example": "Pérez"
+                        },
+                        "mail": {
+                          "type": "string",
+                          "description": "Email del usuario",
+                          "example": "juan.perez@gmail.com"
+                        },
+                        "nombreFantasia": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Nombre de fantasía del prestatario",
+                          "example": "Plomería Pérez"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "nombre",
+                        "apellido",
+                        "mail",
+                        "nombreFantasia"
+                      ]
+                    },
                     "id": {
                       "type": "number",
                       "description": "ID del turno",
                       "example": 1
                     },
-                    "tarea": {
+                    "servicio": {
                       "type": "object",
                       "properties": {
-                        "nombreTarea": {
+                        "id": {
                           "type": "string",
-                          "minLength": 2,
-                          "maxLength": 100,
-                          "description": "Nombre de la tarea",
-                          "example": "Reparación de grifería"
+                          "description": "ID del servicio",
+                          "example": 1
                         },
-                        "descripcionTarea": {
+                        "estado": {
                           "type": "string",
-                          "maxLength": 500,
-                          "description": "Descripción de la tarea",
-                          "example": "Reparación y mantenimiento de grifería en el hogar"
+                          "enum": [
+                            "activo",
+                            "inactivo"
+                          ],
+                          "description": "Estado del servicio",
+                          "example": "activo"
                         },
-                        "duracionTarea": {
+                        "precio": {
                           "type": "number",
                           "minimum": 0,
                           "exclusiveMinimum": true,
-                          "description": "Duración de la tarea en minutos",
-                          "example": 60
+                          "description": "Precio del servicio",
+                          "example": 1500
+                        },
+                        "servicio": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "exclusiveMinimum": true,
+                          "description": "ID de la servicio asociada al servicio",
+                          "example": 1
+                        },
+                        "usuario": {
+                          "type": "integer",
+                          "nullable": true,
+                          "minimum": 0,
+                          "exclusiveMinimum": true,
+                          "description": "ID del usuario asociado al servicio (opcional)",
+                          "example": 2
                         }
                       },
                       "required": [
-                        "nombreTarea",
-                        "duracionTarea"
+                        "id",
+                        "estado",
+                        "precio",
+                        "servicio"
                       ]
                     },
                     "pago": {
@@ -9989,13 +10214,12 @@
                     }
                   },
                   "required": [
-                    "fecha",
-                    "hora",
-                    "usuarioId",
+                    "fechaHora",
                     "montoFinal",
                     "estado",
+                    "usuarioid",
                     "id",
-                    "tarea"
+                    "servicio"
                   ]
                 }
               }

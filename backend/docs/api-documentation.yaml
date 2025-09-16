@@ -22,16 +22,14 @@ tags:
     description: Operaciones para el manejo de Servicios
   - name: Zonas
     description: Operaciones para el manejo de Zonas
-  - name: Reservas
-    description: Operaciones para el manejo de Reservas
-  - name: Autenticación
-    description: Operaciones relacionadas con la autenticación y autorización de usuarios
   - name: Horarios
     description: Operaciones para el manejo de Horarios
   - name: Tareas
     description: Operaciones para el manejo de Tareas
   - name: TipoServicio
     description: Operaciones para el manejo de Tipos de Servicio
+  - name: Autenticación
+    description: Operaciones relacionadas con la autenticación y autorización de usuarios
 components:
   securitySchemes:
     bearerAuth:
@@ -996,18 +994,10 @@ components:
     Turno:
       type: object
       properties:
-        fecha:
+        fechaHora:
           type: string
-          description: Fecha del turno
-          example: 2025-09-30
-        hora:
-          type: string
-          description: Hora del turno
-          example: 14:00
-        usuarioId:
-          type: number
-          description: ID del usuario
-          example: 2
+          description: Fecha y hora del turno
+          example: 2025-09-30T14:00:00Z
         montoFinal:
           type: number
           minimum: 0
@@ -1031,26 +1021,16 @@ components:
           description: Comentario del turno
           example: El servicio fue excelente y puntual.
       required:
-        - fecha
-        - hora
-        - usuarioId
+        - fechaHora
         - montoFinal
         - estado
     TurnoCreate:
       type: object
       properties:
-        fecha:
+        fechaHora:
           type: string
-          description: Fecha del turno
-          example: 2025-09-30
-        hora:
-          type: string
-          description: Hora del turno
-          example: 14:00
-        usuarioId:
-          type: number
-          description: ID del usuario
-          example: 2
+          description: Fecha y hora del turno
+          example: 2025-09-30T14:00:00Z
         montoFinal:
           type: number
           minimum: 0
@@ -1073,32 +1053,24 @@ components:
           maxLength: 500
           description: Comentario del turno
           example: El servicio fue excelente y puntual.
-        tarea:
-          type: number
+        servicio:
+          type: integer
+          minimum: 0
+          exclusiveMinimum: true
           description: ID del servicio
           example: 1
       required:
-        - fecha
-        - hora
-        - usuarioId
+        - fechaHora
         - montoFinal
         - estado
-        - tarea
+        - servicio
     TurnoUpdate:
       type: object
       properties:
-        fecha:
+        fechaHora:
           type: string
-          description: Fecha del turno
-          example: 2025-09-30
-        hora:
-          type: string
-          description: Hora del turno
-          example: 14:00
-        usuarioId:
-          type: number
-          description: ID del usuario
-          example: 2
+          description: Fecha y hora del turno
+          example: 2025-09-30T14:00:00Z
         montoFinal:
           type: number
           minimum: 0
@@ -1121,7 +1093,11 @@ components:
           maxLength: 500
           description: Comentario del turno
           example: El servicio fue excelente y puntual.
-        tarea:
+        usuarioId:
+          type: number
+          description: ID del usuario
+          example: 2
+        servicio:
           type: number
           description: ID del servicio
           example: 1
@@ -1133,7 +1109,7 @@ components:
       type: object
       properties:
         id:
-          type: number
+          type: string
           description: ID del turno
           example: 1
       required:
@@ -1172,18 +1148,10 @@ components:
     FullTurno:
       type: object
       properties:
-        fecha:
+        fechaHora:
           type: string
-          description: Fecha del turno
-          example: 2025-09-30
-        hora:
-          type: string
-          description: Hora del turno
-          example: 14:00
-        usuarioId:
-          type: number
-          description: ID del usuario
-          example: 2
+          description: Fecha y hora del turno
+          example: 2025-09-30T14:00:00Z
         montoFinal:
           type: number
           minimum: 0
@@ -1206,33 +1174,78 @@ components:
           maxLength: 500
           description: Comentario del turno
           example: El servicio fue excelente y puntual.
+        usuarioid:
+          type: object
+          properties:
+            id:
+              type: number
+              description: ID del usuario
+              example: 1
+            nombre:
+              type: string
+              description: Nombre del usuario
+              example: Juan
+            apellido:
+              type: string
+              description: Apellido del usuario
+              example: Pérez
+            mail:
+              type: string
+              description: Email del usuario
+              example: juan.perez@gmail.com
+            nombreFantasia:
+              type: string
+              nullable: true
+              description: Nombre de fantasía del prestatario
+              example: Plomería Pérez
+          required:
+            - id
+            - nombre
+            - apellido
+            - mail
+            - nombreFantasia
         id:
           type: number
           description: ID del turno
           example: 1
-        tarea:
+        servicio:
           type: object
           properties:
-            nombreTarea:
+            id:
               type: string
-              minLength: 2
-              maxLength: 100
-              description: Nombre de la tarea
-              example: Reparación de grifería
-            descripcionTarea:
+              description: ID del servicio
+              example: 1
+            estado:
               type: string
-              maxLength: 500
-              description: Descripción de la tarea
-              example: Reparación y mantenimiento de grifería en el hogar
-            duracionTarea:
+              enum:
+                - activo
+                - inactivo
+              description: Estado del servicio
+              example: activo
+            precio:
               type: number
               minimum: 0
               exclusiveMinimum: true
-              description: Duración de la tarea en minutos
-              example: 60
+              description: Precio del servicio
+              example: 1500
+            servicio:
+              type: integer
+              minimum: 0
+              exclusiveMinimum: true
+              description: ID de la servicio asociada al servicio
+              example: 1
+            usuario:
+              type: integer
+              nullable: true
+              minimum: 0
+              exclusiveMinimum: true
+              description: ID del usuario asociado al servicio (opcional)
+              example: 2
           required:
-            - nombreTarea
-            - duracionTarea
+            - id
+            - estado
+            - precio
+            - servicio
         pago:
           type: array
           items:
@@ -1318,13 +1331,12 @@ components:
               - createdAt
               - updatedAt
       required:
-        - fecha
-        - hora
-        - usuarioId
+        - fechaHora
         - montoFinal
         - estado
+        - usuarioid
         - id
-        - tarea
+        - servicio
     CreateZona:
       type: object
       properties:
@@ -6451,18 +6463,10 @@ paths:
                     items:
                       type: object
                       properties:
-                        fecha:
+                        fechaHora:
                           type: string
-                          description: Fecha del turno
-                          example: 2025-09-30
-                        hora:
-                          type: string
-                          description: Hora del turno
-                          example: 14:00
-                        usuarioId:
-                          type: number
-                          description: ID del usuario
-                          example: 2
+                          description: Fecha y hora del turno
+                          example: 2025-09-30T14:00:00Z
                         montoFinal:
                           type: number
                           minimum: 0
@@ -6485,33 +6489,78 @@ paths:
                           maxLength: 500
                           description: Comentario del turno
                           example: El servicio fue excelente y puntual.
+                        usuarioid:
+                          type: object
+                          properties:
+                            id:
+                              type: number
+                              description: ID del usuario
+                              example: 1
+                            nombre:
+                              type: string
+                              description: Nombre del usuario
+                              example: Juan
+                            apellido:
+                              type: string
+                              description: Apellido del usuario
+                              example: Pérez
+                            mail:
+                              type: string
+                              description: Email del usuario
+                              example: juan.perez@gmail.com
+                            nombreFantasia:
+                              type: string
+                              nullable: true
+                              description: Nombre de fantasía del prestatario
+                              example: Plomería Pérez
+                          required:
+                            - id
+                            - nombre
+                            - apellido
+                            - mail
+                            - nombreFantasia
                         id:
                           type: number
                           description: ID del turno
                           example: 1
-                        tarea:
+                        servicio:
                           type: object
                           properties:
-                            nombreTarea:
+                            id:
                               type: string
-                              minLength: 2
-                              maxLength: 100
-                              description: Nombre de la tarea
-                              example: Reparación de grifería
-                            descripcionTarea:
+                              description: ID del servicio
+                              example: 1
+                            estado:
                               type: string
-                              maxLength: 500
-                              description: Descripción de la tarea
-                              example: Reparación y mantenimiento de grifería en el hogar
-                            duracionTarea:
+                              enum:
+                                - activo
+                                - inactivo
+                              description: Estado del servicio
+                              example: activo
+                            precio:
                               type: number
                               minimum: 0
                               exclusiveMinimum: true
-                              description: Duración de la tarea en minutos
-                              example: 60
+                              description: Precio del servicio
+                              example: 1500
+                            servicio:
+                              type: integer
+                              minimum: 0
+                              exclusiveMinimum: true
+                              description: ID de la servicio asociada al servicio
+                              example: 1
+                            usuario:
+                              type: integer
+                              nullable: true
+                              minimum: 0
+                              exclusiveMinimum: true
+                              description: ID del usuario asociado al servicio (opcional)
+                              example: 2
                           required:
-                            - nombreTarea
-                            - duracionTarea
+                            - id
+                            - estado
+                            - precio
+                            - servicio
                         pago:
                           type: array
                           items:
@@ -6595,13 +6644,12 @@ paths:
                               - createdAt
                               - updatedAt
                       required:
-                        - fecha
-                        - hora
-                        - usuarioId
+                        - fechaHora
                         - montoFinal
                         - estado
+                        - usuarioid
                         - id
-                        - tarea
+                        - servicio
                 required:
                   - message
                   - data
@@ -6647,18 +6695,10 @@ paths:
             schema:
               type: object
               properties:
-                fecha:
+                fechaHora:
                   type: string
-                  description: Fecha del turno
-                  example: 2025-09-30
-                hora:
-                  type: string
-                  description: Hora del turno
-                  example: 14:00
-                usuarioId:
-                  type: number
-                  description: ID del usuario
-                  example: 2
+                  description: Fecha y hora del turno
+                  example: 2025-09-30T14:00:00Z
                 montoFinal:
                   type: number
                   minimum: 0
@@ -6681,17 +6721,17 @@ paths:
                   maxLength: 500
                   description: Comentario del turno
                   example: El servicio fue excelente y puntual.
-                tarea:
-                  type: number
+                servicio:
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
                   description: ID del servicio
                   example: 1
               required:
-                - fecha
-                - hora
-                - usuarioId
+                - fechaHora
                 - montoFinal
                 - estado
-                - tarea
+                - servicio
       responses:
         "201":
           description: Turno creado exitosamente
@@ -6706,18 +6746,10 @@ paths:
                   data:
                     type: object
                     properties:
-                      fecha:
+                      fechaHora:
                         type: string
-                        description: Fecha del turno
-                        example: 2025-09-30
-                      hora:
-                        type: string
-                        description: Hora del turno
-                        example: 14:00
-                      usuarioId:
-                        type: number
-                        description: ID del usuario
-                        example: 2
+                        description: Fecha y hora del turno
+                        example: 2025-09-30T14:00:00Z
                       montoFinal:
                         type: number
                         minimum: 0
@@ -6740,33 +6772,78 @@ paths:
                         maxLength: 500
                         description: Comentario del turno
                         example: El servicio fue excelente y puntual.
+                      usuarioid:
+                        type: object
+                        properties:
+                          id:
+                            type: number
+                            description: ID del usuario
+                            example: 1
+                          nombre:
+                            type: string
+                            description: Nombre del usuario
+                            example: Juan
+                          apellido:
+                            type: string
+                            description: Apellido del usuario
+                            example: Pérez
+                          mail:
+                            type: string
+                            description: Email del usuario
+                            example: juan.perez@gmail.com
+                          nombreFantasia:
+                            type: string
+                            nullable: true
+                            description: Nombre de fantasía del prestatario
+                            example: Plomería Pérez
+                        required:
+                          - id
+                          - nombre
+                          - apellido
+                          - mail
+                          - nombreFantasia
                       id:
                         type: number
                         description: ID del turno
                         example: 1
-                      tarea:
+                      servicio:
                         type: object
                         properties:
-                          nombreTarea:
+                          id:
                             type: string
-                            minLength: 2
-                            maxLength: 100
-                            description: Nombre de la tarea
-                            example: Reparación de grifería
-                          descripcionTarea:
+                            description: ID del servicio
+                            example: 1
+                          estado:
                             type: string
-                            maxLength: 500
-                            description: Descripción de la tarea
-                            example: Reparación y mantenimiento de grifería en el hogar
-                          duracionTarea:
+                            enum:
+                              - activo
+                              - inactivo
+                            description: Estado del servicio
+                            example: activo
+                          precio:
                             type: number
                             minimum: 0
                             exclusiveMinimum: true
-                            description: Duración de la tarea en minutos
-                            example: 60
+                            description: Precio del servicio
+                            example: 1500
+                          servicio:
+                            type: integer
+                            minimum: 0
+                            exclusiveMinimum: true
+                            description: ID de la servicio asociada al servicio
+                            example: 1
+                          usuario:
+                            type: integer
+                            nullable: true
+                            minimum: 0
+                            exclusiveMinimum: true
+                            description: ID del usuario asociado al servicio (opcional)
+                            example: 2
                         required:
-                          - nombreTarea
-                          - duracionTarea
+                          - id
+                          - estado
+                          - precio
+                          - servicio
                       pago:
                         type: array
                         items:
@@ -6850,13 +6927,12 @@ paths:
                             - createdAt
                             - updatedAt
                     required:
-                      - fecha
-                      - hora
-                      - usuarioId
+                      - fechaHora
                       - montoFinal
                       - estado
+                      - usuarioid
                       - id
-                      - tarea
+                      - servicio
                 required:
                   - message
                   - data
@@ -6898,7 +6974,7 @@ paths:
         - Turnos
       parameters:
         - schema:
-            type: number
+            type: string
             description: ID del turno
             example: 1
           required: true
@@ -6919,18 +6995,10 @@ paths:
                   data:
                     type: object
                     properties:
-                      fecha:
+                      fechaHora:
                         type: string
-                        description: Fecha del turno
-                        example: 2025-09-30
-                      hora:
-                        type: string
-                        description: Hora del turno
-                        example: 14:00
-                      usuarioId:
-                        type: number
-                        description: ID del usuario
-                        example: 2
+                        description: Fecha y hora del turno
+                        example: 2025-09-30T14:00:00Z
                       montoFinal:
                         type: number
                         minimum: 0
@@ -6953,33 +7021,78 @@ paths:
                         maxLength: 500
                         description: Comentario del turno
                         example: El servicio fue excelente y puntual.
+                      usuarioid:
+                        type: object
+                        properties:
+                          id:
+                            type: number
+                            description: ID del usuario
+                            example: 1
+                          nombre:
+                            type: string
+                            description: Nombre del usuario
+                            example: Juan
+                          apellido:
+                            type: string
+                            description: Apellido del usuario
+                            example: Pérez
+                          mail:
+                            type: string
+                            description: Email del usuario
+                            example: juan.perez@gmail.com
+                          nombreFantasia:
+                            type: string
+                            nullable: true
+                            description: Nombre de fantasía del prestatario
+                            example: Plomería Pérez
+                        required:
+                          - id
+                          - nombre
+                          - apellido
+                          - mail
+                          - nombreFantasia
                       id:
                         type: number
                         description: ID del turno
                         example: 1
-                      tarea:
+                      servicio:
                         type: object
                         properties:
-                          nombreTarea:
+                          id:
                             type: string
-                            minLength: 2
-                            maxLength: 100
-                            description: Nombre de la tarea
-                            example: Reparación de grifería
-                          descripcionTarea:
+                            description: ID del servicio
+                            example: 1
+                          estado:
                             type: string
-                            maxLength: 500
-                            description: Descripción de la tarea
-                            example: Reparación y mantenimiento de grifería en el hogar
-                          duracionTarea:
+                            enum:
+                              - activo
+                              - inactivo
+                            description: Estado del servicio
+                            example: activo
+                          precio:
                             type: number
                             minimum: 0
                             exclusiveMinimum: true
-                            description: Duración de la tarea en minutos
-                            example: 60
+                            description: Precio del servicio
+                            example: 1500
+                          servicio:
+                            type: integer
+                            minimum: 0
+                            exclusiveMinimum: true
+                            description: ID de la servicio asociada al servicio
+                            example: 1
+                          usuario:
+                            type: integer
+                            nullable: true
+                            minimum: 0
+                            exclusiveMinimum: true
+                            description: ID del usuario asociado al servicio (opcional)
+                            example: 2
                         required:
-                          - nombreTarea
-                          - duracionTarea
+                          - id
+                          - estado
+                          - precio
+                          - servicio
                       pago:
                         type: array
                         items:
@@ -7063,13 +7176,12 @@ paths:
                             - createdAt
                             - updatedAt
                     required:
-                      - fecha
-                      - hora
-                      - usuarioId
+                      - fechaHora
                       - montoFinal
                       - estado
+                      - usuarioid
                       - id
-                      - tarea
+                      - servicio
                 required:
                   - message
                   - data
@@ -7140,7 +7252,7 @@ paths:
         - Turnos
       parameters:
         - schema:
-            type: number
+            type: string
             description: ID del turno
             example: 1
           required: true
@@ -7154,18 +7266,10 @@ paths:
             schema:
               type: object
               properties:
-                fecha:
+                fechaHora:
                   type: string
-                  description: Fecha del turno
-                  example: 2025-09-30
-                hora:
-                  type: string
-                  description: Hora del turno
-                  example: 14:00
-                usuarioId:
-                  type: number
-                  description: ID del usuario
-                  example: 2
+                  description: Fecha y hora del turno
+                  example: 2025-09-30T14:00:00Z
                 montoFinal:
                   type: number
                   minimum: 0
@@ -7188,7 +7292,11 @@ paths:
                   maxLength: 500
                   description: Comentario del turno
                   example: El servicio fue excelente y puntual.
-                tarea:
+                usuarioId:
+                  type: number
+                  description: ID del usuario
+                  example: 2
+                servicio:
                   type: number
                   description: ID del servicio
                   example: 1
@@ -7210,18 +7318,10 @@ paths:
                   data:
                     type: object
                     properties:
-                      fecha:
+                      fechaHora:
                         type: string
-                        description: Fecha del turno
-                        example: 2025-09-30
-                      hora:
-                        type: string
-                        description: Hora del turno
-                        example: 14:00
-                      usuarioId:
-                        type: number
-                        description: ID del usuario
-                        example: 2
+                        description: Fecha y hora del turno
+                        example: 2025-09-30T14:00:00Z
                       montoFinal:
                         type: number
                         minimum: 0
@@ -7244,33 +7344,78 @@ paths:
                         maxLength: 500
                         description: Comentario del turno
                         example: El servicio fue excelente y puntual.
+                      usuarioid:
+                        type: object
+                        properties:
+                          id:
+                            type: number
+                            description: ID del usuario
+                            example: 1
+                          nombre:
+                            type: string
+                            description: Nombre del usuario
+                            example: Juan
+                          apellido:
+                            type: string
+                            description: Apellido del usuario
+                            example: Pérez
+                          mail:
+                            type: string
+                            description: Email del usuario
+                            example: juan.perez@gmail.com
+                          nombreFantasia:
+                            type: string
+                            nullable: true
+                            description: Nombre de fantasía del prestatario
+                            example: Plomería Pérez
+                        required:
+                          - id
+                          - nombre
+                          - apellido
+                          - mail
+                          - nombreFantasia
                       id:
                         type: number
                         description: ID del turno
                         example: 1
-                      tarea:
+                      servicio:
                         type: object
                         properties:
-                          nombreTarea:
+                          id:
                             type: string
-                            minLength: 2
-                            maxLength: 100
-                            description: Nombre de la tarea
-                            example: Reparación de grifería
-                          descripcionTarea:
+                            description: ID del servicio
+                            example: 1
+                          estado:
                             type: string
-                            maxLength: 500
-                            description: Descripción de la tarea
-                            example: Reparación y mantenimiento de grifería en el hogar
-                          duracionTarea:
+                            enum:
+                              - activo
+                              - inactivo
+                            description: Estado del servicio
+                            example: activo
+                          precio:
                             type: number
                             minimum: 0
                             exclusiveMinimum: true
-                            description: Duración de la tarea en minutos
-                            example: 60
+                            description: Precio del servicio
+                            example: 1500
+                          servicio:
+                            type: integer
+                            minimum: 0
+                            exclusiveMinimum: true
+                            description: ID de la servicio asociada al servicio
+                            example: 1
+                          usuario:
+                            type: integer
+                            nullable: true
+                            minimum: 0
+                            exclusiveMinimum: true
+                            description: ID del usuario asociado al servicio (opcional)
+                            example: 2
                         required:
-                          - nombreTarea
-                          - duracionTarea
+                          - id
+                          - estado
+                          - precio
+                          - servicio
                       pago:
                         type: array
                         items:
@@ -7354,13 +7499,12 @@ paths:
                             - createdAt
                             - updatedAt
                     required:
-                      - fecha
-                      - hora
-                      - usuarioId
+                      - fechaHora
                       - montoFinal
                       - estado
+                      - usuarioid
                       - id
-                      - tarea
+                      - servicio
                 required:
                   - message
                   - data
@@ -7431,7 +7575,7 @@ paths:
         - Turnos
       parameters:
         - schema:
-            type: number
+            type: string
             description: ID del turno
             example: 1
           required: true
@@ -7446,18 +7590,10 @@ paths:
               schema:
                 type: object
                 properties:
-                  fecha:
+                  fechaHora:
                     type: string
-                    description: Fecha del turno
-                    example: 2025-09-30
-                  hora:
-                    type: string
-                    description: Hora del turno
-                    example: 14:00
-                  usuarioId:
-                    type: number
-                    description: ID del usuario
-                    example: 2
+                    description: Fecha y hora del turno
+                    example: 2025-09-30T14:00:00Z
                   montoFinal:
                     type: number
                     minimum: 0
@@ -7480,33 +7616,78 @@ paths:
                     maxLength: 500
                     description: Comentario del turno
                     example: El servicio fue excelente y puntual.
+                  usuarioid:
+                    type: object
+                    properties:
+                      id:
+                        type: number
+                        description: ID del usuario
+                        example: 1
+                      nombre:
+                        type: string
+                        description: Nombre del usuario
+                        example: Juan
+                      apellido:
+                        type: string
+                        description: Apellido del usuario
+                        example: Pérez
+                      mail:
+                        type: string
+                        description: Email del usuario
+                        example: juan.perez@gmail.com
+                      nombreFantasia:
+                        type: string
+                        nullable: true
+                        description: Nombre de fantasía del prestatario
+                        example: Plomería Pérez
+                    required:
+                      - id
+                      - nombre
+                      - apellido
+                      - mail
+                      - nombreFantasia
                   id:
                     type: number
                     description: ID del turno
                     example: 1
-                  tarea:
+                  servicio:
                     type: object
                     properties:
-                      nombreTarea:
+                      id:
                         type: string
-                        minLength: 2
-                        maxLength: 100
-                        description: Nombre de la tarea
-                        example: Reparación de grifería
-                      descripcionTarea:
+                        description: ID del servicio
+                        example: 1
+                      estado:
                         type: string
-                        maxLength: 500
-                        description: Descripción de la tarea
-                        example: Reparación y mantenimiento de grifería en el hogar
-                      duracionTarea:
+                        enum:
+                          - activo
+                          - inactivo
+                        description: Estado del servicio
+                        example: activo
+                      precio:
                         type: number
                         minimum: 0
                         exclusiveMinimum: true
-                        description: Duración de la tarea en minutos
-                        example: 60
+                        description: Precio del servicio
+                        example: 1500
+                      servicio:
+                        type: integer
+                        minimum: 0
+                        exclusiveMinimum: true
+                        description: ID de la servicio asociada al servicio
+                        example: 1
+                      usuario:
+                        type: integer
+                        nullable: true
+                        minimum: 0
+                        exclusiveMinimum: true
+                        description: ID del usuario asociado al servicio (opcional)
+                        example: 2
                     required:
-                      - nombreTarea
-                      - duracionTarea
+                      - id
+                      - estado
+                      - precio
+                      - servicio
                   pago:
                     type: array
                     items:
@@ -7590,13 +7771,12 @@ paths:
                         - createdAt
                         - updatedAt
                 required:
-                  - fecha
-                  - hora
-                  - usuarioId
+                  - fechaHora
                   - montoFinal
                   - estado
+                  - usuarioid
                   - id
-                  - tarea
+                  - servicio
         "404":
           description: Turno no encontrado
           content:
