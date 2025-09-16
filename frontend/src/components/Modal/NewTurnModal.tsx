@@ -3,7 +3,7 @@ import CustomSelect from '../Select/CustomSelect';
 import { turnosApi } from '../../services/turnosApi';
 import { useRoleReturn } from '../../cookie/useProtectRoute.tsx';
 import { useNavigate } from 'react-router-dom';
-import { string, z } from 'zod';
+import { z } from 'zod';
 
 // Esquema simplificado que valida todo de una vez
 const turnFormSchema = z.object({

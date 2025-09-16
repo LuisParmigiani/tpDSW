@@ -33,7 +33,7 @@ export const usuarioInfoSchema = z.object({
 // ===================================================================================================================
 export const servicioSchema = z.object({
   id: z.string().describe('ID del servicio').openapi({
-    example: 1,
+    example: '1', // Cambiado de 1 a '1'
   }),
   estado: z
     .enum(['activo', 'inactivo'])
@@ -215,7 +215,9 @@ export const TurnoUpdateSchema = TurnoSchema.extend({
 // ===================================================================================================================
 
 export const TurnoIdSchema = z.object({
-  id: z.string().describe('ID del turno').openapi({ example: 1 }),
+  id: z.string().describe('ID del turno').openapi({
+    example: '1', // Cambiado de 1 a '1'
+  }),
 });
 
 // ===================================================================================================================
