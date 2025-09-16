@@ -1,43 +1,87 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import useAuth from '../../cookie/useAuth';
 
 interface Item {
   id: number;
   name: string;
   link: string;
+  legajo?: string;
 }
 
 function Footer() {
+  const { logout } = useAuth();
+
   const services: Item[] = [
-    { id: 1, name: 'Plomero', link: '#plomero' },
-    { id: 2, name: 'Electricista', link: '#electricista' },
-    { id: 3, name: 'Carpintero', link: '#carpintero' },
-    { id: 4, name: 'Pintor', link: '#pintor' },
-    { id: 5, name: 'Constructor', link: '#constructor' },
-    { id: 6, name: 'Cerrajero', link: '#cerrajero' },
-    { id: 7, name: 'Ver Todos...', link: '#todos' },
+    {
+      id: 1,
+      name: 'Plomero',
+      link: '/servicios?tipoServicio=Plomería&zona=Todas&orderBy=calificacion',
+    },
+    {
+      id: 2,
+      name: 'Electricista',
+      link: '/servicios?tipoServicio=Electricidad&zona=Todas&orderBy=calificacion',
+    },
+    {
+      id: 3,
+      name: 'Carpintero',
+      link: '/servicios?tipoServicio=Carpintería&zona=Todas&orderBy=calificacion',
+    },
+    {
+      id: 4,
+      name: 'Pintor',
+      link: '/servicios?tipoServicio=Pintura&zona=Todas&orderBy=calificacion',
+    },
+    {
+      id: 5,
+      name: 'Constructor',
+      link: '/servicios?tipoServicio=Construcción&zona=Todas&orderBy=calificacion',
+    },
+    {
+      id: 6,
+      name: 'Cerrajero',
+      link: '/servicios?tipoServicio=Cerrajería&zona=Todas&orderBy=calificacion',
+    },
+    { id: 7, name: 'Ver Todos...', link: '/servicios' },
   ];
 
   const us: Item[] = [
-    { id: 1, name: 'Inversiones', link: '#inversiones' },
-    { id: 2, name: 'Información', link: '#informacion' },
-    { id: 3, name: 'Reviews', link: '#reviews' },
-    { id: 4, name: 'Equipo', link: '#equipo' },
+    {
+      id: 1,
+      name: 'Agustín Dana',
+      legajo: '12345',
+      link: 'https://github.com/Anfibio0010',
+    },
+    {
+      id: 2,
+      name: 'Luis Parmigiani',
+      legajo: '67890',
+      link: 'https://github.com/LuisParmigiani',
+    },
+    {
+      id: 3,
+      name: 'Santiago Malet',
+      legajo: '11223',
+      link: 'https://github.com/SantiagoMalet12',
+    },
+    {
+      id: 4,
+      name: 'Juan Bautista Pérez',
+      legajo: '44556',
+      link: 'https://github.com/juabn',
+    },
   ];
 
   const navegacion: Item[] = [
-    { id: 1, name: 'Inicio', link: '#inicio' },
-    { id: 2, name: 'Iniciar Sesión', link: '#log-in' },
-    { id: 3, name: 'Registrarse', link: '#sign-up' },
-    { id: 4, name: 'Servicios', link: '#Servicios' },
-    { id: 5, name: 'Reseñas', link: '#Reseñas' },
+    { id: 1, name: 'Inicio', link: '/' },
+    { id: 2, name: 'Iniciar Sesión', link: '/login' },
+    { id: 3, name: 'Registrarse', link: '/registration' },
+    { id: 5, name: 'Sobre nosotros', link: '/about' },
   ];
 
   const social: Item[] = [
-    { id: 1, name: 'Github', link: '#github' },
-    { id: 2, name: 'Instagram', link: '#instagram' },
-    { id: 3, name: 'Facebook', link: '#facebook' },
-    { id: 4, name: 'Twitter', link: '#twitter' },
+    { id: 1, name: 'Mail', link: 'mailto: reformixoficial@gmail.com' },
   ];
 
   const [showServices, setShowServices] = useState(false);
@@ -64,16 +108,63 @@ function Footer() {
 
   // Función para renderizar listas
   const renderList = (list: Item[]) => {
-    return list.map((listItem) => (
-      <li className="text-2sm my-1.5 " key={listItem.id}>
-        <Link
-          className="no-underline text-black transition-colors duration-200 ease-in-out hover:text-naranja-1"
-          to={listItem.link}
+    return list.map((listItem) => {
+      const handleClick = () => {
+        if (listItem.name === 'Inicio') {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        if (['Iniciar Sesión', 'Registrarse'].includes(listItem.name)) {
+          logout();
+        }
+      };
+      const isExternal =
+        listItem.link.startsWith('http') || listItem.link.startsWith('mailto:');
+      return (
+        <li
+          className="text-2sm my-1.5 "
+          key={listItem.id}
+          onClick={
+            ['Inicio', 'Iniciar Sesión', 'Registrarse'].includes(listItem.name)
+              ? handleClick
+              : undefined
+          }
         >
-          {listItem.name}
-        </Link>
-      </li>
-    ));
+          {isExternal ? (
+            <a
+              className="no-underline text-black transition-colors duration-200 ease-in-out hover:text-naranja-1"
+              href={listItem.link}
+              target={listItem.link.startsWith('http') ? '_blank' : undefined}
+              rel={
+                listItem.link.startsWith('http')
+                  ? 'noopener noreferrer'
+                  : undefined
+              }
+            >
+              {listItem.name}
+            </a>
+          ) : (
+            <Link
+              className="no-underline text-black transition-colors duration-200 ease-in-out hover:text-naranja-1"
+              to={listItem.link}
+            >
+              {listItem.name}
+            </Link>
+          )}
+          {listItem.legajo && (
+            <span
+              style={{
+                fontSize: '0.9em',
+                color: 'black',
+                display: 'block',
+                marginTop: '2px',
+              }}
+            >
+              Legajo: {listItem.legajo}
+            </span>
+          )}
+        </li>
+      );
+    });
   };
 
   // Componente para la flecha animada
@@ -125,9 +216,7 @@ function Footer() {
             />
           </svg>
         </div>
-        <p className="m-1 text-1xl align-center text-black">
-          © 2025 Nombre de la Empresa
-        </p>
+        <p className="m-1 text-1xl align-center text-black">© 2025 Reformix</p>
         <p className="text-base text-gray text-center">
           Todos los derechos reservados
         </p>
@@ -160,7 +249,7 @@ function Footer() {
             onClick={handleToggleUs}
           >
             <h4 className="m-0 text-1xl flex items-center justify-between font-bold">
-              Sobre Nosotros
+              Integrantes
               <ArrowIcon isOpen={showUs} />
             </h4>
           </div>
@@ -223,7 +312,7 @@ function Footer() {
         </div>
 
         <div className="flex flex-col flex-1 min-w-0 mx-1">
-          <h4 className=" font-bold mb-4 underline text-2xl">Sobre Nosotros</h4>
+          <h4 className=" font-bold mb-4 underline text-2xl">Integrantes</h4>
           <ul className="list-none p-0 m-0 flex flex-col">{renderList(us)}</ul>
         </div>
 
@@ -235,7 +324,9 @@ function Footer() {
         </div>
 
         <div className="flex flex-col flex-1 min-w-0 mx-1">
-          <h4 className=" font-bold mb-4 underline text-2xl">Redes Sociales</h4>
+          <h4 className=" font-bold mb-4 underline text-2xl">
+            Nuestro contacto
+          </h4>
           <ul className="list-none p-0 m-0 flex flex-col">
             {renderList(social)}
           </ul>
