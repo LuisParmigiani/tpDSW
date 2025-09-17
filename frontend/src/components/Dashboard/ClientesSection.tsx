@@ -548,7 +548,7 @@ function ClientesSection() {
   }
 
   return (
-    <DashboardSection>
+    <DashboardSection title="Mis turnos">
       <StripeConnection loadingMessage="Cargando información de clientes...">
         <div
           className={`mb-4 sm:mb-6 flex ${
@@ -557,9 +557,7 @@ function ClientesSection() {
             isMobileLayout ? '' : 'sm:items-center sm:justify-between'
           } gap-3 sm:gap-2 px-2 sm:px-0 relative`}
         >
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
-            Turnos
-          </h2>
+          
           <div
             className={`flex ${
               isMobileLayout ? 'flex-col' : 'flex-col sm:flex-row'

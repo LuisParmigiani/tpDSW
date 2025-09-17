@@ -4,8 +4,7 @@ import TareaRow, { type Tarea } from '../TareaRow/TareaRow';
 import { useState, useEffect, useCallback } from 'react';
 import { tiposServicioApi } from '../../services/tipoSericiosApi';
 import { tareasApi } from '../../services/tareasApi';
-import { serviciosApi } from '../../services/serviciosApi';
-
+import { serviciosApi } from '../../services/serviciosApi'
 import { Alert, AlertDescription } from '../Alerts/Alerts';
 import useAuth from '../../cookie/useAuth';
 import StripeConnection from '../StripeConnection/StripeConnection';
@@ -548,16 +547,9 @@ function ServiciosSection() {
 
   // Función para guardar cambios por tipo de servicio
   return (
-    <DashboardSection>
+    <DashboardSection title="Mis servicios">
       <StripeConnection loadingMessage="Cargando configuración de servicios...">
         <div className="space-y-8">
-          {/* Header */}
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Mis Servicios
-            </h2>
-          </div>
-
           {/* Selector de Tipos de Servicio */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 text-left">

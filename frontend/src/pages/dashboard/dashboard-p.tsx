@@ -9,6 +9,7 @@ import PagosSection from '../../components/Dashboard/PagosSection';
 import HorariosSection from '../../components/Dashboard/HorariosSection';
 import { useProtectRoute } from '../../cookie/useProtectRoute.tsx';
 import DevolucionPago from '../../components/Modal/DevolucionPago.tsx';
+import ZonasSection from '../../components/Dashboard/ZonasSection.tsx';
 
 function Dashboard() {
   const lugar = 'dashboard';
@@ -58,6 +59,8 @@ function Dashboard() {
         return <PagosSection />;
       case 'horarios':
         return <HorariosSection />;
+      case 'zonas':
+        return <ZonasSection />;
       default:
         return <PerfilSection />;
     }
