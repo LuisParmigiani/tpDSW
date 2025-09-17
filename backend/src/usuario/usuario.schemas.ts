@@ -150,13 +150,9 @@ export const loginSchema = z.object({
     .openapi({
       example: 'juan.perez@gmail.com',
     }),
-  contrasena: z
-    .string()
-    .min(6, 'La contraseña debe tener al menos 6 caracteres')
-    .describe('Contraseña del usuario')
-    .openapi({
-      example: 'Password123',
-    }),
+  contrasena: z.string().describe('Contraseña del usuario').openapi({
+    example: 'Password123',
+  }),
 });
 
 export const findPrestatariosByTipoServicioAndZonaParamsSchema = z.object({

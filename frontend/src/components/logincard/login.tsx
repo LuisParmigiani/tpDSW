@@ -4,7 +4,6 @@ import { usuariosApi } from '../../services/usuariosApi';
 import { useParams } from 'react-router-dom';
 import useAuth from '../../cookie/useAuth';
 import { cn } from '../../lib/utils.ts';
-import { AxiosError } from 'axios';
 import { Alert, AlertTitle, AlertDescription } from './../Alerts/Alerts.tsx';
 import { useProtectRoute } from '../../cookie/useProtectRoute.tsx';
 function Logincard() {
@@ -45,7 +44,7 @@ function Logincard() {
           navigate('/');
         }
       }
-    } catch (error: AxiosError | any) {
+    } catch (error: any) {
       try {
         if (error.response.data?.errors[0]?.message) {
           setMessage(error.response.data.errors[0].message);
