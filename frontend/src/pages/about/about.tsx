@@ -2,11 +2,11 @@ import styles from './about.module.css';
 import Navbar from '../../components/Navbar/Navbar.tsx';
 import AboutContainer from '../../components/AboutContainer/index';
 const text1 =
-  'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Maiores quisquam dolorum blanditiis excepturi architecto eligendi a assumenda, repellat, ad dolorem omnis quasi sunt impedit ipsum adipisci! Nostrum id alias excepturi.';
+  'Somos una empresa dedicada a facilitar el proceso de búsqueda y contratación de profesionales, brindando una plataforma segura y confiable para ambas partes.';
 const text2 =
-  'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Cupiditate ipsam possimus at aliquid doloremque, quod quas reiciendis consequatur nihil temporibus ipsa iste, ut, qui quaerat. Possimus, odio ea soluta quibusdam harum voluptate inventore debitis commodi aliquid?';
+  'Porque creemos en el poder de la tecnología para conectar a las personas y crear oportunidades. Queremos ser el puente que une a los profesionales con las empresas, facilitando el crecimiento y el éxito mutuo.';
 const text3 =
-  'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde, vero enim? Ut unde ab consequuntur, est sequi, quidem voluptatibus voluptas magnam iste delectus, assumenda debitis.';
+  'Nuestros valores se centran en la confianza, la transparencia y la innovación. Nos esforzamos por ofrecer un servicio de calidad, promoviendo relaciones laborales justas y equitativas.';
 function About() {
   return (
     <>
@@ -17,20 +17,20 @@ function About() {
         <div className={styles.aboutCollections}>
           <AboutContainer
             isAlignedRight
-            imageUrl="images/nosotros-about.jpg"
-            title="Sobre nosotros"
+            imageUrl="images/imagen-gente-trabajando.jpg"
+            title="¿Quiénes somos?"
             text={text1}
           ></AboutContainer>
           <AboutContainer
             isAlignedRight={false}
-            imageUrl="images/SantiagoMalet.png"
-            title="Por que elegimos este camino?"
+            imageUrl="images/imagen-gente-martillo.jpg"
+            title="¿Por qué elegimos este camino?"
             text={text2}
           ></AboutContainer>
           <AboutContainer
             isAlignedRight
-            imageUrl="images/nosotros-about.jpg"
-            title="somos unos capos"
+            imageUrl="images/imagen-manos.jpg"
+            title="Nuestros valores"
             text={text3}
           ></AboutContainer>
         </div>

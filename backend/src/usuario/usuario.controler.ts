@@ -448,6 +448,7 @@ async function loginUsuario(req: Request, res: Response) {
     const passwordStr =
       typeof contrasena === 'string' ? contrasena : contrasena?.[0];
 
+    //No deberia tirar nunca este error pero por las dudaaaaas
     if (!emailStr || !passwordStr) {
       return res
         .status(400)
@@ -456,12 +457,16 @@ async function loginUsuario(req: Request, res: Response) {
 
     const usuario = await em.findOne(Usuario, { mail: emailStr });
     if (!usuario) {
-      return res.status(401).json({ message: 'Usuario no encontrado' });
+      return res.status(401).json({ message: 'Credenciales incorrectas' });
+    }
+
+    if (!usuario) {
+      return res.status(401).json({ message: 'Credenciales incorrectas' });
     }
 
     const passwordMatch = await bcrypt.compare(passwordStr, usuario.contrasena);
     if (!passwordMatch) {
-      return res.status(401).json({ message: 'Contraseña incorrecta' });
+      return res.status(401).json({ message: 'Credenciales incorrectas' });
     }
 
     const { contrasena: _, ...usuarioSinContrasena } = usuario;
