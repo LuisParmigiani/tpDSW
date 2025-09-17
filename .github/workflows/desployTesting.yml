@@ -67,16 +67,23 @@ jobs:
         with:
           version: 8
 
-      # Fix: Update lockfile if needed
+      # Install dependencies properly
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      # Debug step to verify installation
-      - name: Debug - Check vitest installation
+      # Debug step to verify vitest is installed
+      - name: Debug - Check installation
         run: |
-          echo "=== Checking vitest in frontend ==="
-          ls -la frontend/node_modules/.bin/ | grep vitest || echo "vitest not found"
+          echo "=== Root node_modules ==="
+          ls -la node_modules/.bin/ | grep -E "(vitest|playwright)" || echo "Not found in root"
+          echo "=== Frontend node_modules ==="
+          ls -la frontend/node_modules/.bin/ | grep vitest || echo "vitest not found in frontend"
+          echo "=== pnpm list vitest ==="
           pnpm list vitest --filter frontend || echo "vitest not listed"
+          echo "=== Working directory ==="
+          pwd
+          echo "=== Frontend directory ==="
+          ls -la frontend/
 
       - name: Run frontend tests
         run: pnpm run test:frontend
