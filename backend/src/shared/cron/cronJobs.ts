@@ -2,7 +2,7 @@ import cron from 'node-cron';
 import { orm } from '../db/orm.js';
 import { Turno } from '../../turno/turno.entity.js';
 import { CRON_CONFIG } from './cronConfig.js';
-
+import { sendEmail } from '../../mail/mail.js';
 export class CronJobs {
   /**
    * Opciones globales para todos los cron jobs
@@ -88,6 +88,12 @@ export class CronJobs {
           //  Actualizar estado
           for (const turno of turnosVencidos) {
             turno.estado = 'cancelado';
+            sendEmail(
+              turno.servicio.usuario.mail,
+              'Turno Cancelado',
+              `El turno con ID ${turno.id} ha sido cancelado por no ser confirmado.`
+            );
+            console.log(`❌ Turno cancelado: ${turno.id}`);
           }
 
           //  Guardar cambios
@@ -130,6 +136,13 @@ export class CronJobs {
           // Enviar recordatorios
           for (const turno of turnos) {
             console.log(`📅 Recordatorio enviado para el turno: ${turno.id}`);
+            sendEmail(
+              turno.servicio.usuario.mail,
+              'Recordatorio de Turno',
+              `Tienes un turno programado para el ${turno.fechaHora.toLocaleString()}. Del servicio ${
+                turno.servicio.tarea.nombreTarea
+              }.`
+            );
           }
 
           console.log(`✅ ${turnos.length} recordatorios enviados`);

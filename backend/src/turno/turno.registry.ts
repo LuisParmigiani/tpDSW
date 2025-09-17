@@ -1,18 +1,105 @@
 import { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
+import {
+  TurnoSchema,
+  TurnoCreateSchema,
+  TurnoUpdateSchema,
+  TurnoIdSchema,
+  TurnoQuerySchema,
+  fullTurnoSchema,
+  errorResponseSchema,
+} from './turno.schemas.js';
 import { z } from 'zod';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-import {
-  TurnoCreateSchema,
-  TurnoResponseSchema,
-  TurnoApiResponseSchema,
-} from './turno.schemas.js';
+
+// Extender Zod con OpenAPI
 extendZodWithOpenApi(z);
 
+// Crear el turnoRegistry
 export const turnoRegistry = new OpenAPIRegistry();
 
-turnoRegistry.register('CreateTurno', TurnoCreateSchema);
-turnoRegistry.register('TurnoResponse', TurnoResponseSchema);
-turnoRegistry.register('TurnoApiResponse', TurnoApiResponseSchema);
+// Registrar esquemas
+turnoRegistry.register('Turno', TurnoSchema);
+turnoRegistry.register('TurnoCreate', TurnoCreateSchema);
+turnoRegistry.register('TurnoUpdate', TurnoUpdateSchema);
+turnoRegistry.register('TurnoId', TurnoIdSchema);
+turnoRegistry.register('TurnoQuery', TurnoQuerySchema);
+turnoRegistry.register('FullTurno', fullTurnoSchema);
+turnoRegistry.register('ErrorResponse', errorResponseSchema);
+
+// ==================== GET METHODS ====================
+
+// GET /api/turno
+turnoRegistry.registerPath({
+  method: 'get',
+  path: '/api/turno',
+  description: 'Obtener todos los turnos',
+  summary: 'Listar turnos',
+  tags: ['Turnos'],
+  responses: {
+    200: {
+      description: 'Lista de turnos obtenida exitosamente',
+      content: {
+        'application/json': {
+          schema: z.object({
+            message: z.string().openapi({ example: 'found all turns' }),
+            data: z.array(fullTurnoSchema),
+          }),
+        },
+      },
+    },
+    500: {
+      description: 'Error interno del servidor',
+      content: {
+        'application/json': {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+  },
+});
+
+// GET /api/turno/{id}
+turnoRegistry.registerPath({
+  method: 'get',
+  path: '/api/turno/{id}',
+  description: 'Obtener un turno por ID',
+  summary: 'Obtener turno',
+  tags: ['Turnos'],
+  request: {
+    params: TurnoIdSchema,
+  },
+  responses: {
+    200: {
+      description: 'Turno encontrado',
+      content: {
+        'application/json': {
+          schema: z.object({
+            message: z.string().openapi({ example: 'found turn' }),
+            data: fullTurnoSchema,
+          }),
+        },
+      },
+    },
+    404: {
+      description: 'Turno no encontrado',
+      content: {
+        'application/json': {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+    500: {
+      description: 'Error interno del servidor',
+      content: {
+        'application/json': {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+  },
+});
+
+// ==================== POST METHODS ====================
 
 // POST /api/turno
 turnoRegistry.registerPath({
@@ -36,171 +123,57 @@ turnoRegistry.registerPath({
       description: 'Turno creado exitosamente',
       content: {
         'application/json': {
-          schema: TurnoApiResponseSchema,
-          examples: {
-            ejemploExitoso: {
-              summary: 'Ejemplo de respuesta exitosa',
-              value: {
-                message: 'Turno creado exitosamente',
-                data: {
-                  id: 1,
-                  fecha: '2025-09-30',
-                  hora: '14:00',
-                  usuarioId: 2,
-                  servicioId: 1,
-                  zonaId: 3,
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-    400: {
-      description: 'Error de validación',
-      content: {
-        'application/json': {
-          schema: z.object({ message: z.string() }),
-        },
-      },
-    },
-  },
-});
-
-// GET /api/turno
-turnoRegistry.registerPath({
-  method: 'get',
-  path: '/api/turno',
-  description: 'Obtener todos los turnos',
-  summary: 'Listar turnos',
-  tags: ['Turnos'],
-  responses: {
-    200: {
-      description: 'Lista de turnos',
-      content: {
-        'application/json': {
           schema: z.object({
-            message: z.string(),
-            data: z.array(TurnoResponseSchema),
+            message: z
+              .string()
+              .openapi({ example: 'Turno creado exitosamente' }),
+            data: fullTurnoSchema,
           }),
-          examples: {
-            ejemploLista: {
-              summary: 'Ejemplo de lista de turnos',
-              value: {
-                message: 'Turnos encontrados',
-                data: [
-                  {
-                    id: 1,
-                    fecha: '2025-09-30',
-                    hora: '14:00',
-                    usuarioId: 2,
-                    servicioId: 1,
-                    zonaId: 3,
-                  },
-                ],
-              },
-            },
-          },
+        },
+      },
+    },
+    500: {
+      description: 'Error interno del servidor',
+      content: {
+        'application/json': {
+          schema: errorResponseSchema,
         },
       },
     },
   },
 });
 
-// GET /api/turno/{id}
+// ==================== PATCH METHODS ====================
+
+// PATCH /api/turno/{id}
 turnoRegistry.registerPath({
-  method: 'get',
+  method: 'patch',
   path: '/api/turno/{id}',
-  description: 'Obtener un turno por ID',
-  summary: 'Obtener turno',
-  tags: ['Turnos'],
-  request: {
-    params: z.object({ id: z.string().regex(/^\d+$/) }),
-  },
-  responses: {
-    200: {
-      description: 'Turno encontrado',
-      content: {
-        'application/json': {
-          schema: z.object({
-            message: z.string(),
-            data: TurnoResponseSchema,
-          }),
-          examples: {
-            ejemploEncontrado: {
-              summary: 'Ejemplo de turno encontrado',
-              value: {
-                message: 'Turno encontrado',
-                data: {
-                  id: 1,
-                  fecha: '2025-09-30',
-                  hora: '14:00',
-                  usuarioId: 2,
-                  servicioId: 1,
-                  zonaId: 3,
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-    404: {
-      description: 'Turno no encontrado',
-      content: {
-        'application/json': {
-          schema: z.object({
-            message: z.string().openapi({ example: 'Turno no encontrado' }),
-          }),
-        },
-      },
-    },
-  },
-});
-
-// PUT /api/turno/{id}
-turnoRegistry.registerPath({
-  method: 'put',
-  path: '/api/turno/{id}',
-  description: 'Actualizar un turno por ID',
+  description: 'Actualizar parcialmente un turno',
   summary: 'Actualizar turno',
   tags: ['Turnos'],
   request: {
-    params: z.object({ id: z.string().regex(/^\d+$/) }),
+    params: TurnoIdSchema,
     body: {
       description: 'Datos del turno a actualizar',
       content: {
         'application/json': {
-          schema: TurnoCreateSchema.partial(),
+          schema: TurnoUpdateSchema,
         },
       },
     },
   },
   responses: {
     200: {
-      description: 'Turno actualizado',
+      description: 'Turno actualizado exitosamente',
       content: {
         'application/json': {
           schema: z.object({
-            message: z.string(),
-            data: TurnoResponseSchema,
+            message: z
+              .string()
+              .openapi({ example: 'Turn updated successfully' }),
+            data: fullTurnoSchema,
           }),
-          examples: {
-            ejemploActualizado: {
-              summary: 'Ejemplo de turno actualizado',
-              value: {
-                message: 'Turno actualizado',
-                data: {
-                  id: 1,
-                  fecha: '2025-09-30',
-                  hora: '14:00',
-                  usuarioId: 2,
-                  servicioId: 1,
-                  zonaId: 3,
-                },
-              },
-            },
-          },
         },
       },
     },
@@ -208,14 +181,22 @@ turnoRegistry.registerPath({
       description: 'Turno no encontrado',
       content: {
         'application/json': {
-          schema: z.object({
-            message: z.string().openapi({ example: 'Turno no encontrado' }),
-          }),
+          schema: errorResponseSchema,
+        },
+      },
+    },
+    500: {
+      description: 'Error interno del servidor',
+      content: {
+        'application/json': {
+          schema: errorResponseSchema,
         },
       },
     },
   },
 });
+
+// ==================== DELETE METHODS ====================
 
 // DELETE /api/turno/{id}
 turnoRegistry.registerPath({
@@ -225,33 +206,14 @@ turnoRegistry.registerPath({
   summary: 'Eliminar turno',
   tags: ['Turnos'],
   request: {
-    params: z.object({ id: z.string().regex(/^\d+$/) }),
+    params: TurnoIdSchema,
   },
   responses: {
     200: {
-      description: 'Turno eliminado',
+      description: 'Turno eliminado exitosamente',
       content: {
         'application/json': {
-          schema: z.object({
-            message: z.string(),
-            data: TurnoResponseSchema,
-          }),
-          examples: {
-            ejemploEliminado: {
-              summary: 'Ejemplo de turno eliminado',
-              value: {
-                message: 'Turno eliminado',
-                data: {
-                  id: 1,
-                  fecha: '2025-09-30',
-                  hora: '14:00',
-                  usuarioId: 2,
-                  servicioId: 1,
-                  zonaId: 3,
-                },
-              },
-            },
-          },
+          schema: fullTurnoSchema,
         },
       },
     },
@@ -259,9 +221,15 @@ turnoRegistry.registerPath({
       description: 'Turno no encontrado',
       content: {
         'application/json': {
-          schema: z.object({
-            message: z.string().openapi({ example: 'Turno no encontrado' }),
-          }),
+          schema: errorResponseSchema,
+        },
+      },
+    },
+    500: {
+      description: 'Error interno del servidor',
+      content: {
+        'application/json': {
+          schema: errorResponseSchema,
         },
       },
     },

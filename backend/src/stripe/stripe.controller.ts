@@ -1,7 +1,6 @@
 import Stripe from 'stripe';
 import { Request, Response } from 'express';
 import { getOauth } from '../usuario/usuario.controler.js';
-import { updatePagoSplit } from '../pago/pago.controller.js';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-08-27.basil',
 });
@@ -35,7 +34,7 @@ async function createAccount(req: AuthRequest, res: Response) {
         first_name: usuario.nombre,
         last_name: usuario.apellido,
         email: usuario.mail,
-        phone: usuario.telefono,
+        phone: `+11${usuario.telefono}`,
         dob: {
           day: 15,
           month: 5,
@@ -54,6 +53,15 @@ async function createAccount(req: AuthRequest, res: Response) {
         card_payments: { requested: true },
         transfers: { requested: true },
       },
+      // 🔥 CONFIGURACIÓN PARA PAYOUTS AUTOMÁTICOS DIARIOS
+      settings: {
+        payouts: {
+          schedule: {
+            interval: 'daily', // Payouts automáticos cada día
+            delay_days: 2, // Demora mínima (estándar para US)
+          },
+        },
+      },
     });
 
     // 2️⃣ Generar enlace de onboarding
@@ -63,8 +71,16 @@ async function createAccount(req: AuthRequest, res: Response) {
       return_url: `${process.env.FRONTEND_URL}dashboard/success`,
       type: 'account_onboarding',
     });
+
+    console.log(`Account ID: ${account.id}`);
     console.log(`Enlace de onboarding: ${accountLink.url}`);
-    res.json({ url: accountLink.url });
+    console.log(`Payouts configurados como: DAILY (automático)`);
+
+    res.json({
+      url: accountLink.url,
+      accountId: account.id,
+      payoutSchedule: 'daily',
+    });
   } catch (err) {
     console.log(err);
     if (err instanceof Error) {
@@ -74,6 +90,7 @@ async function createAccount(req: AuthRequest, res: Response) {
     }
   }
 }
+
 async function createSplitPayment(req: Request, res: Response) {
   const { amount, sellerStripeId, turno, userID, userMail } = req.body;
 

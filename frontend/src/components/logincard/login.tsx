@@ -6,7 +6,7 @@ import useAuth from '../../cookie/useAuth';
 import { cn } from '../../lib/utils.ts';
 import { AxiosError } from 'axios';
 import { Alert, AlertTitle, AlertDescription } from './../Alerts/Alerts.tsx';
-
+import { useProtectRoute } from '../../cookie/useProtectRoute.tsx';
 function Logincard() {
   const { id, servicio, Tarea, horario, dia } = useParams<{
     id?: string;
@@ -18,7 +18,7 @@ function Logincard() {
   const { verificarAuth } = useAuth();
   const navigate = useNavigate();
   const [message, setMessage] = useState('');
-
+  useProtectRoute();
   // ✅ Simplified state management
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ mail: '', contrasena: '' });

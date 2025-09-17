@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
+import { id } from 'zod/v4/locales';
 
 // Extender Zod con OpenAPI
 extendZodWithOpenApi(z);
@@ -14,6 +15,45 @@ const ERROR_MESSAGES = {
   tipoServicio: 'El ID del tipo de servicio debe ser un número entero positivo',
 };
 
+// ===================================================================================================================
+// ========================================== servicio schema =========================================
+// ===================================================================================================================
+export const servicioSchema = z.object({
+  id: z.number().describe('ID del servicio').openapi({
+    example: 1,
+  }),
+  estado: z
+    .enum(['activo', 'inactivo'])
+    .describe('Estado del servicio')
+    .openapi({
+      example: 'activo',
+    }),
+  precio: z
+    .number()
+    .positive('El precio debe ser un número positivo')
+    .describe('Precio del servicio')
+    .openapi({
+      example: 1500,
+    }),
+  tarea: z
+    .number()
+    .int()
+    .positive('El ID de la tarea debe ser un número entero positivo')
+    .describe('ID de la tarea asociada al servicio')
+    .openapi({
+      example: 1,
+    }),
+  usuario: z
+    .number()
+    .int()
+    .positive('El ID del usuario debe ser un número entero positivo')
+    .nullable()
+    .optional()
+    .describe('ID del usuario asociado al servicio (opcional)')
+    .openapi({
+      example: 2,
+    }),
+});
 // ===================================================================================================================
 // ========================================== tipoServicio schema =========================================
 // ===================================================================================================================
@@ -68,6 +108,7 @@ export const tareaBaseSchemaWithTipoServicioId = tareaBaseSchema.extend({
     .positive(ERROR_MESSAGES.tipoServicio)
     .describe('ID del tipo de servicio')
     .openapi({ example: 1 }),
+  servicioSchema: servicioSchema,
 });
 
 // ===================================================================================================================

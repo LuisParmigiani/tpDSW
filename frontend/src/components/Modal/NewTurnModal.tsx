@@ -22,7 +22,6 @@ const turnFormSchema = z.object({
 // Schema para validar datos finales antes del envío
 const apiDataSchema = z.object({
   servicio: z.number().positive(),
-  tarea: z.number().positive(),
   fechaHora: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/),
   estado: z.literal('pendiente'),
   montoFinal: z.number().positive(),
@@ -87,7 +86,7 @@ function NewTurnModal({
   prestatario,
   setopen,
   servicio = '',
-  Tarea = '',
+  Tarea = 'lala',
   horario = '',
   dia = '',
   open,
@@ -102,7 +101,6 @@ function NewTurnModal({
   // Devuelve un objeto con errores encontrados o null si todo está válido
   const validateInitialParams = () => {
     const errors: Record<string, string> = {};
-
     // Validar servicio inicial
     if (
       servicio &&
@@ -111,10 +109,15 @@ function NewTurnModal({
       errors.initialService = 'Servicio inicial no válido';
     }
 
-    // Validar tarea inicial
+    // Validar tarea inicial solo si el servicio inicial es válido
     if (
+      servicio &&
       Tarea &&
-      !prestatario.servicios.some((serv) => serv.tarea.nombreTarea === Tarea)
+      !prestatario.servicios.some(
+        (serv) =>
+          serv.tarea.nombreTarea === Tarea &&
+          serv.tarea.tipoServicio.nombreTipo === servicio
+      )
     ) {
       errors.initialTask = 'Tarea inicial no válida';
     }
@@ -276,14 +279,21 @@ function NewTurnModal({
   // Efecto para generar las opciones de tareas según el servicio seleccionado
   useEffect(() => {
     const newTareasOptions: Option[] = [];
+    const seenTasks = new Set(); // Conjunto para evitar duplicados
+
     prestatario.servicios.forEach((servicio) => {
-      if (servicio.tarea.tipoServicio.nombreTipo === selectedService) {
+      if (
+        servicio.tarea.tipoServicio.nombreTipo === selectedService &&
+        !seenTasks.has(servicio.tarea.nombreTarea) // Verificar si ya se agregó
+      ) {
         newTareasOptions.push({
           value: servicio.tarea.nombreTarea,
           label: servicio.tarea.nombreTarea,
         });
+        seenTasks.add(servicio.tarea.nombreTarea); // Marcar como agregado
       }
     });
+
     setTareasOptions(newTareasOptions);
   }, [selectedService, prestatario]);
 
@@ -514,31 +524,33 @@ function NewTurnModal({
         return;
       }
 
+      // Buscar el servicio correspondiente a la tarea seleccionada
       const services = prestatario.servicios.find(
         (s) => s.tarea.nombreTarea === selectedTask
       );
 
       if (!services) {
-        setValidationErrors({ general: 'Servicio no encontrado' });
+        setValidationErrors({
+          general: 'Servicio no encontrado para la tarea seleccionada',
+        });
         setIsValidating(false);
         return;
       }
 
       const precio = services.precio || 100;
       const turnData = {
-        servicio: services.id,
-        tarea: services.tarea.id,
+        servicio: services.id, // Usar el ID del servicio encontrado
         fechaHora: `${dayForTurn}T${horarioSelected}:00`,
         estado: 'pendiente' as const,
         montoFinal: precio * 0.05 + precio,
       };
 
+      // Log para verificar los datos enviados
+      console.log('Datos enviados al backend:', turnData);
+
       // Validar datos para API
       apiDataSchema.parse(turnData);
-      console.log(
-        '....................................................',
-        turnData
-      );
+
       await turnosApi.createWithCookie(turnData);
 
       // Limpiar formulario
@@ -564,12 +576,7 @@ function NewTurnModal({
           error.message ||
           'Error al guardar el turno',
       });
-      console.log('Error: --------------------------------------', error);
-
-      console.error(
-        'Error al guardar el turno: --------------------------------------',
-        error
-      );
+      console.error('Error al guardar el turno:', error);
       setValidationErrors({
         general: 'Error al guardar el turno. Por favor, intente nuevamente.',
       });
@@ -791,6 +798,7 @@ function NewTurnModal({
                 setOptions={(value) => {
                   if (isValidValue('task', value)) {
                     setSelectedTask(value);
+                    console.log('Tarea seleccionada:', value, selectedTask);
                   }
                 }}
                 value={selectedTask}

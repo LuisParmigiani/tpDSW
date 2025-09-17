@@ -3,7 +3,7 @@
 GET http://localhost:3000/api/horario
 
 ### Busco horarios por idDeUsuario
-GET http://localhost:3000/api/horario/36
+GET http://localhost:3000/api/horario/usuario/36
 
 ### Cargamos un horario
 POST http://localhost:3000/api/horario
