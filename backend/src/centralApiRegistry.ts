@@ -10,9 +10,70 @@ import { turnoRegistry } from './turno/turno.registry.js';
 import { zonaRegistry } from './zona/zona.registry.js';
 import { horarioRegistry } from './horario/horario.registry.js';
 import { servicioRegistry } from './servicio/servicio.registry.js';
-import { pagoRegistry } from './pago/pago.registry.js'; // Asegúrate de importar el registro correcto
-import { tareaRegistry } from './tarea/tarea.registry.js'; // Agrega el registro de tareas
+import { pagoRegistry } from './pago/pago.registry.js';
+import { tareaRegistry } from './tarea/tarea.registry.js';
 import { tipoServicioRegistry } from './tipoServicio/tipoServicio.registory.js';
+
+// Function to generate Swagger UI HTML
+function generateSwaggerUIHTML(openApiDocument: any): string {
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeService API Documentation</title>
+  <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui.css" />
+  <style>
+    html {
+      box-sizing: border-box;
+      overflow: -moz-scrollbars-vertical;
+      overflow-y: scroll;
+    }
+    *, *:before, *:after {
+      box-sizing: inherit;
+    }
+    body {
+      margin:0;
+      background: #fafafa;
+    }
+    .swagger-ui .topbar {
+      background-color: #2c3e50;
+    }
+    .swagger-ui .topbar .download-url-wrapper {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="swagger-ui"></div>
+  <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-bundle.js"></script>
+  <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-standalone-preset.js"></script>
+  <script>
+    window.onload = function() {
+      const ui = SwaggerUIBundle({
+        spec: ${JSON.stringify(openApiDocument)},
+        dom_id: '#swagger-ui',
+        deepLinking: true,
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIStandalonePreset
+        ],
+        plugins: [
+          SwaggerUIBundle.plugins.DownloadUrl
+        ],
+        layout: "StandaloneLayout",
+        tryItOutEnabled: true,
+        requestInterceptor: function(req) {
+          // Add any custom request headers here if needed
+          return req;
+        }
+      });
+    };
+  </script>
+</body>
+</html>`;
+}
 
 async function generateOpenApiDocument() {
   const registry = new OpenAPIRegistry();
@@ -26,15 +87,15 @@ async function generateOpenApiDocument() {
 
   //* Coleccion final donde van a ir los registros de cada api para que se combinen en uno solo y se documenten
   const allDefinitions = [
-    ...registry.definitions, // Esquemas de seguridad
-    ...usuarioRegistry.definitions, // Esquemas y definiciones del usuario
-    ...turnoRegistry.definitions, // Esquemas y definiciones de turno
+    ...registry.definitions,
+    ...usuarioRegistry.definitions,
+    ...turnoRegistry.definitions,
     ...zonaRegistry.definitions,
     ...horarioRegistry.definitions,
-    ...servicioRegistry.definitions, // Esquemas y definiciones del servicio
-    ...pagoRegistry.definitions, // Cambiado de pagoSchema.definitions a pagoRegistry.definitions
-    ...tareaRegistry.definitions, // Agrega las definiciones de tareas
-    ...tipoServicioRegistry.definitions, // Agrega las definiciones de tipo de servicio
+    ...servicioRegistry.definitions,
+    ...pagoRegistry.definitions,
+    ...tareaRegistry.definitions,
+    ...tipoServicioRegistry.definitions,
   ];
 
   //Generador con todas las definiciones
@@ -54,7 +115,6 @@ async function generateOpenApiDocument() {
     servers: [
       {
         url: 'http://localhost:3000/api',
-
         description: 'Development server',
       },
       {
@@ -109,17 +169,15 @@ async function generateOpenApiDocument() {
     JSON.stringify(document, null, 2)
   );
 
-  // Generate YAML documentation
-  const yaml = await import('yaml');
-  await fs.writeFile(
-    path.join(docsDir, 'api-documentation.yaml'),
-    yaml.stringify(document)
-  );
+  // Generate HTML documentation with Swagger UI
+  const htmlContent = generateSwaggerUIHTML(document);
+  await fs.writeFile(path.join(docsDir, 'api-documentation.html'), htmlContent);
 
   console.log('✅ API Documentation generated successfully!');
   console.log('📁 Files created:');
   console.log('   - docs/api-documentation.json');
-  console.log('   - docs/api-documentation.yaml');
+  console.log('   - docs/api-documentation.html');
+  console.log('');
 
   return document;
 }

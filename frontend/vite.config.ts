@@ -26,16 +26,32 @@ export default defineConfig({
         secure: false,
       },
     },
-    // ...existing code...
   },
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: './src/test/setup.ts',
-    projects: [
-      {
-        extends: true,
+    setupFiles: ['./src/test/setup.ts'],
+    css: true,
+    // Conditional CI configuration - only applies in CI environment
+    ...(process.env.CI && {
+      pool: 'forks',
+      poolOptions: {
+        forks: {
+          singleFork: true,
+        },
       },
+      // Try to inline problematic dependencies in CI
+      deps: {
+        inline: ['jsdom', 'webidl-conversions'],
+      },
+    }),
+    // Exclude E2E tests from Vitest
+    exclude: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/playwright-report/**',
+      '**/test-results/**',
+      '**/tests/**', // This excludes your Playwright tests directory
     ],
   },
 });

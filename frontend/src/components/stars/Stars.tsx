@@ -4,16 +4,21 @@ type Props = {
 };
 
 function Stars({ cant, className }: Props) {
+  if (cant === 0) {
+    return <p data-testid="no-rating">No tiene calificaciones</p>;
+  }
   const stars = [];
   for (let i = 0; i < 5; i++) {
     if (i < cant) {
       if (i - cant > -1 && i - cant != 0) {
         stars.push(
+          //agrega la media estrella
           <svg
             key={i}
             className="w-6 h-6"
             viewBox="0 -0.02 60.031 60.031"
             xmlns="http://www.w3.org/2000/svg"
+            data-testid="half-star-icon"
           >
             <path
               fill="#f97316"
@@ -26,12 +31,14 @@ function Stars({ cant, className }: Props) {
           </svg>
         );
       } else {
+        //agrega estrella llena
         stars.push(
           <svg
             key={i}
             className="w-6 h-6 "
             viewBox="0 -0.03 60.062 60.062"
             xmlns="http://www.w3.org/2000/svg"
+            data-testid="full-star-icon"
           >
             <path
               fill="#f97316"
@@ -45,11 +52,13 @@ function Stars({ cant, className }: Props) {
       }
     } else {
       stars.push(
+        //agrega estrella vacia
         <svg
           key={i}
           className="w-6 h-6"
           viewBox="0 -0.02 60.031 60.031"
           xmlns="http://www.w3.org/2000/svg"
+          data-testid="empty-star-icon"
         >
           <path
             fill="#f97316"

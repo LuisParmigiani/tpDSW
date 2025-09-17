@@ -36,3 +36,9 @@ frontend/dist/**/*
 
 ## built vscode extensions
 *.vsix
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

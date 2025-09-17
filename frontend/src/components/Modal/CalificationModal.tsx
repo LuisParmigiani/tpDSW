@@ -61,6 +61,7 @@ function CalificationModal({
   flagged,
 }: Props) {
   // alertas de errores del back
+  const [spinner, setSpinner] = React.useState(false);
 
   const {
     control,
@@ -190,6 +191,7 @@ function CalificationModal({
             form="calification-form"
             className="px-4 py-2 hover:text-amber-700 rounded-sm border-1 border-naranja-1 bg-naranja-1 hover:bg-white text-white disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={!isValid}
+            onClick={() => {}}
           >
             Guardar
           </button>
