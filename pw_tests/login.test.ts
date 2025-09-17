@@ -2,9 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Login', () => {
   test.beforeEach(async ({ page }) => {
-    const baseURL = process.env.FRONTEND_URL || 'http://localhost:5173';
-    console.log('Base URL testing:', baseURL);
-    await page.goto('' + baseURL + '/login');
+    await page.goto('/login');
   });
   test('Login con credenciales válidas, como prestatario', async ({ page }) => {
     //Agarro los componentes que necesito del login
