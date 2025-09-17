@@ -26,16 +26,19 @@ export default defineConfig({
         secure: false,
       },
     },
-    // ...existing code...
   },
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: './src/test/setup.ts',
-    projects: [
-      {
-        extends: true,
-      },
+    setupFiles: ['./src/test/setup.ts'],
+    css: true,
+    // Exclude E2E tests from Vitest
+    exclude: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/playwright-report/**',
+      '**/test-results/**',
+      '**/tests/**', // Exclude Playwright tests directory
     ],
   },
 });

@@ -1,0 +1,197 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # Backend Tests
+  backend-tests:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: homeservice_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+      - name: Install dependencies
+        run: pnpm install
+      - name: Wait for MySQL
+        run: |
+          while ! mysqladmin ping -h"127.0.0.1" --silent; do
+            sleep 1
+          done
+      - name: Run backend tests
+        env:
+          NODE_ENV: test
+          DB_URL: mysql://root:root@localhost:3306/homeservice_test
+        run: pnpm run test:backend
+
+  # Frontend Tests
+  frontend-tests:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+      - name: Install dependencies
+        run: pnpm install
+      - name: Run frontend tests
+        run: pnpm run test:frontend
+
+  # Deploy Backend (after unit tests pass)
+  deploy-backend:
+    name: Deploy Backend
+    needs: [backend-tests, frontend-tests]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+      - name: Install deps and build
+        run: |
+          pnpm install --no-frozen-lockfile
+          pnpm build
+      - name: Install Fly CLI
+        run: |
+          curl -L https://fly.io/install.sh | sh
+          echo "${HOME}/.fly/bin" >> $GITHUB_PATH
+      - name: Deploy to Fly.io
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          export FLYCTL_INSTALL="$HOME/.fly"
+          export PATH="$FLYCTL_INSTALL/bin:$PATH"
+          sed -i "s/REEMPLAZA_CON_NOMBRE_APP_FLY/${{ secrets.FLY_APP_NAME }}/" fly.toml
+          flyctl deploy --config fly.toml --remote-only --strategy immediate
+
+  # Deploy Frontend (after backend is deployed)
+  deploy-frontend:
+    name: Deploy Frontend
+    needs: [deploy-backend]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+      - name: Install and build frontend
+        working-directory: frontend
+        env:
+          VITE_API_URL: https://${{ secrets.FLY_APP_NAME }}.fly.dev
+        run: |
+          pnpm install --no-frozen-lockfile
+          pnpm build
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftp
+          local-dir: frontend/dist/
+          server-dir: public_html/
+          exclude: |
+            **/.git*
+            **/node_modules/**
+            **/*.map
+          dangerous-clean-slate: false
+
+  # E2E Tests AFTER deployment (Production Testing)
+  e2e-tests:
+    name: Production E2E Tests
+    needs: [deploy-frontend]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+      - name: Install dependencies
+        run: pnpm install
+      - name: Install Playwright Browsers
+        run: pnpm exec playwright install --with-deps chromium
+
+      # Wait for deployment to be fully ready
+      - name: Wait for production deployment
+        run: |
+          timeout 300 bash -c 'until curl -f https://${{ secrets.FRONTEND_URL }} 2>/dev/null; do sleep 10; done'
+          timeout 300 bash -c 'until curl -f https://${{ secrets.FLY_APP_NAME }}.fly.dev/health 2>/dev/null; do sleep 10; done'
+
+      # Run E2E tests against production
+      - name: Run Production E2E tests
+        env:
+          PLAYWRIGHT_BASE_URL: https://${{ secrets.FRONTEND_URL }}
+          API_BASE_URL: https://${{ secrets.FLY_APP_NAME }}.fly.dev
+        run: pnpm run test:e2e
+
+      - name: Upload Playwright Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-production
+          path: playwright-report/
+          retention-days: 30
+
+  # Rollback on E2E failure (optional)
+  rollback-on-failure:
+    name: Rollback on E2E Failure
+    needs: [e2e-tests]
+    runs-on: ubuntu-latest
+    if: failure() && github.ref == 'refs/heads/main'
+    steps:
+      - name: Notify E2E Test Failure
+        run: |
+          echo "⚠️ E2E tests failed in production!"
+          echo "Consider rolling back deployment or fixing issues immediately."
+      # Add actual rollback logic here if needed
