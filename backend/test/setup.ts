@@ -186,6 +186,7 @@ beforeAll(async () => {
   // Set test environment
   process.env.NODE_ENV = 'test';
   process.env.DB_URL = 'mysql://test:test@localhost:3306/test_db';
+  process.env.OPENAI_API_KEY = process.env.OPENAI_API_KEY || 'test-dummy-key';
 });
 
 afterAll(async () => {
@@ -242,5 +243,20 @@ vi.mock('stripe', () => ({
     },
   })),
 }));
+
+// Add this mock BEFORE any code that might import your service
+vi.mock('openai', () => {
+  return {
+    default: class OpenAI {
+      chat = {
+        completions: {
+          create: vi.fn().mockResolvedValue({
+            choices: [{ message: { content: 'mocked-response' } }],
+          }),
+        },
+      };
+    },
+  };
+});
 
 console.log('✅ Test setup complete');
