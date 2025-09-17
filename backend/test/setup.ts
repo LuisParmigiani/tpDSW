@@ -2,6 +2,10 @@ import { beforeAll, afterAll, beforeEach, vi } from 'vitest';
 
 console.log('🧪 Setting up backend tests...');
 
+// Ensure env vars BEFORE any app imports
+process.env.NODE_ENV = 'test';
+process.env.OPENAI_API_KEY = process.env.OPENAI_API_KEY || 'test-dummy-key';
+
 // Mock MikroORM completely before any imports
 vi.mock('@mikro-orm/core', () => ({
   // Entity decorators
