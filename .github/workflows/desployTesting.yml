@@ -55,16 +55,28 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
         with:
           version: 8
+
+      # Fix: Install ALL dependencies (including dev dependencies)
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
+
+      # Debug step to verify installation
+      - name: Debug - Check vitest installation
+        run: |
+          echo "=== Checking vitest in frontend ==="
+          ls -la frontend/node_modules/.bin/ | grep vitest || echo "vitest not found"
+          pnpm list vitest --filter frontend || echo "vitest not listed"
+
       - name: Run frontend tests
         run: pnpm run test:frontend
 
