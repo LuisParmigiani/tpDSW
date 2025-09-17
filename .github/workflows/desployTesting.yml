@@ -160,7 +160,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: Install Playwright Browsers
-        run: pnpm exec playwright install --with-deps chromium
+        run: pnpm exec playwright install chromium firefox webkit --with-deps
 
       # Wait for deployment to be fully ready
       - name: Wait for production deployment
