@@ -101,9 +101,13 @@ describe('Middleware y CORS', () => {
   });
 
   it('Debería manejar las solicitudes de preflight CORS', async () => {
+    const testOrigin = process.env.CI
+      ? 'http://localhost:3000' // CI environment origin
+      : 'http://localhost:5173'; // Local development origin
+
     const res = await request(app)
       .options('/api/usuario')
-      .set('Origin', 'http://localhost:5173')
+      .set('Origin', testOrigin)
       .set('Access-Control-Request-Method', 'GET');
 
     // Debería manejar la solicitud OPTIONS
