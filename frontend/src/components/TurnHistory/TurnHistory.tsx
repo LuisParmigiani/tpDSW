@@ -69,7 +69,7 @@ function TurnHistory({ estado }: Props) {
   // Filtros de los turnos
   const [selectedValueShow, setSelectedValueShow] = useState('');
   // Variables de paginacion:
-  const cantItemsPerPage = '9'; // Cantidad de turnos por pagina
+  const cantItemsPerPage = 9; // Cantidad de turnos por pagina
   const [currentPage, setCurrentPage] = useState(1); // Página actual
   const [totalPages, setTotalPages] = useState(1); // Total de páginas
   const [flagged, setFlagged] = useState(false); //Bandera para saber si el comentario es inapropiado
@@ -96,7 +96,7 @@ function TurnHistory({ estado }: Props) {
       try {
         const res = await turnosApi.getByUserId(
           cantItemsPerPage,
-          currentPage.toString(),
+          currentPage,
           selectedValueShow,
           selectedValueOrder
         );

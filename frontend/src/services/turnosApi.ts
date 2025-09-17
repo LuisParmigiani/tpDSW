@@ -5,8 +5,8 @@ export const turnosApi = {
   getAll: () => api.get('/turno'),
   getById: (id: string) => api.get(`/turno/${id}`),
   getByUserId: (
-    cantItemsPerPage: string,
-    currentPage: string,
+    cantItemsPerPage: number,
+    currentPage: number,
     selectedValueShow?: string,
     selectedValueOrder?: string
   ) => {
