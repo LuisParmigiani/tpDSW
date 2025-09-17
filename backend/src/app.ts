@@ -27,18 +27,25 @@ import { stripeRouter } from './stripe/stripe.route.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Silenciar logs de dotenv si estuvieran habilitados externamente
+if (process.env.DOTENV_CONFIG_DEBUG) {
+  delete process.env.DOTENV_CONFIG_DEBUG;
+}
+
 // Load .env only if it exists to distinguish local from production mode
 const envPath = path.join(__dirname, '../../.env');
 const isLocalEnv = fs.existsSync(envPath);
-if (isLocalEnv) {
+if (isLocalEnv && process.env.__DOTENV_ALREADY_CONFIGURED !== '1') {
   dotenv.config({ path: envPath });
+  process.env.__DOTENV_ALREADY_CONFIGURED = '1';
 }
 
 const isProduction = process.env.NODE_ENV === 'production';
 
-export const staticPath = !isProduction
-  ? '/app/public/uploads' // Fly.io volume mount point
-  : path.join(__dirname, '../public/uploads'); // Local development
+// Ajuste: local -> carpeta dentro del proyecto; producción -> volumen Fly.io
+export const staticPath = isLocalEnv
+  ? path.join(__dirname, '../public/uploads')
+  : '/app/public/uploads';
 
 function downloadFile(url: string, dest: string): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -130,7 +137,7 @@ export function createApp(
   const rawOrigins = local
     ? 'http://localhost:5173'
     : process.env.FRONTEND_ORIGIN ||
-      'https://reformix.site,https://www.reformix.site';
+      'https://reformix.site,http://www.reformix.site';
   const allowedOrigins = rawOrigins.split(',').map((o: string) => o.trim());
 
   app.use(
@@ -269,17 +276,21 @@ export async function initializeApp() {
 }
 
 // 🔄 PRESERVED: Original startup logic (only runs when file is executed directly)
-if (import.meta.url === `file://${process.argv[1]}`) {
-  // This ensures the original behavior is preserved when running the file directly
-  const app = createApp();
-  await initializeApp();
+const isMainModule =
+  process.argv[1] &&
+  fileURLToPath(import.meta.url) === path.resolve(process.argv[1] as string);
 
-  const local = isLocalEnv;
-  console.log(local);
-  const port = local ? 3000 : Number(process.env.PORT) || 8080;
-  app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-  });
+if (isMainModule) {
+  // Evitar top-level await: IIFE async
+  void (async () => {
+    const app = createApp();
+    await initializeApp();
+
+    const port = Number(process.env.PORT) || (isLocalEnv ? 3000 : 8080);
+    app.listen(port, () => {
+      console.log(`Server running on port ${port}`);
+    });
+  })();
 }
 
 // 🔄 PRESERVED: Default export for backward compatibility

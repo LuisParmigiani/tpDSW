@@ -267,37 +267,48 @@ export const turnoQuerySchemaDash = z.object({
 
 export const TurnoQuerySchema = z.object({
   cantItemsPerPage: z
-    .number()
-    .int()
-    .positive(
+    .string()
+    .min(
+      1,
       'La cantidad de items por página debe ser un número entero positivo'
     )
     .optional()
     .describe('Cantidad de items por página')
-    .openapi({ example: 10 }),
+    .openapi({ example: '10' }),
   currentPage: z
-    .number()
-    .int()
-    .positive('La página actual debe ser un número entero positivo')
+    .string()
+    .min(1, 'La página actual debe ser un número entero positivo')
     .optional()
     .describe('Página actual')
-    .openapi({ example: 1 }),
+    .openapi({ example: '1' }),
   selectedValueShow: z
-    .enum(['fecha', 'estado', 'calificacion', 'montoFinal'])
+    .enum([
+      'todos',
+      'faltanCalificar',
+      'calificados',
+      'cancelados',
+      'pendientes',
+      'completado',
+      'porPagar',
+      'pagado',
+      'pagoPendiente',
+      'all',
+    ])
     .optional()
     .describe('Campo para mostrar')
-    .openapi({ example: 'fecha' }),
+    .openapi({ example: 'pagado' }),
   selectedValueOrder: z
-    .enum(['asc', 'desc'])
+    .enum([
+      'todos',
+      'fechaA',
+      'fechaD',
+      'calificacionM',
+      'calificacionP',
+      'all',
+    ])
     .optional()
     .describe('Campo para ordenar')
-    .openapi({ example: 'asc' }),
-  searchQuery: z
-    .string()
-    .min(1, 'La consulta de búsqueda debe tener al menos 1 carácter')
-    .optional()
-    .describe('Consulta de búsqueda')
-    .openapi({ example: 'Juan' }),
+    .openapi({ example: 'fechaA' }),
 });
 
 export const errorResponseSchema = z.object({
