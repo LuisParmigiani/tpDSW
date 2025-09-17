@@ -124,12 +124,10 @@ function DashNav({ activeSection, setActiveSection, showMobileNav, setShowMobile
           onClick={() => setShowMobileNav?.(false)}
         />
       )}
-      
-      {/* Sidebar principal - siempre visible */}
       <div className={`bg-white shadow-lg border-r border-gray-200 transition-all duration-300 flex flex-col ${
         isMobile 
-          ? 'w-16 fixed inset-y-0 left-0 z-30' // En móvil: siempre colapsado
-          : `${isCollapsed ? 'w-16' : 'w-64'} relative` // En desktop: normal
+          ? 'w-16 fixed inset-y-0 left-0 z-30' 
+          : `${isCollapsed ? 'w-16' : 'w-64'} relative` 
       }`}>
         
         <div className="p-4 border-b border-gray-200 h-16 flex items-center">
@@ -156,7 +154,7 @@ function DashNav({ activeSection, setActiveSection, showMobileNav, setShowMobile
           </div>
         ) : (
           <div className="flex justify-center h-full items-center">
-            {/* Botón hamburguesa para móvil */}
+            {/* botón hamburguesa */}
             {isMobile && (
               <button
                 onClick={() => setShowMobileNav?.(true)}
@@ -173,7 +171,7 @@ function DashNav({ activeSection, setActiveSection, showMobileNav, setShowMobile
                 </svg>
               </button>
             )}
-            {/* Solo mostrar botón de expandir en desktop */}
+            {/* boton flecha solo en escritorio */}
             {!isMobile && (
               <button
                 onClick={() => setIsCollapsed(!isCollapsed)}
@@ -221,13 +219,9 @@ function DashNav({ activeSection, setActiveSection, showMobileNav, setShowMobile
         ))}
       </ul>
     </nav>
-
-    {/* Botón de Logout */}
         <div className="p-4">
           <LogoutButton onLogout={handleLogout} isCollapsed={isMobile || isCollapsed} />
         </div>
-
-        {/* Información del Usuario */}
         <div className="p-4 border-t border-gray-200">
           <div className={`flex items-center ${(isMobile || isCollapsed) ? 'justify-center' : 'space-x-3'}`}>
             <img 
@@ -250,8 +244,6 @@ function DashNav({ activeSection, setActiveSection, showMobileNav, setShowMobile
           </div>
         </div>
       </div>
-
-      {/* Sidebar expandida para móvil (overlay) */}
       {isMobile && (
         <div className={`bg-white shadow-lg border-r border-gray-200 w-64 flex flex-col fixed inset-y-0 left-0 z-50 transform transition-all duration-300 ease-out ${
           showMobileNav ? 'translate-x-0' : '-translate-x-full'

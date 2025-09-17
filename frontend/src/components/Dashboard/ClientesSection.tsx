@@ -8,50 +8,11 @@ import TurnoDetailsModal from '../Modal/TurnoDetailsModal';
 import ConfirmationModal from '../Modal/ConfirmationModal';
 import useAuth from '../../cookie/useAuth';
 import StripeConnection from '../StripeConnection/StripeConnection';
+import { Alert } from '../Alerts/Alerts';
 
-// Función auxiliar para capitalizar la primera letra
 const capitalizeFirstLetter = (string: string) => {
   if (!string) return string;
   return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-};
-
-// Función para convertir datos del API al formato que usa el componente
-const convertirTurnoADisplay = (turno: unknown): TurnoDisplay => {
-  const turnoObj = turno as {
-    id: number;
-    fechaHora: string;
-    estado: string;
-    montoFinal: number;
-    usuario?: { nombre?: string; apellido?: string; mail?: string };
-    servicio?: { tarea?: { descripcionTarea?: string } };
-  };
-
-  const fechaHora = new Date(turnoObj.fechaHora);
-
-  return {
-    id: turnoObj.id,
-    cliente:
-      turnoObj.usuario?.nombre && turnoObj.usuario?.apellido
-        ? `${turnoObj.usuario.nombre} ${turnoObj.usuario.apellido}`
-        : turnoObj.usuario?.mail || 'Usuario desconocido',
-    fecha: fechaHora.toLocaleDateString('es-AR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: '2-digit',
-    }),
-    hora: fechaHora.toLocaleTimeString('es-AR', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true,
-    }),
-    estado: capitalizeFirstLetter(turnoObj.estado),
-    tarea:
-      turnoObj.servicio?.tarea?.descripcionTarea || 'Tarea no especificada',
-    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(
-      turnoObj.usuario?.nombre || turnoObj.usuario?.mail || 'Usuario'
-    )}&background=f97316&color=ffffff`,
-    monto: Number(turnoObj.montoFinal) || 0,
-  };
 };
 
 interface TurnoDisplay {
@@ -65,9 +26,39 @@ interface TurnoDisplay {
   monto: number;
 }
 
+// funcion para convertir datos del API al formato del item de la tabla
+const convertirTurnoADisplay = (turno: any): TurnoDisplay => {
+	const fechaHora = new Date(turno.fechaHora);
+
+	return {
+		id: turno.id,
+		cliente:
+			turno.usuario?.nombre && turno.usuario?.apellido
+				? `${turno.usuario.nombre} ${turno.usuario.apellido}`
+				: 'Usuario desconocido',
+		fecha: fechaHora.toLocaleDateString('es-AR', {
+			day: '2-digit',
+			month: '2-digit',
+			year: '2-digit',
+		}),
+		hora: fechaHora.toLocaleTimeString('es-AR', {
+			hour: '2-digit',
+			minute: '2-digit',
+			hour12: true,
+		}),
+		estado: capitalizeFirstLetter(turno.estado),
+		tarea: turno.servicio?.tarea?.descripcionTarea || 'Tarea no especificada',
+		avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(
+			turno.usuario?.nombre || turno.usuario?.mail || 'Usuario'
+		)}&background=f97316&color=ffffff`,
+		monto: Number(turno.montoFinal) || 0,
+	};
+};
+
+
 function ClientesSection() {
-  const { usuario } = useAuth(); // Obtener usuario logueado
-  const [selectedTurnoIds, setSelectedTurnoIds] = useState<number[]>([]); // Cambio: usar IDs en lugar de índices
+  const { usuario } = useAuth(); 
+  const [selectedTurnoIds, setSelectedTurnoIds] = useState<number[]>([]); 
   const [showMenu, setShowMenu] = useState(false);
   const [showBar, setShowBar] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
@@ -83,7 +74,7 @@ function ClientesSection() {
   const [sortBy, setSortBy] = useState<string>('');
   const [estadoFilters, setEstadoFilters] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [activeSearchQuery, setActiveSearchQuery] = useState<string>(''); // La búsqueda actualmente aplicada
+  const [activeSearchQuery, setActiveSearchQuery] = useState<string>('');
   const [showEstadoDropdown, setShowEstadoDropdown] = useState(false);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
@@ -111,14 +102,11 @@ function ClientesSection() {
           setLoading(false);
           return;
         }
-
         if (isPageChange) {
-          setLoading(true); // Solo para cambios de página
+          setLoading(true); 
         }
-
         setError(null);
-
-        // Mapear las opciones del frontend a los valores que espera el backend
+        // ordenamiento para el back
         let backendOrderValue = '';
         switch (ordenamiento) {
           case 'fecha':
@@ -137,34 +125,29 @@ function ClientesSection() {
             backendOrderValue = '';
         }
 
-        // Determinar filtro de estado para el backend
+        //filtro de estado para el backend
         let backendFilterValue = '';
         if (filtrosEstado.length === 1) {
-          // Si solo hay un filtro seleccionado, usar el filtro específico
           const estado = filtrosEstado[0].toLowerCase();
           if (estado === 'pendiente') backendFilterValue = 'pendientes';
           else if (estado === 'confirmado') backendFilterValue = 'confirmados';
           else if (estado === 'cancelado') backendFilterValue = 'cancelados';
           else if (estado === 'completado') backendFilterValue = 'completado';
         } else if (filtrosEstado.length > 1) {
-          // Para múltiples filtros, enviamos los estados separados por coma
+          // si hay mas de 1 filtro envio los estados separados por coma
           backendFilterValue =
             'multipleStates:' +
             filtrosEstado.map((e) => e.toLowerCase()).join(',');
         }
-        // Si no hay filtros, no aplicar filtro específico (mostrar todos)
-
         const response = await turnosApi.getByPrestadorId(
           usuario.id.toString(),
           itemsPerPage.toString(),
           page.toString(),
-          backendFilterValue || 'all', // selectedValueShow - usar 'all' si está vacío
-          backendOrderValue, // selectedValueOrder - nuestro ordenamiento
-          searchTerm // searchQuery - parámetro de búsqueda
+          backendFilterValue || 'all', 
+          backendOrderValue, 
+          searchTerm
         );
-
         const turnosDisplay = response.data.data.map(convertirTurnoADisplay);
-
         setTurnos(turnosDisplay);
         setTotalPages(response.data.pagination.totalPages);
       } catch (err: unknown) {
@@ -178,18 +161,11 @@ function ClientesSection() {
       } finally {
         setLoading(false);
       }
-      console.log('Cargar turnos con:', {
-        page,
-        ordenamiento,
-        filtrosEstado,
-        isPageChange,
-        searchTerm,
-      });
     },
     [itemsPerPage, sortBy, estadoFilters, usuario]
   );
 
-  // Cargar turnos al montar el componente y cuando cambie la página
+ 
   useEffect(() => {
     if (currentPage === 1) {
       cargarTurnos(
@@ -198,40 +174,34 @@ function ClientesSection() {
         estadoFilters,
         false,
         activeSearchQuery
-      ); // Mantener búsqueda activa
+      ); 
     } else {
-      cargarTurnos(currentPage, sortBy, estadoFilters, true, activeSearchQuery); // Mantener búsqueda activa
+      cargarTurnos(currentPage, sortBy, estadoFilters, true, activeSearchQuery);
     }
   }, [currentPage, cargarTurnos, sortBy, estadoFilters, activeSearchQuery]);
 
-  // Función para manejar la búsqueda al presionar Enter
-  const handleSearch = () => {
-    setCurrentPage(1); // Reset a página 1
-    setActiveSearchQuery(searchQuery);
-    cargarTurnos(1, sortBy, estadoFilters, false, searchQuery); // Cargar con búsqueda
-  };
+  // manejo de busqueda, y borrado de searchquery
 
-  // Función para manejar el Enter en el input de búsqueda
+  const handleSearch = () => {
+    setCurrentPage(1); 
+    setActiveSearchQuery(searchQuery);
+    cargarTurnos(1, sortBy, estadoFilters, false, searchQuery);
+  };
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       handleSearch();
     }
   };
-
-  // useEffect para limpiar la búsqueda automáticamente cuando el campo esté vacío
   useEffect(() => {
     if (searchQuery.trim() === '' && activeSearchQuery !== '') {
-      // El usuario borró todo el texto, limpiar la búsqueda activa
       setActiveSearchQuery('');
       setCurrentPage(1);
       cargarTurnos(1, sortBy, estadoFilters, false, '');
     }
   }, [searchQuery, activeSearchQuery, sortBy, estadoFilters, cargarTurnos]);
-
-  // Los turnos actuales son todos los que se muestran (ya vienen paginados del API)
   const currentTurnos = turnos;
 
-  // Helper para determinar si todos los elementos de la página actual están seleccionados
+  // helper para saber si estan todos seleccionados con boolean
   const currentPageTurnoIds = currentTurnos.map((turno) => turno.id);
   const allCurrentPageSelected =
     currentPageTurnoIds.length > 0 &&
@@ -255,7 +225,6 @@ function ClientesSection() {
     }
   }, [pendingAction, modalVisible]);
 
-  // Cerrar dropdown cuando se hace clic fuera
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -283,35 +252,29 @@ function ClientesSection() {
     }
   };
 
+  //chequea si es verdad, los deselecciona, si no los selecciona a todos
   const handleSelectAll = () => {
     if (allCurrentPageSelected) {
-      // Deseleccionar todos los de la página actual
       setSelectedTurnoIds((prev) =>
         prev.filter((id) => !currentPageTurnoIds.includes(id))
       );
     } else {
-      // Seleccionar todos los de la página actual
       setSelectedTurnoIds((prev) => [
-        ...new Set([...prev, ...currentPageTurnoIds]),
+        ...new Set([...prev, ...currentPageTurnoIds]), //filtra duplicados
       ]);
     }
   };
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    // NO limpiar selecciones al cambiar de página - mantener los IDs seleccionados
   };
 
-  // Handler para actualizar estado de los seleccionados
   const handleUpdateEstado = (
     nuevoEstado: 'Confirmado' | 'Cancelado' | 'Completado'
   ) => {
     setPendingAction(nuevoEstado);
     setModalVisible(true);
-    // calculateSelectedCounts se ejecutará automáticamente por el useEffect
   };
-
-  // Handler para mostrar detalles del turno seleccionado
   const handleShowDetails = async () => {
     if (selectedTurnoIds.length === 0) {
       showAnimatedError('No hay turnos seleccionados');
@@ -324,20 +287,17 @@ function ClientesSection() {
     }
 
     try {
-      // Buscar el turno en los datos locales primero
+      // chequeo local por si es un turno de esa pagina,
+	  // si no es de esa llama a la api.
       const turnoId = selectedTurnoIds[0];
       const turnoLocal = turnos.find((t) => t.id === turnoId);
 
       if (turnoLocal) {
-        // Usar datos locales que ya tienen la descripción de la tarea
         setSelectedTurnoDetails(turnoLocal);
         setShowDetailsModal(true);
       } else {
-        // Si no está en los datos locales, obtener del backend
-        // (esto puede pasar con turnos de otras páginas)
         const response = await turnosApi.getById(turnoId.toString());
-        const turnoData = response.data.data || response.data;
-
+        const turnoData = response.data.data;
         if (turnoData) {
           const turnoDisplay = convertirTurnoADisplay(turnoData);
           setSelectedTurnoDetails(turnoDisplay);
@@ -353,26 +313,22 @@ function ClientesSection() {
   const handleConfirmAction = async () => {
     if (pendingAction && selectedTurnoIds.length > 0) {
       try {
-        // Obtener todos los turnos seleccionados desde el backend para validar
+        // mapeo las respuestas de la api
         const turnosPromises = selectedTurnoIds.map((id) =>
           turnosApi.getById(id.toString())
         );
-        const turnosResponses = await Promise.all(turnosPromises);
-
+        const turnosResponses = await Promise.all(turnosPromises); //esperar todas las respuestas
         const turnosValidos: number[] = [];
-
         turnosResponses.forEach((response) => {
-          const turno = response.data.data || response.data;
-          if (!turno || !turno.estado) return;
-
+			// los completados y cancelados returnean pq no se pueden alterar
+          const turno = response.data.data;
+          if (!turno) return;
           const estado = turno.estado.toLowerCase();
-
-          // Verificar que no esté completado o cancelado
           if (estado === 'completado' || estado === 'cancelado') {
             return;
           }
 
-          // Validar transiciones específicas
+          // validar diferentes transiciones
           let esValido = false;
           if (pendingAction === 'Confirmado' && estado === 'pendiente') {
             esValido = true;
@@ -393,7 +349,7 @@ function ClientesSection() {
           }
         });
 
-        // Actualizar solo los turnos válidos
+        // actualizar turnjos validos
         if (turnosValidos.length > 0) {
           await turnosApi.updateMultipleEstados(
             turnosValidos,
@@ -401,7 +357,7 @@ function ClientesSection() {
           );
         }
 
-        // Recargar los datos después de la actualización
+        // actualiza turnos
         await cargarTurnos(
           currentPage,
           sortBy,
@@ -428,33 +384,28 @@ function ClientesSection() {
     setModalVisible(false);
   };
 
-  // Estado para contar turnos válidos/inválidos cross-page
+  // cuenta turnos validos e invalidos para las otras paginas tmb
   const [validSelectedCount, setValidSelectedCount] = useState(0);
   const [invalidSelectedCount, setInvalidSelectedCount] = useState(0);
-
-  // Función helper para mostrar mensajes de error con animación
   const showAnimatedError = (message: string) => {
     setErrorMessage(message);
     setShowErrorMessage(true);
     setTimeout(() => setIsErrorAnimating(true), 10);
-
-    // Después de 3 segundos, iniciar animación de salida
     setTimeout(() => {
       setIsErrorAnimating(false);
       setTimeout(() => setShowErrorMessage(false), 200);
     }, 3000);
   };
 
-  // Función para calcular turnos válidos/inválidos cross-page
+  // calcula los turnos validos e invalidos, sirve para mostrarlo
   const calculateSelectedCounts = useCallback(async () => {
     if (selectedTurnoIds.length === 0 || !pendingAction) {
       setValidSelectedCount(0);
       setInvalidSelectedCount(0);
       return;
     }
-
+	//calcula los turnos validos e invalidos, no actualiza
     try {
-      // Obtener todos los turnos seleccionados por ID
       const turnosPromises = selectedTurnoIds.map((id) =>
         turnosApi.getById(id.toString())
       );
@@ -464,21 +415,16 @@ function ClientesSection() {
       let invalidCount = 0;
 
       turnosResponses.forEach((response) => {
-        const turno = response.data.data || response.data;
-        if (!turno || !turno.estado) {
+        const turno = response.data.data;
+        if (!turno) {
           invalidCount++;
           return;
         }
-
         const estado = turno.estado.toLowerCase();
-
-        // Verificar que no esté completado o cancelado (no se pueden alterar)
         if (estado === 'completado' || estado === 'cancelado') {
           invalidCount++;
           return;
         }
-
-        // Validar transiciones específicas
         let esValido = false;
         if (pendingAction === 'Confirmado' && estado === 'pendiente') {
           esValido = true;
@@ -513,72 +459,38 @@ function ClientesSection() {
       calculateSelectedCounts();
     }
   }, [pendingAction, calculateSelectedCounts]);
-
-  // Detectar tamaño de pantalla para layout móvil (mismo breakpoint que DashNav)
   useEffect(() => {
     const checkScreenSize = () => {
       setIsMobileLayout(window.innerWidth < 768);
     };
-
     checkScreenSize();
     window.addEventListener('resize', checkScreenSize);
-
     return () => {
       window.removeEventListener('resize', checkScreenSize);
     };
   }, []);
-
-  // Cerrar dropdowns cuando se hace clic fuera
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      // Cerrar dropdown de estado
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setShowEstadoDropdown(false);
-      }
-      // Cerrar dropdown de ordenar
-      if (
-        sortDropdownRef.current &&
-        !sortDropdownRef.current.contains(event.target as Node)
-      ) {
-        setShowSortDropdown(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  // Función para manejar el cambio de ordenamiento (ahora para botones)
+  // manejar el cambio de ordenamiento o sea sortBy
   const handleSortSelect = (newSortBy: string) => {
     setSortBy(newSortBy);
-
-    // Recargar los datos con el nuevo ordenamiento desde la primera página
     setCurrentPage(1);
-    cargarTurnos(1, newSortBy, estadoFilters, false, activeSearchQuery); // Mantener búsqueda activa
+    cargarTurnos(1, newSortBy, estadoFilters, false, activeSearchQuery); 
   };
 
-  // Funciones para manejar los filtros de estado
+  // manejar los filtros de estado
   const handleEstadoFilterChange = (estado: string) => {
     const newFilters = estadoFilters.includes(estado)
       ? estadoFilters.filter((f) => f !== estado)
       : [...estadoFilters, estado];
 
     setEstadoFilters(newFilters);
-
-    // Recargar los datos con los nuevos filtros desde la primera página
     setCurrentPage(1);
-    cargarTurnos(1, sortBy, newFilters, false, activeSearchQuery); // Mantener búsqueda activa
+    cargarTurnos(1, sortBy, newFilters, false, activeSearchQuery); 
   };
 
   const clearEstadoFilters = () => {
     setEstadoFilters([]);
     setCurrentPage(1);
-    cargarTurnos(1, sortBy, [], false, activeSearchQuery); // Mantener búsqueda activa
+    cargarTurnos(1, sortBy, [], false, activeSearchQuery);
   };
 
   const estadosDisponibles = [
@@ -588,7 +500,7 @@ function ClientesSection() {
     'Completado',
   ];
 
-  // Mostrar loading - responsive
+  
   if (loading) {
     return (
       <DashboardSection>
@@ -638,7 +550,6 @@ function ClientesSection() {
   return (
     <DashboardSection>
       <StripeConnection loadingMessage="Cargando información de clientes...">
-        {/* Header responsive */}
         <div
           className={`mb-4 sm:mb-6 flex ${
             isMobileLayout ? 'flex-col' : 'flex-col sm:flex-row'
@@ -664,7 +575,7 @@ function ClientesSection() {
                 isMobileLayout ? 'w-full' : 'w-full sm:w-auto'
               } border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500`}
             />
-            {/* Dropdown de ordenar - personalizado para coincidir con "Filtrar por" */}
+            {/* dropdown ordenar*/}
             <div
               ref={sortDropdownRef}
               className={`relative ${
@@ -788,7 +699,7 @@ function ClientesSection() {
               )}
             </div>
 
-            {/* Dropdown de filtrar por estado */}
+            {/* dropdown filtros*/}
             <div
               className={`relative ${
                 isMobileLayout ? 'w-full' : 'w-full sm:w-auto'
@@ -943,7 +854,7 @@ function ClientesSection() {
             </tbody>
           </table>
 
-          {/* Paginación responsive */}
+          {/* paginacion */}
           <div
             className={`mt-2 flex items-center justify-center sm:justify-end px-2 sm:px-0 ${
               currentTurnos.length > 0 ? 'min-h-[60px]' : 'min-h-[20px]'
@@ -955,42 +866,20 @@ function ClientesSection() {
               onPageChange={handlePageChange}
             />
           </div>
-          <style>{`
-          .fade-in {
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeInBox 0.3s forwards;
-          }
-          .fade-out {
-            opacity: 1;
-            transform: translateY(0);
-            animation: fadeOutBox 0.3s forwards;
-          }
-          @keyframes fadeInBox {
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-          @keyframes fadeOutBox {
-            to {
-              opacity: 0;
-              transform: translateY(20px);
-            }
-          }
-        `}</style>
-          {/* Mensaje de error responsive */}
-          {showErrorMessage && (
-            <div
-              className={`fixed left-1/2 bottom-16 sm:bottom-24 transform -translate-x-1/2 z-50 bg-red-100 border border-red-200 text-red-800 px-3 sm:px-4 py-2 rounded-lg shadow-lg transition-all duration-200 text-sm sm:text-base mx-4 max-w-[90vw] sm:max-w-none ${
-                isErrorAnimating
-                  ? 'scale-100 opacity-100'
-                  : 'scale-95 opacity-0'
-              }`}
-            >
-              {errorMessage}
-            </div>
-          )}
+          
+		  {showErrorMessage && (
+			<Alert
+			  variant="danger"
+			  autoClose
+			  autoCloseDelay={3000}
+			  className={`fixed left-1/2 bottom-16 sm:bottom-24 transform -translate-x-1/2 z-50 shadow-lg max-w-[90vw] sm:max-w-none transition-all duration-200 ${
+				isErrorAnimating ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
+			  }`}
+			  onClose={() => setShowErrorMessage(false)}
+			>
+			  {errorMessage}
+			</Alert>
+		  )}
           {showBar && (
             <SelectionBar
               selectedCount={selectedTurnoIds.length}
@@ -1008,7 +897,7 @@ function ClientesSection() {
             />
           )}
 
-          {/* Modal de confirmación */}
+          {/* modal de confirmacion */}
           <ConfirmationModal
             isVisible={modalVisible}
             pendingAction={pendingAction}
@@ -1018,7 +907,7 @@ function ClientesSection() {
             onCancel={handleCancelAction}
           />
 
-          {/* Modal de detalles del turno */}
+          {/* modal de detalles del turno */}
           <TurnoDetailsModal
             isVisible={showDetailsModal}
             turnoDetails={selectedTurnoDetails}
