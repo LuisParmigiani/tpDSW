@@ -56,31 +56,35 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '18' # Keep Node 18 for now
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
         with:
           version: 8
-      # Install dependencies from root (for workspace)
+
+      # Add cache for faster installs
+      - name: Cache pnpm modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
-      # Ensure frontend dependencies are properly installed
-      - name: Install frontend dependencies specifically
-        working-directory: frontend
-        run: pnpm install --no-frozen-lockfile
-      # Debug to see what's installed
-      - name: Debug installation
-        run: |
-          echo "=== Frontend node_modules ==="
-          ls -la frontend/node_modules/.bin/ | grep vitest || echo "vitest not found"
-          echo "=== Frontend package.json ==="
-          cat frontend/package.json | grep -A 5 -B 5 vitest
-          echo "=== pnpm list vitest ==="
-          pnpm list vitest --filter frontend
+
       - name: Run frontend tests
+        env:
+          NODE_ENV: test
+          CI: true
+          # Fix jsdom issues in CI
+          NODE_OPTIONS: '--max-old-space-size=4096'
         run: pnpm run test:frontend
 
   # Deploy Backend (after unit tests pass)
