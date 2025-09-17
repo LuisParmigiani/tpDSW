@@ -7,6 +7,8 @@ import {
   TurnoQuerySchema,
   fullTurnoSchema,
   errorResponseSchema,
+  turnoQuerySchemaDash,
+  // Nuevo import
 } from './turno.schemas.js';
 import { z } from 'zod';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
@@ -99,6 +101,48 @@ turnoRegistry.registerPath({
   },
 });
 
+turnoRegistry.registerPath({
+  method: 'get',
+  path: '/api/turno/byPrestador/{id}',
+  description:
+    'Obtener turnos por ID del prestador. La ruta acepta parámetros adicionales opcionales en el path.',
+  summary: 'Obtener turnos por prestador',
+  tags: ['Turnos'],
+  request: {
+    params: turnoQuerySchemaDash,
+  },
+  responses: {
+    200: {
+      description: 'Turnos encontrados',
+      content: {
+        'application/json': {
+          schema: z.object({
+            message: z
+              .string()
+              .openapi({ example: 'found turns by prestador id' }),
+            data: z.array(fullTurnoSchema),
+          }),
+        },
+      },
+    },
+    404: {
+      description: 'Turno no encontrado',
+      content: {
+        'application/json': {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+    500: {
+      description: 'Error interno del servidor',
+      content: {
+        'application/json': {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+  },
+});
 // ==================== POST METHODS ====================
 
 // POST /api/turno

@@ -21,6 +21,7 @@ import {
   TurnoCreateSchema,
   TurnoUpdateSchema,
   TurnoIdSchema,
+  turnoQuerySchemaDash,
 } from './turno.schemas.js';
 export const turnoRouter = Router();
 
@@ -29,14 +30,13 @@ turnoRouter.get('/', findall);
 turnoRouter.get(
   '/byUser/:cantItemsPerPage?/:currentPage?/:selectedValueShow?/:selectedValueOrder?',
   authenticateToken,
-  validateQuery(TurnoQuerySchema),
+  validateParams(TurnoQuerySchema),
   getTurnosByUserId
 );
 
 turnoRouter.get(
   '/byPrestador/:id/:cantItemsPerPage?/:currentPage?/:selectedValueShow?/:selectedValueOrder?/:searchQuery?',
-  validateQuery(TurnoQuerySchema),
-  validateParams(TurnoIdSchema),
+  validateParams(turnoQuerySchemaDash),
   getTurnosByPrestadorId
 );
 

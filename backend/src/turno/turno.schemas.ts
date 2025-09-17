@@ -231,6 +231,40 @@ export const fullTurnoSchema = TurnoSchema.extend({
   pago: array(pagoSchema).optional(),
 });
 
+export const turnoQuerySchemaDash = z.object({
+  id: z.string().describe('ID del prestatario').openapi({
+    example: '52',
+  }),
+  cantItemsPerPage: z
+    .string()
+    .optional()
+    .describe('Cantidad de items por página')
+    .openapi({ example: '10' }),
+  currentPage: z
+    .string()
+    .optional()
+    .describe('Página actual')
+    .openapi({ example: '1' }),
+  selectedValueShow: z
+    .string()
+    .optional()
+    .describe(
+      'Campo para mostrar o filtro especial (puede ser multipleStates:pendiente,confirmado)'
+    )
+    .openapi({ example: 'multipleStates:pendiente,confirmado' }),
+  selectedValueOrder: z
+    .string()
+    .optional()
+    .describe('Campo para ordenar')
+    .openapi({ example: 'asc' }),
+  searchQuery: z
+    .string()
+    .min(1, 'La consulta de búsqueda debe tener al menos 1 carácter')
+    .optional()
+    .describe('Consulta de búsqueda')
+    .openapi({ example: 'Juan' }),
+});
+
 export const TurnoQuerySchema = z.object({
   cantItemsPerPage: z
     .number()
@@ -258,6 +292,12 @@ export const TurnoQuerySchema = z.object({
     .optional()
     .describe('Campo para ordenar')
     .openapi({ example: 'asc' }),
+  searchQuery: z
+    .string()
+    .min(1, 'La consulta de búsqueda debe tener al menos 1 carácter')
+    .optional()
+    .describe('Consulta de búsqueda')
+    .openapi({ example: 'Juan' }),
 });
 
 export const errorResponseSchema = z.object({

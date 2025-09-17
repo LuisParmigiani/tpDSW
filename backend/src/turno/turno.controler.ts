@@ -404,6 +404,7 @@ async function getTurnosByPrestadorId(req: Request, res: Response) {
 
   // Determinar el filtro de calificación según selectedValueShow
   let calificacionFilter: any = {};
+
   switch (selectedValueShow) {
     case 'faltanCalificar':
       calificacionFilter = { calificacion: null, estado: 'completado' };

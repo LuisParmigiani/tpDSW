@@ -9,6 +9,7 @@ import bcrypt from 'bcrypt';
 import { orm } from '../shared/db/orm.js';
 import nodemailer from 'nodemailer';
 import { processProfileImage } from '../utils/imageProcessor.js';
+import { lookTipoServicio } from '../tipoServicio/tipoServ.controler.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const em = orm.em;
@@ -213,7 +214,7 @@ async function findOne(req: Request, res: Response) {
     const { id } = req.params; // Validated by Zod
     const user = await em.findOneOrFail(
       Usuario,
-      { id: Number(id), servicios: { estado: 'activo' } },
+      { id: Number(id) },
       {
         populate: [
           'turnos',
@@ -223,8 +224,14 @@ async function findOne(req: Request, res: Response) {
           'tiposDeServicio',
           'horarios',
         ],
+        populateWhere: {
+          servicios: { estado: 'activo' },
+        },
       }
     );
+
+    // Ocultar contraseña por seguridad
+    (user as any).contrasena = undefined;
 
     res.status(200).json({ message: 'usuario encontrado', data: user });
   } catch (error: any) {
@@ -709,6 +716,48 @@ async function uploadProfileImage(req: Request, res: Response) {
   }
 }
 
+async function lookUserTipoServicio(id: number, tareaId: number, act: boolean) {
+  try {
+    const tipoServicioEntity = await lookTipoServicio(tareaId);
+    if (act) {
+      // Verificar si el usuario ya tiene el tipo de servicio
+      const user = await em.findOne(Usuario, {
+        id,
+        tiposDeServicio: { id: tipoServicioEntity.id },
+      });
+
+      if (!user) {
+        // Si no lo tiene, agregarlo
+        const userToUpdate = await em.findOneOrFail(Usuario, { id });
+        userToUpdate.tiposDeServicio.add(tipoServicioEntity);
+        await em.flush();
+      }
+    } else {
+      // Verificar si el usuario tiene otros servicios activos de este tipo
+      const user = await em.find(Usuario, {
+        id,
+        servicios: {
+          estado: 'activo',
+          tarea: { tipoServicio: { id: tipoServicioEntity.id } },
+        },
+      });
+
+      if (user.length === 0) {
+        // Si no tiene otros servicios activos de este tipo, eliminarlo
+        const userToUpdate = await em.findOneOrFail(
+          Usuario,
+          { id },
+          { populate: ['tiposDeServicio'] }
+        );
+        userToUpdate.tiposDeServicio.remove(tipoServicioEntity);
+
+        await em.flush();
+      }
+    }
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+}
 export {
   findAll,
   findPrestatariosByTipoServicioAndZona,
@@ -726,4 +775,5 @@ export {
   putOauth,
   getOauth,
   uploadProfileImage,
+  lookUserTipoServicio,
 };
