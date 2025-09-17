@@ -52,6 +52,7 @@ function Alert({
     <div
       data-slot="alert"
       role="alert"
+      data-testid="alert"
       className={cn(
         alertVariants({ variant }),
         'pr-10 transition-all duration-300 transform-gpu',
@@ -75,6 +76,7 @@ function Alert({
             e.stopPropagation();
             handleClose();
           }}
+          data-testid="close-button"
           className={cn(
             'absolute top-2 right-2 w-6 h-6',
             'flex items-center justify-center rounded-full',
@@ -100,6 +102,7 @@ function AlertTitle({ className, ...props }: React.ComponentProps<'div'>) {
         className
       )}
       {...props}
+      data-testid="alert-title"
     />
   );
 }
@@ -116,6 +119,7 @@ function AlertDescription({
         className
       )}
       {...props}
+      data-testid="alert-description"
     />
   );
 }

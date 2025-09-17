@@ -9,7 +9,11 @@
     "start": "node dist/app.js",
     "generate-docs": "tsx src/centralApiRegistry.ts",
     "docs:serve": "swagger-ui-serve docs/api-documentation.json",
-    "generate/docs": "tsx src/generateDocs.ts"
+    "generate/docs": "tsx src/generateDocs.ts",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest --watch"
   },
   "keywords": [],
   "author": "",
@@ -32,12 +36,20 @@
     "@types/range-parser": "^1.2.7",
     "@types/send": "^0.17.5",
     "@types/serve-static": "^1.15.8",
+    "@types/supertest": "^6.0.3",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",
+    "@vitest/ui": "^3.2.4",
+    "c8": "^10.1.3",
+    "jest": "^30.1.3",
+    "jsdom": "^27.0.0",
     "nodemon": "^3.1.10",
+    "supertest": "^7.1.4",
+    "ts-node": "^10.9.2",
     "tsc-watch": "6.0.4",
     "tsx": "^4.20.5",
-    "typescript": "5.1.3"
+    "typescript": "5.1.3",
+    "vitest": "^3.2.4"
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^7.1.1",
@@ -79,7 +91,6 @@
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "swagger-ui-serve": "^0.0.4",
-    "ts-node": "^10.9.2",
     "update": "^0.7.4",
     "uuid": "^11.1.0",
     "yaml": "^2.8.1",
