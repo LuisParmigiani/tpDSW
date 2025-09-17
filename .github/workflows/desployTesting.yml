@@ -56,35 +56,30 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
         with:
           version: 8
-
-      # Install dependencies properly
+      # Install dependencies from root (for workspace)
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
-
-      # Debug step to verify vitest is installed
-      - name: Debug - Check installation
+      # Ensure frontend dependencies are properly installed
+      - name: Install frontend dependencies specifically
+        working-directory: frontend
+        run: pnpm install --no-frozen-lockfile
+      # Debug to see what's installed
+      - name: Debug installation
         run: |
-          echo "=== Root node_modules ==="
-          ls -la node_modules/.bin/ | grep -E "(vitest|playwright)" || echo "Not found in root"
           echo "=== Frontend node_modules ==="
-          ls -la frontend/node_modules/.bin/ | grep vitest || echo "vitest not found in frontend"
+          ls -la frontend/node_modules/.bin/ | grep vitest || echo "vitest not found"
+          echo "=== Frontend package.json ==="
+          cat frontend/package.json | grep -A 5 -B 5 vitest
           echo "=== pnpm list vitest ==="
-          pnpm list vitest --filter frontend || echo "vitest not listed"
-          echo "=== Working directory ==="
-          pwd
-          echo "=== Frontend directory ==="
-          ls -la frontend/
-
+          pnpm list vitest --filter frontend
       - name: Run frontend tests
         run: pnpm run test:frontend
 

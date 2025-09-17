@@ -7,10 +7,10 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "test": "pnpm exec vitest",
-    "test:run": "pnpm exec vitest run",
-    "test:coverage": "pnpm exec vitest run --coverage",
-    "test:watch": "pnpm exec vitest --watch"
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest --watch"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
