@@ -102,7 +102,7 @@ describe('Middleware y CORS', () => {
 
   it('Debería manejar las solicitudes de preflight CORS', async () => {
     const testOrigin = process.env.CI
-      ? process.env.CI // CI environment origin
+      ? 'http://localhost:3000' // CI environment origin
       : 'http://localhost:5173'; // Local development origin
 
     const res = await request(app)
