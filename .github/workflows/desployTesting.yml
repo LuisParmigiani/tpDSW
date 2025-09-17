@@ -56,36 +56,22 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18' # Keep Node 18 for now
-
+          node-version: '18'
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
         with:
           version: 8
-
-      # Add cache for faster installs
-      - name: Cache pnpm modules
-        uses: actions/cache@v3
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
-
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
-
+      - name: Install workspace deps
+        run: pnpm install --no-frozen-lockfile --recursive
+      - name: Debug deps
+        run: |
+          pnpm list vite --filter frontend || true
+          ls -la frontend/node_modules/.bin/ | grep vite || echo "vite bin missing"
       - name: Run frontend tests
-        env:
-          NODE_ENV: test
-          CI: true
-          # Fix jsdom issues in CI
-          NODE_OPTIONS: '--max-old-space-size=4096'
-        run: pnpm run test:frontend
+        run: pnpm --filter frontend test:run
 
   # Deploy Backend (after unit tests pass)
   deploy-backend:
