@@ -17,19 +17,19 @@ function About() {
         <div className={styles.aboutCollections}>
           <AboutContainer
             isAlignedRight
-            imageUrl="images/gente_trabajando.jpg"
+            imageUrl="images/imagen-gente-trabajando.jpg"
             title="¿Quiénes somos?"
             text={text1}
           ></AboutContainer>
           <AboutContainer
             isAlignedRight={false}
-            imageUrl="images/gente-martillo.jpg"
+            imageUrl="images/imagen-gente-martillo.jpg"
             title="¿Por qué elegimos este camino?"
             text={text2}
           ></AboutContainer>
           <AboutContainer
             isAlignedRight
-            imageUrl="images/manos.jpg"
+            imageUrl="images/imagen-manos.jpg"
             title="Nuestros valores"
             text={text3}
           ></AboutContainer>
