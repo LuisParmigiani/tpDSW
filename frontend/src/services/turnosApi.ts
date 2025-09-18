@@ -47,7 +47,7 @@ export const turnosApi = {
     if (selectedValueOrder && selectedValueOrder.trim() !== '') {
       parts.push(selectedValueOrder.trim());
     } else if (searchQuery && searchQuery.trim() !== '') {
-      parts.push('none'); 
+      parts.push('none');
     }
     if (searchQuery && searchQuery.trim() !== '') {
       parts.push(encodeURIComponent(searchQuery.trim()));
@@ -72,7 +72,7 @@ export const turnosApi = {
   updateMultipleEstados: async (turnoIds: number[], nuevoEstado: string) => {
     return Promise.all(
       turnoIds.map((id) =>
-        api.patch(`/turno/${id}`, { estado: nuevoEstado.toLowerCase() })
+        api.put(`/turno/${id}`, { estado: nuevoEstado.toLowerCase() })
       )
     );
   },
