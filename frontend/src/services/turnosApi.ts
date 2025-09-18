@@ -64,7 +64,7 @@ export const turnosApi = {
     });
   },
   update: (id: string, data: EntityData) => api.put(`/turno/${id}`, data),
-  patch: (id: string, data: EntityData) => api.patch(`/turno/${id}`, data),
+  patch: (id: string, data: EntityData) => api.put(`/turno/${id}`, data),
   delete: (id: string) => api.delete(`/turno/${id}`),
   getTurnsPerDay: (id: string, date: string) =>
     api.get(`turno/turnosPorDia/${id}/${date}`),
