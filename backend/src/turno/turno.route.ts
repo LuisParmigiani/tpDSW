@@ -64,4 +64,11 @@ turnoRouter.put(
   update
 );
 
+turnoRouter.patch(
+  '/:id',
+  validateParams(TurnoIdSchema),
+  validateBody(TurnoUpdateSchema),
+  update
+);
+
 turnoRouter.delete('/:id', validateParams(TurnoIdSchema), remove);

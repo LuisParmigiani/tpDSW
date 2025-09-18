@@ -71,7 +71,7 @@ export const turnosApi = {
   updateMultipleEstados: async (turnoIds: number[], nuevoEstado: string) => {
     return Promise.all(
       turnoIds.map((id) =>
-        api.put(`/turno/${id}`, { estado: nuevoEstado.toLowerCase() })
+        api.patch(`/turno/${id}`, { estado: nuevoEstado.toLowerCase() })
       )
     );
   },
