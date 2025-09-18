@@ -1,9 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
 import { Zona } from './zona.entity.js';
 import { orm } from '../shared/db/orm.js';
-
+import { getOauth } from '../usuario/usuario.controler.js';
+import { populate } from 'dotenv';
 const em = orm.em;
 
+interface AuthRequest extends Request {
+  user?: {
+    id: string;
+    rol: string;
+    email: string;
+  };
+}
 async function findAll(req: Request, res: Response) {
   try {
     const zona = await em.find(Zona, {}, { populate: ['usuarios'] });
@@ -166,5 +174,100 @@ async function remove(req: Request, res: Response) {
     });
   }
 }
+async function findAllPerUser(req: AuthRequest, res: Response) {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ message: 'Unauthorized: User ID missing' });
+    }
+    const allZonas = await em.find(Zona, {}, { populate: ['usuarios'] });
 
-export { findAll, findOne, add, update, remove };
+    const userZonas = await em.find(Zona, { usuarios: { id: Number(userId) } });
+
+    const zonas = [];
+    for (const z of allZonas) {
+      if (z.id === userZonas.find((uz) => uz.id === z.id)?.id) {
+        zonas.push({
+          id: z.id,
+          descripcionZona: z.descripcionZona,
+          selected: true,
+        });
+      } else {
+        zonas.push({
+          id: z.id,
+          descripcionZona: z.descripcionZona,
+          selected: false,
+        });
+      }
+    }
+
+    res.status(200).json({
+      message: 'Zonas encontradas',
+      data: zonas,
+    });
+  } catch (error: any) {
+    console.error('Error fetching zonas for user:', error);
+    res.status(500).json({
+      message: 'Error interno del servidor',
+      error: error.message,
+    });
+  }
+}
+// si el etado es true significa que ya estaba seleccionado y hay que sacarlo
+async function updateByUser(req: AuthRequest, res: Response) {
+  try {
+    const userId = req.user?.id;
+    const { id } = req.params;
+    const estado = req.body.estado;
+    if (!userId) {
+      return res.status(401).json({ message: 'Unauthorized: User ID missing' });
+    }
+    const user = await getOauth(Number(userId));
+
+    // Busco la zona una sola vez
+    const zona = await em.findOneOrFail(
+      Zona,
+      { id: Number(id) },
+      { populate: ['usuarios'] }
+    );
+
+    if (estado) {
+      // estaba seleccionado => remover
+      zona.usuarios.remove(user);
+      await em.flush();
+      return res.status(200).json({
+        message: 'Zona removida del usuario',
+        data: {
+          id: zona.id,
+          descripcionZona: zona.descripcionZona,
+          selected: false,
+        },
+      });
+    } else {
+      // no estaba seleccionado => agregar
+      zona.usuarios.add(user);
+      await em.flush();
+      return res.status(200).json({
+        message: 'Zona agregada al usuario',
+        data: {
+          id: zona.id,
+          descripcionZona: zona.descripcionZona,
+          selected: true,
+        },
+      });
+    }
+  } catch (error: any) {
+    if (error?.name === 'NotFoundError') {
+      return res.status(404).json({
+        message: 'Usuario o zona no encontrada',
+      });
+    }
+    console.error('Error updating zona for user:', error);
+    res.status(500).json({
+      message: 'Error interno del servidor',
+      error: error.message,
+    });
+  }
+}
+
+export { findAll, findOne, add, update, remove, findAllPerUser, updateByUser };

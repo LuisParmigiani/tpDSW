@@ -1,9 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { Servicio } from './servicio.entity.js';
 import { orm } from '../shared/db/orm.js';
-import { Turno } from '../turno/turno.entity.js';
-import { Tarea } from '../tarea/tarea.entity.js';
-import { Usuario } from '../usuario/usuario.entity.js';
+import { lookUserTipoServicio } from '../usuario/usuario.controler.js';
 
 const em = orm.em;
 
@@ -182,6 +180,7 @@ async function upsertByUserAndTask(req: Request, res: Response) {
       servicioExistente.precio = precio;
       servicioExistente.estado = 'activo';
       await em.persistAndFlush(servicioExistente);
+      await lookUserTipoServicio(Number(usuarioId), Number(tareaId), true);
       res.status(200).json({
         message: 'Servicio actualizado',
         data: servicioExistente,
@@ -196,6 +195,10 @@ async function upsertByUserAndTask(req: Request, res: Response) {
         estado: 'activo',
       });
       await em.persistAndFlush(nuevoServicio);
+      // ==============================================================================================================================
+      // Aca si no hay alguna tarea con ese tipo ebe agregarlo al usuario.
+      // ==============================================================================================================================
+      await lookUserTipoServicio(Number(usuarioId), Number(tareaId), true); // TODO: Reemplaza 'true' con el tercer argumento correcto si es necesario
       res.status(201).json({
         message: 'Servicio creado',
         data: nuevoServicio,
@@ -265,7 +268,10 @@ async function deactivateByUserAndTask(req: Request, res: Response) {
     // Cambiar estado a inactivo en lugar de eliminar
     servicio.estado = 'inactivo';
     await em.persistAndFlush(servicio);
-
+    // ==============================================================================================================================
+    // Hay que agregar que se elimine el tipo de servicio del usuario al sacar todos los servicios de ese tipo si es que no le queda ninguno activo.
+    // ==============================================================================================================================
+    await lookUserTipoServicio(Number(usuarioId), Number(tareaId), false);
     res.status(200).json({
       message: 'Servicio desactivado exitosamente',
       data: servicio,

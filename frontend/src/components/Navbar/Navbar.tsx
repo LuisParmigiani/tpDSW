@@ -26,9 +26,7 @@ function Navbar() {
   useEffect(() => {
     const getUsuario = async () => {
       try {
-        console.log('Cargando usuario...');
         const res = await usuariosApi.getByCookie();
-        console.log('Usuario cargado:', res.data.data);
         setUsuario(res.data.data);
       } catch (err) {
         console.error('Error al cargar usuario:', err);

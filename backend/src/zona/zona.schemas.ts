@@ -132,6 +132,27 @@ export const idParamSchema = z.object({
     }),
 });
 
+export const findAllZonasConUsuariosResponseSchema = z.object({
+  id: z.number().describe('ID único de la zona').openapi({
+    example: 1,
+  }),
+  descripcionZona: z.string().describe('Descripción de la zona').openapi({
+    example: 'Centro',
+  }),
+  selected: z
+    .boolean()
+    .describe('Indica si la zona está seleccionada por el usuario')
+    .openapi({
+      example: true,
+    }),
+});
+
+export const updateByUserValidation = z.object({
+  estado: z.boolean().describe('Estado de selección de la zona').openapi({
+    example: true,
+  }),
+});
+
 // Query parameters for pagination
 
 // Validation schemas for middleware

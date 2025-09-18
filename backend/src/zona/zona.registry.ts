@@ -11,6 +11,8 @@ import {
   errorResponseSchema,
   successMessageSchema,
   idParamSchema,
+  findAllZonasConUsuariosResponseSchema,
+  updateByUserValidation,
 } from './zona.schemas.js';
 
 // Extend Zod with OpenAPI functionality
@@ -32,7 +34,11 @@ zonaRegistry.register(
 zonaRegistry.register('ErrorResponse', errorResponseSchema);
 zonaRegistry.register('SuccessMessage', successMessageSchema);
 zonaRegistry.register('IdParam', idParamSchema);
-
+zonaRegistry.register(
+  'FindAllZonasConUsuariosResponse',
+  findAllZonasConUsuariosResponseSchema
+);
+zonaRegistry.register('UpdateByUserValidation', updateByUserValidation);
 // ==================== POST METHODS ====================
 
 // POST /api/zona
@@ -129,6 +135,33 @@ zonaRegistry.registerPath({
   },
 });
 
+zonaRegistry.registerPath({
+  method: 'get',
+  path: '/api/zona/usuario',
+  description: 'Obtener todas las zonas con sus usuarios asociados',
+  summary: 'Listar todas las zonas completas',
+  tags: ['Zonas'],
+  request: {},
+  responses: {
+    200: {
+      description:
+        'Lista de zonas con usuarios asociados obtenida exitosamente',
+      content: {
+        'application/json': {
+          schema: findAllZonasConUsuariosResponseSchema,
+        },
+      },
+    },
+    500: {
+      description: 'Error interno del servidor',
+      content: {
+        'application/json': {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+  },
+});
 // GET /api/zona/simple
 zonaRegistry.registerPath({
   method: 'get',
@@ -261,6 +294,67 @@ zonaRegistry.registerPath({
             message: z.string().openapi({
               example: 'Ya existe una zona con esa descripción',
             }),
+          }),
+        },
+      },
+    },
+    500: {
+      description: 'Error interno del servidor',
+      content: {
+        'application/json': {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+  },
+});
+
+zonaRegistry.registerPath({
+  method: 'put',
+  path: '/api/zona/updateByUser/{id}',
+  description: 'Poner o quitar la zona al usuario autenticado',
+  summary: 'Actualizar zona',
+  tags: ['Zonas'],
+  request: {
+    params: idParamSchema,
+    body: {
+      description: 'Datos de la zona a actualizar',
+      content: {
+        'application/json': {
+          schema: updateByUserValidation,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Zona actualizada exitosamente',
+      content: {
+        'application/json': {
+          // Ajusto el schema para reflejar id + descripcionZona + selected
+          schema: z.object({
+            message: z
+              .string()
+              .openapi({ example: 'Zona agregada al usuario' }),
+            data: findAllZonasConUsuariosResponseSchema,
+          }),
+        },
+      },
+    },
+    400: {
+      description: 'Error de validación',
+      content: {
+        'application/json': {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+    404: {
+      description: 'Zona no encontrada',
+      content: {
+        'application/json': {
+          schema: z.object({
+            message: z.string().openapi({ example: 'Zona no encontrada' }),
           }),
         },
       },

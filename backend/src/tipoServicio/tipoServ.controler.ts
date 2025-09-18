@@ -109,4 +109,23 @@ async function remove(req: Request, res: Response) {
   }
 }
 
-export { findAll, findAllWithTareas, findOne, add, update, remove };
+async function lookTipoServicio(Tareaid: number) {
+  try {
+    const tipoServicio = await em.findOneOrFail(TipoServicio, {
+      tareas: { id: Tareaid },
+    });
+    return tipoServicio;
+  } catch (error) {
+    throw new Error('Tipo de servicio no encontrado');
+  }
+}
+
+export {
+  findAll,
+  findAllWithTareas,
+  findOne,
+  add,
+  update,
+  remove,
+  lookTipoServicio,
+};

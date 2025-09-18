@@ -128,6 +128,7 @@ function Logincard() {
 
                 <button
                   type="submit"
+                  data-testid="login-button"
                   className={
                     form.mail === '' || form.contrasena === ''
                       ? 'w-full bg-gray-300 text-black-500 px-5 py-2.5 rounded-b-2xl cursor-pointer focus:outline-none mb-5 mt-3 '
@@ -173,10 +174,13 @@ function Logincard() {
             className="max-w-xl mt-4"
             onClose={() => setMessage('')}
             autoClose={true}
-            autoCloseDelay={5000}
+            autoCloseDelay={10000}
+            data-testid="alert"
           >
             <AlertTitle>Error</AlertTitle>
-            <AlertDescription className="mx-auto">{message}</AlertDescription>
+            <AlertDescription className="mx-auto" data-testid="alert-msg">
+              {message}
+            </AlertDescription>
           </Alert>
         )}
       </div>

@@ -202,7 +202,6 @@
           },
           "contrasena": {
             "type": "string",
-            "minLength": 6,
             "description": "Contraseña del usuario",
             "example": "Password123"
           }
@@ -1493,6 +1492,12 @@
             ],
             "description": "Campo para ordenar",
             "example": "asc"
+          },
+          "searchQuery": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Consulta de búsqueda",
+            "example": "Juan"
           }
         }
       },
@@ -1960,6 +1965,44 @@
           "data"
         ]
       },
+      "FindAllZonasConUsuariosResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "ID único de la zona",
+            "example": 1
+          },
+          "descripcionZona": {
+            "type": "string",
+            "description": "Descripción de la zona",
+            "example": "Centro"
+          },
+          "selected": {
+            "type": "boolean",
+            "description": "Indica si la zona está seleccionada por el usuario",
+            "example": true
+          }
+        },
+        "required": [
+          "id",
+          "descripcionZona",
+          "selected"
+        ]
+      },
+      "UpdateByUserValidation": {
+        "type": "object",
+        "properties": {
+          "estado": {
+            "type": "boolean",
+            "description": "Estado de selección de la zona",
+            "example": true
+          }
+        },
+        "required": [
+          "estado"
+        ]
+      },
       "Horario": {
         "type": "object",
         "properties": {
@@ -2159,8 +2202,8 @@
           "usuario",
           "id"
         ],
-        "title": "CrearHorario",
-        "description": "Esquema para crear un nuevo horario"
+        "description": "Esquema para crear un nuevo horario",
+        "title": "CrearHorario"
       },
       "UpdateHorario": {
         "type": "object",
@@ -2317,8 +2360,8 @@
             "example": 1
           }
         },
-        "title": "ActualizarHorario",
-        "description": "Esquema para actualizar un horario existente"
+        "description": "Esquema para actualizar un horario existente",
+        "title": "ActualizarHorario"
       },
       "DeleteHorario": {
         "type": "object",
@@ -2482,8 +2525,8 @@
           "usuario",
           "id"
         ],
-        "title": "BorrarHorario",
-        "description": "Esquema para eliminar un horario"
+        "description": "Esquema para eliminar un horario",
+        "title": "BorrarHorario"
       },
       "CreateServicio": {
         "type": "object",
@@ -3502,8 +3545,8 @@
           "id",
           "turno"
         ],
-        "title": "CreatePago",
-        "description": "Esquema para crear un nuevo pago"
+        "description": "Esquema para crear un nuevo pago",
+        "title": "CreatePago"
       },
       "CreatePago": {
         "type": "object",
@@ -3618,8 +3661,8 @@
           "id",
           "turno"
         ],
-        "title": "CreatePago",
-        "description": "Esquema para crear un nuevo pago"
+        "description": "Esquema para crear un nuevo pago",
+        "title": "CreatePago"
       },
       "GetPago": {
         "type": "object",
@@ -3772,8 +3815,8 @@
           "id",
           "turno"
         ],
-        "title": "GetPago",
-        "description": "Esquema para obtener un pago existente"
+        "description": "Esquema para obtener un pago existente",
+        "title": "GetPago"
       },
       "DeletePago": {
         "type": "object",
@@ -3926,8 +3969,8 @@
           "id",
           "turno"
         ],
-        "title": "DeletePago",
-        "description": "Esquema para eliminar un pago existente"
+        "description": "Esquema para eliminar un pago existente",
+        "title": "DeletePago"
       },
       "UpdatePago": {
         "type": "object",
@@ -4068,8 +4111,8 @@
             ]
           }
         },
-        "title": "UpdatePago",
-        "description": "Esquema para actualizar un pago existente"
+        "description": "Esquema para actualizar un pago existente",
+        "title": "UpdatePago"
       },
       "CreateTarea": {
         "type": "object",
@@ -4107,8 +4150,8 @@
           "duracionTarea",
           "tipoServicio"
         ],
-        "title": "CreateTarea",
-        "description": "Esquema para crear una nueva tarea"
+        "description": "Esquema para crear una nueva tarea",
+        "title": "CreateTarea"
       },
       "UpdateTarea": {
         "type": "object",
@@ -4159,8 +4202,8 @@
             ]
           }
         },
-        "title": "UpdateTarea",
-        "description": "Esquema para actualizar una tarea existente"
+        "description": "Esquema para actualizar una tarea existente",
+        "title": "UpdateTarea"
       },
       "DeleteTarea": {
         "type": "object",
@@ -4211,8 +4254,8 @@
             ]
           }
         },
-        "title": "DeleteTarea",
-        "description": "Esquema para eliminar una tarea existente"
+        "description": "Esquema para eliminar una tarea existente",
+        "title": "DeleteTarea"
       },
       "Tarea": {
         "type": "object",
@@ -4263,8 +4306,8 @@
             ]
           }
         },
-        "title": "DeleteTarea",
-        "description": "Esquema para eliminar una tarea existente"
+        "description": "Esquema para eliminar una tarea existente",
+        "title": "DeleteTarea"
       },
       "CreateTipoServicio": {
         "type": "object",
@@ -4452,8 +4495,8 @@
           "nombreTipo",
           "descripcionTipo"
         ],
-        "title": "CreateTipoServicio",
-        "description": "Esquema para crear un nuevo tipo de servicio"
+        "description": "Esquema para crear un nuevo tipo de servicio",
+        "title": "CreateTipoServicio"
       },
       "UpdateTipoServicio": {
         "type": "object",
@@ -4637,8 +4680,8 @@
             }
           }
         },
-        "title": "UpdateTipoServicio",
-        "description": "Esquema para actualizar un tipo de servicio"
+        "description": "Esquema para actualizar un tipo de servicio",
+        "title": "UpdateTipoServicio"
       },
       "DeleteTipoServicio": {
         "type": "object",
@@ -4830,8 +4873,8 @@
           "nombreTipo",
           "descripcionTipo"
         ],
-        "title": "DeleteTipoServicio",
-        "description": "Esquema para eliminar un tipo de servicio"
+        "description": "Esquema para eliminar un tipo de servicio",
+        "title": "DeleteTipoServicio"
       },
       "GetTipoServicio": {
         "type": "object",
@@ -5023,8 +5066,8 @@
           "nombreTipo",
           "descripcionTipo"
         ],
-        "title": "GetTipoServicio",
-        "description": "Esquema para obtener un tipo de servicio"
+        "description": "Esquema para obtener un tipo de servicio",
+        "title": "GetTipoServicio"
       }
     },
     "parameters": {}
@@ -6322,7 +6365,6 @@
           {
             "schema": {
               "type": "string",
-              "minLength": 6,
               "description": "Contraseña del usuario",
               "example": "Password123"
             },
@@ -10314,6 +10356,432 @@
         }
       }
     },
+    "/api/turno/byPrestador/{id}": {
+      "get": {
+        "description": "Obtener turnos por ID del prestador. La ruta acepta parámetros adicionales opcionales en el path.",
+        "summary": "Obtener turnos por prestador",
+        "tags": [
+          "Turnos"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "description": "ID del prestatario",
+              "example": "52"
+            },
+            "required": true,
+            "description": "ID del prestatario",
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Cantidad de items por página",
+              "example": "10"
+            },
+            "required": false,
+            "description": "Cantidad de items por página",
+            "name": "cantItemsPerPage",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Página actual",
+              "example": "1"
+            },
+            "required": false,
+            "description": "Página actual",
+            "name": "currentPage",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Campo para mostrar o filtro especial (puede ser multipleStates:pendiente,confirmado)",
+              "example": "multipleStates:pendiente,confirmado"
+            },
+            "required": false,
+            "description": "Campo para mostrar o filtro especial (puede ser multipleStates:pendiente,confirmado)",
+            "name": "selectedValueShow",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Campo para ordenar",
+              "example": "asc"
+            },
+            "required": false,
+            "description": "Campo para ordenar",
+            "name": "selectedValueOrder",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Consulta de búsqueda",
+              "example": "Juan"
+            },
+            "required": false,
+            "description": "Consulta de búsqueda",
+            "name": "searchQuery",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Turnos encontrados",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "found turns by prestador id"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "fechaHora": {
+                            "type": "string",
+                            "description": "Fecha y hora del turno",
+                            "example": "2025-09-30T14:00:00Z"
+                          },
+                          "montoFinal": {
+                            "type": "number",
+                            "minimum": 0,
+                            "exclusiveMinimum": true,
+                            "description": "Monto final del turno",
+                            "example": 15000
+                          },
+                          "estado": {
+                            "type": "string",
+                            "description": "Estado del turno",
+                            "example": "Pendiente"
+                          },
+                          "calificacion": {
+                            "type": "number",
+                            "minimum": 1,
+                            "maximum": 5,
+                            "description": "Calificación del turno",
+                            "example": 4
+                          },
+                          "comentario": {
+                            "type": "string",
+                            "minLength": 20,
+                            "maxLength": 500,
+                            "description": "Comentario del turno",
+                            "example": "El servicio fue excelente y puntual."
+                          },
+                          "usuarioid": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "number",
+                                "description": "ID del usuario",
+                                "example": 1
+                              },
+                              "nombre": {
+                                "type": "string",
+                                "description": "Nombre del usuario",
+                                "example": "Juan"
+                              },
+                              "apellido": {
+                                "type": "string",
+                                "description": "Apellido del usuario",
+                                "example": "Pérez"
+                              },
+                              "mail": {
+                                "type": "string",
+                                "description": "Email del usuario",
+                                "example": "juan.perez@gmail.com"
+                              },
+                              "nombreFantasia": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Nombre de fantasía del prestatario",
+                                "example": "Plomería Pérez"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "nombre",
+                              "apellido",
+                              "mail",
+                              "nombreFantasia"
+                            ]
+                          },
+                          "id": {
+                            "type": "number",
+                            "description": "ID del turno",
+                            "example": 1
+                          },
+                          "servicio": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "description": "ID del servicio",
+                                "example": "1"
+                              },
+                              "estado": {
+                                "type": "string",
+                                "enum": [
+                                  "activo",
+                                  "inactivo"
+                                ],
+                                "description": "Estado del servicio",
+                                "example": "activo"
+                              },
+                              "precio": {
+                                "type": "number",
+                                "minimum": 0,
+                                "exclusiveMinimum": true,
+                                "description": "Precio del servicio",
+                                "example": 1500
+                              },
+                              "servicio": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "exclusiveMinimum": true,
+                                "description": "ID de la servicio asociada al servicio",
+                                "example": 1
+                              },
+                              "usuario": {
+                                "type": "integer",
+                                "nullable": true,
+                                "minimum": 0,
+                                "exclusiveMinimum": true,
+                                "description": "ID del usuario asociado al servicio (opcional)",
+                                "example": 2
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "estado",
+                              "precio",
+                              "servicio"
+                            ]
+                          },
+                          "pago": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "paymentIntentId": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "description": "ID del pago en Stripe",
+                                  "example": "pi_1JXXXXXX"
+                                },
+                                "amount": {
+                                  "type": "number",
+                                  "minimum": 350,
+                                  "description": "Monto del pago en centavos",
+                                  "example": 1000
+                                },
+                                "currency": {
+                                  "type": "string",
+                                  "minLength": 3,
+                                  "maxLength": 3,
+                                  "description": "Moneda del pago en formato ISO (ej: usd, ars)",
+                                  "example": "usd"
+                                },
+                                "estado": {
+                                  "type": "string",
+                                  "enum": [
+                                    "requires_payment_method",
+                                    "requires_confirmation",
+                                    "requires_action",
+                                    "processing",
+                                    "succeeded",
+                                    "requires_capture",
+                                    "canceled"
+                                  ],
+                                  "description": "Estado del pago en Stripe",
+                                  "example": "succeeded"
+                                },
+                                "sellerStripeId": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "description": "ID del vendedor de la cuenta de Stripe",
+                                  "example": "acct_1JXXXXXX"
+                                },
+                                "amountReceived": {
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "description": "Monto recibido por el vendedor en centavos",
+                                  "example": 950
+                                },
+                                "applicationFeeAmount": {
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "description": "Comisión de la plataforma en centavos",
+                                  "example": 50
+                                },
+                                "transferId": {
+                                  "type": "string",
+                                  "description": "ID de la transferencia a la cuenta del vendedor en Stripe",
+                                  "example": "tr_1JXXXXXX"
+                                },
+                                "buyerEmail": {
+                                  "type": "string",
+                                  "format": "email",
+                                  "description": "Correo electrónico del comprador",
+                                  "example": "buyer@example.com"
+                                },
+                                "metadata": {
+                                  "type": "object",
+                                  "additionalProperties": {
+                                    "nullable": true
+                                  },
+                                  "description": "Datos adicionales como productId, orderId",
+                                  "example": {
+                                    "productId": "prod_123",
+                                    "orderId": "ord_456"
+                                  }
+                                },
+                                "createdAt": {
+                                  "type": "string",
+                                  "format": "date-time",
+                                  "description": "Fecha de creación del pago en formato ISO",
+                                  "example": "2023-10-01T12:34:56Z"
+                                },
+                                "updatedAt": {
+                                  "type": "string",
+                                  "format": "date-time",
+                                  "description": "Fecha de última actualización del pago en formato ISO",
+                                  "example": "2023-10-01T12:34:56Z"
+                                }
+                              },
+                              "required": [
+                                "paymentIntentId",
+                                "amount",
+                                "currency",
+                                "estado",
+                                "sellerStripeId",
+                                "amountReceived",
+                                "createdAt",
+                                "updatedAt"
+                              ]
+                            }
+                          }
+                        },
+                        "required": [
+                          "fechaHora",
+                          "montoFinal",
+                          "estado",
+                          "usuarioid",
+                          "id",
+                          "servicio"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Turno no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "userId"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "El UserID debe ser un número positivo"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "userId"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "El UserID debe ser un número positivo"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/zona": {
       "post": {
         "description": "Crear una nueva zona",
@@ -10585,6 +11053,92 @@
                   "required": [
                     "message",
                     "data"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "descripcionZona"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Descripción inválida"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/zona/usuario": {
+      "get": {
+        "description": "Obtener todas las zonas con sus usuarios asociados",
+        "summary": "Listar todas las zonas completas",
+        "tags": [
+          "Zonas"
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de zonas con usuarios asociados obtenida exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "number",
+                      "description": "ID único de la zona",
+                      "example": 1
+                    },
+                    "descripcionZona": {
+                      "type": "string",
+                      "description": "Descripción de la zona",
+                      "example": "Centro"
+                    },
+                    "selected": {
+                      "type": "boolean",
+                      "description": "Indica si la zona está seleccionada por el usuario",
+                      "example": true
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "descripcionZona",
+                    "selected"
                   ]
                 }
               }
@@ -11262,6 +11816,201 @@
         }
       }
     },
+    "/api/zona/updateByUser/{id}": {
+      "put": {
+        "description": "Poner o quitar la zona al usuario autenticado",
+        "summary": "Actualizar zona",
+        "tags": [
+          "Zonas"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "description": "ID numérico de la zona",
+              "example": "1"
+            },
+            "required": true,
+            "description": "ID numérico de la zona",
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "description": "Datos de la zona a actualizar",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "estado": {
+                    "type": "boolean",
+                    "description": "Estado de selección de la zona",
+                    "example": true
+                  }
+                },
+                "required": [
+                  "estado"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Zona actualizada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Zona agregada al usuario"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "number",
+                          "description": "ID único de la zona",
+                          "example": 1
+                        },
+                        "descripcionZona": {
+                          "type": "string",
+                          "description": "Descripción de la zona",
+                          "example": "Centro"
+                        },
+                        "selected": {
+                          "type": "boolean",
+                          "description": "Indica si la zona está seleccionada por el usuario",
+                          "example": true
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "descripcionZona",
+                        "selected"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "descripcionZona"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Descripción inválida"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Zona no encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Zona no encontrada"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Campo que falló",
+                            "example": "descripcionZona"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Mensaje de error",
+                            "example": "Descripción inválida"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "message"
+                        ]
+                      },
+                      "description": "Detalles de errores de validación"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/horario": {
       "post": {
         "description": "Crear un nuevo horario para un usuario determinado",
@@ -11479,8 +12228,8 @@
                         "usuario",
                         "id"
                       ],
-                      "title": "CrearHorario",
-                      "description": "Esquema para crear un nuevo horario"
+                      "description": "Esquema para crear un nuevo horario",
+                      "title": "CrearHorario"
                     }
                   },
                   "required": [
@@ -11530,8 +12279,8 @@
                   "required": [
                     "message"
                   ],
-                  "title": "Error",
-                  "description": "Esquema para representar un error"
+                  "description": "Esquema para representar un error",
+                  "title": "Error"
                 }
               }
             }
@@ -11575,8 +12324,8 @@
                   "required": [
                     "message"
                   ],
-                  "title": "Error",
-                  "description": "Esquema para representar un error"
+                  "description": "Esquema para representar un error",
+                  "title": "Error"
                 }
               }
             }
@@ -11765,8 +12514,8 @@
                         "usuario",
                         "id"
                       ],
-                      "title": "GetHorario",
-                      "description": "Esquema para obtener un horario"
+                      "description": "Esquema para obtener un horario",
+                      "title": "GetHorario"
                     }
                   },
                   "required": [
@@ -11816,8 +12565,8 @@
                   "required": [
                     "message"
                   ],
-                  "title": "Error",
-                  "description": "Esquema para representar un error"
+                  "description": "Esquema para representar un error",
+                  "title": "Error"
                 }
               }
             }
@@ -11861,8 +12610,8 @@
                   "required": [
                     "message"
                   ],
-                  "title": "Error",
-                  "description": "Esquema para representar un error"
+                  "description": "Esquema para representar un error",
+                  "title": "Error"
                 }
               }
             }
@@ -11975,8 +12724,8 @@
                   "required": [
                     "message"
                   ],
-                  "title": "Error",
-                  "description": "Esquema para representar un error"
+                  "description": "Esquema para representar un error",
+                  "title": "Error"
                 }
               }
             }
@@ -12020,8 +12769,8 @@
                   "required": [
                     "message"
                   ],
-                  "title": "Error",
-                  "description": "Esquema para representar un error"
+                  "description": "Esquema para representar un error",
+                  "title": "Error"
                 }
               }
             }
@@ -12239,8 +12988,8 @@
                           "example": 1
                         }
                       },
-                      "title": "ActualizarHorario",
-                      "description": "Esquema para actualizar un horario existente"
+                      "description": "Esquema para actualizar un horario existente",
+                      "title": "ActualizarHorario"
                     }
                   },
                   "required": [
@@ -12290,8 +13039,8 @@
                   "required": [
                     "message"
                   ],
-                  "title": "Error",
-                  "description": "Esquema para representar un error"
+                  "description": "Esquema para representar un error",
+                  "title": "Error"
                 }
               }
             }
@@ -12335,8 +13084,8 @@
                   "required": [
                     "message"
                   ],
-                  "title": "Error",
-                  "description": "Esquema para representar un error"
+                  "description": "Esquema para representar un error",
+                  "title": "Error"
                 }
               }
             }
@@ -12537,8 +13286,8 @@
                         "usuario",
                         "id"
                       ],
-                      "title": "BorrarHorario",
-                      "description": "Esquema para eliminar un horario"
+                      "description": "Esquema para eliminar un horario",
+                      "title": "BorrarHorario"
                     }
                   },
                   "required": [
@@ -12588,8 +13337,8 @@
                   "required": [
                     "message"
                   ],
-                  "title": "Error",
-                  "description": "Esquema para representar un error"
+                  "description": "Esquema para representar un error",
+                  "title": "Error"
                 }
               }
             }
@@ -12633,8 +13382,8 @@
                   "required": [
                     "message"
                   ],
-                  "title": "Error",
-                  "description": "Esquema para representar un error"
+                  "description": "Esquema para representar un error",
+                  "title": "Error"
                 }
               }
             }
@@ -15364,8 +16113,8 @@
                         "id",
                         "turno"
                       ],
-                      "title": "CreatePago",
-                      "description": "Esquema para crear un nuevo pago"
+                      "description": "Esquema para crear un nuevo pago",
+                      "title": "CreatePago"
                     }
                   },
                   "required": [
@@ -15637,8 +16386,8 @@
                         "id",
                         "turno"
                       ],
-                      "title": "GetPago",
-                      "description": "Esquema para obtener un pago existente"
+                      "description": "Esquema para obtener un pago existente",
+                      "title": "GetPago"
                     }
                   },
                   "required": [
@@ -15888,8 +16637,8 @@
                     ]
                   }
                 },
-                "title": "UpdatePago",
-                "description": "Esquema para actualizar un pago existente"
+                "description": "Esquema para actualizar un pago existente",
+                "title": "UpdatePago"
               }
             }
           }
@@ -16045,8 +16794,8 @@
                           ]
                         }
                       },
-                      "title": "UpdatePago",
-                      "description": "Esquema para actualizar un pago existente"
+                      "description": "Esquema para actualizar un pago existente",
+                      "title": "UpdatePago"
                     }
                   },
                   "required": [
@@ -16316,8 +17065,8 @@
                         "id",
                         "turno"
                       ],
-                      "title": "DeletePago",
-                      "description": "Esquema para eliminar un pago existente"
+                      "description": "Esquema para eliminar un pago existente",
+                      "title": "DeletePago"
                     }
                   },
                   "required": [
@@ -16589,8 +17338,8 @@
                         "id",
                         "turno"
                       ],
-                      "title": "GetPago",
-                      "description": "Esquema para obtener un pago existente"
+                      "description": "Esquema para obtener un pago existente",
+                      "title": "GetPago"
                     }
                   },
                   "required": [
@@ -16848,8 +17597,8 @@
                         "id",
                         "turno"
                       ],
-                      "title": "GetPago",
-                      "description": "Esquema para obtener un pago existente"
+                      "description": "Esquema para obtener un pago existente",
+                      "title": "GetPago"
                     }
                   },
                   "required": [
@@ -17084,8 +17833,8 @@
                         "duracionTarea",
                         "tipoServicio"
                       ],
-                      "title": "CreateTarea",
-                      "description": "Esquema para crear una nueva tarea"
+                      "description": "Esquema para crear una nueva tarea",
+                      "title": "CreateTarea"
                     }
                   },
                   "required": [
@@ -17267,8 +18016,8 @@
                           ]
                         }
                       },
-                      "title": "DeleteTarea",
-                      "description": "Esquema para eliminar una tarea existente"
+                      "description": "Esquema para eliminar una tarea existente",
+                      "title": "DeleteTarea"
                     }
                   },
                   "required": [
@@ -17440,8 +18189,8 @@
                     ]
                   }
                 },
-                "title": "UpdateTarea",
-                "description": "Esquema para actualizar una tarea existente"
+                "description": "Esquema para actualizar una tarea existente",
+                "title": "UpdateTarea"
               }
             }
           }
@@ -17507,8 +18256,8 @@
                           ]
                         }
                       },
-                      "title": "UpdateTarea",
-                      "description": "Esquema para actualizar una tarea existente"
+                      "description": "Esquema para actualizar una tarea existente",
+                      "title": "UpdateTarea"
                     }
                   },
                   "required": [
@@ -17688,8 +18437,8 @@
                           ]
                         }
                       },
-                      "title": "DeleteTarea",
-                      "description": "Esquema para eliminar una tarea existente"
+                      "description": "Esquema para eliminar una tarea existente",
+                      "title": "DeleteTarea"
                     }
                   },
                   "required": [
@@ -17859,8 +18608,8 @@
                             ]
                           }
                         },
-                        "title": "DeleteTarea",
-                        "description": "Esquema para eliminar una tarea existente"
+                        "description": "Esquema para eliminar una tarea existente",
+                        "title": "DeleteTarea"
                       }
                     }
                   },
@@ -18223,8 +18972,8 @@
                     "nombreTipo",
                     "descripcionTipo"
                   ],
-                  "title": "CreateTipoServicio",
-                  "description": "Esquema para crear un nuevo tipo de servicio"
+                  "description": "Esquema para crear un nuevo tipo de servicio",
+                  "title": "CreateTipoServicio"
                 }
               }
             }
@@ -18460,8 +19209,8 @@
                     }
                   }
                 },
-                "title": "UpdateTipoServicio",
-                "description": "Esquema para actualizar un tipo de servicio"
+                "description": "Esquema para actualizar un tipo de servicio",
+                "title": "UpdateTipoServicio"
               }
             }
           }
@@ -18653,8 +19402,8 @@
                       }
                     }
                   },
-                  "title": "UpdateTipoServicio",
-                  "description": "Esquema para actualizar un tipo de servicio"
+                  "description": "Esquema para actualizar un tipo de servicio",
+                  "title": "UpdateTipoServicio"
                 }
               }
             }
@@ -18944,8 +19693,8 @@
                     "nombreTipo",
                     "descripcionTipo"
                   ],
-                  "title": "GetTipoServicio",
-                  "description": "Esquema para obtener un tipo de servicio"
+                  "description": "Esquema para obtener un tipo de servicio",
+                  "title": "GetTipoServicio"
                 }
               }
             }
@@ -19190,8 +19939,8 @@
                     "nombreTipo",
                     "descripcionTipo"
                   ],
-                  "title": "GetTipoServicio",
-                  "description": "Esquema para obtener un tipo de servicio"
+                  "description": "Esquema para obtener un tipo de servicio",
+                  "title": "GetTipoServicio"
                 }
               }
             }
@@ -19436,8 +20185,8 @@
                     "nombreTipo",
                     "descripcionTipo"
                   ],
-                  "title": "GetTipoServicio",
-                  "description": "Esquema para obtener un tipo de servicio"
+                  "description": "Esquema para obtener un tipo de servicio",
+                  "title": "GetTipoServicio"
                 }
               }
             }

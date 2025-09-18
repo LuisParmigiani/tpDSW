@@ -9,8 +9,17 @@ import {
   createZonaValidation,
   updateZonaValidation,
   idParamValidation,
+  updateByUserValidation,
 } from './zona.schemas.js';
-import { findAll, findOne, add, update, remove } from './zona.controller.js';
+import {
+  findAll,
+  findOne,
+  add,
+  update,
+  remove,
+  findAllPerUser,
+  updateByUser,
+} from './zona.controller.js';
 
 export const zonaRouter = Router();
 
@@ -18,16 +27,26 @@ export const zonaRouter = Router();
 zonaRouter.post('/', validateBody(createZonaValidation), add);
 
 // ==================== GET ROUTES ====================
-zonaRouter.get('/', findAll);
+zonaRouter.get('/usuario/', authenticateToken, findAllPerUser);
 
 zonaRouter.get('/:id', validateParams(idParamValidation), findOne);
 
+zonaRouter.get('/', findAll);
 // ==================== PUT ROUTES ====================
 zonaRouter.put(
   '/:id',
   validateParams(idParamValidation),
   validateBody(updateZonaValidation),
   update
+);
+
+// Agrego la ruta PUT para que coincida con el frontend y la documentación
+zonaRouter.put(
+  '/updateByUser/:id',
+  authenticateToken,
+  validateParams(idParamValidation),
+  validateBody(updateByUserValidation),
+  updateByUser
 );
 
 // ==================== PATCH ROUTES ====================

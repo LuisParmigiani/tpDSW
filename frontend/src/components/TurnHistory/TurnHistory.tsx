@@ -69,7 +69,7 @@ function TurnHistory({ estado }: Props) {
   // Filtros de los turnos
   const [selectedValueShow, setSelectedValueShow] = useState('');
   // Variables de paginacion:
-  const cantItemsPerPage = '9'; // Cantidad de turnos por pagina
+  const cantItemsPerPage = 9; // Cantidad de turnos por pagina
   const [currentPage, setCurrentPage] = useState(1); // Página actual
   const [totalPages, setTotalPages] = useState(1); // Total de páginas
   const [flagged, setFlagged] = useState(false); //Bandera para saber si el comentario es inapropiado
@@ -96,7 +96,7 @@ function TurnHistory({ estado }: Props) {
       try {
         const res = await turnosApi.getByUserId(
           cantItemsPerPage,
-          currentPage.toString(),
+          currentPage,
           selectedValueShow,
           selectedValueOrder
         );
@@ -134,7 +134,11 @@ function TurnHistory({ estado }: Props) {
   };
 
   // Guardar calificación
-  const SaveRating = async (rating: number, comentario: string) => {
+  const SaveRating = async (
+    rating: number,
+    comentario: string,
+    setSpinner: (value: boolean) => void
+  ) => {
     if (data) {
       const dataForUpdate = {
         calificacion: rating,
@@ -144,6 +148,7 @@ function TurnHistory({ estado }: Props) {
         const res = await turnosApi.update(data.id.toString(), dataForUpdate);
         console.log('Respuesta de la API:', res);
         setFlagged(res.data.flagged || false); // Actualizar el estado de flagged si viene en la respuesta
+        setSpinner(false); //desactiva el spinner de cargando...
 
         // Actualizar el turno en la lista local en lugar de recargar toda la página
         if (turns) {

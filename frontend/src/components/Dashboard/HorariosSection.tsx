@@ -202,11 +202,9 @@ function HorariosSection() {
   }
 
   return (
-    <DashboardSection>
+    <DashboardSection title="Horarios de trabajo">
       <div className="px-2 sm:px-0">
-        <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6">
-          Horarios de Trabajo
-        </h2>
+        
 
         {!conectadoStripe ? (
           // Mostrar formulario de conexión con Stripe
