@@ -61,17 +61,13 @@ jobs:
           version: 8
       - name: Install workspace deps
         run: pnpm install --no-frozen-lockfile --recursive
-      - name: Debug deps
-        run: |
-          pnpm list vite --filter frontend || true
-          ls -la frontend/node_modules/.bin/ | grep vite || echo "vite bin missing"
       - name: Run frontend tests
         run: pnpm --filter frontend test:run
 
-  # Deploy Backend (after unit tests pass)
+  # Deploy Backend (only after tests pass and on main branch)
   deploy-backend:
-    name: Deploy Backend
-    needs: [backend-tests, frontend-tests]
+    name: Deploy Backend to Fly.io
+    needs: [backend-tests, frontend-tests] # Wait for tests to pass
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     defaults:
@@ -80,26 +76,38 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Set up pnpm
         uses: pnpm/action-setup@v3
         with:
           version: 8
-      - name: Install deps and build
-        run: |
-          pnpm install --no-frozen-lockfile
-          pnpm build
+
+      - name: Install deps (prod + build)
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
       - name: Install Fly CLI
         run: |
           curl -L https://fly.io/install.sh | sh
           echo "${HOME}/.fly/bin" >> $GITHUB_PATH
-      - name: Deploy to Fly.io
+
+      - name: Deploy
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
         run: |
           export FLYCTL_INSTALL="$HOME/.fly"
           export PATH="$FLYCTL_INSTALL/bin:$PATH"
+          if ! command -v flyctl >/dev/null; then echo "Fly CLI no instalado"; exit 1; fi
           sed -i "s/REEMPLAZA_CON_NOMBRE_APP_FLY/${{ secrets.FLY_APP_NAME }}/" fly.toml
           flyctl deploy --config fly.toml --remote-only --strategy immediate
+
+      - name: Post URL
+        if: always()
+        run: |
+          echo "App: ${{ secrets.FLY_APP_NAME }}"
+          echo "https://${{ secrets.FLY_APP_NAME }}.fly.dev" || true
 
   # Deploy Frontend (after backend is deployed)
   deploy-frontend:
@@ -111,7 +119,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Add the FTP diagnostic steps from deploy.yml
       - name: Diagnostic FTP login (fail fast)
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
@@ -182,7 +189,7 @@ jobs:
             **/story*/**
           dangerous-clean-slate: false
 
-  # E2E Tests AFTER deployment (Production Testing)
+  # E2E Tests AFTER deployment
   e2e-tests:
     name: Production E2E Tests
     needs: [deploy-frontend]
@@ -204,13 +211,11 @@ jobs:
       - name: Install Playwright Browsers
         run: pnpm exec playwright install chromium firefox webkit --with-deps
 
-      # Wait for deployment to be fully ready
       - name: Wait for production deployment
         run: |
           timeout 300 bash -c 'until curl -f https://${{ secrets.FRONTEND_URL }} 2>/dev/null; do sleep 10; done'
           timeout 300 bash -c 'until curl -f https://${{ secrets.FLY_APP_NAME }}.fly.dev/health 2>/dev/null; do sleep 10; done'
 
-      # Run E2E tests against production
       - name: Run Production E2E tests
         env:
           PLAYWRIGHT_BASE_URL: https://${{ secrets.FRONTEND_URL }}
@@ -224,16 +229,3 @@ jobs:
           name: playwright-report-production
           path: playwright-report/
           retention-days: 30
-
-  # Rollback on E2E failure (optional)
-  rollback-on-failure:
-    name: Rollback on E2E Failure
-    needs: [e2e-tests]
-    runs-on: ubuntu-latest
-    if: failure() && github.ref == 'refs/heads/main'
-    steps:
-      - name: Notify E2E Test Failure
-        run: |
-          echo "⚠️ E2E tests failed in production!"
-          echo "Consider rolling back deployment or fixing issues immediately."
-      # Add actual rollback logic here if needed
