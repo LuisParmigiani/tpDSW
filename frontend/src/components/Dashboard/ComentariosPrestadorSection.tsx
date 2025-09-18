@@ -1,5 +1,5 @@
 import DashboardSection from '../DashboardSection/DashboardSection';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { usuariosApi } from '../../services/usuariosApi';
 import Comments from '../Comments/Comments';
 import useAuth from '../../cookie/useAuth';
@@ -12,7 +12,7 @@ function ComentariosPrestadorSection() {
   const [error, setError] = useState<string | null>(null);
 
   // Función para cargar comentarios desde el API
-  const cargarComentarios = async () => {
+  const cargarComentarios = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -20,40 +20,31 @@ function ComentariosPrestadorSection() {
       const prestadorId = usuario?.id?.toString();
       
       if (!prestadorId) {
-        console.error('No se pudo obtener prestadorId:', { usuario, prestadorId });
         setError('No se pudo obtener el ID del usuario logueado.');
         return;
       }
 
       const response = await usuariosApi.getCommentsByUserId(
         prestadorId,
-        '50', // máximo 50 comentarios
-        '1',  // página 1
-        'fechaCreacion_desc' // ordenar por fecha descendente
+        '50', 
+        '1', 
+        'fechaCreacion_desc'
       );
-      
-      // Extraer los IDs de los turnos/comentarios
       const comentarios = response.data.data || [];
-      
-      // Filtrar solo comentarios de servicios del prestador logueado
       const comentariosFiltrados = comentarios.filter((comentario: Turno) => {
         return comentario.servicio?.usuario === usuario?.id;
       });
-      
-      
-      // Usar el ID del turno, uso any porque turno no tiene id definido en el tipo y si lo cambio se rompe todo creo.
+      // Usar el ID del turno, uso any porque turno no tiene id definido en el tipo y si lo cambio se rompe todo.
       const ids = comentariosFiltrados.map((comentario: any) => comentario.id).filter((id: number) => id);
       
       setComentariosIds(ids);
       
     } catch (err: any) {
       console.error('Error al cargar comentarios:', err);
-      
-      // Si es un 404, significa que no hay comentarios, no es un error fatal
       if (err?.response?.status === 404) {
         console.log('Usuario no tiene comentarios (404)');
-        setComentariosIds([]); // Array vacío = "No tienes comentarios aún"
-        setError(null); // No mostrar error
+        setComentariosIds([]); 
+        setError(null); 
       } else {
         setError('Error al cargar los comentarios. Por favor, intenta nuevamente.');
         setComentariosIds([]);
@@ -61,14 +52,13 @@ function ComentariosPrestadorSection() {
     } finally {
       setLoading(false);
     }
-  };
-
+  }, [usuario?.id]);
   // Cargar comentarios cuando el usuario esté disponible
   useEffect(() => {
     if (usuario?.id) {
       cargarComentarios();
     }
-  }, [usuario?.id]);
+  }, [usuario?.id, cargarComentarios]);
 
   if (loading) {
     return (
