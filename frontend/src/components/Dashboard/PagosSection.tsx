@@ -74,12 +74,8 @@ function PagosSection() {
   };
 
   return (
-    <DashboardSection>
+    <DashboardSection title="Pagos e Ingresos">
       <div className="px-2 sm:px-0">
-        <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6">
-          Pagos e Ingresos
-        </h2>
-
         <StripeConnection loadingMessage="Cargando información de pagos...">
           {/* Contenido que se muestra solo si el usuario tiene Stripe conectado */}
           {loading ? (

@@ -32,7 +32,7 @@ export const turnosApi = {
     selectedValueOrder?: string,
     searchQuery?: string
   ) => {
-    // Construir la URL usando un array para evitar dobles barras
+    // contruyo la url con el array
     const parts = [
       'turno',
       'byPrestador',
@@ -42,19 +42,16 @@ export const turnosApi = {
       selectedValueShow || 'all',
     ];
 
-    // Agregar selectedValueOrder solo si hay valor o si necesitamos searchQuery
-    if (selectedValueOrder && selectedValueOrder !== '') {
-      parts.push(selectedValueOrder);
+    // chequeo por si existen tanto el selectedValueOrder como el searchQuery pero no son vacios,
+    //para armar la url bien
+    if (selectedValueOrder && selectedValueOrder.trim() !== '') {
+      parts.push(selectedValueOrder.trim());
     } else if (searchQuery && searchQuery.trim() !== '') {
-      // Si hay searchQuery pero no selectedValueOrder, usar placeholder
-      parts.push('none'); // placeholder que el backend reconocerá como vacío
+      parts.push('none'); 
     }
-
-    // Agregar searchQuery si hay
     if (searchQuery && searchQuery.trim() !== '') {
       parts.push(encodeURIComponent(searchQuery.trim()));
     }
-
     const url = '/' + parts.join('/');
     console.log('URL construida:', url);
     return api.get(url);
@@ -72,15 +69,10 @@ export const turnosApi = {
   getTurnsPerDay: (id: string, date: string) =>
     api.get(`turno/turnosPorDia/${id}/${date}`),
 
-  // Métodos específicos para el dashboard del prestatario
   updateMultipleEstados: async (turnoIds: number[], nuevoEstado: string) => {
-    // Convertir el estado a minúsculas antes de enviar a la BD
-    const estadoMinusculas = nuevoEstado.toLowerCase();
-
-    // Realizar actualizaciones en paralelo siguiendo el patrón de tu API
     return Promise.all(
       turnoIds.map((id) =>
-        api.patch(`/turno/${id}`, { estado: estadoMinusculas })
+        api.patch(`/turno/${id}`, { estado: nuevoEstado.toLowerCase() })
       )
     );
   },

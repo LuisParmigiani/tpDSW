@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import useAuth from '../../cookie/useAuth';
 import LogoutButton from '../LogoutButton/LogoutButton.tsx';
 
+
 export interface MenuItem {
   id: string;
   name: string;
@@ -63,15 +64,6 @@ function DashNav({ activeSection, setActiveSection, showMobileNav, setShowMobile
       )
     },
     {
-      id: 'clientes',
-      name: 'Clientes',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-        </svg>
-      )
-    },
-    {
       id: 'servicios',
       name: 'Servicios',
       icon: (
@@ -80,6 +72,36 @@ function DashNav({ activeSection, setActiveSection, showMobileNav, setShowMobile
           <path d="M15.0003 16.3496C14.8378 16.3496 14.6753 16.3121 14.5253 16.2246L7.90028 12.3996C7.45028 12.1371 7.30025 11.5621 7.56275 11.1246C7.82525 10.6746 8.40028 10.5246 8.83778 10.7871L14.9878 14.3496L21.1003 10.8121C21.5503 10.5496 22.1253 10.7121 22.3753 11.1496C22.6253 11.5871 22.4753 12.1746 22.0378 12.4246L15.4628 16.2246C15.3253 16.2996 15.1628 16.3496 15.0003 16.3496Z" fill="currentColor"/>
           <path d="M15 23.1501C14.4875 23.1501 14.0625 22.7251 14.0625 22.2126V15.4126C14.0625 14.9001 14.4875 14.4751 15 14.4751C15.5125 14.4751 15.9375 14.9001 15.9375 15.4126V22.2126C15.9375 22.7251 15.5125 23.1501 15 23.1501Z" fill="currentColor"/>
           <path d="M14.9998 23.4373C14.2748 23.4373 13.5624 23.2748 12.9874 22.9623L8.98733 20.7373C7.78733 20.0748 6.8623 18.4873 6.8623 17.1123V12.8748C6.8623 11.5123 7.79983 9.92476 8.98733 9.24976L12.9874 7.02476C14.1374 6.38726 15.8623 6.38726 17.0123 7.02476L21.0123 9.24976C22.2123 9.91226 23.1374 11.4998 23.1374 12.8748V17.1123C23.1374 18.4748 22.1998 20.0623 21.0123 20.7373L17.0123 22.9623C16.4373 23.2873 15.7248 23.4373 14.9998 23.4373ZM14.9998 8.43726C14.5873 8.43726 14.1873 8.51226 13.8998 8.67476L9.89984 10.8998C9.28734 11.2373 8.7373 12.1873 8.7373 12.8748V17.1123C8.7373 17.8123 9.28734 18.7498 9.89984 19.0873L13.8998 21.3123C14.4748 21.6373 15.5248 21.6373 16.0998 21.3123L20.0998 19.0873C20.7123 18.7498 21.2624 17.7998 21.2624 17.1123V12.8748C21.2624 12.1748 20.7123 11.2373 20.0998 10.8998L16.0998 8.67476C15.8123 8.51226 15.4123 8.43726 14.9998 8.43726Z" fill="currentColor"/>
+        </svg>
+      )
+    },
+    {
+      id: 'zonas',
+      name: 'Zonas',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24">
+            <g fill="currentColor" fill-rule="evenodd" clip-rule="evenodd">
+                <path d="M16.272 10.272a4 4 0 1 1-8 0a4 4 0 0 1 8 0Zm-2 0a2 2 0 1 1-4 0a2 2 0 0 1 4 0Z"/>
+                <path d="M5.794 16.518a9 9 0 1 1 12.724-.312l-6.206 6.518l-6.518-6.206Zm11.276-1.691l-4.827 5.07l-5.07-4.827a7 7 0 1 1 9.897-.243Z"/>
+            </g>
+        </svg>
+      )
+    },
+    {
+      id: 'horarios',
+      name: 'Horarios',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      )
+    },
+    {
+      id: 'clientes',
+      name: 'Clientes',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
         </svg>
       )
     },
@@ -101,15 +123,6 @@ function DashNav({ activeSection, setActiveSection, showMobileNav, setShowMobile
         </svg>
       )
     },
-    {
-      id: 'horarios',
-      name: 'Horarios',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      )
-    }
   ];
 
   return (
@@ -124,12 +137,10 @@ function DashNav({ activeSection, setActiveSection, showMobileNav, setShowMobile
           onClick={() => setShowMobileNav?.(false)}
         />
       )}
-      
-      {/* Sidebar principal - siempre visible */}
       <div className={`bg-white shadow-lg border-r border-gray-200 transition-all duration-300 flex flex-col ${
         isMobile 
-          ? 'w-16 fixed inset-y-0 left-0 z-30' // En móvil: siempre colapsado
-          : `${isCollapsed ? 'w-16' : 'w-64'} relative` // En desktop: normal
+          ? 'w-16 fixed inset-y-0 left-0 z-30' 
+          : `${isCollapsed ? 'w-16' : 'w-64'} relative` 
       }`}>
         
         <div className="p-4 border-b border-gray-200 h-16 flex items-center">
@@ -156,7 +167,7 @@ function DashNav({ activeSection, setActiveSection, showMobileNav, setShowMobile
           </div>
         ) : (
           <div className="flex justify-center h-full items-center">
-            {/* Botón hamburguesa para móvil */}
+            {/* botón hamburguesa */}
             {isMobile && (
               <button
                 onClick={() => setShowMobileNav?.(true)}
@@ -173,7 +184,7 @@ function DashNav({ activeSection, setActiveSection, showMobileNav, setShowMobile
                 </svg>
               </button>
             )}
-            {/* Solo mostrar botón de expandir en desktop */}
+            {/* boton flecha solo en escritorio */}
             {!isMobile && (
               <button
                 onClick={() => setIsCollapsed(!isCollapsed)}
@@ -221,13 +232,9 @@ function DashNav({ activeSection, setActiveSection, showMobileNav, setShowMobile
         ))}
       </ul>
     </nav>
-
-    {/* Botón de Logout */}
         <div className="p-4">
           <LogoutButton onLogout={handleLogout} isCollapsed={isMobile || isCollapsed} />
         </div>
-
-        {/* Información del Usuario */}
         <div className="p-4 border-t border-gray-200">
           <div className={`flex items-center ${(isMobile || isCollapsed) ? 'justify-center' : 'space-x-3'}`}>
             <img 
@@ -250,8 +257,6 @@ function DashNav({ activeSection, setActiveSection, showMobileNav, setShowMobile
           </div>
         </div>
       </div>
-
-      {/* Sidebar expandida para móvil (overlay) */}
       {isMobile && (
         <div className={`bg-white shadow-lg border-r border-gray-200 w-64 flex flex-col fixed inset-y-0 left-0 z-50 transform transition-all duration-300 ease-out ${
           showMobileNav ? 'translate-x-0' : '-translate-x-full'
@@ -315,6 +320,7 @@ function DashNav({ activeSection, setActiveSection, showMobileNav, setShowMobile
           </div>
         </div>
       )}
+      
     </>
   );
 }
