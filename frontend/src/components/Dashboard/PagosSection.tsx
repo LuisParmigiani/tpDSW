@@ -82,7 +82,7 @@ function PagosSection() {
             </div>
           ) : (
             <div className="space-y-6">
-              {/* Verificar si no hay servicios realizados */}
+              
               {estadisticas.ingresosAnio === 0 ? (
                 <div className="py-8 px-4 flex justify-center">
                   <Alert variant="info" className="max-w-md w-full text-center">

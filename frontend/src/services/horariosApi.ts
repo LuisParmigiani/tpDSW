@@ -7,6 +7,6 @@ export const horariosApi = {
   create: (data: EntityData) => api.post('/horario', data),
   update: (id: string, data: EntityData) => api.put(`/horario/${id}`, data),
   delete: (id: string) => api.delete(`/horario/${id}`),
-  getByUsuarioId: (usuarioId: string | number) => api.get(`/horario/${usuarioId}`),
-  updateBatchByUsuarioId: (usuarioId: string | number, data: EntityData[]) => api.put(`/horario/usuario/${usuarioId}`, data),
+  getByUsuarioId: (usuarioId: number) => api.get(`/horario/${usuarioId}`),
+  updateBatchByUsuarioId: (usuarioId: number, data: EntityData[]) => api.put(`/horario/usuario/${usuarioId}`, data),
 };
