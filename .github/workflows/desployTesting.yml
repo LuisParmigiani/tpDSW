@@ -110,34 +110,76 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      # Add the FTP diagnostic steps from deploy.yml
+      - name: Diagnostic FTP login (fail fast)
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          set -e
+          RAW_SERVER="$FTP_SERVER"
+          CLEAN_SERVER="${RAW_SERVER#ftp://}"
+          echo "Testing FTP connection..."
+          sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends lftp >/dev/null
+
+          if lftp -u "$FTP_USERNAME","$FTP_PASSWORD" -e "set ftp:ssl-allow no; set net:max-retries 1; pwd; bye" "$CLEAN_SERVER"; then
+            echo "PROTOCOL=ftp" >> $GITHUB_ENV
+          elif lftp -u "$FTP_USERNAME","$FTP_PASSWORD" -e "set ftp:ssl-force yes; set ftp:ssl-protect-data yes; set net:max-retries 1; pwd; bye" "$CLEAN_SERVER"; then
+            echo "PROTOCOL=ftps" >> $GITHUB_ENV
+          else
+            echo "ERROR: FTP connection failed"
+            exit 1
+          fi
+
+      - name: Detectar carpeta destino remota
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          CLEAN_SERVER="${FTP_SERVER#ftp://}"
+          LIST=$(lftp -u "$FTP_USERNAME","$FTP_PASSWORD" -e "set ftp:ssl-allow no; cls -1; bye" "$CLEAN_SERVER" 2>/dev/null || true)
+          if echo "$LIST" | grep -qx public_html; then
+            echo "SERVER_DIR=public_html/" >> $GITHUB_ENV
+          else
+            echo "SERVER_DIR=./" >> $GITHUB_ENV
+          fi
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
         with:
           version: 8
+
       - name: Install and build frontend
         working-directory: frontend
         env:
           VITE_API_URL: https://${{ secrets.FLY_APP_NAME }}.fly.dev
         run: |
-          pnpm install --no-frozen-lockfile
+          pnpm config set registry https://registry.npmjs.org/
+          pnpm install --no-frozen-lockfile --prefer-offline
           pnpm build
+
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftp
+          protocol: ${{ env.PROTOCOL }}
           local-dir: frontend/dist/
-          server-dir: public_html/
+          server-dir: ${{ env.SERVER_DIR }}
           exclude: |
             **/.git*
             **/node_modules/**
             **/*.map
+            **/story*/**
           dangerous-clean-slate: false
 
   # E2E Tests AFTER deployment (Production Testing)
