@@ -8,7 +8,6 @@ import { serviciosApi } from '../../services/serviciosApi'
 import { Alert, AlertDescription } from '../Alerts/Alerts';
 import useAuth from '../../cookie/useAuth';
 import StripeConnection from '../StripeConnection/StripeConnection';
-import { zonasApi } from '../../services/zonasApi';
 
 // Función para convertir datos del API al formato del componente
 const convertirTipoServicioADisplay = (
@@ -58,9 +57,6 @@ function ServiciosSection() {
   const [tareasVisibles, setTareasVisibles] = useState<Tarea[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [zonas, setZonas] = useState<
-    { id: number; descripcionZona: string; selected: boolean }[]
-  >([]);
   // Estados para la funcionalidad de guardado
   const [showAlert, setShowAlert] = useState(false);
   const [alertType, setAlertType] = useState<'success' | 'danger'>('success');
@@ -70,46 +66,6 @@ function ServiciosSection() {
   const [tipoServicioActivo, setTipoServicioActivo] = useState<number | null>(
     null
   );
-
-  // Buscar todas las zonas
-  useEffect(() => {
-    const fetchZonas = async () => {
-      try {
-        const cargarZonas = await zonasApi.getAllPerUser();
-        setZonas(cargarZonas.data.data);
-      } catch (error) {
-        console.error('Error cargando zonas:', error);
-        // No mostramos error, solo logueamos
-      }
-    };
-    fetchZonas();
-  }, []);
-
-  const cambioZona = async (zonaId: number, estado: boolean) => {
-    try {
-      const res = await zonasApi.updateByUser(zonaId.toString(), estado);
-      if (res.data) {
-        setZonas((prevZonas) =>
-          prevZonas.map((zona) =>
-            zona.id === zonaId ? { ...zona, selected: !zona.selected } : zona
-          )
-        );
-      }
-      setShowAlert(true);
-      setAlertType('success');
-      if (!estado) {
-        setAlertMessage('Zona agregada correctamente');
-      } else {
-        setAlertMessage('Zona eliminada correctamente');
-      }
-    } catch (error) {
-      setShowAlert(true);
-      setAlertType('danger');
-      setAlertMessage('Error al actualizar la zona');
-      console.error('Error cambiando zona:', error);
-    }
-  };
-
   // Cargar tipos de servicio desde la API
   const cargarTiposServicio = useCallback(async () => {
     try {
@@ -550,6 +506,7 @@ function ServiciosSection() {
     <DashboardSection title="Mis servicios">
       <StripeConnection loadingMessage="Cargando configuración de servicios...">
         <div className="space-y-8">
+          
           {/* Selector de Tipos de Servicio */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 text-left">
@@ -693,6 +650,17 @@ function ServiciosSection() {
                     })}
                   </tbody>
                 </table>
+              {showAlert && (
+                  <Alert
+                    variant={alertType}
+                    onClose={() => setShowAlert(false)}
+                    autoClose
+                    autoCloseDelay={3500}
+                    className="max-w-fit m-4 flex justify-self-center"
+                  >
+                    <AlertDescription>{alertMessage}</AlertDescription>
+                  </Alert>
+              )}
               </div>
             </div>
           )}
@@ -717,7 +685,9 @@ function ServiciosSection() {
                 Selecciona al menos un tipo de servicio arriba para ver las
                 tareas disponibles.
               </p>
+              
             </div>
+            
           ) : (
             tareasVisibles.length === 0 &&
             tipoServicioActivo !== null && (
@@ -743,68 +713,12 @@ function ServiciosSection() {
                   }
                   ".
                 </p>
+                 {/* ALERTA DE FEEDBACK */}
+        
               </div>
             )
           )}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 text-left">
-              Mis zonas
-            </h3>
-            {zonas.length > 0 ? (
-              <div className="flex items-center justify-between flex-wrap">
-                {zonas.map((zona) => (
-                  <button
-                    key={zona.id}
-                    className={`flex items-center gap-3 px-5 py-2 my-2 mr-3 rounded-lg transition-colors duration-150 border ${
-                      zona.selected
-                        ? 'border-naranja-1 bg-naranja-1'
-                        : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-orange-500'
-                    }`}
-                    onClick={() => cambioZona(zona.id, zona.selected)}
-                  >
-                    <span
-                      className={`w-5 h-5 flex items-center justify-center rounded-full border-2 ${
-                        zona.selected
-                          ? 'border-white bg-white'
-                          : 'border-naranja-1 bg-transparent'
-                      }`}
-                    >
-                      {zona.selected && (
-                        <svg
-                          className="w-3 h-3 text-naranja-1"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                      )}
-                    </span>
-                    <span className="font-medium">{zona.descripcionZona}</span>
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-500">No hay zonas disponibles.</p>
-            )}
-          </div>
-
-          {/* Alert de confirmación */}
-          {showAlert && (
-            <Alert
-              variant={alertType}
-              onClose={() => setShowAlert(false)}
-              autoClose={true}
-              autoCloseDelay={5000}
-            >
-              <AlertDescription>{alertMessage}</AlertDescription>
-            </Alert>
-          )}
+         
         </div>
       </StripeConnection>
     </DashboardSection>

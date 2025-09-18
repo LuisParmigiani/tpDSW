@@ -18,12 +18,10 @@ function ComentariosPrestadorSection() {
       setError(null);
       
       const prestadorId = usuario?.id?.toString();
-      
       if (!prestadorId) {
         setError('No se pudo obtener el ID del usuario logueado.');
         return;
       }
-
       const response = await usuariosApi.getCommentsByUserId(
         prestadorId,
         '50', 
@@ -34,7 +32,7 @@ function ComentariosPrestadorSection() {
       const comentariosFiltrados = comentarios.filter((comentario: Turno) => {
         return comentario.servicio?.usuario === usuario?.id;
       });
-      // Usar el ID del turno, uso any porque turno no tiene id definido en el tipo y si lo cambio se rompe todo.
+      // Usar el ID del turno, uso any porque turno no tiene id definido en el tipo y si lo cambio se rompe todo creo.
       const ids = comentariosFiltrados.map((comentario: any) => comentario.id).filter((id: number) => id);
       
       setComentariosIds(ids);

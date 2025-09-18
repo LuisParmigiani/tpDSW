@@ -2,10 +2,10 @@ import { api } from './api';
 import type { EntityData } from './api';
 
 export interface EstadisticasPagos {
-  ingresosMes: number;   // Ingresos del mes actual
-  ingresosAnio: number;  // Ingresos totales (todos los tiempos) 
-  clientesMes: number;   // Clientes del mes actual
-  clientesAnio: number;  // Clientes totales (todos los tiempos)
+  ingresosMes: number;   
+  ingresosAnio: number;  
+  clientesMes: number;   // en realidad son la cantidad de trabajos del mes actual
+  clientesAnio: number;  // lo mismo
 }
 
 export interface EstadisticasResponse {

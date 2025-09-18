@@ -16,8 +16,6 @@ function PagosSection() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Cargar estadísticas cuando el componente se monta
   useEffect(() => {
     const cargarEstadisticas = async () => {
       if (!usuario) {
@@ -28,32 +26,16 @@ function PagosSection() {
       try {
         setLoading(true);
         setError(null);
-        
-        console.log(`=== DEBUG Frontend: Cargando estadísticas para usuario ${usuario.id} ===`);
-        
         const response = await pagoApi.getEstadisticasByUser(usuario.id);
-        
-        console.log('Respuesta del API:', response);
-        console.log('Datos recibidos:', response.data);
-        
-        // El backend devuelve { message: string, data: EstadisticasPagos }
-        const datos = response.data?.data || response.data;
-        console.log('Datos reales:', datos);
-        
-        // Asegurar que los valores sean números válidos
+        const datos = response.data?.data;
+        //por si era null
         const estadisticasSeguras = {
           ingresosMes: Number(datos.ingresosMes) || 0,
           ingresosAnio: Number(datos.ingresosAnio) || 0,
           clientesMes: Number(datos.clientesMes) || 0,
           clientesAnio: Number(datos.clientesAnio) || 0
         };
-        
-        console.log('Estadísticas procesadas:', estadisticasSeguras);
-        console.log('Valor de ingresosAnio:', estadisticasSeguras.ingresosAnio);
-        console.log('Tipo de ingresosAnio:', typeof estadisticasSeguras.ingresosAnio);
-        console.log('¿Es igual a 0?', estadisticasSeguras.ingresosAnio === 0);
-        console.log('¿Mostrar alerta de sin servicios?', estadisticasSeguras.ingresosAnio === 0);
-        
+
         setEstadisticas(estadisticasSeguras);
         setLoading(false);
       } catch (err) {
@@ -69,7 +51,7 @@ function PagosSection() {
   const formatearMoneda = (cantidad: number) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
-      currency: 'ARS'
+      currency: 'USD'
     }).format(cantidad);
   };
 
@@ -115,8 +97,7 @@ function PagosSection() {
                   
                   <CardPago
                     title="Ingresos este mes"
-                    value={estadisticas.ingresosMes}
-                    displayValue={formatearMoneda(estadisticas.ingresosMes)}
+                    value={formatearMoneda(estadisticas.ingresosMes)}
                     color="green"
                     icon={
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor">
@@ -127,8 +108,7 @@ function PagosSection() {
 
                   <CardPago
                     title="Ingresos totales"
-                    value={estadisticas.ingresosAnio}
-                    displayValue={formatearMoneda(estadisticas.ingresosAnio)}
+                    value={formatearMoneda(estadisticas.ingresosAnio)}
                     color="blue"
                     icon={
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -138,8 +118,8 @@ function PagosSection() {
                   />
 
                   <CardPago
-                    title="Clientes este mes"
-                    value={estadisticas.clientesMes}
+                    title="Trabajos este mes"
+                    value={estadisticas.clientesMes.toString()}
                     color="orange"
                     icon={
                       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -149,8 +129,8 @@ function PagosSection() {
                   />
 
                   <CardPago
-                    title="Clientes totales"
-                    value={estadisticas.clientesAnio}
+                    title="Trabajos totales"
+                    value={estadisticas.clientesAnio.toString()}
                     color="purple"
                     icon={
                       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">

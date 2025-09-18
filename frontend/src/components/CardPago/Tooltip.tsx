@@ -1,8 +1,8 @@
 import { useState } from 'react';
 
 interface TooltipProps {
-  children: React.ReactNode;
-  content: string;
+  children: React.ReactNode; // lo q esta encerrado en el tooltip
+  content: string; // el numero q muestra el tooltip
 }
 
 function Tooltip({ children, content }: TooltipProps) {
