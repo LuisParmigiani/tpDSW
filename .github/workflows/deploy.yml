@@ -23,8 +23,6 @@ jobs:
           CLEAN_SERVER="${RAW_SERVER#ftp://}" # quita prefijo si lo tiene
           echo "Server (raw): $RAW_SERVER"
           echo "Server (clean): $CLEAN_SERVER"
-          # exportar host limpio para usarlo luego en la acción
-          echo "SERVER_HOST=$CLEAN_SERVER" >> $GITHUB_ENV
           echo -n "Server HEX: "; echo -n "$CLEAN_SERVER" | xxd -p
           echo "Testing login as user: $FTP_USERNAME"
           echo -n "Username HEX: "; echo -n "$FTP_USERNAME" | xxd -p
