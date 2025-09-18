@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main] # antes: [never]
+    branches: [never] # antes: [never]
   pull_request:
     branches: [main]
 

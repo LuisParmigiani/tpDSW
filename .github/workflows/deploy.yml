@@ -138,4 +138,4 @@ jobs:
             **/*.map
             **/story*/**
           log-level: verbose
-          dangerous-clean-slate: false
+          dangerous-clean-slate: true
