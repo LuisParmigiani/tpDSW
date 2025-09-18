@@ -10,7 +10,8 @@
     "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "test:watch": "vitest --watch"
+    "test:watch": "vitest --watch",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
@@ -54,10 +55,17 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.2.0",
+    "playwright": "^1.54.1",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.34.1",
     "vite": "^6.3.5",
     "vitest": "^3.2.4",
     "jsdom": "^22.1.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@tailwindcss/oxide",
+      "esbuild"
+    ]
   }
 }

@@ -10,6 +10,7 @@ interface JWTPayload {
 }
 interface AuthRequest extends Request {
   user?: JWTPayload;
+  mail?: string;
 }
 
 const router = Router();
@@ -25,7 +26,7 @@ router.get('/verificar', verifyToken, async (req: AuthRequest, res) => {
       // Buscar el usuario completo en la base de datos
       const em = orm.em.fork();
       const usuario = await em.findOne(Usuario, { id: req.user.id });
-      
+
       if (!usuario) {
         res.json({
           user: null,
@@ -53,7 +54,7 @@ router.get('/verificar', verifyToken, async (req: AuthRequest, res) => {
       console.error('Error al obtener usuario:', error);
       res.status(500).json({
         user: null,
-        error: 'Error interno del servidor'
+        error: 'Error interno del servidor',
       });
     }
   }
