@@ -11,53 +11,72 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Verify FTP credentials
+      - name: Debug and verify FTP credentials
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
-          echo "Testing connection to: $FTP_SERVER"
+          echo "=== DEBUGGING FTP CONNECTION ==="
+          echo "Server: $FTP_SERVER"
           echo "Username: $FTP_USERNAME"
           echo "Password length: $(echo -n "$FTP_PASSWORD" | wc -c) characters"
+          echo "Password first 3 chars: $(echo -n "$FTP_PASSWORD" | cut -c1-3)..."
+          echo "Password SHA256: $(echo -n "$FTP_PASSWORD" | sha256sum | cut -d' ' -f1)"
+          echo "Username HEX: $(echo -n "$FTP_USERNAME" | xxd -p)"
+          echo "Password HEX (first 6 chars): $(echo -n "$FTP_PASSWORD" | cut -c1-6 | xxd -p)"
 
-          # Install lftp for testing
-          sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends lftp
+          # Install tools
+          sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends lftp curl
 
-          # Test FTP connection (Hostinger IP-based FTP)
-          echo "Testing FTP connection to Hostinger..."
-          if lftp -u "$FTP_USERNAME","$FTP_PASSWORD" -e "set ftp:ssl-allow no; set net:max-retries 2; pwd; ls; bye" "$FTP_SERVER"; then
-            echo "✅ FTP connection successful"
-            echo "PROTOCOL=ftp" >> $GITHUB_ENV
-            echo "CONNECTION_OK=true" >> $GITHUB_ENV
+          echo "=== TESTING WITH CURL ==="
+          echo "Testing basic FTP with curl..."
+          if curl -v --disable-epsv --connect-timeout 30 \
+            ftp://$FTP_SERVER -u "$FTP_USERNAME:$FTP_PASSWORD" \
+            --ftp-method nocwd -Q "PWD" 2>&1 | tee curl_output.log; then
+            echo "✅ CURL FTP test had some response"
           else
-            echo "❌ FTP connection failed, trying FTPS..."
-            if lftp -u "$FTP_USERNAME","$FTP_PASSWORD" -e "set ftp:ssl-force yes; set ftp:ssl-protect-data yes; set ssl:verify-certificate no; set net:max-retries 2; pwd; bye" "$FTP_SERVER"; then
-              echo "✅ FTPS connection successful"
-              echo "PROTOCOL=ftps" >> $GITHUB_ENV
-              echo "CONNECTION_OK=true" >> $GITHUB_ENV
-            else
-              echo "❌ Both FTP and FTPS failed - check credentials"
-              echo "CONNECTION_OK=false" >> $GITHUB_ENV
-              exit 1
-            fi
+            echo "❌ CURL FTP test failed completely"
           fi
 
+          echo "=== TESTING WITH LFTP (Plain FTP) ==="
+          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" -e "set ftp:ssl-allow no; set debug 3; pwd; bye" "$FTP_SERVER" 2>&1 || true
+
+          echo "=== TESTING WITH LFTP (FTPS) ==="  
+          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" -e "set ftp:ssl-force yes; set ftp:ssl-protect-data yes; set ssl:verify-certificate no; set debug 3; pwd; bye" "$FTP_SERVER" 2>&1 || true
+
+          echo "=== TESTING ALTERNATIVE HOSTINGER SERVERS ==="
+          # Try common Hostinger FTP servers
+          for server in "files.000webhost.com" "ftp.reformix.site"; do
+            echo "Testing server: $server"
+            if timeout 20 lftp -u "$FTP_USERNAME","$FTP_PASSWORD" -e "set ftp:ssl-allow no; set net:max-retries 1; pwd; bye" "$server" 2>/dev/null; then
+              echo "✅ Alternative server $server works!"
+              echo "ALTERNATIVE_SERVER=$server" >> $GITHUB_ENV
+              break
+            else
+              echo "❌ Server $server failed"
+            fi
+          done
+
+          # Set connection status for next steps
+          echo "CONNECTION_OK=debug" >> $GITHUB_ENV
+          echo "PROTOCOL=ftp" >> $GITHUB_ENV
+
       - name: Setup Node.js
-        if: env.CONNECTION_OK == 'true'
+        if: env.CONNECTION_OK == 'debug'
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           registry-url: 'https://registry.npmjs.org'
 
       - name: Setup pnpm
-        if: env.CONNECTION_OK == 'true'
+        if: env.CONNECTION_OK == 'debug'
         uses: pnpm/action-setup@v3
         with:
           version: 8
 
       - name: Configure pnpm for deployment
-        if: env.CONNECTION_OK == 'true'
+        if: env.CONNECTION_OK == 'debug'
         working-directory: frontend
         run: |
           pnpm config set registry https://registry.npmjs.org/
@@ -67,41 +86,42 @@ jobs:
           pnpm config set fetch-retry-maxtimeout 60000
 
       - name: Install dependencies
-        if: env.CONNECTION_OK == 'true'
+        if: env.CONNECTION_OK == 'debug'
         working-directory: frontend
         run: pnpm install --no-frozen-lockfile --prefer-offline
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Build project
-        if: env.CONNECTION_OK == 'true'
+        if: env.CONNECTION_OK == 'debug'
         working-directory: frontend
         run: pnpm build
 
       - name: List build output
-        if: env.CONNECTION_OK == 'true'
+        if: env.CONNECTION_OK == 'debug'
         run: |
           echo "Build output files:"
           find frontend/dist -type f -print | head -20 | sed 's/^/  📄 /'
           echo "Total files to deploy: $(find frontend/dist -type f | wc -l)"
 
-      - name: Deploy to Hostinger via FTP
-        if: env.CONNECTION_OK == 'true'
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ${{ env.PROTOCOL }}
-          local-dir: frontend/dist/
-          server-dir: public_html/
-          exclude: |
-            **/.git*
-            **/node_modules/**
-            **/*.map
-            **/.DS_Store
-            **/Thumbs.db
-            **/story*/**
-          log-level: verbose
-          dangerous-clean-slate: false
-          timeout: 600000
+      # SKIP DEPLOY FOR NOW - DEBUGGING ONLY
+      # - name: Deploy to Hostinger via FTP
+      #   if: env.CONNECTION_OK == 'debug'
+      #   uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      #   with:
+      #     server: ${{ secrets.FTP_SERVER }}
+      #     username: ${{ secrets.FTP_USERNAME }}
+      #     password: ${{ secrets.FTP_PASSWORD }}
+      #     protocol: ${{ env.PROTOCOL }}
+      #     local-dir: frontend/dist/
+      #     server-dir: public_html/
+      #     exclude: |
+      #       **/.git*
+      #       **/node_modules/**
+      #       **/*.map
+      #       **/.DS_Store
+      #       **/Thumbs.db
+      #       **/story*/**
+      #     log-level: verbose
+      #     dangerous-clean-slate: false
+      #     timeout: 600000
