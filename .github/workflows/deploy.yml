@@ -105,23 +105,23 @@ jobs:
           echo "Total files to deploy: $(find frontend/dist -type f | wc -l)"
 
       # SKIP DEPLOY FOR NOW - DEBUGGING ONLY
-      # - name: Deploy to Hostinger via FTP
-      #   if: env.CONNECTION_OK == 'debug'
-      #   uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-      #   with:
-      #     server: ${{ secrets.FTP_SERVER }}
-      #     username: ${{ secrets.FTP_USERNAME }}
-      #     password: ${{ secrets.FTP_PASSWORD }}
-      #     protocol: ${{ env.PROTOCOL }}
-      #     local-dir: frontend/dist/
-      #     server-dir: public_html/
-      #     exclude: |
-      #       **/.git*
-      #       **/node_modules/**
-      #       **/*.map
-      #       **/.DS_Store
-      #       **/Thumbs.db
-      #       **/story*/**
-      #     log-level: verbose
-      #     dangerous-clean-slate: false
-      #     timeout: 600000
+      - name: Deploy to Hostinger via FTP
+        if: env.CONNECTION_OK == 'debug'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ${{ env.PROTOCOL }}
+          local-dir: frontend/dist/
+          server-dir: public_html/
+          exclude: |
+            **/.git*
+            **/node_modules/**
+            **/*.map
+            **/.DS_Store
+            **/Thumbs.db
+            **/story*/**
+          log-level: verbose
+          dangerous-clean-slate: false
+          timeout: 600000
