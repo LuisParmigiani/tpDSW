@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { usuariosApi } from '../../services/usuariosApi';
-import Navbar from '../Navbar/Navbar'; // Ajusta la ruta según la ubicación real de tu Navbar
+import Navbar from '../Navbar/Navbar';
 import { z } from 'zod';
 
 const schema = z.object({
@@ -24,10 +24,12 @@ export type Usuario = z.infer<typeof schema>;
 
 function ChangePassword() {
   const navigate = useNavigate();
+
+  //setea la contraseña y la confirmacion
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  //Para el modal
+  //Setea mensaje y modal
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -36,8 +38,8 @@ function ChangePassword() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const location = useLocation();
-  // inntenta obtener mail y codigo del estado o de localStorage para que el usuario
-  // pueda refrescar la página
+
+  // inntenta obtener mail y codigo del estado
   const mail = location.state?.mail || localStorage.getItem('recoveryMail');
   const codigo =
     location.state?.codigo || localStorage.getItem('recoveryCodigo');
@@ -49,6 +51,8 @@ function ChangePassword() {
       nuevaContrasena: password,
       contrasena: password,
     };
+
+    //valida los datos ingresados por el usuario con zod
     const resultado = schema.safeParse(datos);
     if (!resultado.success) {
       const errores = resultado.error.issues;
@@ -57,12 +61,14 @@ function ChangePassword() {
       return;
     }
 
+    //valida que las contraseñas coincidan
     if (password !== confirmPassword) {
       setMessage('Las contraseñas no coinciden');
       setOpen(true);
       return;
     }
 
+    //intenta cambiar la password
     try {
       await usuariosApi.cambiarPassword({
         mail,
@@ -71,7 +77,6 @@ function ChangePassword() {
       });
       setMessage('Contraseña cambiada con éxito');
       setOpen(true);
-      // limpia localStorage después de cambiar la contraseña
       localStorage.removeItem('recoveryMail');
       localStorage.removeItem('recoveryCodigo');
     } catch {

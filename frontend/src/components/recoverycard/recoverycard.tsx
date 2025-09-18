@@ -3,16 +3,18 @@ import { Link, useNavigate } from 'react-router-dom';
 import { usuariosApi } from '../../services/usuariosApi';
 import { z } from 'zod';
 
-// eslint-disable-next-line react-refresh/only-export-components
-export const usuarioSchema = z.object({
+const usuarioSchema = z.object({
   mail: z.string().email('Ingrese un formato de email válido'),
 });
 
 export type Usuario = z.infer<typeof usuarioSchema>;
 
 function Recovery() {
+  //abre el modal de recuperación
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
+
+  //Almacena código de recuperación
   const [codigo, setCodigo] = useState('');
 
   const navigate = useNavigate();
@@ -37,6 +39,7 @@ function Recovery() {
     return () => clearInterval(interval);
   }, [timerActivo, tiempoRestante]);
 
+  //valida el código ingresado por el usuario
   const validarCodigo = async () => {
     try {
       await usuariosApi.validateRecoveryCode({
@@ -54,6 +57,7 @@ function Recovery() {
     mail: '',
   });
 
+  //valida que el email ingresado tenga un formato válido
   const envioFormulario = async () => {
     const result = usuarioSchema.safeParse(form);
     if (!result.success) {
@@ -65,7 +69,6 @@ function Recovery() {
 
     try {
       await usuariosApi.recoverPassword(form);
-      console.log('Recuperación de contraseña exitosa');
       setOpen(true);
       setCodigo('');
       setMessage('Ingrese el código de recuperación que se envió a su email');
@@ -89,6 +92,7 @@ function Recovery() {
 
   return (
     <>
+      {/* Modal de recuperación */}
       {open && (
         <div className="fixed inset-0 flex items-center justify-center bg-neutral-5 backdrop-blur-md bg-opacity-40 z-50">
           <div className="text-black bg-white p-4 rounded shadow-md max-w-xl w-full text-center">
@@ -164,7 +168,7 @@ function Recovery() {
                 <button
                   onClick={() => {
                     envioFormulario();
-                    setTiempoRestante(20); // reinicia a 10 minutos
+                    setTiempoRestante(20);
                     setTimerActivo(true);
                     setValidado(true);
                   }}
