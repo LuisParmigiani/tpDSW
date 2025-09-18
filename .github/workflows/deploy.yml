@@ -26,7 +26,7 @@ jobs:
           echo "Username: $CLEAN_USERNAME"
           echo "Password length: ${#CLEAN_PASSWORD}"
 
-          # Use the working server from previous tests
+          # Use Hostinger credentials
           echo "FTP_SERVER_CLEAN=ftp.reformix.site" >> $GITHUB_ENV
           echo "FTP_USERNAME_CLEAN=$CLEAN_USERNAME" >> $GITHUB_ENV
           echo "FTP_PASSWORD_CLEAN=$CLEAN_PASSWORD" >> $GITHUB_ENV
@@ -64,7 +64,7 @@ jobs:
           password: ${{ env.FTP_PASSWORD_CLEAN }}
           protocol: ftp
           local-dir: frontend/dist/
-          server-dir: public_html/
+          server-dir: /home/u797556926/domains/reformix.site/public_html/
           exclude: |
             **/.git*
             **/node_modules/**
