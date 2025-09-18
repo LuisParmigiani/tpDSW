@@ -1,9 +1,9 @@
-import React from 'react';
 import StarRating from '../stars/RatingStars';
 import { Alert, AlertTitle, AlertDescription } from '../Alerts/Alerts.tsx';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useState, useEffect } from 'react';
 
 // Esquema de validación con Zod
 const calificationSchema = z.object({
@@ -49,7 +49,11 @@ type Usuario = {
 type Props = {
   data: Turno;
   closeModal: () => void;
-  SaveRating: (rating: number, comentario: string) => void;
+  SaveRating: (
+    rating: number,
+    comentario: string,
+    setSpinner: (value: boolean) => void
+  ) => void;
   setFlagged: (value: boolean) => void;
   flagged: boolean;
 };
@@ -62,8 +66,12 @@ function CalificationModal({
   flagged,
 }: Props) {
   // alertas de errores del back
-  const [spinner, setSpinner] = React.useState(false);
-
+  const [spinner, setSpinner] = useState(false);
+  useEffect(() => {
+    if (flagged) {
+      setSpinner(false);
+    }
+  }, [flagged]);
   const {
     control,
     handleSubmit,
@@ -79,7 +87,7 @@ function CalificationModal({
   });
 
   const onSubmit = (formData: CalificationFormData) => {
-    SaveRating(formData.rating, formData.comentario);
+    SaveRating(formData.rating, formData.comentario, setSpinner);
   };
 
   return (
@@ -179,7 +187,13 @@ function CalificationModal({
             </div>
           </div>
         </form>
-        <div className="flex gap-4 mt-4">
+        {spinner && (
+          <div className="flex justify-center mt-4">
+            <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-6 w-6"></div>
+            <span className="ml-2">Procesando...Por favor espere</span>
+          </div>
+        )}
+        <div className="flex gap-4 mt-4 justify-center">
           <button
             type="button"
             className="px-4 py-2 hover:text-neutral-400 rounded-sm border-1 border-neutral-400 bg-neutral-400 hover:bg-white text-white"
@@ -192,7 +206,9 @@ function CalificationModal({
             form="calification-form"
             className="px-4 py-2 hover:text-amber-700 rounded-sm border-1 border-naranja-1 bg-naranja-1 hover:bg-white text-white disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={!isValid}
-            onClick={() => {}}
+            onClick={() => {
+              setSpinner(true);
+            }}
           >
             Guardar
           </button>

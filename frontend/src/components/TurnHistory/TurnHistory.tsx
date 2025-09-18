@@ -134,7 +134,11 @@ function TurnHistory({ estado }: Props) {
   };
 
   // Guardar calificación
-  const SaveRating = async (rating: number, comentario: string) => {
+  const SaveRating = async (
+    rating: number,
+    comentario: string,
+    setSpinner: (value: boolean) => void
+  ) => {
     if (data) {
       const dataForUpdate = {
         calificacion: rating,
@@ -144,6 +148,7 @@ function TurnHistory({ estado }: Props) {
         const res = await turnosApi.update(data.id.toString(), dataForUpdate);
         console.log('Respuesta de la API:', res);
         setFlagged(res.data.flagged || false); // Actualizar el estado de flagged si viene en la respuesta
+        setSpinner(false); //desactiva el spinner de cargando...
 
         // Actualizar el turno en la lista local en lugar de recargar toda la página
         if (turns) {
