@@ -57,7 +57,7 @@ turnoRouter.post(
   addWithCookie
 );
 
-turnoRouter.patch(
+turnoRouter.put(
   '/:id',
   validateParams(TurnoIdSchema),
   validateBody(TurnoUpdateSchema),
