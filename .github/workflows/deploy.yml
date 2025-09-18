@@ -1,4 +1,4 @@
-name: Deploy Frontend
+name: Deploy Frontend to Hostinger
 
 on:
   push:
@@ -11,94 +11,53 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Diagnostic FTP login (fail fast)
+      - name: Verify FTP credentials
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
-          set -e
-          RAW_SERVER="$FTP_SERVER"
-          CLEAN_SERVER="${RAW_SERVER#ftp://}" # quita prefijo si lo tiene
-          echo "Server (raw): $RAW_SERVER"
-          echo "Server (clean): $CLEAN_SERVER"
-          echo -n "Server HEX: "; echo -n "$CLEAN_SERVER" | xxd -p
-          echo "Testing login as user: $FTP_USERNAME"
-          echo -n "Username HEX: "; echo -n "$FTP_USERNAME" | xxd -p
-          echo -n "Password length: "; echo -n "$FTP_PASSWORD" | wc -c
-          echo -n "Password SHA256: "; echo -n "$FTP_PASSWORD" | sha256sum | cut -d' ' -f1
-          echo "---- CURL (plain FTP) ----"
-          if curl -s --disable-epsv ftp://$CLEAN_SERVER -u "$FTP_USERNAME:$FTP_PASSWORD" -Q "QUIT" >/dev/null 2>&1; then
-            echo "FTP credentials OK (curl/plain)";
-            echo "PLAIN_OK=true" >> $GITHUB_ENV
-          else
-            echo "FTP credentials FAIL (curl/plain)";
-            echo "PLAIN_OK=false" >> $GITHUB_ENV
-          fi
-          echo "Instalando lftp para pruebas adicionales..."
-          sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends lftp >/dev/null
-          echo "---- LFTP (plain FTP) ----"
-          if lftp -u "$FTP_USERNAME","$FTP_PASSWORD" -e "set ftp:ssl-allow no; set net:max-retries 1; pwd; bye" "$CLEAN_SERVER"; then
-            echo "LFTP plain OK"; echo "LFTP_PLAIN_OK=true" >> $GITHUB_ENV
-          else
-            echo "LFTP plain FAIL"; echo "LFTP_PLAIN_OK=false" >> $GITHUB_ENV
-          fi
-          echo "---- LFTP (FTPS explicit) ----"
-          if lftp -u "$FTP_USERNAME","$FTP_PASSWORD" -e "set ftp:ssl-force yes; set ftp:ssl-protect-data yes; set net:max-retries 1; pwd; bye" "$CLEAN_SERVER"; then
-            echo "LFTP FTPS OK"; echo "LFTP_FTPS_OK=true" >> $GITHUB_ENV
-          else
-            echo "LFTP FTPS FAIL"; echo "LFTP_FTPS_OK=false" >> $GITHUB_ENV
-          fi
-          echo "---- Diagnóstico final ----"
-          echo "Si TODOS fallan => credenciales incorrectas o cuenta bloqueada. Si sólo FTPS OK => fuerza TLS y debes cambiar protocol a ftps."
-          # No abortar todavía; dejaremos que el usuario analice.
+          echo "Testing connection to: $FTP_SERVER"
+          echo "Username: $FTP_USERNAME"
+          echo "Password length: $(echo -n "$FTP_PASSWORD" | wc -c) characters"
 
-      - name: Detectar carpeta destino remota
-        if: success()
-        env:
-          FTP_SERVER: ${{ secrets.FTP_SERVER }}
-          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-        run: |
-          set -e
-          RAW_SERVER="$FTP_SERVER"
-          CLEAN_SERVER="${RAW_SERVER#ftp://}"
-          echo "Listando root remoto (sin TLS)..."
-          LIST=$(lftp -u "$FTP_USERNAME","$FTP_PASSWORD" -e "set ftp:ssl-allow no; cls -1; bye" "$CLEAN_SERVER" 2>/dev/null || true)
-          echo "Entradas root:"; printf '%s\n' "$LIST"
-          if echo "$LIST" | grep -qx public_html; then
-            echo "Detectado public_html"; echo "SERVER_DIR=public_html/" >> $GITHUB_ENV
-          else
-            echo "No existe public_html -> usar raíz"; echo "SERVER_DIR=./" >> $GITHUB_ENV
-          fi
+          # Install lftp for testing
+          sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends lftp
 
-      - name: Determinar protocolo y validar credenciales
-        if: success()
-        run: |
-          echo "LFTP_PLAIN_OK=${LFTP_PLAIN_OK} | LFTP_FTPS_OK=${LFTP_FTPS_OK} | PLAIN_OK=${PLAIN_OK}"
-          # Prioridad: si plain funciona usamos ftp, si sólo FTPS funciona usamos ftps, si ninguno falla
-          if [ "${LFTP_PLAIN_OK}" = "true" ]; then
-            echo "Elegido protocolo ftp (plain OK)"; echo "PROTOCOL=ftp" >> $GITHUB_ENV
-          elif [ "${LFTP_FTPS_OK}" = "true" ]; then
-            echo "Plain falló pero FTPS OK -> usando ftps"; echo "PROTOCOL=ftps" >> $GITHUB_ENV
+          # Test FTP connection (Hostinger IP-based FTP)
+          echo "Testing FTP connection to Hostinger..."
+          if lftp -u "$FTP_USERNAME","$FTP_PASSWORD" -e "set ftp:ssl-allow no; set net:max-retries 2; pwd; ls; bye" "$FTP_SERVER"; then
+            echo "✅ FTP connection successful"
+            echo "PROTOCOL=ftp" >> $GITHUB_ENV
+            echo "CONNECTION_OK=true" >> $GITHUB_ENV
           else
-            echo "ERROR: Ningún método FTP autenticó correctamente; abortando." >&2
-            exit 2
+            echo "❌ FTP connection failed, trying FTPS..."
+            if lftp -u "$FTP_USERNAME","$FTP_PASSWORD" -e "set ftp:ssl-force yes; set ftp:ssl-protect-data yes; set ssl:verify-certificate no; set net:max-retries 2; pwd; bye" "$FTP_SERVER"; then
+              echo "✅ FTPS connection successful"
+              echo "PROTOCOL=ftps" >> $GITHUB_ENV
+              echo "CONNECTION_OK=true" >> $GITHUB_ENV
+            else
+              echo "❌ Both FTP and FTPS failed - check credentials"
+              echo "CONNECTION_OK=false" >> $GITHUB_ENV
+              exit 1
+            fi
           fi
-          echo "Protocolo final: $(grep PROTOCOL= $GITHUB_ENV | tail -1 | cut -d= -f2)"
 
       - name: Setup Node.js
+        if: env.CONNECTION_OK == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           registry-url: 'https://registry.npmjs.org'
 
       - name: Setup pnpm
+        if: env.CONNECTION_OK == 'true'
         uses: pnpm/action-setup@v3
         with:
           version: 8
 
       - name: Configure pnpm for deployment
+        if: env.CONNECTION_OK == 'true'
         working-directory: frontend
         run: |
           pnpm config set registry https://registry.npmjs.org/
@@ -107,22 +66,27 @@ jobs:
           pnpm config set fetch-retry-mintimeout 10000
           pnpm config set fetch-retry-maxtimeout 60000
 
-      - name: Install deps
+      - name: Install dependencies
+        if: env.CONNECTION_OK == 'true'
         working-directory: frontend
         run: pnpm install --no-frozen-lockfile --prefer-offline
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Build
+      - name: Build project
+        if: env.CONNECTION_OK == 'true'
         working-directory: frontend
         run: pnpm build
 
-      - name: List dist
+      - name: List build output
+        if: env.CONNECTION_OK == 'true'
         run: |
-          echo "Dist files:"; find frontend/dist -maxdepth 3 -type f -print | sed 's/^/ - /'
+          echo "Build output files:"
+          find frontend/dist -type f -print | head -20 | sed 's/^/  📄 /'
+          echo "Total files to deploy: $(find frontend/dist -type f | wc -l)"
 
-      - name: Deploy via FTP
-        if: success()
+      - name: Deploy to Hostinger via FTP
+        if: env.CONNECTION_OK == 'true'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -130,11 +94,14 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ${{ env.PROTOCOL }}
           local-dir: frontend/dist/
-          server-dir: ${{ env.SERVER_DIR }}
+          server-dir: public_html/
           exclude: |
             **/.git*
             **/node_modules/**
             **/*.map
+            **/.DS_Store
+            **/Thumbs.db
             **/story*/**
           log-level: verbose
           dangerous-clean-slate: false
+          timeout: 600000
