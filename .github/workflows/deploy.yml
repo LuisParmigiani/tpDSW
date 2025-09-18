@@ -114,7 +114,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ${{ env.PROTOCOL }}
           local-dir: frontend/dist/
-          server-dir: public_html/
+          server-dir: /home/u797556926/domains/reformix.site/public_html/
           exclude: |
             **/.git*
             **/node_modules/**
