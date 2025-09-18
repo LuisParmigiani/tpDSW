@@ -25,6 +25,7 @@ jobs:
           RAW_SERVER="$FTP_SERVER"
           CLEAN_SERVER="${RAW_SERVER#ftp://}" # quita prefijo si lo tiene
           CLEAN_SERVER="${CLEAN_SERVER#ftps://}" # quita ftps:// si lo tiene
+          CLEAN_SERVER="${CLEAN_SERVER#sftp://}" # quita sftp:// si lo tiene
           echo "Server (raw): $RAW_SERVER"
           echo "Server (clean): $CLEAN_SERVER"
           echo -n "Server HEX: "; echo -n "$CLEAN_SERVER" | xxd -p
@@ -56,21 +57,28 @@ jobs:
           else
             echo "LFTP FTPS FAIL"; echo "LFTP_FTPS_OK=false" >> $GITHUB_ENV
           fi
+          echo "---- LFTP (SFTP/SSH) ----"
+          if lftp -u "$FTP_USERNAME","$FTP_PASSWORD" -e "set sftp:auto-confirm yes; set net:max-retries 1; pwd; bye" "sftp://$CLEAN_SERVER"; then
+            echo "LFTP SFTP OK"; echo "LFTP_SFTP_OK=true" >> $GITHUB_ENV
+          else
+            echo "LFTP SFTP FAIL"; echo "LFTP_SFTP_OK=false" >> $GITHUB_ENV
+          fi
           echo "---- Diagnóstico final ----"
-          echo "Si TODOS fallan => credenciales incorrectas o cuenta bloqueada. Si sólo FTPS OK => fuerza TLS y debes cambiar protocol a ftps."
-          # No abortar todavía; dejaremos que el usuario analice.
+          echo "Si TODOS fallan => credenciales incorrectas o cuenta bloqueada. Si sólo FTPS OK => fuerza TLS y debes cambiar protocol a ftps. Si sólo SFTP OK => el servidor no soporta FTP/FTPS."
 
       - name: Determinar protocolo y validar credenciales
         if: success()
         run: |
-          echo "LFTP_PLAIN_OK=${LFTP_PLAIN_OK} | LFTP_FTPS_OK=${LFTP_FTPS_OK} | PLAIN_OK=${PLAIN_OK}"
-          # Prioridad: si plain funciona usamos ftp, si sólo FTPS funciona usamos ftps, si ninguno falla
+          echo "LFTP_PLAIN_OK=${LFTP_PLAIN_OK} | LFTP_FTPS_OK=${LFTP_FTPS_OK} | LFTP_SFTP_OK=${LFTP_SFTP_OK} | PLAIN_OK=${PLAIN_OK}"
+          # Prioridad: si plain funciona usamos ftp, si sólo FTPS funciona usamos ftps, si sólo SFTP funciona usamos sftp
           if [ "${LFTP_PLAIN_OK}" = "true" ]; then
             echo "Elegido protocolo ftp (plain OK)"; echo "PROTOCOL=ftp" >> $GITHUB_ENV
           elif [ "${LFTP_FTPS_OK}" = "true" ]; then
             echo "Plain falló pero FTPS OK -> usando ftps"; echo "PROTOCOL=ftps" >> $GITHUB_ENV
+          elif [ "${LFTP_SFTP_OK}" = "true" ]; then
+            echo "Sólo SFTP autenticó -> usando sftp"; echo "PROTOCOL=sftp" >> $GITHUB_ENV
           else
-            echo "ERROR: Ningún método FTP autenticó correctamente; abortando." >&2
+            echo "ERROR: Ningún método autenticó correctamente; abortando." >&2
             exit 2
           fi
           echo "Protocolo final: $(grep PROTOCOL= $GITHUB_ENV | tail -1 | cut -d= -f2)"
@@ -85,13 +93,18 @@ jobs:
         run: |
           set -e
           CLEAN_SERVER="$SERVER_HOST"
-          if [ "$PROTOCOL" = "ftps" ]; then
+          if [ "$PROTOCOL" = "sftp" ]; then
+            LFTP_OPTS='set sftp:auto-confirm yes;'
+            SCHEME='sftp://'
+          elif [ "$PROTOCOL" = "ftps" ]; then
             LFTP_OPTS='set ftp:ssl-force yes; set ftp:ssl-protect-data yes;'
+            SCHEME=''
           else
             LFTP_OPTS='set ftp:ssl-allow no;'
+            SCHEME=''
           fi
           echo "Listando root remoto ($PROTOCOL)..."
-          LIST=$(lftp -u "$FTP_USERNAME","$FTP_PASSWORD" -e "${LFTP_OPTS} set net:max-retries 1; cls -1; bye" "$CLEAN_SERVER" 2>/dev/null || true)
+          LIST=$(lftp -u "$FTP_USERNAME","$FTP_PASSWORD" -e "${LFTP_OPTS} set net:max-retries 1; cls -1; bye" "${SCHEME}${CLEAN_SERVER}" 2>/dev/null || true)
           echo "Entradas root:"; printf '%s\n' "$LIST"
           if echo "$LIST" | grep -qx public_html; then
             echo "Detectado public_html"; echo "SERVER_DIR=public_html/" >> $GITHUB_ENV
@@ -133,8 +146,8 @@ jobs:
         run: |
           echo "Dist files:"; find frontend/dist -maxdepth 3 -type f -print | sed 's/^/ - /'
 
-      - name: Deploy via FTP
-        if: success()
+      - name: Deploy via FTP/FTPS
+        if: success() && env.PROTOCOL != 'sftp'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ env.SERVER_HOST }} # usar host normalizado (sin prefijo)
@@ -149,4 +162,15 @@ jobs:
             **/*.map
             **/story*/**
           log-level: verbose
-          dangerous-clean-slate: true
+          dangerous-clean-slate: false
+
+      - name: Deploy via SFTP
+        if: success() && env.PROTOCOL == 'sftp'
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+        with:
+          server: ${{ env.SERVER_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local_path: frontend/dist/
+          remote_path: ${{ env.SERVER_DIR }}
+          sftp_only: true
