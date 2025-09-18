@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [never]
+    branches: [main] # antes: [never]
   pull_request:
     branches: [main]
 
@@ -130,6 +130,8 @@ jobs:
           CLEAN_SERVER="${RAW_SERVER#ftp://}" # quita prefijo si lo tiene
           echo "Server (raw): $RAW_SERVER"
           echo "Server (clean): $CLEAN_SERVER"
+          # exportar host limpio para usarlo después
+          echo "SERVER_HOST=$CLEAN_SERVER" >> $GITHUB_ENV
           echo -n "Server HEX: "; echo -n "$CLEAN_SERVER" | xxd -p
           echo "Testing login as user: $FTP_USERNAME"
           echo -n "Username HEX: "; echo -n "$FTP_USERNAME" | xxd -p
@@ -209,7 +211,7 @@ jobs:
           pnpm config set fetch-retries 5
           pnpm config set fetch-retry-factor 2
           pnpm config set fetch-retry-mintimeout 10000
-          pnpm config set fetch-retry-maxtimeout 60000V
+          pnpm config set fetch-retry-maxtimeout 60000 # corregido: antes 60000V
 
       - name: Install deps
         working-directory: frontend
@@ -225,7 +227,7 @@ jobs:
         if: success()
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ secrets.FTP_SERVER }}
+          server: ${{ env.SERVER_HOST }} # usar host sin prefijo
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ${{ env.PROTOCOL }}
