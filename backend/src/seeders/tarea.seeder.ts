@@ -31,22 +31,33 @@ export class TareaSeeder extends Seeder {
         let nombreTarea = '';
         switch (tipo.nombreTipo) {
           case 'Limpieza Residencial':
+            nombreTarea = faker.helpers.arrayElement([
+              'Limpieza de cocina',
+              'Limpieza de baño',
+              'Limpieza de habitaciones',
+              'Limpieza de sala',
+              'Limpieza de ventanas',
+              'Limpieza profunda',
+              'Limpieza de fachada',
+            ]);
+            break;
           case 'Limpieza Industrial':
             nombreTarea = faker.helpers.arrayElement([
-              'Limpieza de ventanas',
-              'Limpieza de pisos',
-              'Limpieza de baños',
-              'Limpieza de cocina',
-              'Organización de habitaciones',
+              'Limpieza de musgo',
+              'Limpieza de ventanas en edificios',
+              'Limpieza profunda de cocinas',
+              'Limpieza de vereda',
+              'Puesta a tono de exteriores',
             ]);
             break;
           case 'Plomería':
             nombreTarea = faker.helpers.arrayElement([
               'Reparación de cañerías',
               'Instalación de grifería',
-              'Desagüe de lavamanos',
+              'Destape de pileta',
               'Revisión de fugas',
               'Instalación de sanitarios',
+              'Mantenimiento de bombas',
             ]);
             break;
           case 'Electricidad':
@@ -56,6 +67,7 @@ export class TareaSeeder extends Seeder {
               'Cambio de iluminación',
               'Instalación de cables',
               'Mantenimiento de panel eléctrico',
+              'Revisión de tableros',
             ]);
             break;
           case 'Jardinería':
@@ -65,10 +77,171 @@ export class TareaSeeder extends Seeder {
               'Plantación de flores',
               'Riego de jardines',
               'Limpieza de hojas',
+              'Diseño paisajístico',
+            ]);
+            break;
+          case 'Pintura':
+            nombreTarea = faker.helpers.arrayElement([
+              'Pintura de paredes interiores',
+              'Pintura de fachadas',
+              'Pintura de techos',
+              'Aplicación de barniz',
+              'Preparación de superficies',
+              'Pintura decorativa',
+            ]);
+            break;
+          case 'Carpintería':
+            nombreTarea = faker.helpers.arrayElement([
+              'Fabricación de muebles',
+              'Reparación de puertas',
+              'Instalación de estanterías',
+              'Reparación de ventanas',
+              'Trabajo con madera',
+              'Barnizado de muebles',
+            ]);
+            break;
+          case 'Construcción':
+            nombreTarea = faker.helpers.arrayElement([
+              'Levantamiento de paredes',
+              'Colocación de pisos',
+              'Construcción de techos',
+              'Trabajos de albañilería',
+              'Reparación estructural',
+              'Ampliaciones',
+            ]);
+            break;
+          case 'Cerrajería':
+            nombreTarea = faker.helpers.arrayElement([
+              'Cambio de cerraduras',
+              'Instalación de rejas',
+              'Reparación de llaves',
+              'Apertura de puertas',
+              'Instalación de sistemas de seguridad',
+              'Duplicado de llaves',
+            ]);
+            break;
+          case 'Climatización':
+            nombreTarea = faker.helpers.arrayElement([
+              'Instalación de aire acondicionado',
+              'Mantenimiento de split',
+              'Reparación de ventiladores',
+              'Limpieza de filtros',
+              'Carga de gas refrigerante',
+              'Revisión de ductos',
+            ]);
+            break;
+          case 'Reparaciones Generales':
+            nombreTarea = faker.helpers.arrayElement([
+              'Reparación de goteras',
+              'Arreglo de grietas',
+              'Reparación de azulejos',
+              'Mantenimiento preventivo',
+              'Reparaciones menores',
+              'Solución de problemas diversos',
+            ]);
+            break;
+          case 'Servicios Técnicos':
+            nombreTarea = faker.helpers.arrayElement([
+              'Diagnóstico técnico',
+              'Instalación de equipos',
+              'Mantenimiento especializado',
+              'Calibración de instrumentos',
+              'Soporte técnico',
+              'Análisis de sistemas',
+            ]);
+            break;
+          case 'Servicios del Hogar':
+            nombreTarea = faker.helpers.arrayElement([
+              'Organización de espacios',
+              'Limpieza de electrodomésticos',
+              'Mantenimiento doméstico',
+              'Cuidado de plantas',
+              'Servicios de lavandería',
+              'Gestión del hogar',
+            ]);
+            break;
+          case 'Servicios Integrales':
+            nombreTarea = faker.helpers.arrayElement([
+              'Mantenimiento completo',
+              'Renovación integral',
+              'Servicios combinados',
+              'Gestión total',
+              'Soluciones integrales',
+              'Administración de servicios',
+            ]);
+            break;
+          case 'Hogar y Jardín':
+            nombreTarea = faker.helpers.arrayElement([
+              'Mantenimiento de patios',
+              'Cuidado de jardines',
+              'Limpieza de exteriores',
+              'Decoración de espacios verdes',
+              'Mantenimiento de terrazas',
+              'Servicios combinados hogar-jardín',
+            ]);
+            break;
+          case 'Control de Plagas':
+            nombreTarea = faker.helpers.arrayElement([
+              'Fumigación de hormigas',
+              'Control de cucarachas',
+              'Eliminación de roedores',
+              'Desinsectación',
+              'Tratamiento de termitas',
+              'Prevención de plagas',
+            ]);
+            break;
+          case 'Mantenimiento Integral':
+            nombreTarea = faker.helpers.arrayElement([
+              'Mantenimiento de edificios',
+              'Revisión de instalaciones',
+              'Mantenimiento preventivo',
+              'Gestión de mantenimiento',
+              'Servicios de conserje',
+              'Mantenimiento correctivo',
+            ]);
+            break;
+          case 'Servicios de Piscinas':
+            nombreTarea = faker.helpers.arrayElement([
+              'Limpieza de piscinas',
+              'Mantenimiento de filtros',
+              'Control de químicos',
+              'Reparación de bombas',
+              'Limpieza de fondo',
+              'Mantenimiento estacional',
+            ]);
+            break;
+          case 'Decoración Interior':
+            nombreTarea = faker.helpers.arrayElement([
+              'Diseño de ambientes',
+              'Selección de colores',
+              'Decoración de salas',
+              'Ambientación de espacios',
+              'Asesoramiento decorativo',
+              'Renovación de interiores',
+            ]);
+            break;
+          case 'Refrigeración':
+            nombreTarea = faker.helpers.arrayElement([
+              'Reparación de heladeras',
+              'Mantenimiento de freezers',
+              'Instalación de cámaras frías',
+              'Reparación de sistemas de frío',
+              'Carga de gas refrigerante',
+              'Diagnóstico de equipos',
+            ]);
+            break;
+          case 'Tecnología y Automatización':
+            nombreTarea = faker.helpers.arrayElement([
+              'Instalación de domótica',
+              'Configuración de sistemas inteligentes',
+              'Automatización de luces',
+              'Instalación de sensores',
+              'Programación de sistemas',
+              'Mantenimiento tecnológico',
             ]);
             break;
           default:
-            nombreTarea = `${tipo.nombreTipo} `;
+            nombreTarea = `${tipo.nombreTipo} - Tarea ${i}`;
         }
 
         // Verificar si ya existe una tarea con este nombre

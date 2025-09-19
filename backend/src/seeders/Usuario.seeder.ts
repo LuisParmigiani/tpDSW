@@ -20,7 +20,7 @@ export class UsuarioSeeder extends Seeder {
           .int({ min: 10000000, max: 50000000 })
           .toString(),
         foto: 'https://backend-patient-morning-1303.fly.dev/uploads/profiles/default-avatar.webp',
-        telefono: '+1' + faker.phone.number(),
+        telefono: faker.phone.number(),
         nombre: faker.person.firstName(),
         apellido: faker.person.lastName(),
         direccion: faker.location.streetAddress(),
@@ -48,13 +48,14 @@ export class UsuarioSeeder extends Seeder {
       tipoDoc: 'DNI',
       numeroDoc: faker.number.int({ min: 10000000, max: 50000000 }).toString(),
       foto: 'https://backend-patient-morning-1303.fly.dev/uploads/profiles/default-avatar.webp',
-      telefono: '+1' + faker.phone.number(),
+      telefono: faker.phone.number(),
       nombre: 'Carlos',
       apellido: 'Herrera',
       direccion: faker.location.streetAddress(),
       nombreFantasia: 'Plomería Herrera',
       descripcion: 'Lo que quieras, lo hacemos',
       estado: 'activo',
+      stripeAccountId: 'acct_1N8qgYCuyV9w7dLC',
     });
 
     for (let i = 0; i < 25; i++) {
@@ -63,7 +64,7 @@ export class UsuarioSeeder extends Seeder {
         nombre: faker.person.firstName(),
         apellido: faker.person.lastName(),
         mail: faker.internet.email(),
-        telefono: '+1' + faker.phone.number(),
+        telefono: faker.phone.number(),
         contrasena:
           '$2b$10$0E9iYMk1AvFZNbpfu0yroOGq2/X8NzjWQjQv4cGAiS0dJsaRCh9oG',
         tipoDoc: 'CUIT',
@@ -86,7 +87,7 @@ export class UsuarioSeeder extends Seeder {
         nombre: faker.person.firstName(),
         apellido: faker.person.lastName(),
         mail: faker.internet.email(),
-        telefono: '+1' + faker.phone.number(),
+        telefono: faker.phone.number(),
         contrasena:
           '$2b$10$0E9iYMk1AvFZNbpfu0yroOGq2/X8NzjWQjQv4cGAiS0dJsaRCh9oG',
         tipoDoc: 'CUIT',
