@@ -175,56 +175,6 @@ function Borrower() {
 
   return (
     <>
-      {/* Alerta de error de comentarios */}
-      {updateCommentsError && (
-        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-xl flex justify-center">
-          <Alert
-            autoClose={true}
-            autoCloseDelay={5000}
-            variant="danger"
-            onClose={() => setUpdateCommentsError(null)}
-            className="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 "
-          >
-            <AlertTitle>{updateCommentsError.error}</AlertTitle>
-            <AlertDescription>{updateCommentsError.message}</AlertDescription>
-          </Alert>
-        </div>
-      )}
-      {/* Alerta de error de prestatario */}
-      {updateBorrowerError && (
-        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-xl flex justify-center">
-          <Alert
-            autoClose={true}
-            autoCloseDelay={5000}
-            variant="danger"
-            onClose={() => setUpdateBorrowerError(null)}
-            className="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 w-11/12 "
-          >
-            <AlertTitle>{updateBorrowerError.error}</AlertTitle>
-            <AlertDescription>{updateBorrowerError.message}</AlertDescription>
-          </Alert>
-        </div>
-      )}
-      {/* Alerta de nuevo turno */}
-      {alertNewTurn && (
-        <Alert
-          autoClose={true}
-          autoCloseDelay={5000}
-          variant={
-            alertNewTurn.tipo === 'success' ||
-            alertNewTurn.tipo === 'danger' ||
-            alertNewTurn.tipo === 'default' ||
-            alertNewTurn.tipo === 'info'
-              ? alertNewTurn.tipo
-              : 'default'
-          }
-          onClose={() => setAlertNewTurn(null)}
-          className="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 w-11/12 text-center "
-        >
-          <AlertTitle>{alertNewTurn.error}</AlertTitle>
-          <AlertDescription>{alertNewTurn.message}</AlertDescription>
-        </Alert>
-      )}
       <Navbar />
       {isOpen && prestatario && (
         <NewTurnModal
@@ -271,6 +221,52 @@ function Borrower() {
             </button>
           </div>
         </div>
+        {/* Alerta de error de comentarios */}
+        {updateCommentsError && (
+          <Alert
+            autoClose={true}
+            autoCloseDelay={5000}
+            variant="danger"
+            onClose={() => setUpdateCommentsError(null)}
+            className="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 max-w-xl "
+          >
+            <AlertTitle>{updateCommentsError.error}</AlertTitle>
+            <AlertDescription>{updateCommentsError.message}</AlertDescription>
+          </Alert>
+        )}
+        {/* Alerta de error de prestatario */}
+        {updateBorrowerError && (
+          <Alert
+            autoClose={true}
+            autoCloseDelay={5000}
+            variant="danger"
+            onClose={() => setUpdateBorrowerError(null)}
+            className="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 max-w-xl "
+          >
+            <AlertTitle>{updateBorrowerError.error}</AlertTitle>
+            <AlertDescription>{updateBorrowerError.message}</AlertDescription>
+          </Alert>
+        )}
+        {/* Alerta de nuevo turno */}
+        {alertNewTurn && (
+          <Alert
+            autoClose={true}
+            autoCloseDelay={5000}
+            variant={
+              alertNewTurn.tipo === 'success' ||
+              alertNewTurn.tipo === 'danger' ||
+              alertNewTurn.tipo === 'default' ||
+              alertNewTurn.tipo === 'info'
+                ? alertNewTurn.tipo
+                : 'default'
+            }
+            onClose={() => setAlertNewTurn(null)}
+            className="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 max-w-xl text-center "
+          >
+            <AlertTitle>{alertNewTurn.error}</AlertTitle>
+            <AlertDescription>{alertNewTurn.message}</AlertDescription>
+          </Alert>
+        )}
         <div className="w-9/12 justify-between">
           <h1 className="text-4xl font-bold mb-7 text-black">Comentarios</h1>
           <div className="flex justify-start mb-6 min-h-4/5 ">
