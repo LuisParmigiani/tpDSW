@@ -53,27 +53,24 @@ function PagarTurno({
   userMail,
   turno,
 }: Props) {
-  console.log('Datos para pago:', {
-    amount,
-    sellerStripeId,
-    userID,
-    userMail,
-    turnoId: turno.id,
-  });
   const [loading, setLoading] = useState(false);
   const [preferenceId, setPreferenceId] = useState('');
   const [error, setError] = useState('');
+
   const handlePayment = async () => {
     setLoading(true);
+    setError('');
 
-    // Datos que enviamos al backend
+    // Datos que enviamos al backend - corregir el nombre del campo
     const paymentData = {
-      amount: amount, // 50 USD en centavos
+      amount: amount, // monto en centavos
       sellerStripeId: sellerStripeId, // ID de cuenta conectada del vendedor
       turno: turno.id, // ID del turno que se está pagando
       userMail: userMail,
       userID: userID,
     };
+
+    console.log('Enviando datos de pago:', paymentData);
 
     try {
       // Llamada a tu backend para crear la Checkout Session
@@ -81,6 +78,7 @@ function PagarTurno({
 
       if (!res.data.url) {
         console.error('Error creando Checkout Session', res.data);
+        setError('No se pudo crear la sesión de pago');
         setLoading(false);
         return;
       }
@@ -89,6 +87,7 @@ function PagarTurno({
       window.location.href = res.data.url;
     } catch (err) {
       console.error('Error al crear la sesión de pago:', err);
+      setError('Error al procesar el pago. Intente nuevamente.');
     } finally {
       setLoading(false);
     }
@@ -138,7 +137,7 @@ function PagarTurno({
                   minute: '2-digit',
                 })}
               </p>
-              <p className="pb-10">Monto final: ${turno.montoFinal}</p>
+              <p className="pb-10">Monto final: ${turno.montoFinal / 100}</p>
               <button
                 onClick={handlePayment}
                 disabled={loading}

@@ -92,38 +92,64 @@ async function createAccount(req: AuthRequest, res: Response) {
 }
 
 async function createSplitPayment(req: Request, res: Response) {
-  const { amount, sellerStripeId, turno, userID, userMail } = req.body;
+  try {
+    const { amount, sellerStripeId, turno, userID, userMail } = req.body;
 
-  const platformFeePercentage = 0.05; // 5%
-  const applicationFeeAmount = Math.floor(amount * platformFeePercentage);
+    console.log('Datos recibidos para split payment:', {
+      amount,
+      sellerStripeId,
+      turno,
+      userID,
+      userMail,
+    });
 
-  const session = await stripe.checkout.sessions.create({
-    payment_method_types: ['card'],
-    mode: 'payment',
-    line_items: [
-      {
-        price_data: {
-          currency: 'usd',
-          product_data: { name: `Turno ${turno}` },
-          unit_amount: amount,
+    // Validar datos requeridos
+    if (!amount || !sellerStripeId || !turno || !userID || !userMail) {
+      return res.status(400).json({
+        error: 'Faltan datos requeridos',
+        received: { amount, sellerStripeId, turno, userID, userMail },
+      });
+    }
+
+    const platformFeePercentage = 0.05; // 5%
+    const applicationFeeAmount = Math.floor(amount * platformFeePercentage);
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'payment',
+      line_items: [
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: { name: `Turno ${turno}` },
+            unit_amount: amount,
+          },
+          quantity: 1,
         },
-        quantity: 1,
+      ],
+      payment_intent_data: {
+        application_fee_amount: applicationFeeAmount,
+        transfer_data: { destination: sellerStripeId },
+        metadata: {
+          turnoId: turno.toString(),
+          userID: userID.toString(),
+          userMail: userMail,
+        },
       },
-    ],
-    payment_intent_data: {
-      application_fee_amount: applicationFeeAmount,
-      transfer_data: { destination: sellerStripeId },
-      metadata: {
-        turnoId: turno.toString(),
-        userID: userID.toString(),
-        userMail: userMail,
-      },
-    },
-    success_url: `${process.env.FRONTEND_URL}historial/success`,
-    cancel_url: `${process.env.FRONTEND_URL}historial/canceled`,
-  });
+      success_url: `${process.env.FRONTEND_URL}historial/success`,
+      cancel_url: `${process.env.FRONTEND_URL}historial/canceled`,
+    });
 
-  res.json({ url: session.url });
+    console.log('Sesión de pago creada exitosamente:', session.id);
+    res.json({ url: session.url });
+  } catch (err) {
+    console.error('Error en createSplitPayment:', err);
+    if (err instanceof Error) {
+      res.status(500).json({ error: err.message });
+    } else {
+      res.status(500).json({ error: String(err) });
+    }
+  }
 }
 
 export { createAccount, createSplitPayment };

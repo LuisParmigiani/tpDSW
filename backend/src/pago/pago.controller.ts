@@ -361,11 +361,6 @@ async function getEstadisticasByUser(req: Request, res: Response) {
       });
     }
 
-    console.log(
-      `=== DEBUG: Obteniendo estadísticas para usuario ${usuarioId} ===`
-    );
-
-    // Obtener fechas para filtros de mes actual
     const ahora = new Date();
     const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
 
@@ -387,12 +382,12 @@ async function getEstadisticasByUser(req: Request, res: Response) {
     );
 
     const ingresosMes = pagosMes.reduce(
-      (total, pago) => total + (pago.amountReceived || 0),
+      (total, pago) => total + (pago.amountReceived),
       0
     );
     const clientesMes = pagosMes.length;
 
-    // Ingresos TOTALES (todos los pagos exitosos, sin filtro de fecha)
+    // Ingresos TOTALES
     const pagosTotales = await em.find(
       Pago,
       {
@@ -412,17 +407,13 @@ async function getEstadisticasByUser(req: Request, res: Response) {
       (total, pago) => total + (pago.amountReceived || 0),
       0
     );
-    const clientesTotales = pagosTotales.length;
-
-    // Convertir de centavos a pesos y asegurar que siempre sean números válidos
+    const clientesTotales = pagosTotales.length; //todos los  trabajos
     const estadisticas = {
-      ingresosMes: Number((ingresosMes / 100).toFixed(2)) || 0,
-      ingresosAnio: Number((ingresosTotales / 100).toFixed(2)) || 0, // Ahora son totales
-      clientesMes: clientesMes || 0,
-      clientesAnio: clientesTotales || 0, // Ahora son totales
+      ingresosMes: Number((ingresosMes/100).toFixed(2)),
+      ingresosAnio: Number((ingresosTotales/100).toFixed(2)), 
+      clientesMes: clientesMes,
+      clientesAnio: clientesTotales, 
     };
-
-    console.log(`Estadísticas calculadas:`, estadisticas);
 
     res.status(200).json({
       message: 'Estadísticas obtenidas exitosamente',
@@ -434,91 +425,6 @@ async function getEstadisticasByUser(req: Request, res: Response) {
       message: 'Error interno del servidor',
       error: error instanceof Error ? error.message : 'Error desconocido',
     });
-  }
-  async function getEstadisticasByUser(req: Request, res: Response) {
-    try {
-      const usuarioId = req.params.usuarioId;
-
-      if (!usuarioId) {
-        return res.status(400).json({
-          message: 'ID de usuario requerido',
-        });
-      }
-
-      console.log(
-        `=== DEBUG: Obteniendo estadísticas para usuario ${usuarioId} ===`
-      );
-
-      // Obtener fechas para filtros de mes actual
-      const ahora = new Date();
-      const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
-
-      // Ingresos del mes actual
-      const pagosMes = await em.find(
-        Pago,
-        {
-          estado: 'succeeded' as const,
-          createdAt: { $gte: inicioMes },
-          turno: {
-            servicio: {
-              usuario: { id: Number(usuarioId) },
-            },
-          },
-        },
-        {
-          populate: ['turno.servicio.usuario'],
-        }
-      );
-
-      const ingresosMes = pagosMes.reduce(
-        (total, pago) => total + (pago.amountReceived || 0),
-        0
-      );
-      const clientesMes = pagosMes.length;
-
-      // Ingresos TOTALES (todos los pagos exitosos, sin filtro de fecha)
-      const pagosTotales = await em.find(
-        Pago,
-        {
-          estado: 'succeeded' as const,
-          turno: {
-            servicio: {
-              usuario: { id: Number(usuarioId) },
-            },
-          },
-        },
-        {
-          populate: ['turno.servicio.usuario'],
-        }
-      );
-
-      const ingresosTotales = pagosTotales.reduce(
-        (total, pago) => total + (pago.amountReceived || 0),
-        0
-      );
-      const clientesTotales = pagosTotales.length;
-
-      // Convertir de centavos a pesos y asegurar que siempre sean números válidos
-      const estadisticas = {
-        ingresosMes: Number((ingresosMes / 100).toFixed(2)) || 0,
-        ingresosAnio: Number((ingresosTotales / 100).toFixed(2)) || 0, // Ahora son totales
-        clientesMes: clientesMes || 0,
-        clientesAnio: clientesTotales || 0, // Ahora son totales
-      };
-
-      console.log(`Estadísticas calculadas:`, estadisticas);
-
-      res.status(200).json({
-        message: 'Estadísticas obtenidas exitosamente',
-        data: estadisticas,
-      });
-    } catch (error) {
-      console.error('Error al obtener estadísticas:', error);
-      res.status(500).json({
-        message: 'Error interno del servidor',
-        error: error instanceof Error ? error.message : 'Error desconocido',
-      });
-    }
   }
 }
 

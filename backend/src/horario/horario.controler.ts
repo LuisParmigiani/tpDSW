@@ -73,18 +73,15 @@ async function updateBatchByUser(req: Request, res: Response) {
     if (!Array.isArray(horariosInput)) {
       return res.status(400).json({ message: 'El body debe ser un array de horarios' });
     }
-    // Validar y procesar cada horario
+    
     for (const h of horariosInput) {
-      if (typeof h.diaSemana !== 'number' || typeof h.horaDesde !== 'string' || typeof h.horaHasta !== 'string') {
-        return res.status(400).json({ message: 'Formato de horario inválido' });
-      }
       if (!(h.horaDesde === '00:00:00' && h.horaHasta === '00:00:00')) {
         if (h.horaDesde >= h.horaHasta) {
           return res.status(400).json({ message: `La hora desde debe ser menor que la hora hasta para el día ${h.diaSemana}` });
         }
       }
     }
-    // Obtener todos los horarios actuales del usuario
+    
     const horariosActuales = await em.find(Horario, { usuario: usuarioId });
     // Actualizar o crear cada horario
     for (const h of horariosInput) {

@@ -1,4 +1,3 @@
-import './../../index.css';
 type Props = {
   texto: string;
   accion?: (event: React.MouseEvent<HTMLButtonElement>) => void;

@@ -5,7 +5,7 @@ import Footer from '../Footer/Footer';
 import PaginationControls from '../Pagination/PaginationControler';
 import CustomSelect from '../Select/CustomSelect';
 import CalificationModal from '../Modal/CalificationModal';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import DevolucionPago from '../Modal/DevolucionPago.tsx';
 import { useProtectRoute } from '../../cookie/useProtectRoute.tsx';
 import TurnCard from './turnCard';
@@ -54,7 +54,8 @@ type Props = {
   estado?: string;
 };
 
-function TurnHistory({ estado }: Props) {
+function TurnHistory() {
+  const { estado } = useParams<{ estado?: string }>();
   const { usuario, loading: authLoading } = useProtectRoute(['cliente']);
   const [abrirDevolucion, setAbrirDevolucion] = useState(false);
   const navigate = useNavigate();
@@ -74,9 +75,13 @@ function TurnHistory({ estado }: Props) {
   const [totalPages, setTotalPages] = useState(1); // Total de páginas
   const [flagged, setFlagged] = useState(false); //Bandera para saber si el comentario es inapropiado
 
-  if (estado) {
-    setAbrirDevolucion(true);
-  }
+  useEffect(() => {
+    console.log('Estado recibido en TurnHistory:', estado);
+    if (estado) {
+      setAbrirDevolucion(true);
+    }
+  }, [estado]);
+
   // alertas para la devolucion del back
   const [updateError, setUpdateError] = useState<{
     error: string;
@@ -245,7 +250,7 @@ function TurnHistory({ estado }: Props) {
           autoCloseDelay={3000}
           variant="danger"
           onClose={() => setUpdateError(null)}
-          className="w-full"
+          className="max-w-xl"
         >
           <AlertTitle>{updateError.error}</AlertTitle>
           <AlertDescription>{updateError.message}</AlertDescription>
@@ -257,7 +262,7 @@ function TurnHistory({ estado }: Props) {
           autoCloseDelay={3000}
           variant="success"
           onClose={() => setUpdateSuccess(null)}
-          className="w-full"
+          className="max-w-xl"
         >
           <AlertTitle>{updateSuccess.success}</AlertTitle>
           <AlertDescription>{updateSuccess.message}</AlertDescription>

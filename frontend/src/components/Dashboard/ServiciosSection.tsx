@@ -4,138 +4,59 @@ import TareaRow, { type Tarea } from '../TareaRow/TareaRow';
 import { useState, useEffect, useCallback } from 'react';
 import { tiposServicioApi } from '../../services/tipoSericiosApi';
 import { tareasApi } from '../../services/tareasApi';
-import { serviciosApi } from '../../services/serviciosApi'
+import { serviciosApi } from '../../services/serviciosApi';
 import { Alert, AlertDescription } from '../Alerts/Alerts';
 import useAuth from '../../cookie/useAuth';
 import StripeConnection from '../StripeConnection/StripeConnection';
-import { zonasApi } from '../../services/zonasApi';
 
-// Función para convertir datos del API al formato del componente
-const convertirTipoServicioADisplay = (
-  tipoServicio: unknown
-): TipoServicioData => {
-  const tipoObj = tipoServicio as {
-    id: number;
-    nombreTipo?: string;
-    descripcionTipo?: string;
-    // Posibles variaciones del backend
-    nombre?: string;
-    descripcion?: string;
-    name?: string;
-    description?: string;
-    nombreTipoServ?: string;
-    descripcionTipoServ?: string;
-  };
-
-  // Usar los campos correctos del backend: nombreTipo y descripcionTipo
-  const nombre =
-    tipoObj.nombreTipo ||
-    tipoObj.nombre ||
-    tipoObj.name ||
-    tipoObj.nombreTipoServ ||
-    `Tipo ${tipoObj.id}`;
-  const descripcion =
-    tipoObj.descripcionTipo ||
-    tipoObj.descripcion ||
-    tipoObj.description ||
-    tipoObj.descripcionTipoServ ||
-    'Sin descripción disponible';
-
-  const resultado = {
-    id: tipoObj.id,
-    nombre: nombre,
-    descripcion: descripcion,
-    activo: false, // Por defecto todos inician inactivos
-  };
-
-  return resultado;
-};
 
 function ServiciosSection() {
-  const { usuario } = useAuth(); // Obtener usuario logueado
+  const { usuario } = useAuth(); 
   const [tiposServicio, setTiposServicio] = useState<TipoServicioData[]>([]);
   const [tareas, setTareas] = useState<Tarea[]>([]);
   const [tareasVisibles, setTareasVisibles] = useState<Tarea[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [zonas, setZonas] = useState<
-    { id: number; descripcionZona: string; selected: boolean }[]
-  >([]);
-  // Estados para la funcionalidad de guardado
   const [showAlert, setShowAlert] = useState(false);
   const [alertType, setAlertType] = useState<'success' | 'danger'>('success');
   const [alertMessage, setAlertMessage] = useState('');
-
-  // Estado para la paginación por tipo de servicio
   const [tipoServicioActivo, setTipoServicioActivo] = useState<number | null>(
     null
   );
 
-  // Buscar todas las zonas
-  useEffect(() => {
-    const fetchZonas = async () => {
-      try {
-        const cargarZonas = await zonasApi.getAllPerUser();
-        setZonas(cargarZonas.data.data);
-      } catch (error) {
-        console.error('Error cargando zonas:', error);
-        // No mostramos error, solo logueamos
-      }
+  interface TipoServicio{
+    id: number;
+    nombreTipo: string;
+    descripcionTipo: string;
+
+  }
+
+  // funcion convierte datos en lo que espera el componente
+  const convertirTipoServicioADisplay = (tipoServicio: TipoServicio): TipoServicioData => {
+    const tipoObj = tipoServicio as TipoServicio;
+    const resultado = {
+      id: tipoObj.id,
+      nombre: tipoObj.nombreTipo,
+      descripcion: tipoObj.descripcionTipo, 
+      activo: false 
     };
-    fetchZonas();
-  }, []);
-
-  const cambioZona = async (zonaId: number, estado: boolean) => {
-    try {
-      const res = await zonasApi.updateByUser(zonaId.toString(), estado);
-      if (res.data) {
-        setZonas((prevZonas) =>
-          prevZonas.map((zona) =>
-            zona.id === zonaId ? { ...zona, selected: !zona.selected } : zona
-          )
-        );
-      }
-      setShowAlert(true);
-      setAlertType('success');
-      if (!estado) {
-        setAlertMessage('Zona agregada correctamente');
-      } else {
-        setAlertMessage('Zona eliminada correctamente');
-      }
-    } catch (error) {
-      setShowAlert(true);
-      setAlertType('danger');
-      setAlertMessage('Error al actualizar la zona');
-      console.error('Error cambiando zona:', error);
-    }
+    
+    return resultado;
   };
-
-  // Cargar tipos de servicio desde la API
+  
+  // cargar tipos de servicio desde la API
   const cargarTiposServicio = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
       const response = await tiposServicioApi.getAll();
-
-      if (response.data && response.data.data) {
+      if (response.data.data) {
         const tiposConvertidos = response.data.data.map(
           convertirTipoServicioADisplay
         );
 
         setTiposServicio(tiposConvertidos);
-      } else {
-        // Probar diferentes estructuras de respuesta
-
-        if (Array.isArray(response.data)) {
-          const tiposConvertidos = response.data.map(
-            convertirTipoServicioADisplay
-          );
-          setTiposServicio(tiposConvertidos);
-        } else {
-          console.error('Estructura de respuesta inesperada:', response);
-          setError('Error al cargar los tipos de servicio');
-        }
       }
     } catch (err) {
       console.error('Error cargando tipos de servicio:', err);
@@ -150,94 +71,33 @@ function ServiciosSection() {
     try {
       const response = await tareasApi.getAll();
 
-      if (response.data && response.data.data) {
+      if (response.data.data) {
         const tareasConvertidas = response.data.data.map(
           (tarea: {
             id: number;
-            nombreTarea?: string;
-            descripcionTarea?: string;
-            duracionTarea?: number;
-            tipoServicio?: number | { id: number }; // Puede ser número directo o objeto
-            tipoServicioId?: number;
-            tipo_servicio_id?: number;
+            nombreTarea: string;
+            descripcionTarea: string;
+            duracionTarea: number;
+            tipoServicio: number; 
+            
           }) => {
             // Si tipoServicio es un número, usarlo directamente; si es objeto, usar .id
-            let tipoServicioId: number;
-            if (typeof tarea.tipoServicio === 'number') {
-              tipoServicioId = tarea.tipoServicio;
-            } else if (
-              tarea.tipoServicio &&
-              typeof tarea.tipoServicio === 'object'
-            ) {
-              tipoServicioId = tarea.tipoServicio.id;
-            } else {
-              tipoServicioId =
-                tarea.tipoServicioId || tarea.tipo_servicio_id || 0;
-            }
-
             return {
               id: tarea.id,
-              descripcion:
-                tarea.nombreTarea ||
-                tarea.descripcionTarea ||
-                `Tarea ${tarea.id}`,
-              tipoServicioId: tipoServicioId,
-              seleccionada: false, // Por defecto no seleccionada
+              descripcion: tarea.descripcionTarea,
+              tipoServicioId: tarea.tipoServicio,
+              seleccionada: false, 
               precio: 0, // Precio inicial
-              duracion: tarea.duracionTarea || 0, // Guardamos la duración también
-            };
-          }
-        );
-
-        setTareas(tareasConvertidas);
-      } else if (Array.isArray(response.data)) {
-        const tareasConvertidas = response.data.map(
-          (tarea: {
-            id: number;
-            nombreTarea?: string;
-            descripcionTarea?: string;
-            duracionTarea?: number;
-            tipoServicio?: number | { id: number }; // Puede ser número directo o objeto
-            tipoServicioId?: number;
-            tipo_servicio_id?: number;
-          }) => {
-            // Si tipoServicio es un número, usarlo directamente; si es objeto, usar .id
-            let tipoServicioId: number;
-            if (typeof tarea.tipoServicio === 'number') {
-              tipoServicioId = tarea.tipoServicio;
-            } else if (
-              tarea.tipoServicio &&
-              typeof tarea.tipoServicio === 'object'
-            ) {
-              tipoServicioId = tarea.tipoServicio.id;
-            } else {
-              tipoServicioId =
-                tarea.tipoServicioId || tarea.tipo_servicio_id || 0;
-            }
-
-            return {
-              id: tarea.id,
-              descripcion:
-                tarea.nombreTarea ||
-                tarea.descripcionTarea ||
-                `Tarea ${tarea.id}`,
-              tipoServicioId: tipoServicioId,
-              seleccionada: false,
-              precio: 0,
-              duracion: tarea.duracionTarea || 0,
+              duracion: tarea.duracionTarea, // Guardamos la duración también
             };
           }
         );
         setTareas(tareasConvertidas);
-      } else {
-        console.error(
-          'Estructura de respuesta de tareas inesperada:',
-          response
-        );
-      }
+      }  
+      
     } catch (err) {
       console.error('Error cargando tareas:', err);
-      // No mostramos error para tareas, solo logueamos
+      
     }
   }, []);
 
@@ -248,44 +108,31 @@ function ServiciosSection() {
     try {
       const response = await serviciosApi.getByUser(usuario.id);
 
-      if (response.data && response.data.data) {
+      if (response.data.data) {
         const serviciosExistentes = response.data.data;
-
-        // Extraer información de los servicios
-        const tiposConServicios = new Set<number>(); // Tipos que tienen cualquier servicio (activo o inactivo)
+        const tiposConServicios = new Set<number>(); // Tipos que tienen cualquier servicio 
         const tareasConPrecios = new Map<number, number>(); // tareaId -> precio
         const tareasActivas = new Map<number, boolean>(); // tareaId -> isActive
-
         serviciosExistentes.forEach(
-          (servicio: {
-            tarea?: { id: number; tipoServicio?: { id: number } } | number;
-            precio: number;
-            estado?: string;
-          }) => {
-            const tareaId =
-              typeof servicio.tarea === 'object'
-                ? servicio.tarea?.id
-                : servicio.tarea;
-            const tipoServicioId =
-              typeof servicio.tarea === 'object'
-                ? servicio.tarea?.tipoServicio?.id
-                : undefined;
+          (servicio: {tarea: { id: number; tipoServicio: { id: number } }; precio: number; estado?: string;}) => {
+            const tareaId = servicio.tarea.id;
+            const tipoServicioId = servicio.tarea.tipoServicio.id;
             const precio = servicio.precio;
             const isActive = servicio.estado === 'activo';
 
+            // guarda precio, estado y tipo de servicio
             if (tareaId && precio) {
               tareasConPrecios.set(tareaId, precio);
               tareasActivas.set(tareaId, isActive);
             }
-
-            // Marcar tipos como activos si tienen cualquier servicio (activo o inactivo)
+            
             if (tipoServicioId) {
               tiposConServicios.add(tipoServicioId);
             }
           }
         );
 
-        // Actualizar tipos de servicio (marcar como activos si tienen cualquier servicio)
+
         setTiposServicio((prev) =>
           prev.map((tipo) => ({
             ...tipo,
@@ -298,7 +145,7 @@ function ServiciosSection() {
           prev.map((tarea) => ({
             ...tarea,
             seleccionada: tareasActivas.get(tarea.id) || false, // true solo si está activa
-            precio: tareasConPrecios.get(tarea.id) || 0,
+            precio: tareasConPrecios.get(tarea.id) || 0, // precio o 0 si no existe
           }))
         );
       }
@@ -364,32 +211,30 @@ function ServiciosSection() {
       setShowAlert(true);
       return;
     }
-
-    // Encontrar el tipo de servicio actual
     const tipoActual = tiposServicio.find((tipo) => tipo.id === tipoId);
     if (!tipoActual) return;
 
-    const seraDesactivado = tipoActual.activo; // Si está activo, será desactivado
+    const seraDesactivado = tipoActual.activo; 
 
     // Actualizar el estado del tipo de servicio
     setTiposServicio((prev) => {
-      const nuevosTimpos = prev.map((tipo) =>
+      const nuevosTiempos = prev.map((tipo) =>
         tipo.id === tipoId ? { ...tipo, activo: !tipo.activo } : tipo
       );
 
-      return nuevosTimpos;
+      return nuevosTiempos;
     });
 
     // Si se está desactivando el tipo, desactivar automáticamente todos los servicios relacionados
     if (seraDesactivado) {
-      // Encontrar todas las tareas relacionadas con este tipo
+      
       const tareasDelTipo = tareas.filter(
         (tarea) => tarea.tipoServicioId === tipoId
       );
 
-      if (tareasDelTipo.length > 0) {
+      {
         try {
-          // Desactivar servicios en el backend
+          
           await Promise.allSettled(
             tareasDelTipo.map(async (tarea) => {
               try {
@@ -402,7 +247,7 @@ function ServiciosSection() {
                   `Error al desactivar servicio (Usuario ${usuario.id}, Tarea ${tarea.id}):`,
                   error
                 );
-                // Ignorar errores - probablemente el servicio no existía
+               
               }
             })
           );
@@ -479,7 +324,7 @@ function ServiciosSection() {
         await serviciosApi.upsertByUserAndTask({
           tareaId: tarea.id,
           usuarioId: usuario.id,
-          precio: tarea.precio,
+          precio: tarea.precio * 100, // Convertir a centavos
         });
         // Actualizar estado local
         handleTareaChange(tareaId, 'seleccionada', true);
@@ -512,7 +357,7 @@ function ServiciosSection() {
     }
 
     const tarea = tareas.find((t) => t.id === tareaId);
-    if (!tarea || !tarea.seleccionada) {
+    if (!tarea) {
       setAlertType('danger');
       setAlertMessage('Solo se puede actualizar el precio de tareas activas');
       setShowAlert(true);
@@ -531,7 +376,7 @@ function ServiciosSection() {
       await serviciosApi.upsertByUserAndTask({
         tareaId: tarea.id,
         usuarioId: usuario.id,
-        precio: nuevoPrecio,
+        precio: nuevoPrecio * 100, // Convertir a centavos
       });
 
       setAlertType('success');
@@ -545,11 +390,11 @@ function ServiciosSection() {
     }
   };
 
-  // Función para guardar cambios por tipo de servicio
   return (
     <DashboardSection title="Mis servicios">
       <StripeConnection loadingMessage="Cargando configuración de servicios...">
         <div className="space-y-8">
+          
           {/* Selector de Tipos de Servicio */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 text-left">
@@ -693,6 +538,17 @@ function ServiciosSection() {
                     })}
                   </tbody>
                 </table>
+              {showAlert && (
+                  <Alert
+                    variant={alertType}
+                    onClose={() => setShowAlert(false)}
+                    autoClose
+                    autoCloseDelay={3500}
+                    className="max-w-fit m-4 flex justify-self-center"
+                  >
+                    <AlertDescription>{alertMessage}</AlertDescription>
+                  </Alert>
+              )}
               </div>
             </div>
           )}
@@ -717,7 +573,9 @@ function ServiciosSection() {
                 Selecciona al menos un tipo de servicio arriba para ver las
                 tareas disponibles.
               </p>
+              
             </div>
+            
           ) : (
             tareasVisibles.length === 0 &&
             tipoServicioActivo !== null && (
@@ -743,68 +601,12 @@ function ServiciosSection() {
                   }
                   ".
                 </p>
+                 {/* ALERTA DE FEEDBACK */}
+        
               </div>
             )
           )}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 text-left">
-              Mis zonas
-            </h3>
-            {zonas.length > 0 ? (
-              <div className="flex items-center justify-between flex-wrap">
-                {zonas.map((zona) => (
-                  <button
-                    key={zona.id}
-                    className={`flex items-center gap-3 px-5 py-2 my-2 mr-3 rounded-lg transition-colors duration-150 border ${
-                      zona.selected
-                        ? 'border-naranja-1 bg-naranja-1'
-                        : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-orange-500'
-                    }`}
-                    onClick={() => cambioZona(zona.id, zona.selected)}
-                  >
-                    <span
-                      className={`w-5 h-5 flex items-center justify-center rounded-full border-2 ${
-                        zona.selected
-                          ? 'border-white bg-white'
-                          : 'border-naranja-1 bg-transparent'
-                      }`}
-                    >
-                      {zona.selected && (
-                        <svg
-                          className="w-3 h-3 text-naranja-1"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                      )}
-                    </span>
-                    <span className="font-medium">{zona.descripcionZona}</span>
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-500">No hay zonas disponibles.</p>
-            )}
-          </div>
-
-          {/* Alert de confirmación */}
-          {showAlert && (
-            <Alert
-              variant={alertType}
-              onClose={() => setShowAlert(false)}
-              autoClose={true}
-              autoCloseDelay={5000}
-            >
-              <AlertDescription>{alertMessage}</AlertDescription>
-            </Alert>
-          )}
+         
         </div>
       </StripeConnection>
     </DashboardSection>

@@ -2,7 +2,11 @@ name: CI/CD Pipeline
 
 on:
   push:
+<<<<<<< HEAD
     branches: [never] # antes: [never]
+=======
+    branches: [main]
+>>>>>>> ac8ad3a05381462da93856b4a4081024f879036d
   pull_request:
     branches: [main]
 
@@ -162,6 +166,10 @@ jobs:
           # No abortar todavía; dejaremos que el usuario analice.
 
       - name: Detectar carpeta destino remota
+<<<<<<< HEAD
+=======
+        if: success()
+>>>>>>> ac8ad3a05381462da93856b4a4081024f879036d
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
@@ -178,6 +186,10 @@ jobs:
           else
             echo "No existe public_html -> usar raíz"; echo "SERVER_DIR=./" >> $GITHUB_ENV
           fi
+<<<<<<< HEAD
+=======
+
+>>>>>>> ac8ad3a05381462da93856b4a4081024f879036d
       - name: Determinar protocolo y validar credenciales
         if: success()
         run: |
@@ -197,11 +209,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
+<<<<<<< HEAD
+=======
+          registry-url: 'https://registry.npmjs.org'
+>>>>>>> ac8ad3a05381462da93856b4a4081024f879036d
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
         with:
           version: 8
+<<<<<<< HEAD
+=======
+
+>>>>>>> ac8ad3a05381462da93856b4a4081024f879036d
       - name: Configure pnpm for deployment
         working-directory: frontend
         run: |
@@ -209,7 +229,11 @@ jobs:
           pnpm config set fetch-retries 5
           pnpm config set fetch-retry-factor 2
           pnpm config set fetch-retry-mintimeout 10000
+<<<<<<< HEAD
           pnpm config set fetch-retry-maxtimeout 60000V
+=======
+          pnpm config set fetch-retry-maxtimeout 60000
+>>>>>>> ac8ad3a05381462da93856b4a4081024f879036d
 
       - name: Install deps
         working-directory: frontend
@@ -221,6 +245,13 @@ jobs:
         working-directory: frontend
         run: pnpm build
 
+<<<<<<< HEAD
+=======
+      - name: List dist
+        run: |
+          echo "Dist files:"; find frontend/dist -maxdepth 3 -type f -print | sed 's/^/ - /'
+
+>>>>>>> ac8ad3a05381462da93856b4a4081024f879036d
       - name: Deploy via FTP
         if: success()
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
