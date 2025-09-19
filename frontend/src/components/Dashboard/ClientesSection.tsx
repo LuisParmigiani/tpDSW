@@ -28,37 +28,36 @@ interface TurnoDisplay {
 
 // funcion para convertir datos del API al formato del item de la tabla
 const convertirTurnoADisplay = (turno: any): TurnoDisplay => {
-	const fechaHora = new Date(turno.fechaHora);
+  const fechaHora = new Date(turno.fechaHora);
 
-	return {
-		id: turno.id,
-		cliente:
-			turno.usuario?.nombre && turno.usuario?.apellido
-				? `${turno.usuario.nombre} ${turno.usuario.apellido}`
-				: 'Usuario desconocido',
-		fecha: fechaHora.toLocaleDateString('es-AR', {
-			day: '2-digit',
-			month: '2-digit',
-			year: '2-digit',
-		}),
-		hora: fechaHora.toLocaleTimeString('es-AR', {
-			hour: '2-digit',
-			minute: '2-digit',
-			hour12: true,
-		}),
-		estado: capitalizeFirstLetter(turno.estado),
-		tarea: turno.servicio?.tarea?.descripcionTarea || 'Tarea no especificada',
-		avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(
-			turno.usuario?.nombre || turno.usuario?.mail || 'Usuario'
-		)}&background=f97316&color=ffffff`,
-		monto: Number(turno.montoFinal) || 0,
-	};
+  return {
+    id: turno.id,
+    cliente:
+      turno.usuario?.nombre && turno.usuario?.apellido
+        ? `${turno.usuario.nombre} ${turno.usuario.apellido}`
+        : 'Usuario desconocido',
+    fecha: fechaHora.toLocaleDateString('es-AR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: '2-digit',
+    }),
+    hora: fechaHora.toLocaleTimeString('es-AR', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    }),
+    estado: capitalizeFirstLetter(turno.estado),
+    tarea: turno.servicio?.tarea?.descripcionTarea || 'Tarea no especificada',
+    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(
+      turno.usuario?.nombre || turno.usuario?.mail || 'Usuario'
+    )}&background=f97316&color=ffffff`,
+    monto: Number(turno.montoFinal) || 0,
+  };
 };
 
-
 function ClientesSection() {
-  const { usuario } = useAuth(); 
-  const [selectedTurnoIds, setSelectedTurnoIds] = useState<number[]>([]); 
+  const { usuario } = useAuth();
+  const [selectedTurnoIds, setSelectedTurnoIds] = useState<number[]>([]);
   const [showMenu, setShowMenu] = useState(false);
   const [showBar, setShowBar] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
@@ -103,7 +102,7 @@ function ClientesSection() {
           return;
         }
         if (isPageChange) {
-          setLoading(true); 
+          setLoading(true);
         }
         setError(null);
         // ordenamiento para el back
@@ -143,8 +142,8 @@ function ClientesSection() {
           usuario.id.toString(),
           itemsPerPage.toString(),
           page.toString(),
-          backendFilterValue || 'all', 
-          backendOrderValue, 
+          backendFilterValue || 'all',
+          backendOrderValue,
           searchTerm
         );
         const turnosDisplay = response.data.data.map(convertirTurnoADisplay);
@@ -165,7 +164,6 @@ function ClientesSection() {
     [itemsPerPage, sortBy, estadoFilters, usuario]
   );
 
- 
   useEffect(() => {
     if (currentPage === 1) {
       cargarTurnos(
@@ -174,7 +172,7 @@ function ClientesSection() {
         estadoFilters,
         false,
         activeSearchQuery
-      ); 
+      );
     } else {
       cargarTurnos(currentPage, sortBy, estadoFilters, true, activeSearchQuery);
     }
@@ -183,7 +181,7 @@ function ClientesSection() {
   // manejo de busqueda, y borrado de searchquery
 
   const handleSearch = () => {
-    setCurrentPage(1); 
+    setCurrentPage(1);
     setActiveSearchQuery(searchQuery);
     cargarTurnos(1, sortBy, estadoFilters, false, searchQuery);
   };
@@ -288,7 +286,7 @@ function ClientesSection() {
 
     try {
       // chequeo local por si es un turno de esa pagina,
-	  // si no es de esa llama a la api.
+      // si no es de esa llama a la api.
       const turnoId = selectedTurnoIds[0];
       const turnoLocal = turnos.find((t) => t.id === turnoId);
 
@@ -320,7 +318,7 @@ function ClientesSection() {
         const turnosResponses = await Promise.all(turnosPromises); //esperar todas las respuestas
         const turnosValidos: number[] = [];
         turnosResponses.forEach((response) => {
-			// los completados y cancelados returnean pq no se pueden alterar
+          // los completados y cancelados returnean pq no se pueden alterar
           const turno = response.data.data;
           if (!turno) return;
           const estado = turno.estado.toLowerCase();
@@ -404,7 +402,7 @@ function ClientesSection() {
       setInvalidSelectedCount(0);
       return;
     }
-	//calcula los turnos validos e invalidos, no actualiza
+    //calcula los turnos validos e invalidos, no actualiza
     try {
       const turnosPromises = selectedTurnoIds.map((id) =>
         turnosApi.getById(id.toString())
@@ -473,7 +471,7 @@ function ClientesSection() {
   const handleSortSelect = (newSortBy: string) => {
     setSortBy(newSortBy);
     setCurrentPage(1);
-    cargarTurnos(1, newSortBy, estadoFilters, false, activeSearchQuery); 
+    cargarTurnos(1, newSortBy, estadoFilters, false, activeSearchQuery);
   };
 
   // manejar los filtros de estado
@@ -484,7 +482,7 @@ function ClientesSection() {
 
     setEstadoFilters(newFilters);
     setCurrentPage(1);
-    cargarTurnos(1, sortBy, newFilters, false, activeSearchQuery); 
+    cargarTurnos(1, sortBy, newFilters, false, activeSearchQuery);
   };
 
   const clearEstadoFilters = () => {
@@ -500,7 +498,6 @@ function ClientesSection() {
     'Completado',
   ];
 
-  
   if (loading) {
     return (
       <DashboardSection>
@@ -557,9 +554,10 @@ function ClientesSection() {
             isMobileLayout ? '' : 'sm:items-center sm:justify-between'
           } gap-3 sm:gap-2 px-2 sm:px-0 relative`}
         >
-          
           <div
-            className={`flex ${
+            className={`flex ${  
+
+              
               isMobileLayout ? 'flex-col' : 'flex-col sm:flex-row'
             } gap-2 sm:gap-2 relative`}
           >
@@ -864,20 +862,22 @@ function ClientesSection() {
               onPageChange={handlePageChange}
             />
           </div>
-          
-		  {showErrorMessage && (
-			<Alert
-			  variant="danger"
-			  autoClose
-			  autoCloseDelay={3000}
-			  className={`fixed left-1/2 bottom-16 sm:bottom-24 transform -translate-x-1/2 z-50 shadow-lg max-w-[90vw] sm:max-w-none transition-all duration-200 ${
-				isErrorAnimating ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
-			  }`}
-			  onClose={() => setShowErrorMessage(false)}
-			>
-			  {errorMessage}
-			</Alert>
-		  )}
+
+          {showErrorMessage && (
+            <Alert
+              variant="danger"
+              autoClose
+              autoCloseDelay={3000}
+              className={`fixed left-1/2 bottom-16 sm:bottom-24 transform -translate-x-1/2 z-50 shadow-lg max-w-[90vw] sm:max-w-none transition-all duration-200 ${
+                isErrorAnimating
+                  ? 'scale-100 opacity-100'
+                  : 'scale-95 opacity-0'
+              }`}
+              onClose={() => setShowErrorMessage(false)}
+            >
+              {errorMessage}
+            </Alert>
+          )}
           {showBar && (
             <SelectionBar
               selectedCount={selectedTurnoIds.length}

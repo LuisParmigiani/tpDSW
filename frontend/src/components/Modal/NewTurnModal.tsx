@@ -92,6 +92,7 @@ function NewTurnModal({
   open,
   manejoAlertas,
 }: Props) {
+  const [montofinal, setMontofinal] = useState(0);
   const navigate = useNavigate();
   // Verificar si el usuario ha iniciado sesión
   const rol = useRoleReturn();
@@ -542,7 +543,7 @@ function NewTurnModal({
         servicio: services.id, // Usar el ID del servicio encontrado
         fechaHora: `${dayForTurn}T${horarioSelected}:00`,
         estado: 'pendiente' as const,
-        montoFinal: precio * 0.05 + precio,
+        montoFinal: precio * 1.05, // Convertir a centavos
       };
 
       // Log para verificar los datos enviados
@@ -644,6 +645,7 @@ function NewTurnModal({
               <p>Tarea: </p>
               <p>Dia: </p>
               <p>Hora: </p>
+              <p>Monto: </p>
             </div>
             <div className="flex flex-col items-start gap-3 mb-4 ml-11">
               <p>{prestatario.mail}</p>
@@ -652,6 +654,7 @@ function NewTurnModal({
               <p>{selectedTask}</p>
               <p>{dayForTurn}</p>
               <p>{horarioSelected}</p>
+              <p> {montofinal} USD</p>
             </div>
           </div>
           <div className="flex sm:flex-col sm:p-0 px-3 items-start gap-7 mb-4 sm:ml-11 h-full justify-between mt-4">
@@ -994,6 +997,11 @@ function NewTurnModal({
           {page === 2 && (
             <button
               onClick={() => {
+                const services = prestatario.servicios.find(
+                  (s) => s.tarea.nombreTarea === selectedTask
+                );
+                const precio = services ? services.precio || 100 : 100;
+                setMontofinal((precio * 1.05) / 100); // Actualizar monto final con recargo del 5%
                 if (validateForm('datetime')) {
                   setConfirmationModalOpen(true);
                 }

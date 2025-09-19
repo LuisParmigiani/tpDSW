@@ -4,7 +4,7 @@ import TareaRow, { type Tarea } from '../TareaRow/TareaRow';
 import { useState, useEffect, useCallback } from 'react';
 import { tiposServicioApi } from '../../services/tipoSericiosApi';
 import { tareasApi } from '../../services/tareasApi';
-import { serviciosApi } from '../../services/serviciosApi'
+import { serviciosApi } from '../../services/serviciosApi';
 import { Alert, AlertDescription } from '../Alerts/Alerts';
 import useAuth from '../../cookie/useAuth';
 import StripeConnection from '../StripeConnection/StripeConnection';
@@ -324,7 +324,7 @@ function ServiciosSection() {
         await serviciosApi.upsertByUserAndTask({
           tareaId: tarea.id,
           usuarioId: usuario.id,
-          precio: tarea.precio,
+          precio: tarea.precio * 100, // Convertir a centavos
         });
         // Actualizar estado local
         handleTareaChange(tareaId, 'seleccionada', true);
@@ -376,7 +376,7 @@ function ServiciosSection() {
       await serviciosApi.upsertByUserAndTask({
         tareaId: tarea.id,
         usuarioId: usuario.id,
-        precio: nuevoPrecio,
+        precio: nuevoPrecio * 100, // Convertir a centavos
       });
 
       setAlertType('success');

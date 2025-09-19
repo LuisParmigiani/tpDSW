@@ -159,7 +159,7 @@ export const updateTurnosEstado = async (
   try {
     // Realizar actualizaciones en paralelo
     await Promise.all(
-      turnoIds.map((id) => api.patch(`/turnos/${id}`, { estado: nuevoEstado }))
+      turnoIds.map((id) => api.put(`/turnos/${id}`, { estado: nuevoEstado }))
     );
   } catch (error) {
     console.error('Error al actualizar estado de turnos:', error);
