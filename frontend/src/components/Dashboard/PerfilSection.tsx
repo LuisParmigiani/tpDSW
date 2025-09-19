@@ -44,6 +44,16 @@ const profileSchema = z.object({
     ),
   // ✅ Add photo as optional field - it will be handled separately but tracked by the form
   foto: z.string().optional(),
+  nombreFantasia: z
+    .string()
+    .min(2, 'El nombre fantasia debe tener al menos 2 caracteres')
+    .max(30, 'El nombre fantasia no puede exceder 30 caracteres')
+    .optional(),
+  descripcion: z
+    .string()
+    .min(5, 'La descripción debe tener al menos 5 caracteres')
+    .max(300, 'La descripción no puede exceder 300 caracteres')
+    .optional(),
 });
 
 // ✅ Infer type from schema
@@ -57,6 +67,8 @@ type PrestadorData = {
   direccion: string;
   telefono: string;
   foto: string;
+  nombreFantasia: string;
+  descripcion: string;
 };
 
 function PerfilSection() {
@@ -85,6 +97,8 @@ function PerfilSection() {
       direccion: '',
       telefono: '',
       foto: '',
+      nombreFantasia: '',
+      descripcion: '',
     },
   });
 
@@ -114,6 +128,8 @@ function PerfilSection() {
         direccion: profileData.direccion || '',
         telefono: profileData.telefono || '',
         foto: profileData.foto || '',
+        nombreFantasia: profileData.nombreFantasia || '',
+        descripcion: profileData.descripcion || '',
       });
     }
   }, [profileData, reset]);
@@ -134,7 +150,9 @@ function PerfilSection() {
       }
     } catch (error: unknown) {
       console.error('Error fetching prestador data:', error);
-      setError(error instanceof Error ? error.message : 'Error loading profile data');
+      setError(
+        error instanceof Error ? error.message : 'Error loading profile data'
+      );
       setDataFetched(false);
     }
   };
@@ -243,10 +261,14 @@ function PerfilSection() {
       console.log('✅ Profile updated successfully');
     } catch (error: unknown) {
       console.error('Error updating profile:', error);
-      const errorResponse = error as { response?: { data?: { error?: string; message?: string } } };
+      const errorResponse = error as {
+        response?: { data?: { error?: string; message?: string } };
+      };
       setUpdateError({
         error: errorResponse.response?.data?.error || 'Error',
-        message: errorResponse.response?.data?.message || 'Error al actualizar el perfil',
+        message:
+          errorResponse.response?.data?.message ||
+          'Error al actualizar el perfil',
       });
     } finally {
       setUploading(false);
@@ -287,7 +309,10 @@ function PerfilSection() {
         {/* Main container - Mobile responsive */}
         <div className="mx-4 sm:max-w-2xl sm:mx-auto bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-8">
           {/* ✅ Form now includes everything */}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-4 sm:space-y-6"
+          >
             {/* ✅ Profile Picture inside form - Mobile responsive */}
             <div className="flex justify-center mb-6 sm:mb-8">
               <ProfilePicture
@@ -357,7 +382,42 @@ function PerfilSection() {
                 )}
               </div>
             </div>
-
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Nombre fantasia
+              </label>
+              <input
+                type="text"
+                {...register('nombreFantasia')}
+                className={`w-full px-3 py-2 sm:px-4 sm:py-3 border rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-colors text-gray-900 outline-none text-sm sm:text-base ${
+                  errors.nombreFantasia ? 'border-red-500' : 'border-gray-300'
+                }`}
+                placeholder="Tu nombre fantasia"
+              />
+              {errors.nombreFantasia && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.nombreFantasia.message}
+                </p>
+              )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Descripción
+              </label>
+              <input
+                type="text"
+                {...register('descripcion')}
+                className={`w-full px-3 py-2 sm:px-4 sm:py-3 border rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-colors text-gray-900 outline-none text-sm sm:text-base ${
+                  errors.descripcion ? 'border-red-500' : 'border-gray-300'
+                }`}
+                placeholder="Tu descripción"
+              />
+              {errors.descripcion && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.descripcion.message}
+                </p>
+              )}
+            </div>
             {/* Address Field */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
