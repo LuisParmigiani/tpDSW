@@ -2,14 +2,12 @@ import Tooltip from './Tooltip';
 
 interface CardPagoProps {
   title: string;
-  value: string | number;
-  displayValue?: string; // For formatted display (like currency)
+  value: string;
   color: 'green' | 'blue' | 'orange' | 'purple';
   icon: React.ReactNode;
 }
 
-function CardPago({ title, value, displayValue, color, icon }: CardPagoProps) {
-  // Color mappings for different themes
+function CardPago({ title, value, color, icon }: CardPagoProps) {
   const colorClasses = {
     green: {
       text: 'text-green-600',
@@ -30,8 +28,8 @@ function CardPago({ title, value, displayValue, color, icon }: CardPagoProps) {
   };
 
   const colors = colorClasses[color];
-  const tooltipContent = displayValue || value.toString();
-  const displayText = displayValue || value;
+  const tooltipContent = value
+  const displayText = value
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 relative overflow-visible">

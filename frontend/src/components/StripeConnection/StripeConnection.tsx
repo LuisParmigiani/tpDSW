@@ -32,7 +32,7 @@ function StripeConnection({
           return;
         }
         
-        if (!usuario || !usuario.id) {
+        if (!usuario) {
           setError('Usuario no autenticado');
           setLoading(false);
           return;
