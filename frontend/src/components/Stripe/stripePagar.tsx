@@ -177,4 +177,3 @@ function PagarTurno({
 }
 
 export default PagarTurno;
-export default PagarTurno;
