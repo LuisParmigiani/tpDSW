@@ -72,7 +72,7 @@ function TurnCard({ navigate, turn, openModal, cancelarTurno }: Props) {
           Servicio: {turn.servicio.tarea.nombreTarea}
         </p>
         <p className="text-xs sm:text-sm text-gray-700 font-medium mb-2">
-          Monto: ${turn.montoFinal}
+          Monto: ${turn.montoFinal / 100}
         </p>
         {/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */}
         {(() => {
