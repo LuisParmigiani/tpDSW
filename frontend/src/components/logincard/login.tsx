@@ -8,12 +8,7 @@ import { Alert, AlertTitle, AlertDescription } from './../Alerts/Alerts.tsx';
 import { useProtectRoute } from '../../cookie/useProtectRoute.tsx';
 
 function Logincard() {
-<<<<<<< HEAD
   const { id, servicio, Tarea, horario, dia, montofinall } = useParams<{
-=======
-  //obtiene los parámetros de la URL si existen
-  const { id, servicio, Tarea, horario, dia } = useParams<{
->>>>>>> bf72ed9eb8e75a7bf641662b31d3fbd089f40839
     id?: string;
     servicio?: string;
     Tarea?: string;
