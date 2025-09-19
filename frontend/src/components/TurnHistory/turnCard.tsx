@@ -84,7 +84,7 @@ function TurnCard({ navigate, turn, openModal, cancelarTurno }: Props) {
             return (
               <>
                 <PagarTurno
-                  amount={turn.montoFinal}
+                  amount={turn.montoFinal * 100} // Convertir a centavos
                   sellerStripeId={turn.servicio.usuario.stripeAccountId ?? ''}
                   userID={turn.usuario.id}
                   userMail={turn.usuario.mail}

@@ -6,6 +6,6 @@ import { stripeWebhook, splitPaymentWebhook } from './webhook.js';
 export const stripeRouter = Router();
 
 stripeRouter.post('/', verifyToken, createAccount);
-stripeRouter.post('/split-payment', verifyToken, createSplitPayment);
+stripeRouter.post('/split-payment', createSplitPayment);
 stripeRouter.post('/webhook', stripeWebhook);
 stripeRouter.post('/webhook/split-payment', splitPaymentWebhook);
