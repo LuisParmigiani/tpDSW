@@ -5,12 +5,10 @@ import { z } from 'zod';
 import { cn } from '../../lib/utils.ts';
 import ProfilePicture from '../ProfilePic/ProfilePicture.tsx';
 import { Alert, AlertDescription, AlertTitle } from '../Alerts/Alerts.tsx';
-import { AxiosError } from 'axios';
 import { useProtectRoute } from '../../cookie/useProtectRoute.tsx';
-//Algunas validaciones no son necesarias pero las dejo para poder crear el objeto
 
-// eslint-disable-next-line react-refresh/only-export-components
-export const usuarioSchema = z.object({
+//schema para validar los datos del formulario
+const usuarioSchema = z.object({
   nombre: z.string().min(1, 'El nombre es obligatorio'),
   mail: z.string().email('Email inválido'),
   contrasena: z
@@ -42,10 +40,17 @@ export type Usuario = z.infer<typeof usuarioSchema>;
 function RegisCard() {
   const navigate = useNavigate();
   const [message, setMessage] = useState('');
+
+  //sirve para bloquear el boton de registro mientras se esta creando la cuenta
   const [uploading, setUploading] = useState(false);
+
+  //Indica estado de registro
   const [success, setSuccess] = useState(false);
+
+  // Almacena el archivo de imagen pendiente de subir
   const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
   useProtectRoute();
+
   //Clases de tailwind para sacar los spinners del input type number en formato desktop
   const sacarSpinners =
     'md:[appearance:textfield] md:[&::-webkit-outer-spin-button]:appearance-none md:[&::-webkit-inner-spin-button]:appearance-none md:[&::-webkit-outer-spin-button]:m-0 md:[&::-webkit-inner-spin-button]:m-0';
@@ -65,6 +70,7 @@ function RegisCard() {
     foto: '',
   });
 
+  //estado en el que se selecciona el tipo de usuario
   const [tipoUsuario, setearTipoUsuario] = useState<'usuario' | 'prestatario'>(
     'usuario'
   );
@@ -232,7 +238,6 @@ function RegisCard() {
     </>
   );
 
-  // ✅ Updated form submission with image upload (following PerfilSection pattern)
   const envioFormulario = async () => {
     setMessage('');
     setUploading(true);
@@ -267,7 +272,7 @@ function RegisCard() {
 
       setMessage('Usuario creado correctamente');
       setSuccess(true);
-      // Redirect to login after a short delay to show success message
+      // Redirecciona a login
       setTimeout(() => {
         navigate('/login');
       }, 1500);
@@ -286,7 +291,8 @@ function RegisCard() {
         foto: '',
       });
       setPendingImageFile(null);
-    } catch (error: AxiosError | any) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       setSuccess(false);
       if (error.response?.data.message) {
         setMessage(error.response.data.message);
@@ -353,7 +359,7 @@ function RegisCard() {
                 <button
                   type="submit"
                   disabled={
-                    uploading || // ✅ Disable while uploading
+                    uploading ||
                     (tipoUsuario === 'prestatario' &&
                       (form.apellido === '' ||
                         form.nombre === '' ||
@@ -376,7 +382,7 @@ function RegisCard() {
                         form.direccion === ''))
                   }
                   className={
-                    uploading || // ✅ Show loading state
+                    uploading ||
                     (tipoUsuario === 'prestatario' &&
                       ((form.nombreFantasia === '' && form.apellido === '') ||
                         form.nombre === '' ||

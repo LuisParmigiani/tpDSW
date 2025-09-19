@@ -6,8 +6,14 @@ import useAuth from '../../cookie/useAuth';
 import { cn } from '../../lib/utils.ts';
 import { Alert, AlertTitle, AlertDescription } from './../Alerts/Alerts.tsx';
 import { useProtectRoute } from '../../cookie/useProtectRoute.tsx';
+
 function Logincard() {
+<<<<<<< HEAD
   const { id, servicio, Tarea, horario, dia, montofinall } = useParams<{
+=======
+  //obtiene los parámetros de la URL si existen
+  const { id, servicio, Tarea, horario, dia } = useParams<{
+>>>>>>> bf72ed9eb8e75a7bf641662b31d3fbd089f40839
     id?: string;
     servicio?: string;
     Tarea?: string;
@@ -15,18 +21,23 @@ function Logincard() {
     dia?: string;
     montofinall?: string;
   }>();
+
   const { verificarAuth } = useAuth();
+
   const navigate = useNavigate();
   const [message, setMessage] = useState('');
-  useProtectRoute();
-  // ✅ Simplified state management
-  const [showPassword, setShowPassword] = useState(false);
-  const [form, setForm] = useState({ mail: '', contrasena: '' });
 
-  // ✅ Simplified toggle function
+  useProtectRoute();
+
+  // Ocultar password
+  const [showPassword, setShowPassword] = useState(false);
+
   const handleClickCrossedEye = () => {
     setShowPassword(!showPassword);
   };
+
+  //variable de estado para almacenar los datos del formulario
+  const [form, setForm] = useState({ mail: '', contrasena: '' });
 
   const envioFormulario = async () => {
     try {
@@ -45,6 +56,7 @@ function Logincard() {
           navigate('/');
         }
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       try {
         if (error.response.data?.errors[0]?.message) {
@@ -94,7 +106,7 @@ function Logincard() {
                   <i className="fa-solid fa-envelope absolute top-4 left-6 text-gray-500 text-lg pointer-events-none"></i>
                 </div>
 
-                {/* ✅ Updated Password Input */}
+                {/* Password Input */}
                 <div className="relative inline-block w-full">
                   <input
                     type={showPassword ? 'text' : 'password'}
@@ -103,20 +115,19 @@ function Logincard() {
                       setForm({ ...form, contrasena: e.target.value })
                     }
                     className={cn(
-                      'w-full pt-3 pb-3 pr-12 pl-12 text-base border-none', // ✅ pr-12 for icon space
+                      'w-full pt-3 pb-3 pr-12 pl-12 text-base border-none',
                       'rounded-4xl bg-white shadow-inner outline-none mb-4',
                       'text-black font-inter hover:shadow-lg hover:bg-orange-50 transition-all ease-in-out duration-300',
                       'focus:ring-2 focus:ring-naranja-1 focus:border-transparent'
                     )}
                   />
-                  {/* ✅ Eye icon - always positioned from the right */}
+                  {/* Posición del ojo*/}
                   <i
                     className={`${
                       showPassword ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'
                     } absolute top-4 right-4 text-gray-500 text-lg cursor-pointer hover:text-gray-700 transition-colors`}
                     onClick={handleClickCrossedEye}
                   ></i>
-                  {/* Lock icon - positioned from the left */}
                   <i className="fa-solid fa-lock absolute top-4 left-6 text-gray-500 text-lg pointer-events-none"></i>
                 </div>
 

@@ -2,7 +2,11 @@ name: CI/CD Pipeline
 
 on:
   push:
+<<<<<<< HEAD
+    branches: [never] # antes: [never]
+=======
     branches: [main]
+>>>>>>> ac8ad3a05381462da93856b4a4081024f879036d
   pull_request:
     branches: [main]
 
@@ -61,17 +65,13 @@ jobs:
           version: 8
       - name: Install workspace deps
         run: pnpm install --no-frozen-lockfile --recursive
-      - name: Debug deps
-        run: |
-          pnpm list vite --filter frontend || true
-          ls -la frontend/node_modules/.bin/ | grep vite || echo "vite bin missing"
       - name: Run frontend tests
         run: pnpm --filter frontend test:run
 
-  # Deploy Backend (after unit tests pass)
+  # Deploy Backend (only after tests pass and on main branch)
   deploy-backend:
-    name: Deploy Backend
-    needs: [backend-tests, frontend-tests]
+    name: Deploy Backend to Fly.io
+    needs: [backend-tests, frontend-tests] # Wait for tests to pass
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     defaults:
@@ -166,7 +166,10 @@ jobs:
           # No abortar todavía; dejaremos que el usuario analice.
 
       - name: Detectar carpeta destino remota
+<<<<<<< HEAD
+=======
         if: success()
+>>>>>>> ac8ad3a05381462da93856b4a4081024f879036d
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
@@ -183,7 +186,10 @@ jobs:
           else
             echo "No existe public_html -> usar raíz"; echo "SERVER_DIR=./" >> $GITHUB_ENV
           fi
+<<<<<<< HEAD
+=======
 
+>>>>>>> ac8ad3a05381462da93856b4a4081024f879036d
       - name: Determinar protocolo y validar credenciales
         if: success()
         run: |
@@ -203,13 +209,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
+<<<<<<< HEAD
+=======
           registry-url: 'https://registry.npmjs.org'
+>>>>>>> ac8ad3a05381462da93856b4a4081024f879036d
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
         with:
           version: 8
+<<<<<<< HEAD
+=======
 
+>>>>>>> ac8ad3a05381462da93856b4a4081024f879036d
       - name: Configure pnpm for deployment
         working-directory: frontend
         run: |
@@ -217,7 +229,11 @@ jobs:
           pnpm config set fetch-retries 5
           pnpm config set fetch-retry-factor 2
           pnpm config set fetch-retry-mintimeout 10000
+<<<<<<< HEAD
+          pnpm config set fetch-retry-maxtimeout 60000V
+=======
           pnpm config set fetch-retry-maxtimeout 60000
+>>>>>>> ac8ad3a05381462da93856b4a4081024f879036d
 
       - name: Install deps
         working-directory: frontend
@@ -229,10 +245,13 @@ jobs:
         working-directory: frontend
         run: pnpm build
 
+<<<<<<< HEAD
+=======
       - name: List dist
         run: |
           echo "Dist files:"; find frontend/dist -maxdepth 3 -type f -print | sed 's/^/ - /'
 
+>>>>>>> ac8ad3a05381462da93856b4a4081024f879036d
       - name: Deploy via FTP
         if: success()
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -251,7 +270,7 @@ jobs:
           log-level: verbose
           dangerous-clean-slate: false
 
-  # E2E Tests AFTER deployment (Production Testing)
+  # E2E Tests AFTER deployment
   e2e-tests:
     name: Production E2E Tests
     needs: [deploy-frontend]
@@ -273,13 +292,11 @@ jobs:
       - name: Install Playwright Browsers
         run: pnpm exec playwright install chromium firefox webkit --with-deps
 
-      # Wait for deployment to be fully ready
       - name: Wait for production deployment
         run: |
           timeout 300 bash -c 'until curl -f https://${{ secrets.FRONTEND_URL }} 2>/dev/null; do sleep 10; done'
           timeout 300 bash -c 'until curl -f https://${{ secrets.FLY_APP_NAME }}.fly.dev/health 2>/dev/null; do sleep 10; done'
 
-      # Run E2E tests against production
       - name: Run Production E2E tests
         env:
           PLAYWRIGHT_BASE_URL: https://${{ secrets.FRONTEND_URL }}
@@ -293,16 +310,3 @@ jobs:
           name: playwright-report-production
           path: playwright-report/
           retention-days: 30
-
-  # Rollback on E2E failure (optional)
-  rollback-on-failure:
-    name: Rollback on E2E Failure
-    needs: [e2e-tests]
-    runs-on: ubuntu-latest
-    if: failure() && github.ref == 'refs/heads/main'
-    steps:
-      - name: Notify E2E Test Failure
-        run: |
-          echo "⚠️ E2E tests failed in production!"
-          echo "Consider rolling back deployment or fixing issues immediately."
-      # Add actual rollback logic here if needed
