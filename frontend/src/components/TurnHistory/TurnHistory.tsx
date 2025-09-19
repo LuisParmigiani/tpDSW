@@ -250,7 +250,7 @@ function TurnHistory() {
           autoCloseDelay={3000}
           variant="danger"
           onClose={() => setUpdateError(null)}
-          className="max-w-xl"
+          className="max-w-xl mx-auto mt-2"
         >
           <AlertTitle>{updateError.error}</AlertTitle>
           <AlertDescription>{updateError.message}</AlertDescription>
@@ -262,7 +262,7 @@ function TurnHistory() {
           autoCloseDelay={3000}
           variant="success"
           onClose={() => setUpdateSuccess(null)}
-          className="max-w-xl"
+          className="max-w-xl mx-auto mt-2"
         >
           <AlertTitle>{updateSuccess.success}</AlertTitle>
           <AlertDescription>{updateSuccess.message}</AlertDescription>

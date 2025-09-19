@@ -228,7 +228,7 @@ function Borrower() {
             autoCloseDelay={5000}
             variant="danger"
             onClose={() => setUpdateCommentsError(null)}
-            className="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 max-w-xl "
+            className=" z-50 max-w-xl mx-auto -mt-10 "
           >
             <AlertTitle>{updateCommentsError.error}</AlertTitle>
             <AlertDescription>{updateCommentsError.message}</AlertDescription>
@@ -241,7 +241,7 @@ function Borrower() {
             autoCloseDelay={5000}
             variant="danger"
             onClose={() => setUpdateBorrowerError(null)}
-            className="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 max-w-xl "
+            className="  max-w-xl mx-auto -mt-10 "
           >
             <AlertTitle>{updateBorrowerError.error}</AlertTitle>
             <AlertDescription>{updateBorrowerError.message}</AlertDescription>
@@ -261,7 +261,7 @@ function Borrower() {
                 : 'default'
             }
             onClose={() => setAlertNewTurn(null)}
-            className="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 max-w-xl text-center "
+            className=" max-w-xl text-center mx-auto -mt-10"
           >
             <AlertTitle>{alertNewTurn.error}</AlertTitle>
             <AlertDescription>{alertNewTurn.message}</AlertDescription>
