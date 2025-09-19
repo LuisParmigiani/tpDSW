@@ -656,7 +656,7 @@ function NewTurnModal({
               <p>{selectedTask}</p>
               <p>{dayForTurn}</p>
               <p>{horarioSelected}</p>
-              <p> {montofinal} USD</p>
+              <p>{montofinal.toFixed(2)} USD</p>
             </div>
           </div>
           <div className="flex sm:flex-col sm:p-0 px-3 items-start gap-7 mb-4 sm:ml-11 h-full justify-between mt-4">
@@ -821,6 +821,7 @@ function NewTurnModal({
             )}
           </div>
         )}
+
         {/* Página 2: Selección de fecha y horario */}
         {page === 2 && (horariosManana || horariosTarde) && (
           <div className="w-full ">
@@ -960,7 +961,7 @@ function NewTurnModal({
           </div>
         )}
         {/* Botones de navegación del modal */}
-        <div className="flex gap-6 justify-around mt-4 px-10">
+        <div className="flex gap-5 justify-center mt-4 px-10 w-full items-center">
           <button
             className={
               page === 1

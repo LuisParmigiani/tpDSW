@@ -207,25 +207,23 @@ function Borrower() {
       )}
       {/* Alerta de nuevo turno */}
       {alertNewTurn && (
-        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-800 max-w-xl flex justify-center">
-          <Alert
-            autoClose={true}
-            autoCloseDelay={5000}
-            variant={
-              alertNewTurn.tipo === 'success' ||
-              alertNewTurn.tipo === 'danger' ||
-              alertNewTurn.tipo === 'default' ||
-              alertNewTurn.tipo === 'info'
-                ? alertNewTurn.tipo
-                : 'default'
-            }
-            onClose={() => setAlertNewTurn(null)}
-            className="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 w-11/12 text-center "
-          >
-            <AlertTitle>{alertNewTurn.error}</AlertTitle>
-            <AlertDescription>{alertNewTurn.message}</AlertDescription>
-          </Alert>
-        </div>
+        <Alert
+          autoClose={true}
+          autoCloseDelay={5000}
+          variant={
+            alertNewTurn.tipo === 'success' ||
+            alertNewTurn.tipo === 'danger' ||
+            alertNewTurn.tipo === 'default' ||
+            alertNewTurn.tipo === 'info'
+              ? alertNewTurn.tipo
+              : 'default'
+          }
+          onClose={() => setAlertNewTurn(null)}
+          className="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 w-11/12 text-center "
+        >
+          <AlertTitle>{alertNewTurn.error}</AlertTitle>
+          <AlertDescription>{alertNewTurn.message}</AlertDescription>
+        </Alert>
       )}
       <Navbar />
       {isOpen && prestatario && (
