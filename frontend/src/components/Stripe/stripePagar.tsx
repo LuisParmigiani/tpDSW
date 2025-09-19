@@ -137,7 +137,7 @@ function PagarTurno({
                   minute: '2-digit',
                 })}
               </p>
-              <p className="pb-10">Monto final: ${turno.montoFinal}</p>
+              <p className="pb-10">Monto final: ${turno.montoFinal / 100}</p>
               <button
                 onClick={handlePayment}
                 disabled={loading}
