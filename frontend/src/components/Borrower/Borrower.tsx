@@ -53,13 +53,14 @@ type Tarea = {
 };
 
 function Borrower() {
-  const { id, servicio, Tarea, horario, dia, open } = useParams<{
+  const { id, servicio, Tarea, horario, dia, open, montofinall } = useParams<{
     id: string;
     servicio?: string;
     Tarea?: string;
     horario?: string;
     dia?: string;
     open?: string;
+    montofinall?: string;
   }>();
 
   const numericId = Number(id);
@@ -237,6 +238,7 @@ function Borrower() {
           dia={dia}
           open={open}
           manejoAlertas={setAlertNewTurn}
+          montofinall={montofinall ? Number(montofinall) : 0}
         />
       )}
       <div className="flex flex-col items-center   justify-center ">

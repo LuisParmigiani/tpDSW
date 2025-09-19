@@ -80,6 +80,7 @@ type Props = {
   manejoAlertas: (
     alert: { tipo: string; error: string; message: string } | null
   ) => void;
+  montofinall: number;
 };
 
 function NewTurnModal({
@@ -90,9 +91,10 @@ function NewTurnModal({
   horario = '',
   dia = '',
   open,
+  montofinall,
   manejoAlertas,
 }: Props) {
-  const [montofinal, setMontofinal] = useState(0);
+  const [montofinal, setMontofinal] = useState(montofinall);
   const navigate = useNavigate();
   // Verificar si el usuario ha iniciado sesión
   const rol = useRoleReturn();
@@ -692,7 +694,7 @@ function NewTurnModal({
                 rol === ''
                   ? () =>
                       navigate(
-                        `/login/${prestatario.id.toString()}/${selectedService}/${selectedTask}/${horarioSelected}/${dayForTurn}`
+                        `/login/${prestatario.id.toString()}/${selectedService}/${selectedTask}/${horarioSelected}/${dayForTurn}/${montofinal}`
                       )
                   : guardarTurno
               }

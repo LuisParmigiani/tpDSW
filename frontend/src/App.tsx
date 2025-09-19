@@ -22,12 +22,12 @@ function App() {
           <Route path="/" element={<Homepage />} />
           <Route path="/about" element={<About />} />
           <Route
-            path="/prestatario/:id/:servicio?/:Tarea?/:horario?/:dia?/:open?"
+            path="/prestatario/:id/:servicio?/:Tarea?/:horario?/:dia?/:montofinall?/:open?"
             element={<Borrower />}
           />
           <Route path="/Servicios" element={<Servicios />} />
           <Route
-            path="/login/:id?/:servicio?/:Tarea?/:horario?/:dia?"
+            path="/login/:id?/:servicio?/:Tarea?/:horario?/:dia?/:montofinall?"
             element={<Login />}
           />
           <Route path="/recovery" element={<Recovery />} />

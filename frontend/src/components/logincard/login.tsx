@@ -7,12 +7,13 @@ import { cn } from '../../lib/utils.ts';
 import { Alert, AlertTitle, AlertDescription } from './../Alerts/Alerts.tsx';
 import { useProtectRoute } from '../../cookie/useProtectRoute.tsx';
 function Logincard() {
-  const { id, servicio, Tarea, horario, dia } = useParams<{
+  const { id, servicio, Tarea, horario, dia, montofinall } = useParams<{
     id?: string;
     servicio?: string;
     Tarea?: string;
     horario?: string;
     dia?: string;
+    montofinall?: string;
   }>();
   const { verificarAuth } = useAuth();
   const navigate = useNavigate();
@@ -36,9 +37,9 @@ function Logincard() {
       if (data.data.nombreFantasia) {
         navigate('/dashboard');
       } else {
-        if (id && servicio && Tarea && horario && dia) {
+        if (id && servicio && Tarea && horario && dia && montofinall) {
           navigate(
-            `/prestatario/${id}/${servicio}/${Tarea}/${horario}/${dia}/true`
+            `/prestatario/${id}/${servicio}/${Tarea}/${horario}/${dia}/${montofinall}/true`
           );
         } else {
           navigate('/');
