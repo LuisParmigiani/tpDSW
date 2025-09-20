@@ -3,12 +3,13 @@ import { Seeder } from '@mikro-orm/seeder';
 import { faker } from '@faker-js/faker';
 import { EntityManager } from '@mikro-orm/core';
 import { Usuario } from '../usuario/usuario.entity.js';
-
+import { Zona } from '../zona/zona.entity.js';
 export class UsuarioSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {
     console.log(
       'Iniciando UsuarioSeeder........................................................................................................'
     );
+    const zonas = await em.find(Zona, {}); // para forzar carga de usuarios y evitar error de clave foránea
     // Clientes
     for (let i = 0; i < 50; i++) {
       em.create(Usuario, {
@@ -56,6 +57,7 @@ export class UsuarioSeeder extends Seeder {
       descripcion: 'Lo que quieras, lo hacemos',
       estado: 'activo',
       stripeAccountId: 'acct_1N8qgYCuyV9w7dLC',
+      zonas: faker.helpers.arrayElements(zonas, 3),
     });
 
     for (let i = 0; i < 25; i++) {
@@ -78,6 +80,7 @@ export class UsuarioSeeder extends Seeder {
         nombreFantasia: faker.company.name(),
         descripcion: faker.lorem.sentence(),
         estado: 'activo',
+        zonas: faker.helpers.arrayElements(zonas, 3),
       });
     }
 
@@ -99,6 +102,7 @@ export class UsuarioSeeder extends Seeder {
         nombreFantasia: faker.company.name(),
         descripcion: faker.lorem.sentence(),
         estado: 'inactivo',
+        zonas: faker.helpers.arrayElements(zonas, 3),
       });
     }
 

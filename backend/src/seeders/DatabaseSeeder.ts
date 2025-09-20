@@ -15,8 +15,8 @@ export class DatabaseSeeder extends Seeder {
       'Iniciando seeders.....................................................................................................'
     );
     await this.call(em, [
-      UsuarioSeeder,
       ZonaSeeder,
+      UsuarioSeeder,
       TipoServicioSeeder,
       TareaSeeder,
       ServicioSeeder,

@@ -48,7 +48,7 @@ const orm = await MikroORM.init({
 export const syncSchema = async () => {
   try {
     const generator = orm.getSchemaGenerator();
-    /*
+
     console.log('❌ Borrando todas las tablas...');
     await generator.dropSchema();
 
@@ -74,7 +74,7 @@ export const syncSchema = async () => {
     }
 
     // // // Verificación rápida
-    const em = orm.em.fork(); */
+    const em = orm.em.fork();
   } catch (error) {
     console.error('❌ Error ejecutando seeders:', error);
     throw error;

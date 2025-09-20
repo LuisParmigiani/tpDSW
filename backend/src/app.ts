@@ -228,7 +228,7 @@ export async function initializeApp() {
   const rawOrigins = local
     ? 'http://localhost:5173'
     : process.env.FRONTEND_ORIGIN ||
-      'https://reformix.site,https://www.reformix.site';
+      'http://reformix.site,https://www.reformix.site';
   const allowedOrigins = rawOrigins.split(',').map((o: string) => o.trim());
 
   console.log('🌐 Configuración CORS:', {
