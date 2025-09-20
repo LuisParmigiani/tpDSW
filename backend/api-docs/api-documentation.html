@@ -1,4 +1,40 @@
-{
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeService API Documentation</title>
+  <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui.css" />
+  <style>
+    html {
+      box-sizing: border-box;
+      overflow: -moz-scrollbars-vertical;
+      overflow-y: scroll;
+    }
+    *, *:before, *:after {
+      box-sizing: inherit;
+    }
+    body {
+      margin: 0;
+      background: #fafafa;
+    }
+    .swagger-ui .topbar {
+      background-color: #2c3e50;
+    }
+    .swagger-ui .topbar .download-url-wrapper {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="swagger-ui"></div>
+  <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-bundle.js" charset="UTF-8"></script>
+  <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-standalone-preset.js" charset="UTF-8"></script>
+  <script>
+    window.onload = function() {
+      // Begin Swagger UI call region
+      const ui = SwaggerUIBundle({
+        spec: {
   "openapi": "3.0.0",
   "info": {
     "version": "1.0.0",
@@ -167,7 +203,9 @@
           "descripcion": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "minLength": 5,
+                "maxLength": 300
               },
               {
                 "type": "string",
@@ -1460,44 +1498,46 @@
         "type": "object",
         "properties": {
           "cantItemsPerPage": {
-            "type": "integer",
-            "minimum": 0,
-            "exclusiveMinimum": true,
+            "type": "string",
+            "minLength": 1,
             "description": "Cantidad de items por página",
-            "example": 10
+            "example": "10"
           },
           "currentPage": {
-            "type": "integer",
-            "minimum": 0,
-            "exclusiveMinimum": true,
+            "type": "string",
+            "minLength": 1,
             "description": "Página actual",
-            "example": 1
+            "example": "1"
           },
           "selectedValueShow": {
             "type": "string",
             "enum": [
-              "fecha",
-              "estado",
-              "calificacion",
-              "montoFinal"
+              "todos",
+              "faltanCalificar",
+              "calificados",
+              "cancelados",
+              "pendientes",
+              "completado",
+              "porPagar",
+              "pagado",
+              "pagoPendiente",
+              "all"
             ],
             "description": "Campo para mostrar",
-            "example": "fecha"
+            "example": "pagado"
           },
           "selectedValueOrder": {
             "type": "string",
             "enum": [
-              "asc",
-              "desc"
+              "todos",
+              "fechaA",
+              "fechaD",
+              "calificacionM",
+              "calificacionP",
+              "all"
             ],
             "description": "Campo para ordenar",
-            "example": "asc"
-          },
-          "searchQuery": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Consulta de búsqueda",
-            "example": "Juan"
+            "example": "fechaA"
           }
         }
       },
@@ -5184,7 +5224,9 @@
                   "descripcion": {
                     "anyOf": [
                       {
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 5,
+                        "maxLength": 300
                       },
                       {
                         "type": "string",
@@ -8117,7 +8159,9 @@
                   "descripcion": {
                     "anyOf": [
                       {
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 5,
+                        "maxLength": 300
                       },
                       {
                         "type": "string",
@@ -20219,4 +20263,32 @@
       }
     }
   }
-}
+},
+        dom_id: '#swagger-ui',
+        deepLinking: true,
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIStandalonePreset
+        ],
+        plugins: [
+          SwaggerUIBundle.plugins.DownloadUrl
+        ],
+        layout: "StandaloneLayout",
+        tryItOutEnabled: true,
+        filter: true,
+        requestInterceptor: function(req) {
+          // Add any custom request headers here if needed
+          return req;
+        },
+        responseInterceptor: function(res) {
+          // Add any custom response handling here if needed
+          return res;
+        }
+      });
+      // End Swagger UI call region
+
+      window.ui = ui;
+    };
+  </script>
+</body>
+</html>

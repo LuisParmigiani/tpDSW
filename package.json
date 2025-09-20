@@ -26,6 +26,7 @@
     ]
   },
   "scripts": {
+    "install:both": "concurrently \"pnpm --filter frontend install\" \"pnpm --filter backend install\"",
     "dev": "concurrently \"pnpm --filter frontend dev\" \"pnpm --filter backend start:dev\"",
     "build": "concurrently \"pnpm --filter frontend build\" \"pnpm --filter backend build\"",
     "dev:frontend": "pnpm --filter frontend dev",

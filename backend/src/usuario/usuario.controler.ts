@@ -120,9 +120,7 @@ async function findPrestatariosByTipoServicioAndZona(
       ],
       populateWhere: {
         servicios: {
-          turnos: {
-            calificacion: { $ne: null, $gt: 0 }, // Only turnos with calification > 0
-          },
+          estado: 'activo',
         },
       },
     });
