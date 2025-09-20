@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret'; // en producción sacalo a env
+const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
 interface AuthRequest extends Request {
   user?: {
     id: string;
@@ -9,7 +9,7 @@ interface AuthRequest extends Request {
   };
 }
 
-// Middleware para verificar el token de la cookie
+// Middleware para verificar el token
 
 export const verifyToken = (
   req: AuthRequest,

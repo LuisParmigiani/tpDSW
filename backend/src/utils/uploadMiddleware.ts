@@ -38,12 +38,7 @@ export const uploadProfile = multer({
     if (allowedMimes.includes(file.mimetype) && allowedExts.includes(ext)) {
       cb(null, true);
     } else {
-      cb(new Error(' Solo se permiten JPEG, PNG, y WebP'));
+      cb(new Error(' Solo se permiten JPG, JPEG, PNG, y WebP'));
     }
   },
 });
-
-/* Esto generalmente se utilizaría en una ruta de express: 
-app.post('/users/:userId/profile', uploadProfile.single('profileImage'), (req, res) => {
-});
-*/

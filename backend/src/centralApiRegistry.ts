@@ -16,8 +16,7 @@ import { tipoServicioRegistry } from './tipoServicio/tipoServicio.registory.js';
 
 // Function to generate Swagger UI HTML
 function generateSwaggerUIHTML(openApiDocument: any): string {
-  return `
-<!DOCTYPE html>
+  return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -34,7 +33,7 @@ function generateSwaggerUIHTML(openApiDocument: any): string {
       box-sizing: inherit;
     }
     body {
-      margin:0;
+      margin: 0;
       background: #fafafa;
     }
     .swagger-ui .topbar {
@@ -47,12 +46,13 @@ function generateSwaggerUIHTML(openApiDocument: any): string {
 </head>
 <body>
   <div id="swagger-ui"></div>
-  <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-bundle.js"></script>
-  <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-standalone-preset.js"></script>
+  <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-bundle.js" charset="UTF-8"></script>
+  <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-standalone-preset.js" charset="UTF-8"></script>
   <script>
     window.onload = function() {
+      // Begin Swagger UI call region
       const ui = SwaggerUIBundle({
-        spec: ${JSON.stringify(openApiDocument)},
+        spec: ${JSON.stringify(openApiDocument, null, 2)},
         dom_id: '#swagger-ui',
         deepLinking: true,
         presets: [
@@ -64,11 +64,19 @@ function generateSwaggerUIHTML(openApiDocument: any): string {
         ],
         layout: "StandaloneLayout",
         tryItOutEnabled: true,
+        filter: true,
         requestInterceptor: function(req) {
           // Add any custom request headers here if needed
           return req;
+        },
+        responseInterceptor: function(res) {
+          // Add any custom response handling here if needed
+          return res;
         }
       });
+      // End Swagger UI call region
+
+      window.ui = ui;
     };
   </script>
 </body>

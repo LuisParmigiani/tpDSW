@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import jwt from 'jsonwebtoken';
 
+//! Valida el body de las requests
 export const validateBody = (schema: z.ZodSchema) => {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -11,7 +12,7 @@ export const validateBody = (schema: z.ZodSchema) => {
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({
-          message: 'Validation error',
+          message: 'Error de validación',
           errors: error.issues.map((issue: any) => ({
             path: issue.path.join('.'),
             message: issue.message,
@@ -22,7 +23,7 @@ export const validateBody = (schema: z.ZodSchema) => {
     }
   };
 };
-
+//! Valida los parametros de las requests
 export const validateParams = (schema: z.ZodSchema) => {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -32,7 +33,7 @@ export const validateParams = (schema: z.ZodSchema) => {
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({
-          message: 'Invalid parameters',
+          message: 'Parametros invalidos',
           errors: error.issues.map((issue: any) => ({
             path: issue.path.join('.'),
             message: issue.message,
@@ -43,7 +44,7 @@ export const validateParams = (schema: z.ZodSchema) => {
     }
   };
 };
-
+//! Valida los query de las requests
 export const validateQuery = (schema: z.ZodSchema) => {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -53,7 +54,7 @@ export const validateQuery = (schema: z.ZodSchema) => {
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({
-          message: 'Invalid query parameters',
+          message: 'Parametros por query inválidos',
           errors: error.issues.map((issue: any) => ({
             path: issue.path.join('.'),
             message: issue.message,
@@ -64,7 +65,7 @@ export const validateQuery = (schema: z.ZodSchema) => {
     }
   };
 };
-
+//! Autentica el token JWT
 export const authenticateToken = (
   req: Request,
   res: Response,
