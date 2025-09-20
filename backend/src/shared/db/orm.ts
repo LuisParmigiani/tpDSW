@@ -14,14 +14,27 @@ if (process.env.NODE_ENV !== 'production') {
   dotenv.config({ path: path.join(__dirname, './../../../../.env') });
 }
 
-console.log('process.env.LOCAL:', process.env.LOCAL);
+// Evitar exponer credenciales en logs y priorizar DATABASE_URL de entorno
 const local = process.env.LOCAL === 'true';
-const DB_URL = local
-  ? 'mysql://root:root@localhost:3306/homeservice'
-  : 'mysql://u797556926_reformix:LUISluis123!@srv2023.hstgr.io:3306/u797556926_homeService';
+const DB_URL =
+  process.env.DATABASE_URL ?? // Fly/Producción: definir DATABASE_URL en variables de entorno
+  (local
+    ? 'mysql://root:root@localhost:3306/homeservice'
+    : 'mysql://u797556926_reformix:LUISluis123!@srv2023.hstgr.io:3306/u797556926_homeService');
 
-console.log('DB_URL:', DB_URL);
-const DEBUG = local ? true : process.env.DEBUG_SQL === '1';
+// Log seguro (sin credenciales)
+if (process.env.DEBUG_SQL === '1' || local) {
+  try {
+    const safeUrl = new URL(DB_URL);
+    if (safeUrl.password) safeUrl.password = '***';
+    if (safeUrl.username) safeUrl.username = '***';
+    console.log('DB_URL (safe):', safeUrl.toString());
+  } catch {
+    // ignora si DB_URL no es parseable
+  }
+}
+
+const DEBUG = local || process.env.DEBUG_SQL === '1';
 
 const orm = await MikroORM.init({
   driver: MySqlDriver,
