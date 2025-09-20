@@ -74,7 +74,6 @@ export function ServiciosForm({
     },
   });
 
-  // Reset form values when filtrosForm prop changes
   useEffect(() => {
     console.log('FormServicios: filtrosForm changed:', filtrosForm);
     if (filtrosForm && tipoServicios.length > 0 && zonas.length > 0) {
@@ -94,7 +93,7 @@ export function ServiciosForm({
     }
   }, [filtrosForm, form, tipoServicios, zonas]);
 
-  // Calculate tareas based on selected service
+  // Cambia las tareas basandose en que tipo servicio esta seleccionado
   const tareasTipo: Array<{ id: number; nombreTarea: string }> = (() => {
     const tipoSeleccionado = tipoServicios.find(
       (tipo) => tipo.nombreTipo === form.watch('servicio')
