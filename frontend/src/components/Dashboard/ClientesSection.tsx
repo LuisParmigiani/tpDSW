@@ -555,9 +555,7 @@ function ClientesSection() {
           } gap-3 sm:gap-2 px-2 sm:px-0 relative`}
         >
           <div
-            className={`flex ${  
-
-              
+            className={`flex ${
               isMobileLayout ? 'flex-col' : 'flex-col sm:flex-row'
             } gap-2 sm:gap-2 relative`}
           >
