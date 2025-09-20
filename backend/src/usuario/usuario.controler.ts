@@ -80,7 +80,12 @@ async function findPrestatariosByTipoServicioAndZona(
       filtroTipoServicio = nombreTipoServicio;
     }
     let filtroTarea = '';
-    if (tarea && tarea.trim() !== '' && tarea !== undefined) {
+    if (
+      tarea &&
+      tarea !== '--tarea--' &&
+      tarea !== 'Todas' &&
+      tarea !== undefined
+    ) {
       filtroTarea = tarea;
     }
     let filtroZona = '';

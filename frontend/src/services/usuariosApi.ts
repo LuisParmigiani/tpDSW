@@ -13,10 +13,13 @@ export const usuariosApi = {
     const params = new URLSearchParams(); // crea los parámetros para pasarlos en la consulta
     if (maxItems !== undefined) params.append('maxItems', maxItems);
     if (page !== undefined) params.append('page', page);
-    if (tarea === undefined || tarea === '') tarea = ' ';
+    if (tarea === undefined || tarea === '') tarea = '--tarea--';
     const url = `/usuario/prestatarios/${tipoServicio}/${tarea}/${zona}/${orderBy}${
       params ? `?${params}` : ''
     }`;
+    console.log(url);
+    console.log(params);
+    console.log(tarea);
     return api.get(url);
   },
   getById: (id: string) => api.get(`/usuario/${id}`),
