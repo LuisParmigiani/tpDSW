@@ -39,10 +39,9 @@ const profileSchema = z.object({
     .string()
     .min(1, 'El teléfono es requerido')
     .regex(
-      /^[+]?[0-9\s\-()]{8,20}$/,
+      /^[+]?[1-9\s\-()]{8,20}$/,
       'Formato de teléfono inválido (ej: +54 11 1234-5678)'
     ),
-  // ✅ Add photo as optional field - it will be handled separately but tracked by the form
   foto: z.string().optional(),
   nombreFantasia: z
     .string()
@@ -56,7 +55,6 @@ const profileSchema = z.object({
     .optional(),
 });
 
-// ✅ Infer type from schema
 type ProfileFormData = z.infer<typeof profileSchema>;
 
 type PrestadorData = {

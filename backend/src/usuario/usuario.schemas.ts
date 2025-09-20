@@ -60,7 +60,7 @@ export const usuarioBaseSchema = z.object({
     }),
   telefono: z
     .string()
-    .regex(/^[+]?[0-9\s\-()]{8,20}$/, 'Formato de teléfono inválido')
+    .regex(/^[+]?[1-9\s\-()]{8,20}$/, 'Formato de teléfono inválido')
     .describe('Número de teléfono')
     .openapi({
       example: '+54 11 1234-5678',
