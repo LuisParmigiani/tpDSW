@@ -76,7 +76,7 @@ async function findPrestatariosByTipoServicioAndZona(
     const { maxItems = 6, page = 1 } = req.query as any;
 
     let filtroTipoServicio = '';
-    if (nombreTipoServicio !== 'Todos') {
+    if (nombreTipoServicio !== 'Todos' && nombreTipoServicio !== '--tipo--') {
       filtroTipoServicio = nombreTipoServicio;
     }
     let filtroTarea = '';
@@ -89,7 +89,7 @@ async function findPrestatariosByTipoServicioAndZona(
       filtroTarea = tarea;
     }
     let filtroZona = '';
-    if (nombreZona !== 'Todas') {
+    if (nombreZona !== 'Todas' && nombreZona !== '--zona--') {
       filtroZona = nombreZona;
     }
 

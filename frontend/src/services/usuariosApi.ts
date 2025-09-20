@@ -14,6 +14,14 @@ export const usuariosApi = {
     if (maxItems !== undefined) params.append('maxItems', maxItems);
     if (page !== undefined) params.append('page', page);
     if (tarea === undefined || tarea === '') tarea = '--tarea--';
+    if (zona === undefined || zona === '' || zona === 'Todas')
+      zona = '--zona--';
+    if (
+      tipoServicio === undefined ||
+      tipoServicio === '' ||
+      tipoServicio === 'Todos'
+    )
+      tipoServicio = '--tipo--';
     const url = `/usuario/prestatarios/${tipoServicio}/${tarea}/${zona}/${orderBy}${
       params ? `?${params}` : ''
     }`;
