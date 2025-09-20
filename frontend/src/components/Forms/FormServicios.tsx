@@ -36,10 +36,8 @@ const formSchema = z.object({
   }),
 });
 
-// Infer the type from the schema
 type FormValues = z.infer<typeof formSchema>;
 
-// Define props for the component
 export type ServiciosFormProps = {
   tipoServicios: Array<{
     nombreTipo: string;
@@ -60,7 +58,7 @@ export function ServiciosForm({
   tipoServicios,
   zonas,
   onSubmit,
-  filtrosForm, // Added to accept initial filter values
+  filtrosForm,
 }: ServiciosFormProps) {
   const comboInputRef = useRef<ComboInputRef>(null);
 

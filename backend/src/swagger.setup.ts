@@ -3,7 +3,6 @@ import { Application } from 'express';
 import { generateOpenApiDocument } from './centralApiRegistry.js';
 
 export function setupSwagger(app: Application) {
-  // Generate the OpenAPI spec
   const openApiDocument = generateOpenApiDocument();
 
   // Swagger UI options

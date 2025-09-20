@@ -60,7 +60,6 @@ async function findAll(req: Request, res: Response) {
   }
 }
 
-//*Check - Updated to use validated params and query
 async function findPrestatariosByTipoServicioAndZona(
   req: Request,
   res: Response
@@ -166,7 +165,6 @@ async function findPrestatariosByTipoServicioAndZona(
       };
     });
 
-    // Apply ordering if specified
     if (orderBy) {
       prestatariosWithRating.sort((a: any, b: any) => {
         switch (orderBy) {
@@ -196,7 +194,6 @@ async function findPrestatariosByTipoServicioAndZona(
   }
 }
 
-//*Check - Updated to use validated params
 async function findOneOnlyInfo(req: Request, res: Response) {
   try {
     const { id } = req.params; // Validated by Zod
@@ -208,7 +205,6 @@ async function findOneOnlyInfo(req: Request, res: Response) {
   }
 }
 
-//*Check - Updated to use validated params
 async function findOne(req: Request, res: Response) {
   try {
     const { id } = req.params; // Validated by Zod
@@ -242,7 +238,6 @@ async function findOne(req: Request, res: Response) {
   }
 }
 
-//*Check
 async function findOneByCookie(req: AuthRequest, res: Response) {
   try {
     const id = req.user?.id;
@@ -260,7 +255,6 @@ async function findOneByCookie(req: AuthRequest, res: Response) {
   }
 }
 
-//*Check - Updated to use validated body
 async function add(req: Request, res: Response) {
   try {
     const userData = req.body; // Already validated by Zod middleware
@@ -439,7 +433,6 @@ async function getCommentsByUserId(req: Request, res: Response) {
   }
 }
 
-//*Check - Updated to use validated query
 async function loginUsuario(req: Request, res: Response) {
   try {
     const { mail, contrasena } = req.query as any; // Validated by Zod
@@ -504,7 +497,6 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-//*Check - Updated to use validated body
 async function recuperarContrasena(req: Request, res: Response) {
   try {
     const { mail } = req.body; // Validated by Zod
@@ -541,7 +533,6 @@ const codigosRecuperacion: {
   [mail: string]: { codigo: string; expiracion: Date };
 } = {};
 
-//*Check - Updated to use validated body
 async function validarCodigoRecuperacion(req: Request, res: Response) {
   try {
     const { mail, codigo } = req.body; // Validated by Zod
@@ -567,7 +558,6 @@ async function validarCodigoRecuperacion(req: Request, res: Response) {
   }
 }
 
-//*Check - Updated to use validated body
 async function cambiarPassword(req: Request, res: Response) {
   try {
     const { mail, codigo, nuevaContrasena } = req.body; // Validated by Zod
@@ -647,7 +637,6 @@ async function getOauth(id: number) {
   }
 }
 
-//*Check - Updated to use validated params
 async function uploadProfileImage(req: Request, res: Response) {
   const emFork = em.fork();
   try {
