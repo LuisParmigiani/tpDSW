@@ -113,6 +113,13 @@ async function findPrestatariosByTipoServicioAndZona(
         'servicios.turnos',
         'servicios.tarea',
       ],
+      populateWhere: {
+        servicios: {
+          turnos: {
+            calificacion: { $ne: null, $gt: 0 }, // Only turnos with calification > 0
+          },
+        },
+      },
     });
 
     if (total === 0) {
