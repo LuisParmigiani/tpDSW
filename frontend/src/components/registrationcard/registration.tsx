@@ -31,8 +31,19 @@ const usuarioSchema = z.object({
   apellido: z.string().min(1, 'El apellido es obligatorio'),
   direccion: z.string().min(1, 'La dirección es obligatoria'),
   foto: z.string().url('Debe seleccionar una foto'),
-  nombreFantasia: z.string().optional().or(z.literal('')),
-  descripcion: z.string().optional().or(z.literal('')),
+  nombreFantasia: z
+    .string()
+    .min(2, 'El nombre fantasia debe tener al menos 2 caracteres')
+    .max(30, 'El nombre fantasia no puede exceder 30 caracteres')
+    .optional()
+    .or(z.literal('')),
+
+  descripcion: z
+    .string()
+    .min(5, 'La descripción debe tener al menos 5 caracteres')
+    .max(300, 'La descripción no puede exceder 300 caracteres')
+    .optional()
+    .or(z.literal('')),
 });
 
 export type Usuario = z.infer<typeof usuarioSchema>;
