@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { z } from 'zod';
 import { Button } from './../Botones/FormButton';
 import { Form, FormControl, FormField, FormItem, FormMessage } from './Form';
@@ -22,6 +22,7 @@ export type Filtros = {
   zona: string;
   ordenarPor: string;
 };
+
 // Define the form schema
 const formSchema = z.object({
   servicio: z.string().min(1, {
@@ -36,10 +37,8 @@ const formSchema = z.object({
   }),
 });
 
-// Infer the type from the schema
 type FormValues = z.infer<typeof formSchema>;
 
-// Define props for the component
 export type ServiciosFormProps = {
   tipoServicios: Array<{
     nombreTipo: string;
@@ -60,41 +59,70 @@ export function ServiciosForm({
   tipoServicios,
   zonas,
   onSubmit,
-  filtrosForm, // Added to accept initial filter values
+  filtrosForm,
 }: ServiciosFormProps) {
   const comboInputRef = useRef<ComboInputRef>(null);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      servicio: filtrosForm?.servicio || '',
-      tarea: filtrosForm?.tarea || '',
-      zona: filtrosForm?.zona || '',
-      ordenarPor: filtrosForm?.ordenarPor || '',
+      servicio: 'Todos',
+      tarea: '',
+      zona: 'Todas',
+      ordenarPor: 'calificacion',
     },
   });
 
-  // Reset form values when filtrosForm prop changes
+  // FIX: Use useCallback to memoize the reset function
+  const resetForm = useCallback(
+    (newValues: Filtros) => {
+      const values = {
+        servicio: newValues.servicio || 'Todos',
+        tarea: newValues.tarea || '',
+        zona: newValues.zona || 'Todas',
+        ordenarPor: newValues.ordenarPor || 'calificacion',
+      };
+
+      // Only reset if values actually changed
+      const currentValues = form.getValues();
+      const hasChanged =
+        currentValues.servicio !== values.servicio ||
+        currentValues.tarea !== values.tarea ||
+        currentValues.zona !== values.zona ||
+        currentValues.ordenarPor !== values.ordenarPor;
+
+      if (hasChanged) {
+        form.reset(values);
+      }
+    },
+    [form]
+  );
+
+  // FIX: Remove 'form' from dependencies and use a ref to track if we've initialized
+  const hasInitialized = useRef(false);
+
   useEffect(() => {
-    console.log('FormServicios: filtrosForm changed:', filtrosForm);
     if (filtrosForm && tipoServicios.length > 0 && zonas.length > 0) {
-      console.log('FormServicios: Resetting form with values:', {
-        servicio: filtrosForm.servicio,
-        tarea: filtrosForm.tarea,
-        zona: filtrosForm.zona,
-        ordenarPor: filtrosForm.ordenarPor,
+      console.log('FormServicios: Resetting form with values:', filtrosForm);
+      resetForm(filtrosForm);
+      hasInitialized.current = true;
+    } else if (
+      !hasInitialized.current &&
+      tipoServicios.length > 0 &&
+      zonas.length > 0
+    ) {
+      // Set default values only once when data is loaded
+      resetForm({
+        servicio: 'Todos',
+        tarea: '',
+        zona: 'Todas',
+        ordenarPor: 'calificacion',
       });
-
-      form.reset({
-        servicio: filtrosForm.servicio || 'Todos',
-        tarea: filtrosForm.tarea || '',
-        zona: filtrosForm.zona || 'Todas',
-        ordenarPor: filtrosForm.ordenarPor || 'calificacion',
-      });
+      hasInitialized.current = true;
     }
-  }, [filtrosForm, form, tipoServicios, zonas]);
+  }, [filtrosForm, tipoServicios.length, zonas.length, resetForm]);
 
-  // Calculate tareas based on selected service
+  // Cambia las tareas basandose en que tipo servicio esta seleccionado
   const tareasTipo: Array<{ id: number; nombreTarea: string }> = (() => {
     const tipoSeleccionado = tipoServicios.find(
       (tipo) => tipo.nombreTipo === form.watch('servicio')
@@ -107,9 +135,22 @@ export function ServiciosForm({
     onSubmit(values);
   };
 
-  const handleTareaSelect = (item: { id: number; nombreTarea: string }) => {
-    form.setValue('tarea', item.nombreTarea);
-  };
+  const handleTareaSelect = useCallback(
+    (item: { id: number; nombreTarea: string }) => {
+      form.setValue('tarea', item.nombreTarea);
+    },
+    [form]
+  );
+
+  const handleReset = useCallback(() => {
+    form.reset({
+      servicio: 'Todos',
+      tarea: '',
+      zona: 'Todas',
+      ordenarPor: 'calificacion',
+    });
+    comboInputRef.current?.clearInput();
+  }, [form]);
 
   return (
     <Form {...form}>
@@ -254,21 +295,12 @@ export function ServiciosForm({
           </Button>
           <div className="mt-2  ">
             <Button
-              key={2}
               type="reset"
               className={
                 'border-1 border-gray-800 min-w-10 bg-gray-500 text-white text-center py-1 px-4 rounder-md  ' +
                 'hover:bg-gray-300 hover:text-gray-800 w-30 transition duration-300 cursor-pointer '
               }
-              onClick={() => {
-                form.reset({
-                  servicio: 'Todos',
-                  tarea: '',
-                  zona: 'Todas',
-                  ordenarPor: 'calificacion',
-                });
-                comboInputRef.current?.clearInput();
-              }}
+              onClick={handleReset}
             >
               Reestablecer
             </Button>

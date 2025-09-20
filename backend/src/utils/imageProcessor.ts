@@ -3,7 +3,6 @@ import path from 'path';
 import { fileURLToPath } from 'url'; //
 import { dirname } from 'path'; //
 
-// ✅ Recreate __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -12,6 +11,7 @@ export async function processProfileImage(
   userId: number
 ): Promise<string> {
   const outputDir = path.join(__dirname, '../../public/uploads/profiles');
+  //Renombramos la imagen con el id del usuario
   const outputPath = path.join(outputDir, `profile_${userId}.webp`);
 
   await sharp(inputPath)

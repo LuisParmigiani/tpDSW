@@ -82,12 +82,12 @@ function PerfilSection() {
     error: string;
     message: string;
   } | null>(null);
-  // ✅ Track pending image for form submission
+  // State para manejar la imagen pendiente de subir
   const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
 
   const { usuario, loading: authLoading } = useProtectRoute(['prestador']);
 
-  // ✅ React Hook Form setup with Zod validation
+  // Hook form con validación de Zod
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
@@ -110,14 +110,13 @@ function PerfilSection() {
     setValue,
   } = form;
 
-  // Fetch user data
   useEffect(() => {
     if (!authLoading && usuario) {
       fetchPrestador(usuario.id.toString());
     }
   }, [usuario, authLoading]);
 
-  // ✅ Update form when profile data is loaded
+  // Actualizar form cuando profileData cambia
   useEffect(() => {
     if (profileData) {
       console.log('Updating form with profile data:', profileData);
@@ -182,7 +181,7 @@ function PerfilSection() {
     );
   }
 
-  // ✅ Handle image selection (not upload yet)
+  // Maneja cuando se elige una foto nueva
   const handleImageChange = async (file: File) => {
     if (!file) return;
 
@@ -192,23 +191,19 @@ function PerfilSection() {
     // Create a temporary URL for preview
     const tempUrl = URL.createObjectURL(file);
 
-    // ✅ Update form state to trigger isDirty
     setValue('foto', tempUrl, { shouldDirty: true });
-
-    // Update local state for immediate UI feedback
     setProfileData((prev) => (prev ? { ...prev, foto: tempUrl } : null));
 
     console.log('📸 Image selected, form is now dirty');
   };
 
-  // ✅ Form submission handler - handles both data and image
+  // Handler de submit
   const onSubmit = async (data: ProfileFormData) => {
     try {
       setUpdateError(null);
       setUploading(true);
       console.log('Form data to save:', data);
 
-      // ✅ First upload image if there's a pending one
       let updatedImageUrl = profileData?.foto;
       if (pendingImageFile) {
         console.log('📤 Uploading new image...');
@@ -228,7 +223,6 @@ function PerfilSection() {
         }
       }
 
-      // ✅ Then update user data
       const updateData = {
         ...profileData,
         ...data,
@@ -237,7 +231,6 @@ function PerfilSection() {
       console.log('Updating user data with:', updateData);
       await usuariosApi.update(usuario.id.toString(), updateData);
 
-      // ✅ Update local state with final data
       setProfileData((prev) =>
         prev
           ? {
@@ -248,7 +241,6 @@ function PerfilSection() {
           : null
       );
 
-      // ✅ Clear pending image and reset form
       setPendingImageFile(null);
       reset({
         ...data,
@@ -258,9 +250,9 @@ function PerfilSection() {
       setUpdateSuccess(true);
       setTimeout(() => setUpdateSuccess(false), 3000);
 
-      console.log('✅ Profile updated successfully');
+      console.log('Perfile modificado con éxito');
     } catch (error: unknown) {
-      console.error('Error updating profile:', error);
+      console.error('Error modificando perfil:', error);
       const errorResponse = error as {
         response?: { data?: { error?: string; message?: string } };
       };
@@ -306,14 +298,11 @@ function PerfilSection() {
           </Alert>
         )}
 
-        {/* Main container - Mobile responsive */}
         <div className="mx-4 sm:max-w-2xl sm:mx-auto bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-8">
-          {/* ✅ Form now includes everything */}
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="space-y-4 sm:space-y-6"
           >
-            {/* ✅ Profile Picture inside form - Mobile responsive */}
             <div className="flex justify-center mb-6 sm:mb-8">
               <ProfilePicture
                 src={profileData.foto}
@@ -322,7 +311,6 @@ function PerfilSection() {
               />
             </div>
 
-            {/* Email Field */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Dirección de email
@@ -342,7 +330,6 @@ function PerfilSection() {
               )}
             </div>
 
-            {/* Name and Last Name Grid - Stack on mobile */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -418,7 +405,6 @@ function PerfilSection() {
                 </p>
               )}
             </div>
-            {/* Address Field */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Dirección
@@ -438,7 +424,6 @@ function PerfilSection() {
               )}
             </div>
 
-            {/* Phone Field */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Teléfono
@@ -458,7 +443,6 @@ function PerfilSection() {
               )}
             </div>
 
-            {/* Submit Button - Mobile responsive */}
             <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200">
               <button
                 type="submit"
@@ -472,7 +456,6 @@ function PerfilSection() {
                 {isSubmitting ? 'Guardando...' : 'Guardar cambios'}
               </button>
 
-              {/* Updated helper text - Mobile responsive */}
               {!isDirty && !pendingImageFile && (
                 <p className="mt-2 text-sm text-gray-500 text-center sm:text-left">
                   No hay cambios para guardar

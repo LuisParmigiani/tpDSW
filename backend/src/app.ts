@@ -17,17 +17,10 @@ import authRoutes from './shared/middleware/auth.routes.js';
 import https from 'https';
 import { stripeRouter } from './stripe/stripe.route.js';
 
-// ⚠️ MOVED: Only import these when actually needed (not at module level)
-// import 'reflect-metadata';
-// import { orm, syncSchema } from './shared/db/orm.js';
-// import { RequestContext } from '@mikro-orm/core';
-// import { CronManager } from './shared/cron/cronManager.js';
-
 // Recreate __dirname for ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Silenciar logs de dotenv si estuvieran habilitados externamente
 if (process.env.DOTENV_CONFIG_DEBUG) {
   delete process.env.DOTENV_CONFIG_DEBUG;
 }
@@ -46,7 +39,7 @@ const isProduction = process.env.NODE_ENV === 'production';
 export const staticPath = isLocalEnv
   ? path.join(__dirname, '../public/uploads')
   : '/app/public/uploads';
-
+//Función para descargar el avatar por defecto cuando levantamos el back en Fly.io
 function downloadFile(url: string, dest: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const file = fs.createWriteStream(dest);
@@ -275,13 +268,11 @@ export async function initializeApp() {
   }
 }
 
-// 🔄 PRESERVED: Original startup logic (only runs when file is executed directly)
 const isMainModule =
   process.argv[1] &&
   fileURLToPath(import.meta.url) === path.resolve(process.argv[1] as string);
 
 if (isMainModule) {
-  // Evitar top-level await: IIFE async
   void (async () => {
     const app = createApp();
     await initializeApp();
@@ -293,5 +284,4 @@ if (isMainModule) {
   })();
 }
 
-// 🔄 PRESERVED: Default export for backward compatibility
 export default createApp;

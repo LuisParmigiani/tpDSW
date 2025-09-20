@@ -13,8 +13,6 @@ import ChangePassword from './components/recoverycard/changepassword';
 import StripeCreate from './components/Stripe/stripe';
 import PerfilUsuario from './components/perfilUsuario/perfilUsuario';
 function App() {
-  // Creación de la API DSP hay que llevarla a login
-
   return (
     <>
       <Router>

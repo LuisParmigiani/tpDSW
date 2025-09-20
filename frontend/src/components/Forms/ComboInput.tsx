@@ -7,10 +7,10 @@ import React, {
   ChangeEvent,
   forwardRef,
   useImperativeHandle,
+  useMemo,
 } from 'react';
 import { Search, X } from 'lucide-react';
 
-// Type definitions
 interface ComboItem {
   id: number;
   nombreTarea: string;
@@ -27,6 +27,8 @@ export interface ComboInputRef {
   clearInput: () => void;
 }
 
+const DEFAULT_ITEMS: ComboItem[] = [];
+
 const ComboInput = forwardRef<ComboInputRef, ComboInputProps>(
   (
     { items = [], placeholder = 'Buscar tarea', onSelect, className = '' },
@@ -39,10 +41,9 @@ const ComboInput = forwardRef<ComboInputRef, ComboInputProps>(
     const inputRef = useRef<HTMLInputElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    //! Ver después si le pongo alguna lista default.
-    const defaultItems: ComboItem[] = [];
-
-    const sampleItems = items.length > 0 ? items : defaultItems;
+    const sampleItems = useMemo(() => {
+      return items.length > 0 ? items : DEFAULT_ITEMS;
+    }, [items]);
 
     useEffect(() => {
       if (inputValue.trim() === '') {
@@ -107,7 +108,6 @@ const ComboInput = forwardRef<ComboInputRef, ComboInputProps>(
       inputRef.current?.blur();
     };
 
-    // Expose clearInput function through ref
     useImperativeHandle(ref, () => ({
       clearInput,
     }));
@@ -130,14 +130,6 @@ const ComboInput = forwardRef<ComboInputRef, ComboInputProps>(
         document.removeEventListener('mousedown', handleClickOutside);
       };
     }, []);
-    //!Podria fijarme como ponerle íconos que correspondan al tipo de servicio, estaría muy bueno
-    /*   const getIcon = (type: ComboItem['type']): React.ReactElement => {
-    return type === 'folder' ? (
-      <Folder className="w-4 h-4 text-blue-500" />
-    ) : (
-      <File className="w-4 h-4 text-gray-500" />
-    );
-  }; */
 
     const highlightMatch = (
       text: string,
@@ -165,6 +157,7 @@ const ComboInput = forwardRef<ComboInputRef, ComboInputProps>(
         e.preventDefault();
         handleItemClick(item);
       };
+
     return (
       <div className="relative">
         {/* Input Field */}
@@ -215,17 +208,11 @@ const ComboInput = forwardRef<ComboInputRef, ComboInputProps>(
                         : 'hover:bg-gray-50'
                     }`}
                   >
-                    {
-                      /*{getIcon(item.type)}*/
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-gray-900 truncate">
-                          {highlightMatch(item.nombreTarea, inputValue)}
-                        </div>
-                        {/*                       <div className="text-sm text-gray-500 truncate">
-                        {highlightMatch(item.path, inputValue)}
-                      </div> */}
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-gray-900 truncate">
+                        {highlightMatch(item.nombreTarea, inputValue)}
                       </div>
-                    }
+                    </div>
                     {index === selectedIndex && (
                       <div className="text-xs text-blue-600 font-medium">
                         Enter to select
