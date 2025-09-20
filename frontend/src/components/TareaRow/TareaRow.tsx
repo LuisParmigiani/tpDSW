@@ -19,19 +19,27 @@ type TipoServicioData = {
 type TareaRowProps = {
   tarea: Tarea;
   tipoServicio: TipoServicioData | undefined;
-  onTareaChange: (id: number, field: 'seleccionada' | 'precio', value: boolean | number) => void;
+  onTareaChange: (
+    id: number,
+    field: 'seleccionada' | 'precio',
+    value: boolean | number
+  ) => void;
   onActivateDeactivate: (id: number, activate: boolean) => void;
   onPriceUpdate: (id: number, precio: number) => void;
 };
 
-const TareaRow: React.FC<TareaRowProps> = ({ tarea, tipoServicio, onTareaChange, onActivateDeactivate, onPriceUpdate }) => {
+const TareaRow: React.FC<TareaRowProps> = ({
+  tarea,
+  tipoServicio,
+  onTareaChange,
+  onActivateDeactivate,
+  onPriceUpdate,
+}) => {
   return (
-    <tr 
-      key={tarea.id} 
+    <tr
+      key={tarea.id}
       className={`transition-all duration-200 ${
-        tarea.seleccionada 
-          ? 'bg-orange-50' 
-          : 'hover:bg-gray-50'
+        tarea.seleccionada ? 'bg-orange-50' : 'hover:bg-gray-50'
       }`}
     >
       <td className="px-6 py-4 whitespace-nowrap">
@@ -47,7 +55,9 @@ const TareaRow: React.FC<TareaRowProps> = ({ tarea, tipoServicio, onTareaChange,
         </button>
       </td>
       <td className="px-6 py-4 text-left">
-        <div className="text-sm font-medium text-gray-900 text-left">{tarea.descripcion}</div>
+        <div className="text-sm font-medium text-gray-900 text-left">
+          {tarea.descripcion}
+        </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-left">
         <div className="text-sm font-medium text-gray-900 text-left">
@@ -62,7 +72,9 @@ const TareaRow: React.FC<TareaRowProps> = ({ tarea, tipoServicio, onTareaChange,
             min="0"
             step="100"
             value={tarea.precio}
-            placeholder={tarea.seleccionada ? "Presiona Enter para actualizar" : "Precio"}
+            placeholder={
+              tarea.seleccionada ? 'Presiona Enter para actualizar' : 'Precio'
+            }
             onChange={(e) => {
               onTareaChange(tarea.id, 'precio', parseInt(e.target.value) || 0);
             }}
@@ -73,7 +85,9 @@ const TareaRow: React.FC<TareaRowProps> = ({ tarea, tipoServicio, onTareaChange,
               }
             }}
             className={`w-24 px-2 py-1 text-sm border border-gray-300 bg-white text-gray-900 rounded focus:ring-1 focus:ring-orange-500 focus:border-orange-500 hover:border-orange-300 transition-colors duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
-              tarea.seleccionada ? 'placeholder:text-xs placeholder:text-blue-400' : 'placeholder:text-gray-400'
+              tarea.seleccionada
+                ? 'placeholder:text-xs placeholder:text-blue-400'
+                : 'placeholder:text-gray-400'
             }`}
           />
         </div>

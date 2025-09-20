@@ -47,7 +47,7 @@ export class ServicioSeeder extends Seeder {
 
             em.create(Servicio, {
               estado: faker.helpers.arrayElement(['activo', 'inactivo']),
-              precio: faker.number.int({ min: 10, max: 400 }),
+              precio: faker.number.int({ min: 500, max: 6400 }),
               tarea: tareaElegida,
               usuario: prest,
             });

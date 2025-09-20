@@ -9,9 +9,8 @@ import { Alert, AlertDescription } from '../Alerts/Alerts';
 import useAuth from '../../cookie/useAuth';
 import StripeConnection from '../StripeConnection/StripeConnection';
 
-
 function ServiciosSection() {
-  const { usuario } = useAuth(); 
+  const { usuario } = useAuth();
   const [tiposServicio, setTiposServicio] = useState<TipoServicioData[]>([]);
   const [tareas, setTareas] = useState<Tarea[]>([]);
   const [tareasVisibles, setTareasVisibles] = useState<Tarea[]>([]);
@@ -24,26 +23,27 @@ function ServiciosSection() {
     null
   );
 
-  interface TipoServicio{
+  interface TipoServicio {
     id: number;
     nombreTipo: string;
     descripcionTipo: string;
-
   }
 
   // funcion convierte datos en lo que espera el componente
-  const convertirTipoServicioADisplay = (tipoServicio: TipoServicio): TipoServicioData => {
+  const convertirTipoServicioADisplay = (
+    tipoServicio: TipoServicio
+  ): TipoServicioData => {
     const tipoObj = tipoServicio as TipoServicio;
     const resultado = {
       id: tipoObj.id,
       nombre: tipoObj.nombreTipo,
-      descripcion: tipoObj.descripcionTipo, 
-      activo: false 
+      descripcion: tipoObj.descripcionTipo,
+      activo: false,
     };
-    
+
     return resultado;
   };
-  
+
   // cargar tipos de servicio desde la API
   const cargarTiposServicio = useCallback(async () => {
     try {
@@ -78,26 +78,23 @@ function ServiciosSection() {
             nombreTarea: string;
             descripcionTarea: string;
             duracionTarea: number;
-            tipoServicio: number; 
-            
+            tipoServicio: number;
           }) => {
             // Si tipoServicio es un número, usarlo directamente; si es objeto, usar .id
             return {
               id: tarea.id,
               descripcion: tarea.descripcionTarea,
               tipoServicioId: tarea.tipoServicio,
-              seleccionada: false, 
+              seleccionada: false,
               precio: 0, // Precio inicial
               duracion: tarea.duracionTarea, // Guardamos la duración también
             };
           }
         );
         setTareas(tareasConvertidas);
-      }  
-      
+      }
     } catch (err) {
       console.error('Error cargando tareas:', err);
-      
     }
   }, []);
 
@@ -110,28 +107,31 @@ function ServiciosSection() {
 
       if (response.data.data) {
         const serviciosExistentes = response.data.data;
-        const tiposConServicios = new Set<number>(); // Tipos que tienen cualquier servicio 
+        const tiposConServicios = new Set<number>(); // Tipos que tienen cualquier servicio
         const tareasConPrecios = new Map<number, number>(); // tareaId -> precio
         const tareasActivas = new Map<number, boolean>(); // tareaId -> isActive
         serviciosExistentes.forEach(
-          (servicio: {tarea: { id: number; tipoServicio: { id: number } }; precio: number; estado?: string;}) => {
+          (servicio: {
+            tarea: { id: number; tipoServicio: { id: number } };
+            precio: number;
+            estado?: string;
+          }) => {
             const tareaId = servicio.tarea.id;
             const tipoServicioId = servicio.tarea.tipoServicio.id;
             const precio = servicio.precio;
             const isActive = servicio.estado === 'activo';
 
-            // guarda precio, estado y tipo de servicio
+            // guarda precio dividido por 100 (solo para servicios existentes), estado y tipo de servicio
             if (tareaId && precio) {
-              tareasConPrecios.set(tareaId, precio);
+              tareasConPrecios.set(tareaId, precio / 100); // Dividir por 100 solo para servicios existentes
               tareasActivas.set(tareaId, isActive);
             }
-            
+
             if (tipoServicioId) {
               tiposConServicios.add(tipoServicioId);
             }
           }
         );
-
 
         setTiposServicio((prev) =>
           prev.map((tipo) => ({
@@ -145,7 +145,7 @@ function ServiciosSection() {
           prev.map((tarea) => ({
             ...tarea,
             seleccionada: tareasActivas.get(tarea.id) || false, // true solo si está activa
-            precio: tareasConPrecios.get(tarea.id) || 0, // precio o 0 si no existe
+            precio: tareasConPrecios.get(tarea.id) || 0, // precio dividido por 100 si existe, sino 0
           }))
         );
       }
@@ -214,7 +214,7 @@ function ServiciosSection() {
     const tipoActual = tiposServicio.find((tipo) => tipo.id === tipoId);
     if (!tipoActual) return;
 
-    const seraDesactivado = tipoActual.activo; 
+    const seraDesactivado = tipoActual.activo;
 
     // Actualizar el estado del tipo de servicio
     setTiposServicio((prev) => {
@@ -227,14 +227,12 @@ function ServiciosSection() {
 
     // Si se está desactivando el tipo, desactivar automáticamente todos los servicios relacionados
     if (seraDesactivado) {
-      
       const tareasDelTipo = tareas.filter(
         (tarea) => tarea.tipoServicioId === tipoId
       );
 
       {
         try {
-          
           await Promise.allSettled(
             tareasDelTipo.map(async (tarea) => {
               try {
@@ -247,7 +245,6 @@ function ServiciosSection() {
                   `Error al desactivar servicio (Usuario ${usuario.id}, Tarea ${tarea.id}):`,
                   error
                 );
-               
               }
             })
           );
@@ -394,7 +391,6 @@ function ServiciosSection() {
     <DashboardSection title="Mis servicios">
       <StripeConnection loadingMessage="Cargando configuración de servicios...">
         <div className="space-y-8">
-          
           {/* Selector de Tipos de Servicio */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 text-left">
@@ -538,7 +534,7 @@ function ServiciosSection() {
                     })}
                   </tbody>
                 </table>
-              {showAlert && (
+                {showAlert && (
                   <Alert
                     variant={alertType}
                     onClose={() => setShowAlert(false)}
@@ -548,7 +544,7 @@ function ServiciosSection() {
                   >
                     <AlertDescription>{alertMessage}</AlertDescription>
                   </Alert>
-              )}
+                )}
               </div>
             </div>
           )}
@@ -573,9 +569,7 @@ function ServiciosSection() {
                 Selecciona al menos un tipo de servicio arriba para ver las
                 tareas disponibles.
               </p>
-              
             </div>
-            
           ) : (
             tareasVisibles.length === 0 &&
             tipoServicioActivo !== null && (
@@ -601,12 +595,10 @@ function ServiciosSection() {
                   }
                   ".
                 </p>
-                 {/* ALERTA DE FEEDBACK */}
-        
+                {/* ALERTA DE FEEDBACK */}
               </div>
             )
           )}
-         
         </div>
       </StripeConnection>
     </DashboardSection>
