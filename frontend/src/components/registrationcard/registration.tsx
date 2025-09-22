@@ -31,8 +31,8 @@ const usuarioSchema = z.object({
   telefono: z
     .string()
     .regex(
-      /^[+]?[1-9\s\-()]{7,20}$/,
-      'Formato de teléfono inválido, debe contener como mínimo 7 caracteres, No debe empezar con 0.'
+      /^[1-9][0-9]{8,12}$/,
+      'El número de documento debe tener entre 8 y 12 dígitos, no puede empezar con 0'
     ),
   apellido: z.string().min(1, 'El apellido es obligatorio'),
   direccion: z.string().min(1, 'La dirección es obligatoria'),

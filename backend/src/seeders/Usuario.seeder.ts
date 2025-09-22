@@ -90,7 +90,7 @@ export class UsuarioSeeder extends Seeder {
         nombre: faker.person.firstName(),
         apellido: faker.person.lastName(),
         mail: faker.internet.email(),
-        telefono: '351578101' + i,
+        telefono: '35w1578101' + i,
         contrasena:
           '$2b$10$0E9iYMk1AvFZNbpfu0yroOGq2/X8NzjWQjQv4cGAiS0dJsaRCh9oG',
         tipoDoc: 'CUIT',
