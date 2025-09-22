@@ -39,8 +39,8 @@ const profileSchema = z.object({
     .min(8, 'El número de teléfono debe tener entre 8 y 12 dígitos')
     .max(12, 'El número de teléfono debe tener entre 8 y 12 dígitos')
     .regex(
-      /^[1-9][0-9]{8,12}$/,
-      'El número de documento debe tener entre 8 y 12 dígitos, no puede empezar con 0'
+      /^[1-9][0-9]{7,11}$/,
+      'El número de teléfono debe tener entre 8 y 12 dígitos, no puede empezar con 0'
     ),
   // ✅ Add photo as optional field - it will be handled separately but tracked by the form
   foto: z.string().optional(),

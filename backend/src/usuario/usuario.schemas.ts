@@ -63,7 +63,7 @@ export const usuarioBaseSchema = z.object({
     .min(8, 'El número de teléfono debe tener entre 8 y 12 dígitos')
     .max(12, 'El número de teléfono debe tener entre 8 y 12 dígitos')
     .regex(
-      /^[1-9][0-9]{8,12}$/,
+      /^[1-9][0-9]{7,11}$/,
       'El número de teléfono debe tener entre 8 y 12 dígitos, no puede empezar con 0'
     )
     .describe('Número de teléfono')
