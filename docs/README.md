@@ -6,13 +6,14 @@ Bievenidos a la documentación del proyecto
 
 Para minimizar la cantidad de pasos para el setup, decidimos pushear los archivos .env que teníamos
 
-1. `pnpm install` Desde el root: instala las dependencias del root
-2. `pnpm run install:both`Desde el root : instala las dependencias del front y del back
-3. Asegurarse de tener una base de datos con el nombre y los puertos con la que conectamos [Aqui](../backend/src/shared/db/orm.ts)
-4. `pnpm run dev`: levanta tanto el front como el back, con estos tres ya debería correr todo
-5. Para que el seeding de la base se lleve a cabo. Se debe descomentar el bloque de lineas ubicado en archivo anterior ⬆️. **Recomendamos tener la extensión "Better comments" para apreciar mejor**
-6. Después de llevado a cabo el seeding volver a comentar lo anteriormente comentado y guardar el archivo para que todo corra normalmente
-7. Probar la plataforma
+1. Descometar ambos .env (El del front y el del root).
+2. `pnpm install` Desde el root: instala las dependencias del root
+3. `pnpm run install:both`Desde el root : instala las dependencias del front y del back
+4. Asegurarse de tener una base de datos con el nombre y los puertos con la que conectamos [Aqui](../backend/src/shared/db/orm.ts)
+5. `pnpm run dev`: levanta tanto el front como el back, con estos tres ya debería correr todo
+6. Para que el seeding de la base se lleve a cabo. Se debe descomentar el bloque de lineas ubicado en archivo anterior ⬆️. **Recomendamos tener la extensión "Better comments" para apreciar mejor**
+7. Después de llevado a cabo el seeding volver a comentar lo anteriormente comentado y guardar el archivo para que todo corra normalmente
+8. Probar la plataforma
 
 ### Para testear:
 
