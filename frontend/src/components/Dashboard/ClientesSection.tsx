@@ -31,7 +31,31 @@ const convertirTurnoADisplay = (turno: any): TurnoDisplay => {
   // Tratar la fecha como hora local, no UTC
   const fechaHoraString = turno.fechaHora.replace(' ', 'T');
   const fechaHora = new Date(fechaHoraString);
+  console.log('--- Convertir Turno ---');
+  console.log('Fecha original:', turno.fechaHora);
+  console.log('---------------------------------');
+  console.log('-> Fecha local:', fechaHora);
+  console.log('------------------------------------------');
+  console.log(
+    'Hora local formateada:',
+    fechaHora.toLocaleTimeString('es-AR', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    })
+  );
+  console.log('------------------------------------------');
 
+  console.log(
+    'Hora local formateada (12h):',
+    fechaHora.toLocaleTimeString('es-AR', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true,
+    })
+  );
   return {
     id: turno.id,
     cliente:
