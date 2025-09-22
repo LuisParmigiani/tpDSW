@@ -90,7 +90,7 @@ describe('Middleware y CORS', () => {
       numeroDoc: '12345678',
       nombre: 'Agustin',
       apellido: 'Gonzalez',
-      telefono: '+54 11 1234-5678',
+      telefono: '34157810712',
       direccion: 'Calle Falsa 123',
       estado: 'activo',
     });
