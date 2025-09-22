@@ -27,7 +27,10 @@ const usuarioSchema = z.object({
     .regex(/^[0-9]+$/, 'El número de documento solo debe contener números'),
   telefono: z
     .string()
-    .regex(/^[1-9]+$/, 'El teléfono debe contener solo números'),
+    .regex(
+      /^[+]?[1-9\s\-()]{7,20}$/,
+      'Formato de teléfono inválido, debe contener como mínimo 7 caracteres, No debe empezar con 0.'
+    ),
   apellido: z.string().min(1, 'El apellido es obligatorio'),
   direccion: z.string().min(1, 'La dirección es obligatoria'),
   foto: z.string().url('Debe seleccionar una foto'),
