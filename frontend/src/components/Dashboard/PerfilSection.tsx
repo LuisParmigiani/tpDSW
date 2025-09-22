@@ -37,7 +37,8 @@ const profileSchema = z.object({
     .max(200, 'La dirección no puede exceder 200 caracteres'),
   telefono: z
     .string()
-    .min(1, 'El teléfono es requerido')
+    .min(8, 'El número de teléfono debe tener entre 8 y 12 dígitos')
+    .max(12, 'El número de teléfono debe tener entre 8 y 12 dígitos')
     .regex(
       /^[1-9][0-9]{8,12}$/,
       'El número de documento debe tener entre 8 y 12 dígitos, no puede empezar con 0'
