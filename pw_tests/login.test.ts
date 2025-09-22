@@ -14,7 +14,7 @@ test.describe('Login', () => {
     await contraInput.fill('Ref123');
     await loginBtn.click();
     //Tendria que redrigirlo a la dashboard que es el menu del prestatario
-    let dashBoardHeading = page.getByRole('heading', { name: 'dashboard' });
+    let dashBoardHeading = page.getByRole('heading', { name: 'Dashboard' });
     await expect(dashBoardHeading).toBeVisible();
   });
 
