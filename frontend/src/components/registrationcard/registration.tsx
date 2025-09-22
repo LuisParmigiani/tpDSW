@@ -24,7 +24,10 @@ const usuarioSchema = z.object({
   tipoDoc: z.string().min(1, 'El tipo de documento es obligatorio'),
   numeroDoc: z
     .string()
-    .regex(/^[0-9]+$/, 'El número de documento solo debe contener números'),
+    .regex(
+      /^[1-9][0-9]{7,9}$/,
+      'El número de documento debe tener entre 8 y 10 dígitos, no puede empezar con 0'
+    ),
   telefono: z
     .string()
     .regex(
@@ -174,7 +177,7 @@ function RegisCard() {
         <option value="Cuit">CUIT</option>
       </select>
       <input
-        type="number"
+        type="text"
         name="numeroDoc"
         value={form.numeroDoc}
         placeholder="Número de documento"
@@ -185,8 +188,10 @@ function RegisCard() {
           'focus:ring-2 focus:ring-naranja-1 focus:border-transparent',
           sacarSpinners
         )}
+        inputMode="numeric"
+        pattern="[0-9]*"
         onChange={(e) =>
-          setForm({ ...form, numeroDoc: e.target.value.toString() })
+          setForm({ ...form, numeroDoc: e.target.value.replace(/[^0-9]/g, '') })
         }
       />
       <input

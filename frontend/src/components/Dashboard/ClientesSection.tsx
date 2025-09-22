@@ -44,7 +44,7 @@ const convertirTurnoADisplay = (turno: any): TurnoDisplay => {
     hora: fechaHora.toLocaleTimeString('es-AR', {
       hour: '2-digit',
       minute: '2-digit',
-      hour12: true,
+      hour12: false,
     }),
     estado: capitalizeFirstLetter(turno.estado),
     tarea: turno.servicio?.tarea?.descripcionTarea || 'Tarea no especificada',

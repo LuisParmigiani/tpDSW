@@ -38,8 +38,8 @@ const profileSchema = z.object({
     .string()
     .min(1, 'El teléfono es requerido')
     .regex(
-      /^[+]?[1-9\s\-()]{8,20}$/,
-      'Formato de teléfono inválido (ej: +54 11 1234-5678)'
+      /^[1-9][0-9]{7,9}$/,
+      'El número de documento debe tener entre 8 y 10 dígitos, no puede empezar con 0'
     ),
   // ✅ Add photo as optional field - it will be handled separately but tracked by the form
   foto: z.string().optional(),

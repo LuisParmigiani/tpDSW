@@ -104,7 +104,7 @@ const ItemTurno: React.FC<ItemTurnoProps> = ({
         </div>
       </td>
       <td className="py-2 sm:py-3 px-2 sm:px-4 text-gray-900 font-medium text-left whitespace-nowrap text-xs sm:text-sm">
-        {turno.monto ? `$${(turno.monto / 100 / 1.5).toFixed(2)}` : '-'}
+        {turno.monto ? `$${(turno.monto / 100 / 1.05).toFixed(2)}` : '-'}
       </td>
       <td className="py-2 sm:py-3 px-2 sm:px-4 text-left">
         <span
