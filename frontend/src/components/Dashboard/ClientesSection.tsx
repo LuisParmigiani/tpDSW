@@ -28,7 +28,9 @@ interface TurnoDisplay {
 
 // funcion para convertir datos del API al formato del item de la tabla
 const convertirTurnoADisplay = (turno: any): TurnoDisplay => {
-  const fechaHora = new Date(turno.fechaHora);
+  // Tratar la fecha como hora local, no UTC
+  const fechaHoraString = turno.fechaHora.replace(' ', 'T');
+  const fechaHora = new Date(fechaHoraString);
 
   return {
     id: turno.id,
