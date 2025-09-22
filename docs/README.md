@@ -6,7 +6,37 @@ Bievenidos a la documentación del proyecto
 
 Para minimizar la cantidad de pasos para el setup, decidimos pushear los archivos .env que teníamos
 
-1. Descometar ambos .env (El del front y el del root).
+1. Crea los archivos .env El del front con la informacion: [env_front](./README-front.md) y el del root con la informacion [env_root](./README-root.md).
+
+```
+-- openApi .. sk-proj-Op-eBWGF
+OZ6ZIUdSHnyOdJkllb5Y5Y_Dsl8j
+5w_x6GwkggBebrhICxYOq
+dvu
+W5HUPd_pVGCHrsT3BlbkF
+JHjJkIZ4ZJJzgD_56TyZqL-kXvfoH89b8
+R33AIu5mc0bpYYMD0K4ojGhySuEeXwq
+5cy8tjWeWoA
+-- jsw .. YQRu5R2SOb37XnxA4OFi
+Xz2a26pYLV
+GeWpdl
+-- stripe-secter .. sk_test_51S3i
+XQCuxCYVSB
+dAhcsoRYvYZwNIBa
+JEd4A5yIkzbiM3OCR
+47TaSguKQ5ufIfILdG7c
+VKJur3Zjjwo
+VbjB0czkm5003IJMI56a
+-- stripe-secret-webhook-stripe .. whsec_4EAWQ5O
+WdRvnQJzxdCh
+wZGE0aubuCd7d
+--stripe-secret-webhook-stripe-payment whsec_LsYN45
+EjBQNz0yZ5oiBU
+13Seh3x2DPRJ
+-- email-passwprd .. mkyg zmvc
+ hjux pkqr
+```
+
 2. `pnpm install` Desde el root: instala las dependencias del root
 3. `pnpm run install:both`Desde el root : instala las dependencias del front y del back
 4. Asegurarse de tener una base de datos con el nombre y los puertos con la que conectamos [Aqui](../backend/src/shared/db/orm.ts)
