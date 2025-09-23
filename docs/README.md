@@ -4,7 +4,7 @@ Bievenidos a la documentación del proyecto
 
 ## Pasos para el Set Up
 
-Para minimizar la cantidad de pasos para el setup, decidimos pushear los archivos .env que teníamos
+Para minimizar la cantidad de pasos para el setup, decidimos incluir aquí el contenido de los archivos .env que teníamos para levantar el proyecto en local.
 
 1. Crea los archivos .env El del front con la informacion: [env_front](./README-front.md) y el del root con la informacion [env_root](./README-root.md).
 
