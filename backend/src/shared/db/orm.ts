@@ -49,8 +49,8 @@ export const syncSchema = async () => {
   try {
     const generator = orm.getSchemaGenerator();
     //!Descomentar el siguiente bloque de lineas hasta arriba del catch para crear y seedear la base
-
     /*
+    
     console.log('❌ Borrando todas las tablas...');
     await generator.dropSchema();
 

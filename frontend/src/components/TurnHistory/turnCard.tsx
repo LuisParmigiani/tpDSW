@@ -35,6 +35,7 @@ type Usuario = {
   mail: string;
   nombreFantasia: string;
   stripeAccountId?: string;
+  foto: string | null;
 };
 type Props = {
   navigate: (path: string) => void;
@@ -51,8 +52,8 @@ function TurnCard({ navigate, turn, openModal, cancelarTurno }: Props) {
     >
       <div className="mr-6 flex-shrink-0">
         <img
-          className="h-16 w-16 sm:h-20 sm:w-20 object-cover border-2 border-gray-300 rounded-full mx-auto"
-          src="/images/fotoUserId.png"
+          className="h-16 w-16 sm:h-20 sm:w-20  rounded-full mx-auto"
+          src={turn.servicio.usuario.foto || '/images/fotoUserId.png'}
           alt="Foto de perfil de usuario"
         />
       </div>

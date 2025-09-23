@@ -23,8 +23,8 @@ export class TurnoSeeder extends Seeder {
     ];
 
     for (const cliente of clientes) {
-      // Cada cliente tiene entre 10 y 30 turnos
-      const numTurnos = faker.number.int({ min: 10, max: 30 });
+      // Cada cliente tiene entre 20 y 30 turnos
+      const numTurnos = faker.number.int({ min: 20, max: 35 });
       console.log(`Cliente ${cliente.id} - Creando ${numTurnos} turnos...`);
 
       for (let i = 0; i < numTurnos; i++) {
@@ -43,7 +43,7 @@ export class TurnoSeeder extends Seeder {
         let calificacion: number | undefined;
         let comentario: string | undefined;
         if (estado === 'completado') {
-          if (i < Math.floor(numTurnos * 0.4)) {
+          if (i < Math.floor(numTurnos * 0.6)) {
             calificacion = faker.number.int({ min: 1, max: 5 });
             comentario = faker.lorem.sentence();
           }

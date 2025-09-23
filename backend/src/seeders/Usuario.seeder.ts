@@ -11,7 +11,7 @@ export class UsuarioSeeder extends Seeder {
     );
     const zonas = await em.find(Zona, {}); // para forzar carga de usuarios y evitar error de clave foránea
     // Clientes
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 15; i++) {
       em.create(Usuario, {
         mail: faker.internet.email(),
         contrasena:
@@ -60,7 +60,7 @@ export class UsuarioSeeder extends Seeder {
       zonas: faker.helpers.arrayElements(zonas, 3),
     });
 
-    for (let i = 0; i < 25; i++) {
+    for (let i = 0; i < 12; i++) {
       // Prestatarios activos
       em.create(Usuario, {
         nombre: faker.person.firstName(),
@@ -85,7 +85,7 @@ export class UsuarioSeeder extends Seeder {
     }
 
     // Prestatarios inactivos
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 3; i++) {
       em.create(Usuario, {
         nombre: faker.person.firstName(),
         apellido: faker.person.lastName(),
